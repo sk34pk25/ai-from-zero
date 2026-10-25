@@ -1,33 +1,61 @@
-import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
+import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
 import { writeFileSync } from "node:fs";
+import path from "node:path";
+import { gzipSync } from "node:zlib";
 
 import lighthouse from "lighthouse";
 
 const require = createRequire(import.meta.url);
 const chromeLauncher = require("chrome-launcher");
 
-const server = spawn("python3", ["-m", "http.server", "4175", "--bind", "127.0.0.1"], {
-  stdio: "ignore",
-});
+const ROOT = process.cwd();
+const TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".md": "text/plain; charset=utf-8",
+};
 
-function waitForServer() {
-  return new Promise((resolve, reject) => {
-    const started = Date.now();
-    const tick = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:4175/");
-        if (response.ok) {
-          resolve();
-          return;
-        }
-      } catch {
-        // le serveur démarre
+function startServer(port) {
+  const server = createServer(async (req, res) => {
+    try {
+      const url = new URL(req.url || "/", "http://127.0.0.1");
+      let pathname = decodeURIComponent(url.pathname);
+      if (pathname.endsWith("/")) pathname += "index.html";
+      const file = path.resolve(ROOT, `.${pathname}`);
+      if (file !== ROOT && !file.startsWith(`${ROOT}${path.sep}`)) {
+        res.writeHead(403);
+        res.end();
+        return;
       }
-      if (Date.now() - started > 15000) reject(new Error("serveur immobile"));
-      else setTimeout(tick, 200);
-    };
-    tick();
+      const body = await readFile(file);
+      const headers = {
+        "content-type": TYPES[path.extname(file)] || "application/octet-stream",
+        "cache-control": "no-cache",
+      };
+      const compressible = !file.endsWith(".png") && !file.endsWith(".webp");
+      if (compressible && String(req.headers["accept-encoding"] || "").includes("gzip")) {
+        headers["content-encoding"] = "gzip";
+        headers.vary = "accept-encoding";
+        res.writeHead(200, headers);
+        res.end(gzipSync(body));
+        return;
+      }
+      res.writeHead(200, headers);
+      res.end(body);
+    } catch {
+      res.writeHead(404);
+      res.end("introuvable");
+    }
+  });
+  return new Promise((resolve) => {
+    server.listen(port, "127.0.0.1", () => resolve(server));
   });
 }
 
@@ -48,31 +76,40 @@ const desktop = {
   },
 };
 
+const server = await startServer(4175);
+
 try {
-  await waitForServer();
   const chrome = await chromeLauncher.launch({
     chromePath: process.env.CHROME_PATH,
     chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"],
   });
   try {
     const result = await lighthouse("http://127.0.0.1:4175/", { port: chrome.port, output: "json" }, desktop);
-    const scores = Object.fromEntries(
-      Object.entries(result.lhr.categories).map(([key, category]) => [key, Math.round(category.score * 100)]),
+    const mobile = await lighthouse("http://127.0.0.1:4175/", {
+      port: chrome.port,
+      output: "json",
+      onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
+    });
+    const pick = (report) => Object.fromEntries(
+      Object.entries(report.lhr.categories).map(([key, category]) => [key, Math.round(category.score * 100)]),
     );
+    const scores = pick(result);
+    const mobileScores = pick(mobile);
     const weak = Object.values(result.lhr.audits)
       .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
       .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue }))
       .sort((a, b) => a.score - b.score);
-    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, url: result.lhr.requestedUrl, weak }, null, 2));
-    console.log(JSON.stringify(scores));
+    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, mobileScores, url: result.lhr.requestedUrl, weak }, null, 2));
+    console.log(JSON.stringify({ desktop: scores, mobile: mobileScores }));
     const failed = Object.entries(scores).filter(([, score]) => score < 90);
-    if (failed.length) {
-      console.error("Scores sous 90 :", failed);
+    const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 90);
+    if (failed.length || mobileFailed.length) {
+      console.error("Scores sous 90 :", { desktop: failed, mobile: mobileFailed });
       process.exitCode = 1;
     }
   } finally {
     await chrome.kill();
   }
 } finally {
-  server.kill();
+  await new Promise((resolve) => server.close(resolve));
 }

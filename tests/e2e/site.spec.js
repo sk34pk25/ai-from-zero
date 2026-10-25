@@ -43,6 +43,9 @@ test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
     }, lesson.id);
     await expect(page.locator(`[data-lesson-id="${lesson.id}"]`)).toBeVisible();
     await expect(page.locator("h1")).toHaveText(lesson.title);
+    await expect(page.locator("figure[data-visual]")).toHaveAttribute("data-visual", lesson.visual);
+    await expect(page.locator("[data-visual-host]")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "À retenir" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Fil rouge" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Quiz" })).toBeVisible();
   }
@@ -121,10 +124,67 @@ test("le menu mobile s'ouvre", async ({ page }) => {
   await expect(page.locator(".chapter")).toHaveCount(9);
 });
 
+test("les indices survivent au quiz et la piste LLM s'affiche", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto("/#/lecon/1.14");
+  await page.getByRole("button", { name: "Indice suivant" }).click();
+  await page.getByRole("button", { name: "Indice suivant" }).click();
+  await expect(page.locator("#hint-list li")).toHaveCount(2);
+  await page.locator("[data-choice='0']").click();
+  await expect(page.locator("#hint-list li")).toHaveCount(2);
+  await page.getByRole("button", { name: "Voir une correction" }).click();
+  await expect(page.locator("#solution")).toBeVisible();
+  await page.getByRole("button", { name: "Masquer la correction" }).click();
+  await expect(page.locator("#solution")).toBeHidden();
+  await page.goto("/#/construire");
+  await expect(page.locator("h1")).toHaveText("Construire ton LLM");
+  await expect(page.getByRole("heading", { name: "Entraînement réel" })).toBeVisible();
+  await expect(page.locator("[data-run-host]")).toContainText("Validation");
+  await expect(page.locator(".track-step")).toHaveCount(curriculum.track.length);
+  await expect(page.getByRole("link", { name: "4.4" })).toBeVisible();
+  await page.getByRole("link", { name: "4.4" }).click();
+  await expect(page.locator("[data-lesson-id='4.4']")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("chaque famille de visuel interactif répond", async ({ page }) => {
+  const errors = trackErrors(page);
+  const seen = new Set();
+  for (const lesson of lessons) {
+    if (!lesson.interactive || seen.has(lesson.visual)) continue;
+    seen.add(lesson.visual);
+    await page.goto(`/#/lecon/${lesson.id}`);
+    const host = page.locator("[data-visual-host]");
+    await expect(host).toBeVisible();
+    const before = (await host.locator(".visual-readout").count())
+      ? await host.locator(".visual-readout").innerText()
+      : await host.locator("li").first().innerText();
+    if (lesson.visual === "descent") await host.getByRole("button", { name: "Un pas" }).click();
+    else if (lesson.visual === "loss") await host.getByRole("button", { name: "Un pas d'entraînement" }).click();
+    else if (lesson.visual === "transformer") await host.getByRole("button", { name: "Étape suivante" }).click();
+    else if (lesson.visual === "patches") await host.getByRole("button", { name: "Rappeler l'ordre" }).click();
+    else if (lesson.visual === "attention") await host.getByRole("button", { name: "ici" }).click();
+    else if (lesson.visual === "embed") await host.getByRole("button", { name: "code" }).click();
+    else if (lesson.visual === "bigram") await host.getByRole("button", { name: "b", exact: true }).click();
+    else if (lesson.visual === "moe") await host.getByRole("button").first().click();
+    else if (lesson.visual === "tokenize") await host.getByLabel("Texte à découper").fill("bonjour");
+    else if (lesson.visual === "retrieve") await host.getByLabel("Question à comparer aux documents").fill("tokenizer");
+    else await host.locator("input[type=range]").press("ArrowRight");
+    if (lesson.visual === "retrieve") await expect(host.locator("li").first()).toContainText("tokenizer");
+    else await expect(host.locator(".visual-readout")).not.toHaveText(before);
+  }
+  expect([...seen].sort()).toEqual(
+    ["attention", "bigram", "descent", "embed", "loss", "moe", "patches", "relu", "retrieve", "scan", "softmax", "tokenize", "transformer"].sort(),
+  );
+  expect(errors).toEqual([]);
+});
+
 test("axe ne signale rien sur les écrans principaux", async ({ page }) => {
   await page.goto("/");
   await axe(page);
   await page.goto("/#/lecon/4.5");
+  await axe(page);
+  await page.goto("/#/construire");
   await axe(page);
   await page.goto("/#/modele");
   await axe(page);
@@ -142,8 +202,23 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     ["accueil-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/"],
     ["accueil-bureau-clair.png", { width: 1440, height: 900 }, "light", "/"],
     ["accueil-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/"],
-    ["lecon-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/lecon/4.5"],
-    ["lecon-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/lecon/8.7"],
+    ["accueil-mobile-clair.png", { width: 390, height: 844 }, "light", "/"],
+    ["parcours-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/parcours"],
+    ["parcours-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/parcours"],
+    ["parcours-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/parcours"],
+    ["parcours-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/parcours"],
+    ["lecon-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/lecon/1.14"],
+    ["lecon-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/lecon/1.14"],
+    ["lecon-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/lecon/1.14"],
+    ["lecon-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/lecon/1.14"],
+    ["interactif-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/lecon/4.5"],
+    ["interactif-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/lecon/4.5"],
+    ["interactif-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/lecon/4.5"],
+    ["interactif-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/lecon/4.5"],
+    ["piste-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/construire"],
+    ["piste-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/construire"],
+    ["piste-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/construire"],
+    ["piste-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/construire"],
   ];
   for (const [name, viewport, theme, url] of shots) {
     await page.setViewportSize(viewport);
@@ -152,6 +227,12 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("h1")).toBeVisible();
+    if (url.includes("/lecon/")) {
+      await page.locator("figure.visual").evaluate((node) => node.scrollIntoView({ block: "center", behavior: "instant" }));
+    }
+    if (url.includes("/parcours")) {
+      await page.locator("#roadmap").evaluate((node) => node.scrollIntoView({ block: "start", behavior: "instant" }));
+    }
     await page.screenshot({ path: `docs/images/${name}`, animations: "disabled" });
   }
 });

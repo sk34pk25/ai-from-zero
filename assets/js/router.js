@@ -11,6 +11,7 @@ export function parseHash(hash) {
   if (normalized === "/" || normalized === "/accueil") return { name: "home" };
   if (normalized === "/parcours") return { name: "home", focus: "roadmap" };
   if (normalized === "/modele") return { name: "model" };
+  if (normalized === "/construire") return { name: "track" };
   const lesson = normalized.match(LESSON);
   if (lesson) return { name: "lesson", id: lesson[1] };
   const level = normalized.match(LEVEL);
@@ -24,6 +25,8 @@ export function hrefFor(route) {
       return route.focus === "roadmap" ? "#/parcours" : "#/";
     case "model":
       return "#/modele";
+    case "track":
+      return "#/construire";
     case "lesson":
       return `#/lecon/${route.id}`;
     case "level":

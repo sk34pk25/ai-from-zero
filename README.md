@@ -8,7 +8,9 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 ## Où en est le parcours
 
-149 étapes, 13 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON et le plan, et les tests refusent qu'ils divergent.
+149 étapes, 13 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Chaque leçon ouvre sur une intuition, un schéma (parfois manipulable), puis les objectifs, les pièges, des indices progressifs et une correction. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON, les aides et le plan, et les tests refusent qu'ils divergent.
+
+La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie les leçons aux fichiers de `model/`, du dossier vide jusqu'à un TinyGPT entraîné. Le compte-rendu d'un run CPU réel est dans [`data/gpt_run.json`](data/gpt_run.json).
 
 ## Lancer le site en local
 
@@ -32,7 +34,12 @@ pytest
 python3 -m model
 ```
 
-Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, TinyGPT NumPy (RoPE, RMSNorm, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle (`tiny_lm.py`), TinyGPT entraînable (embeddings, attention multi-têtes, MLP, résidus, LayerNorm, AdamW), et les variantes en forward (RoPE, RMSNorm, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+
+```bash
+python3 -m model.gpt_train --steps 400
+python3 -m model.gpt_sample --prompt "le chat "
+```
 
 ## Vérifier
 
@@ -46,7 +53,7 @@ npm run test:e2e
 CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
 ```
 
-L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, axe) et Lighthouse.
+L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, visuels, axe) et Lighthouse. Le script Lighthouse sert les fichiers compressés, comme GitHub Pages, et refuse un score sous 90 au bureau comme sur mobile.
 
 ## Structure
 

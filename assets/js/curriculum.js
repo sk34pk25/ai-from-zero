@@ -18,6 +18,7 @@ export function indexCurriculum(data) {
   return {
     meta: data.meta,
     architecture: data.architecture ?? [],
+    track: data.track ?? [],
     levels,
     lessons,
     byId,

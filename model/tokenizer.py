@@ -11,6 +11,15 @@ class CharTokenizer:
         self.stoi = {char: index for index, char in enumerate(chars)}
         self.itos = {index: char for char, index in self.stoi.items()}
 
+    @classmethod
+    def from_stoi(cls, stoi: dict[str, int]) -> "CharTokenizer":
+        tokenizer = cls.__new__(cls)
+        tokenizer.stoi = {str(char): int(index) for char, index in stoi.items()}
+        tokenizer.itos = {index: char for char, index in tokenizer.stoi.items()}
+        if not tokenizer.stoi:
+            raise ValueError("le vocabulaire est vide")
+        return tokenizer
+
     @property
     def vocab_size(self) -> int:
         return len(self.stoi)

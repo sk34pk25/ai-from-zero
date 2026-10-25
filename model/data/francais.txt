@@ -1,0 +1,792 @@
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.
+le chat dort dans le bois.
+le chat dort.
+le chat dort dans le pré.
+le chat dort.
+le chat dort dans le parc.
+le chat dort.
+le chat mange dans le bois.
+le chat mange.
+le chat mange dans le pré.
+le chat mange.
+le chat mange dans le parc.
+le chat mange.
+le chat lit dans le bois.
+le chat lit.
+le chat lit dans le pré.
+le chat lit.
+le chat lit dans le parc.
+le chat lit.
+le chat court dans le bois.
+le chat court.
+le chat court dans le pré.
+le chat court.
+le chat court dans le parc.
+le chat court.
+le chien dort dans le bois.
+le chien dort.
+le chien dort dans le pré.
+le chien dort.
+le chien dort dans le parc.
+le chien dort.
+le chien mange dans le bois.
+le chien mange.
+le chien mange dans le pré.
+le chien mange.
+le chien mange dans le parc.
+le chien mange.
+le chien lit dans le bois.
+le chien lit.
+le chien lit dans le pré.
+le chien lit.
+le chien lit dans le parc.
+le chien lit.
+le chien court dans le bois.
+le chien court.
+le chien court dans le pré.
+le chien court.
+le chien court dans le parc.
+le chien court.
+le loup dort dans le bois.
+le loup dort.
+le loup dort dans le pré.
+le loup dort.
+le loup dort dans le parc.
+le loup dort.
+le loup mange dans le bois.
+le loup mange.
+le loup mange dans le pré.
+le loup mange.
+le loup mange dans le parc.
+le loup mange.
+le loup lit dans le bois.
+le loup lit.
+le loup lit dans le pré.
+le loup lit.
+le loup lit dans le parc.
+le loup lit.
+le loup court dans le bois.
+le loup court.
+le loup court dans le pré.
+le loup court.
+le loup court dans le parc.
+le loup court.
+le rat dort dans le bois.
+le rat dort.
+le rat dort dans le pré.
+le rat dort.
+le rat dort dans le parc.
+le rat dort.
+le rat mange dans le bois.
+le rat mange.
+le rat mange dans le pré.
+le rat mange.
+le rat mange dans le parc.
+le rat mange.
+le rat lit dans le bois.
+le rat lit.
+le rat lit dans le pré.
+le rat lit.
+le rat lit dans le parc.
+le rat lit.
+le rat court dans le bois.
+le rat court.
+le rat court dans le pré.
+le rat court.
+le rat court dans le parc.
+le rat court.
+la perte baisse quand le modèle apprend.
+le modèle lit le texte et prédit la lettre suivante.
+un token est un nombre.

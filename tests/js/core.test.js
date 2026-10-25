@@ -17,9 +17,11 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
   assert.deepEqual(parseHash("#/niveau/8"), { name: "level", id: 8 });
   assert.deepEqual(parseHash("#/lecon/0.10"), { name: "lesson", id: "0.10" });
   assert.deepEqual(parseHash("#/modele"), { name: "model" });
+  assert.deepEqual(parseHash("#/construire"), { name: "track" });
   assert.equal(parseHash("#/ailleurs").name, "notfound");
   assert.equal(hrefFor({ name: "lesson", id: "4.5" }), "#/lecon/4.5");
   assert.equal(hrefFor({ name: "home", focus: "roadmap" }), "#/parcours");
+  assert.equal(hrefFor({ name: "track" }), "#/construire");
 });
 
 test("0.10 se trie après 0.9", () => {
@@ -86,6 +88,19 @@ test("le curriculum commité a 149 leçons et des réponses réparties", () => {
     counts[step.quiz.answer] += 1;
     assert.ok(step.build.length >= 80);
     assert.equal(JSON.stringify(step).includes("Planifié"), false);
+    assert.equal(typeof step.visual, "string");
+    assert.equal(step.visual.length > 0, true);
+    assert.equal(typeof step.interactive, "boolean");
+    assert.equal(step.takeaways.length, 3);
+    assert.equal(step.pitfalls.length, 3);
+    assert.equal(step.hints.length, 3);
+    assert.ok(step.solution.length > 40);
+    assert.ok(step.codeFile.startsWith("model/"));
+    assert.ok(step.review.includes(step.title));
   }
   assert.deepEqual(counts, [37, 38, 37, 37]);
+  assert.equal(data.track.length, 15);
+  assert.equal(data.track.some((stage) => stage.file === "model/tiny_lm.py"), true);
+  assert.equal(data.track.at(-1).file, "model/gpt_sample.py");
+  assert.equal(data.track.some((stage) => stage.file === "model/gpt_train.py"), true);
 });

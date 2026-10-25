@@ -259,6 +259,169 @@ def test_ablation_keeps_names():
     assert rows[1]["loss"] < rows[0]["loss"]
 
 
+def test_gpt_gradients_match_finite_differences():
+    from model.autograd import Tensor, layernorm
+    from model.gpt_train import bind_parameters, logits_tensor, sequence_loss
+
+    values = Tensor(np.array([-1.2, 0.0, 0.8]))
+    values.gelu().sum().backward()
+    for index, point in enumerate(values.data):
+        def gelu_at(candidate, index=index):
+            trial = values.data.copy()
+            trial[index] = candidate
+            return float(Tensor(trial).gelu().sum().data)
+
+        assert values.grad[index] == pytest.approx(numerical_derivative(gelu_at, float(point), eps=1e-5), abs=1e-5)
+
+    hidden = Tensor(np.array([[0.2, -0.4, 0.7, 1.1], [-0.3, 0.5, -1.2, 0.2]]))
+    gain = Tensor(np.array([1.0, 0.8, 1.2, 0.5]))
+    bias = Tensor(np.array([0.1, -0.2, 0.0, 0.3]))
+    layernorm(hidden, gain, bias).sum().backward()
+
+    def ln_input(candidate):
+        trial = hidden.data.copy()
+        trial[0, 1] = candidate
+        return float(layernorm(Tensor(trial), Tensor(gain.data.copy()), Tensor(bias.data.copy())).sum().data)
+
+    def ln_gain(candidate):
+        trial = gain.data.copy()
+        trial[2] = candidate
+        return float(layernorm(Tensor(hidden.data.copy()), Tensor(trial), Tensor(bias.data.copy())).sum().data)
+
+    assert hidden.grad[0, 1] == pytest.approx(numerical_derivative(ln_input, float(hidden.data[0, 1]), eps=1e-5), abs=1e-4)
+    assert gain.grad[2] == pytest.approx(numerical_derivative(ln_gain, float(gain.data[2]), eps=1e-5), abs=1e-4)
+
+    left = Tensor(np.random.default_rng(0).normal(size=(2, 3, 4)))
+    right = Tensor(np.random.default_rng(1).normal(size=(4, 5)))
+    left.matmul(right).sum().backward()
+
+    def matmul_at(candidate):
+        trial = right.data.copy()
+        trial[1, 2] = candidate
+        return float(Tensor(left.data.copy()).matmul(Tensor(trial)).sum().data)
+
+    assert right.grad[1, 2] == pytest.approx(numerical_derivative(matmul_at, float(right.data[1, 2]), eps=1e-5), abs=1e-4)
+
+    config = GPTConfig(vocab_size=6, d_model=4, n_heads=2, n_layers=1, block_size=4, seed=3)
+    model = TinyGPT(config)
+    params = bind_parameters(model)
+    batch = np.array([[1, 2, 3, 4, 0]])
+    numpy_logits, _ = model.forward(batch[:, :-1])
+    assert logits_tensor(params, batch[:, :-1], config).data == pytest.approx(numpy_logits, abs=1e-8)
+    for tensor in params.values():
+        tensor.zero_grad()
+    sequence_loss(params, batch, config).backward()
+    saved = float(params["l0.wq"].grad[0, 1])
+    eps = 1e-5
+    params["l0.wq"].data[0, 1] += eps
+    higher = float(sequence_loss(params, batch, config).data)
+    params["l0.wq"].data[0, 1] -= 2 * eps
+    lower = float(sequence_loss(params, batch, config).data)
+    params["l0.wq"].data[0, 1] += eps
+    assert saved == pytest.approx((higher - lower) / (2 * eps), abs=1e-4)
+
+
+def test_gpt_trains_checkpoints_and_samples(tmp_path):
+    from model.gpt_train import load_checkpoint, sample_text, save_checkpoint, train_gpt
+
+    text = "le chat dort dans le bois.\nle chat mange.\n" * 20
+    model, tokenizer, result = train_gpt(
+        text,
+        steps=30,
+        lr=0.05,
+        batch=4,
+        block=12,
+        d_model=8,
+        n_heads=2,
+        n_layers=1,
+        seed=0,
+        sample=False,
+        val_every=30,
+        weight_decay=0.0,
+    )
+    assert result.train_loss_end < result.train_loss_start * 0.5
+    assert result.val_loss_end < result.val_loss_start
+    path = tmp_path / "gpt.npz"
+    save_checkpoint(path, model, tokenizer, {"steps": result.steps})
+    loaded, loaded_tokenizer, history = load_checkpoint(path)
+    assert history["steps"] == 30
+    idx = np.asarray(tokenizer.encode("le chat do"))[None, :]
+    original, _ = model.forward(idx)
+    restored, _ = loaded.forward(idx)
+    assert restored == pytest.approx(original)
+    first = sample_text(loaded, loaded_tokenizer, "le chat ", 16, temperature=0.0, top_k=1, seed=0)
+    second = sample_text(loaded, loaded_tokenizer, "le chat ", 16, temperature=0.0, top_k=1, seed=1)
+    assert first == second
+    assert first.startswith("le chat ")
+    assert len(first) == len("le chat ") + 16
+    warm = sample_text(loaded, loaded_tokenizer, "le chat ", 24, temperature=0.8, top_k=4, seed=2)
+    assert warm.startswith("le chat ")
+    assert len(warm) > len(first)
+
+
+def test_committed_french_gpt_run():
+    import json
+
+    from model.gpt_train import load_checkpoint
+
+    report = json.loads((ROOT / "data" / "gpt_run.json").read_text(encoding="utf-8"))
+    assert report["dataset_chars"] > 10_000
+    assert report["steps"] >= 200
+    assert report["train_loss_end"] < report["train_loss_start"] * 0.5
+    assert report["val_loss_end"] < report["val_loss_start"] * 0.5
+    assert any("dans le" in sample["text"] for sample in report["samples"])
+    assert sum(report["attention"]["last_row"]) == pytest.approx(1.0, abs=1e-2)
+    model, tokenizer, _history = load_checkpoint(ROOT / "model" / "data" / "gpt_checkpoint.npz")
+    assert model.parameter_count() == report["parameter_count"]
+    assert tokenizer.vocab_size == report["vocab_size"]
+    assert (ROOT / "model" / "data" / "francais.txt").read_text(encoding="utf-8").startswith("le chat ")
+
+
+def test_gpt_training_refuses_a_modern_variant():
+    from model.gpt_train import bind_parameters
+
+    rope = TinyGPT(GPTConfig(vocab_size=8, d_model=8, n_heads=2, n_layers=1, block_size=4, pos="rope", seed=0))
+    with pytest.raises(ValueError):
+        bind_parameters(rope)
+
+
+def test_tiny_lm_trains_with_real_backward():
+    from model.autograd import Tensor
+    from model.tiny_lm import TinyLM, train_tiny_lm
+    from model.tokenizer import CharTokenizer
+
+    text = "abababababababab"
+    linear = train_tiny_lm(text, steps=40, lr=0.8, seed=0, attention=False)
+    assert linear.loss_end < linear.loss_start * 0.5
+    attended = train_tiny_lm(text, steps=40, lr=0.8, seed=0, attention=True, d_model=8)
+    assert attended.loss_end < attended.loss_start * 0.5
+    assert attended.vocab_size == 2
+    assert attended.generated
+
+    tokenizer = CharTokenizer(text)
+    ids = tokenizer.encode(text)
+    model = TinyLM(tokenizer.vocab_size, d_model=8, seed=1, attention=True)
+    prefix = model.logits(ids)[0].copy()
+    flipped = ids[:-1] + [0 if ids[-1] != 0 else 1]
+    assert np.allclose(prefix, model.logits(flipped)[0])
+
+    left = Tensor(np.array([[0.2, -0.1], [0.4, 0.3]]))
+    right = Tensor(np.array([[0.5, -0.2], [0.1, 0.7]]))
+    (left.matmul(right).sum()).backward()
+    saved = right.grad.copy()
+    eps = 1e-5
+    numeric = np.zeros_like(right.data)
+    for index in np.ndindex(right.data.shape):
+        plus = right.data.copy()
+        minus = right.data.copy()
+        plus[index] += eps
+        minus[index] -= eps
+        higher = float(left.matmul(Tensor(plus)).sum().data)
+        lower = float(left.matmul(Tensor(minus)).sum().data)
+        numeric[index] = (higher - lower) / (2 * eps)
+    assert np.allclose(saved, numeric, atol=1e-6)
+
+
 def test_uniform_cross_entropy_is_log_vocab():
     logits = np.zeros((4, 5))
     targets = np.array([0, 1, 2, 3])

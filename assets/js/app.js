@@ -6,12 +6,18 @@ import { parseHash } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
 import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
 import { modifierLabel } from "./text.js";
+import { mountTrainingRun, mountVisual } from "./visuals.js";
+
+const REVIEW_KEY = "afz-review";
 
 const state = {
   index: null,
   done: new Set(),
   route: { name: "home" },
   quizChoice: null,
+  hintCount: 0,
+  solutionOpen: false,
+  gptRun: null,
   searchActive: 0,
   searchHits: [],
   selectedPart: null,
@@ -34,6 +40,7 @@ function cacheElements() {
   els.progressBar = document.querySelector("#progress-bar");
   els.progressMeta = document.querySelector("#progress-meta");
   els.continueLink = document.querySelector("#continue-link");
+  els.track = document.querySelector("#track-link");
   els.menu = document.querySelector("#menu-button");
   els.sidebar = document.querySelector("#sidebar");
   els.scrim = document.querySelector("#scrim");
@@ -91,6 +98,7 @@ async function boot() {
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     state.index = indexCurriculum(data);
+    state.gptRun = await loadTrainingRun();
     state.done = new Set(loadDone());
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     render({ scroll: "top" });
@@ -104,6 +112,16 @@ async function boot() {
   }
 }
 
+async function loadTrainingRun() {
+  try {
+    const response = await fetch(new URL("data/gpt_run.json", document.baseURI));
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 function loadDone() {
   const stored = normalizeProgress(readJson(localStorage, PROGRESS_KEY, emptyProgress()));
   const known = new Set(state.index ? state.index.orderedIds : []);
@@ -113,6 +131,22 @@ function loadDone() {
 function persistDone() {
   const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
   writeJson(localStorage, PROGRESS_KEY, { v: 1, done: ordered });
+}
+
+function readReview() {
+  const stored = readJson(localStorage, REVIEW_KEY, {});
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
+  return stored;
+}
+
+function writeReviewStamp(id, present) {
+  const map = readReview();
+  if (present) {
+    if (!map[id]) map[id] = Date.now();
+  } else {
+    delete map[id];
+  }
+  writeJson(localStorage, REVIEW_KEY, map);
 }
 
 function currentTheme() {
@@ -294,7 +328,11 @@ function render({ scroll }) {
   const route = parseHash(location.hash);
   const routeKey = JSON.stringify(route);
   const routeChanged = routeKey !== state.lastRouteKey;
-  if (routeChanged) state.quizChoice = null;
+  if (routeChanged) {
+    state.quizChoice = null;
+    state.hintCount = 0;
+    state.solutionOpen = false;
+  }
   state.route = route;
   state.lastRouteKey = routeKey;
   paintChrome();
@@ -330,6 +368,10 @@ function paintChrome() {
     els.continueLink.href = "#/modele";
     els.continueLink.textContent = "Voir le modèle";
   }
+  if (els.track) {
+    if (state.route.name === "track") els.track.setAttribute("aria-current", "page");
+    else els.track.removeAttribute("aria-current");
+  }
   const activeLevel = activeLevelId();
   const links = state.index.levels.map((level) => {
     const progress = levelProgress(level, state.done);
@@ -360,6 +402,7 @@ function paintMain(route) {
   else if (route.name === "level") paintLevel(route.id);
   else if (route.name === "lesson") paintLesson(route.id);
   else if (route.name === "model") paintModel();
+  else if (route.name === "track") paintTrack();
   else paintNotFound(route.path);
   document.title = pageTitle(route);
 }
@@ -375,6 +418,7 @@ function pageTitle(route) {
     return level ? `Niveau ${level.id} · ${level.title} · ${base}` : base;
   }
   if (route.name === "model") return `Mon modèle · ${base}`;
+  if (route.name === "track") return `Construire mon LLM · ${base}`;
   return `${base} — le parcours pour construire la tienne`;
 }
 
@@ -384,11 +428,12 @@ function paintHome() {
   const heroActions = [
     h("a", { class: "button button-primary", href: nextId ? `#/lecon/${nextId}` : "#/modele" }, nextId ? (count === 0 ? "Commencer le parcours" : "Reprendre le parcours") : "Voir le modèle"),
     h("a", { class: "button button-secondary", href: "#/parcours" }, "Voir la roadmap"),
+    h("a", { class: "button button-secondary", href: "#/construire" }, "Construire mon LLM"),
   ];
   const cards = [
     statCard("Progression", `${percent} %`, stepsLabel(count)),
     statCard("Prochaine étape", next ? next.lesson.id : "Terminé", next ? next.lesson.title : "Toutes les étapes sont cochées"),
-    statCard("Fil rouge", "model/", "Tokenizer, bigramme, Transformer, MoE, SSM"),
+    statCard("Ton modèle", "tiny_lm.py", "Un petit modèle entraîné par rétropropagation"),
   ];
   const roadmap = h("section", { class: "panel", id: "roadmap", "aria-labelledby": "roadmap-title" }, [
     h("div", { class: "panel-head" }, [
@@ -415,6 +460,7 @@ function paintHome() {
       ]))),
     ]),
     h("div", { class: "stat-grid" }, cards),
+    reviewBlock(),
     roadmap,
   );
 }
@@ -512,13 +558,17 @@ function paintLesson(id) {
     ]),
   ]);
   els.main.replaceChildren(article);
+  const host = article.querySelector("[data-visual-host]");
+  if (host) mountVisual(host, lesson);
+  restoreLessonAids(article, lesson);
 }
 
 function lessonBody(lesson, grade, done, around) {
   const nodes = [
-    h("section", { class: "callout callout-why" }, [
-      h("h2", { text: "Pourquoi cette étape" }),
-      h("p", { text: lesson.why }),
+    h("p", { class: "lead", text: lesson.why }),
+    h("figure", { class: "visual", "data-visual": lesson.visual || "flow" }, [
+      h("figcaption", { text: lesson.visualCaption || "" }),
+      h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
   ];
   for (const section of lesson.sections) {
@@ -531,13 +581,33 @@ function lessonBody(lesson, grade, done, around) {
     }
   }
   nodes.push(
+    h("section", { class: "callout callout-takeaway" }, [
+      h("h2", { text: "À retenir" }),
+      h("ul", {}, (lesson.takeaways || []).map((item) => h("li", { text: item }))),
+    ]),
+    h("section", { class: "callout callout-pitfall" }, [
+      h("h2", { text: "Pièges fréquents" }),
+      h("ul", {}, (lesson.pitfalls || []).map((item) => h("li", { text: item }))),
+    ]),
     h("section", { class: "callout callout-exercise" }, [
       h("h2", { text: "Exercice" }),
       ...paragraphs(lesson.exercise),
+      h("div", { class: "aid-actions" }, [
+        h("button", { type: "button", "data-hint-button": "true", onClick: () => revealHint(lesson) }, "Indice suivant"),
+        h("button", { type: "button", "data-solution-button": "true", onClick: toggleSolution }, "Voir une correction"),
+      ]),
+      h("ol", { id: "hint-list", "aria-live": "polite" }),
+      h("div", { id: "solution", hidden: true }, paragraphs(lesson.solution || "")),
     ]),
     h("section", { class: "callout callout-build" }, [
       h("h2", { text: "Fil rouge" }),
       ...paragraphs(lesson.build),
+      h("p", {}, ["Fichier : ", h("code", { text: lesson.codeFile || "model/" }), "."]),
+      h("p", {}, [h("a", { href: "#/construire", text: "Ouvrir la piste « construire mon LLM »." })]),
+    ]),
+    h("section", { class: "callout callout-review" }, [
+      h("h2", { text: "À retrouver plus tard" }),
+      h("p", { text: lesson.review || "" }),
     ]),
     quizBlock(lesson, grade),
     h("div", { class: "lesson-actions" }, [
@@ -628,8 +698,13 @@ function feedbackText(lesson, grade) {
 }
 
 function toggleLesson(id) {
-  if (state.done.has(id)) state.done.delete(id);
-  else state.done.add(id);
+  if (state.done.has(id)) {
+    state.done.delete(id);
+    writeReviewStamp(id, false);
+  } else {
+    state.done.add(id);
+    writeReviewStamp(id, true);
+  }
   persistDone();
   toast(state.done.has(id) ? "Étape enregistrée sur cet appareil." : "Étape retirée de la progression.");
   render({ scroll: "keep" });
@@ -677,6 +752,119 @@ function paintModel() {
   );
 }
 
+function revealHint(lesson) {
+  const hints = lesson.hints || [];
+  const list = document.querySelector("#hint-list");
+  if (!list || state.hintCount >= hints.length) return;
+  const item = document.createElement("li");
+  item.textContent = hints[state.hintCount];
+  list.append(item);
+  state.hintCount += 1;
+  if (state.hintCount >= hints.length) {
+    const hintButton = document.querySelector("[data-hint-button]");
+    if (hintButton) hintButton.disabled = true;
+  }
+}
+
+function toggleSolution() {
+  const node = document.querySelector("#solution");
+  if (!node) return;
+  node.hidden = !node.hidden;
+  state.solutionOpen = !node.hidden;
+  const button = document.querySelector("[data-solution-button]");
+  if (button) button.textContent = state.solutionOpen ? "Masquer la correction" : "Voir une correction";
+}
+
+function restoreLessonAids(article, lesson) {
+  const hints = lesson.hints || [];
+  const list = article.querySelector("#hint-list");
+  if (list) {
+    for (let index = 0; index < state.hintCount && index < hints.length; index += 1) {
+      const item = document.createElement("li");
+      item.textContent = hints[index];
+      list.append(item);
+    }
+  }
+  const hintButton = article.querySelector("[data-hint-button]");
+  if (hintButton && state.hintCount >= hints.length && hints.length > 0) hintButton.disabled = true;
+  const solution = article.querySelector("#solution");
+  if (solution) solution.hidden = !state.solutionOpen;
+  const solutionButton = article.querySelector("[data-solution-button]");
+  if (solutionButton) solutionButton.textContent = state.solutionOpen ? "Masquer la correction" : "Voir une correction";
+}
+
+function reviewBlock() {
+  if (state.done.size === 0) return null;
+  const stamps = readReview();
+  const items = [...state.done]
+    .map((id) => ({ id, at: Number(stamps[id]) || 0, item: state.index.byId.get(id) }))
+    .filter((row) => row.item)
+    .sort((a, b) => a.at - b.at)
+    .slice(0, 3);
+  if (items.length === 0) return null;
+  return h("section", { class: "panel review-panel", "aria-labelledby": "review-title" }, [
+    h("p", { class: "eyebrow", text: "Révision espacée" }),
+    h("h2", { id: "review-title", text: "À retrouver" }),
+    h("p", { text: "Ce sont les étapes cochées depuis le plus longtemps. Ferme le cours et explique-les à voix haute avant de les rouvrir." }),
+    h("ul", { class: "review-list" }, items.map((row) => h("li", {}, [
+      h("a", { href: `#/lecon/${row.id}` }, `${row.id} · ${row.item.lesson.title}`),
+    ]))),
+  ]);
+}
+
+function paintTrack() {
+  const stages = state.index.track ?? [];
+  const doneCount = stages.filter((stage) => state.done.has(stage.step)).length;
+  const list = h("ol", { class: "track-list" });
+  stages.forEach((stage, index) => {
+    const done = state.done.has(stage.step);
+    const item = h("li", { class: done ? "track-step is-done" : "track-step" });
+    appendChildren(item, [
+      h("p", { class: "eyebrow", text: done ? `Étape ${index + 1} · cochée` : `Étape ${index + 1}` }),
+      h("h2", { text: stage.title }),
+      h("p", { text: stage.summary }),
+      h("p", {}, [
+        "Fichier ",
+        h("code", { text: stage.file }),
+        " · leçon ",
+        h("a", { href: `#/lecon/${stage.step}`, text: stage.step }),
+        ".",
+      ]),
+    ]);
+    list.append(item);
+  });
+  const sample = [
+    "python3 -m model.gpt_train --steps 400",
+    "python3 -m model.gpt_sample --prompt \"le chat \"",
+  ].join("\n");
+  const pre = h("pre");
+  pre.append(h("code", { text: sample }));
+  const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
+  els.main.replaceChildren(
+    crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
+    h("p", { class: "eyebrow", text: "Fil rouge" }),
+    h("h1", { text: "Construire ton LLM" }),
+    h("p", { class: "lead", text: `${stages.length} étapes, d'un dossier vide jusqu'à un petit GPT entraîné par rétropropagation. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste.` }),
+    h("section", { class: "callout callout-build", "aria-labelledby": "run-title" }, [
+      h("h2", { id: "run-title", text: "Entraînement réel" }),
+      h("p", { text: state.gptRun?.label || "Un entraînement CPU déjà fait dans ce dépôt. Les nombres et les phrases viennent de ce run, pas d'un dessin." }),
+      runHost,
+    ]),
+    h("p", { class: "track-progress", text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.` }),
+    list,
+    h("section", { class: "callout callout-build" }, [
+      h("h2", { text: "Lancer l'entraînement" }),
+      h("p", { text: "Depuis la racine du dépôt. gpt_train.py entraîne TinyGPT (embeddings, blocs, tête) avec l'autograd NumPy et AdamW. gpt_sample.py tire une suite. Le petit modèle de tiny_lm.py reste l'étape d'avant, une seule tête." }),
+      pre,
+    ]),
+    h("section", { class: "callout" }, [
+      h("h2", { text: "Ce que cette piste n'entraîne pas" }),
+      h("p", { text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet." }),
+    ]),
+  );
+  mountTrainingRun(runHost, state.gptRun);
+}
+
 function paintNotFound(path) {
   els.main.replaceChildren(
     h("p", { class: "eyebrow", text: "Introuvable" }),
@@ -704,7 +892,10 @@ function onPlacement() {
   if (!level) return;
   const ok = window.confirm("Marquer les 20 étapes du niveau 0 (fondations numériques) comme déjà connues sur cet appareil ?");
   if (!ok) return;
-  for (const step of level.steps) state.done.add(step.id);
+  for (const step of level.steps) {
+    state.done.add(step.id);
+    writeReviewStamp(step.id, true);
+  }
   persistDone();
   toast("Fondations marquées comme connues.");
   render({ scroll: "keep" });
@@ -714,6 +905,7 @@ function onReset() {
   const ok = window.confirm("Effacer toute la progression enregistrée dans ce navigateur ?");
   if (!ok) return;
   state.done = new Set();
+  writeJson(localStorage, REVIEW_KEY, {});
   persistDone();
   toast("Progression effacée.");
   render({ scroll: "keep" });
