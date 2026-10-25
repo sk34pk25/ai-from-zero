@@ -282,7 +282,7 @@ function paintChart(host, values) {
   const max = Math.max(...values, 0.001);
   values.forEach((value) => {
     const bar = h("span", { class: "loss-bar" });
-    bar.style.height = `${Math.max(8, (value / max) * 100)}%`;
+    bar.style.height = `${Math.max(12, Math.round((value / max) * 72))}px`;
     bar.title = value.toFixed(3);
     host.append(bar);
   });

@@ -25,8 +25,6 @@ test("un autre compte ne déverrouille pas, le propriétaire oui", async ({ page
   await signInAs(page, "autre@example.com");
   await page.goto("/#/ide");
   await expect(page.locator("#ide-run")).toBeDisabled();
-  await page.goto("/#/connexion");
-  await page.getByRole("button", { name: "Se déconnecter" }).click().catch(() => {});
   await signInAs(page);
   await page.goto("/#/donnees");
   await expect(page.locator("h1")).toHaveText("Catalogue des jeux");

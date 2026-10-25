@@ -1161,7 +1161,7 @@ p code, li code {
 
 .ide-chart { align-items: end; min-height: 6rem; }
 
-.loss-bar { width: 0.7rem; transform: none; }
+.loss-bar { width: 0.7rem; min-height: 12px; transform: none; }
 
 .correction-mark { width: 4rem; height: 4rem; color: var(--good); }
 
