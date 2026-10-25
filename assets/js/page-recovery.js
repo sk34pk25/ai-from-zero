@@ -1,8 +1,12 @@
 /** Choix d'un nouveau mot de passe après le lien Supabase. */
 
 import {
+  confirmRecoveryLink,
+  dismissRecoveryToken,
+  getPendingRecoveryToken,
   getRecoveryNotice,
   isOwner,
+  isPasswordRecovery,
   isPasswordSaved,
   isRecoveryPending,
   leaveRecovery,
@@ -95,6 +99,34 @@ function paintSuccess(main) {
   scheduleLeave();
 }
 
+function paintConfirm(main) {
+  const status = statusNode("", "");
+  const verify = h("button", { type: "button", class: "button button-primary" }, "Vérifier le lien");
+  const cancel = h("button", { type: "button", class: "button button-secondary" }, "Demander un nouveau message");
+  verify.addEventListener("click", async () => {
+    verify.disabled = true;
+    cancel.disabled = true;
+    status.textContent = "Vérification du lien…";
+    status.className = "quiz-feedback";
+    await confirmRecoveryLink();
+    paintRecovery(main);
+  });
+  cancel.addEventListener("click", () => {
+    dismissRecoveryToken();
+    paintRecovery(main);
+  });
+  main.replaceChildren(
+    h("p", { class: "eyebrow", text: "Compte" }),
+    h("h1", { text: "Choisir un nouveau mot de passe" }),
+    h("p", {
+      class: "lead",
+      text: "Le message a ouvert cette page sans utiliser le lien. Confirme ici pour le vérifier, puis choisis un nouveau mot de passe.",
+    }),
+    h("div", { class: "login-form" }, [verify, cancel]),
+    status,
+  );
+}
+
 function paintChoose(main) {
   const password = h("input", {
     id: "new-password",
@@ -183,6 +215,10 @@ export function paintRecovery(main) {
   const notice = getRecoveryNotice();
   if (notice) {
     paintRequest(main, notice.message, "incorrect");
+    return;
+  }
+  if (getPendingRecoveryToken() && !isPasswordRecovery()) {
+    paintConfirm(main);
     return;
   }
   if (isRecoveryPending() || !isOwner()) {

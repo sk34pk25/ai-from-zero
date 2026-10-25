@@ -12,6 +12,7 @@ import { OWNER_ID, SUPABASE_ANON_KEY, SUPABASE_URL } from "../config.js";
 import {
   RECOVERY_HASH,
   cleanAuthLocation,
+  normalizeImplicitHref,
   passwordResetRedirect,
   readAuthReturn,
   recoveryErrorMessage,
@@ -37,7 +38,47 @@ export function isConfigured(config = publicConfig()) {
   return config.url.startsWith("https://") && config.anonKey.length >= 20 && config.ownerId.length >= 8;
 }
 
-const AUTH_CALLBACK = ["access_token", "refresh_token", "error", "error_description", "error_code", "code"];
+const RECOVERY_TOKEN_KEY = "afz-recovery-token";
+let pendingRecoveryToken = "";
+
+function rememberTokenHash(value) {
+  pendingRecoveryToken = String(value || "");
+  if (!pendingRecoveryToken || typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(RECOVERY_TOKEN_KEY, pendingRecoveryToken);
+  } catch {
+    /* navigation privée : le jeton reste en mémoire pour cet onglet */
+  }
+}
+
+function readStoredTokenHash() {
+  if (pendingRecoveryToken) return pendingRecoveryToken;
+  if (typeof window === "undefined") return "";
+  try {
+    pendingRecoveryToken = window.sessionStorage.getItem(RECOVERY_TOKEN_KEY) || "";
+  } catch {
+    pendingRecoveryToken = "";
+  }
+  return pendingRecoveryToken;
+}
+
+function forgetTokenHash() {
+  pendingRecoveryToken = "";
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(RECOVERY_TOKEN_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getPendingRecoveryToken() {
+  return readStoredTokenHash();
+}
+
+export function dismissRecoveryToken() {
+  forgetTokenHash();
+}
 
 /** Vrai seulement si une session, un vérificateur PKCE ou un retour Auth
  * est déjà là. Un visiteur anonyme ne charge pas le client : le bundle
@@ -45,10 +86,7 @@ const AUTH_CALLBACK = ["access_token", "refresh_token", "error", "error_descript
  * Supabase à chaque page. */
 export function shouldOpenAuthClient(config, href, storage) {
   try {
-    const url = new URL(href);
-    const hash = url.hash.startsWith("#") ? url.hash.slice(1) : "";
-    const hashParams = new URLSearchParams(hash.includes("=") ? hash : "");
-    if (AUTH_CALLBACK.some((name) => url.searchParams.has(name) || hashParams.has(name))) return true;
+    if (readAuthReturn(href).kind !== "none") return true;
     const ref = new URL(config.url).hostname.split(".")[0];
     const prefix = `sb-${ref}-`;
     for (let index = 0; index < storage.length; index += 1) {
@@ -184,15 +222,25 @@ function rejectForeignUser(next) {
   return Boolean(next) && next.id !== publicConfig().ownerId;
 }
 
+function replaceAuthLocation(next) {
+  if (typeof window === "undefined" || next === window.location.href) return;
+  window.history.replaceState(window.history.state, "", next);
+}
+
 export async function restoreSession() {
-  const auth = typeof window === "undefined" ? { kind: "none" } : readAuthReturn(window.location.href);
-  if (auth.kind === "error") {
+  const auth = typeof window === "undefined" ? { kind: "none", params: {} } : readAuthReturn(window.location.href);
+  if (auth.kind === "implicit") {
+    // Avant createClient : supabase-js lit window.location et ignore un second fragment.
+    replaceAuthLocation(normalizeImplicitHref(window.location.href));
+    holdRecoveryRoute = true;
+  } else if (auth.kind === "token_hash") {
+    // Le GET du scanner ne doit pas échanger le jeton. On le garde pour le bouton.
+    rememberTokenHash(auth.params.token_hash);
+    replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
+  } else if (auth.kind === "error") {
     rememberRecoveryFailure(recoveryErrorMessage(auth.params.error_code, auth.params.error_description));
-    if (typeof window !== "undefined") {
-      const target = cleanAuthLocation(window.location.href, RECOVERY_HASH);
-      if (target !== window.location.href) window.history.replaceState(window.history.state, "", target);
-    }
-  } else if (auth.kind === "implicit" || auth.kind === "pkce") {
+    replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
+  } else if (auth.kind === "pkce") {
     holdRecoveryRoute = true;
   }
   if (!isConfigured() || !hasAuthWork()) {
@@ -219,10 +267,7 @@ export async function restoreSession() {
           ? "Ce lien n'a pas pu être vérifié dans ce navigateur. Demande un nouveau message, puis ouvre-le ici."
           : "Ce lien de réinitialisation n'a pas pu ouvrir de session. Demande un nouveau message.",
       );
-      if (typeof window !== "undefined") {
-        const target = cleanAuthLocation(window.location.href, RECOVERY_HASH);
-        if (target !== window.location.href) window.history.replaceState(window.history.state, "", target);
-      }
+      replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
     }
   } catch {
     user = null;
@@ -296,6 +341,57 @@ export async function updatePassword(password) {
 }
 
 export { passwordResetRedirect };
+
+export async function confirmRecoveryLink() {
+  const tokenHash = readStoredTokenHash();
+  if (!tokenHash) {
+    const message = "Ce lien ne contient pas de jeton à vérifier. Demande un nouveau message.";
+    rememberRecoveryFailure(message);
+    emit();
+    return { ok: false, message };
+  }
+  if (!isConfigured()) {
+    return { ok: false, message: "Supabase n'est pas configuré : le lien ne peut pas être vérifié." };
+  }
+  try {
+    const supabase = await clientOf("implicit");
+    const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+    const next = data?.session?.user ?? null;
+    if (error || !next) {
+      const message = recoveryErrorMessage(error?.code, error?.message);
+      rememberRecoveryFailure(message);
+      forgetTokenHash();
+      emit();
+      return { ok: false, message };
+    }
+    if (rejectForeignUser(next)) {
+      const message = "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.";
+      rememberRecoveryFailure(message);
+      forgetTokenHash();
+      user = null;
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        /* le refus est déjà affiché */
+      }
+      emit();
+      return { ok: false, message };
+    }
+    user = next;
+    passwordRecovery = true;
+    recoveryNotice = null;
+    forgetTokenHash();
+    pinRecoveryRoute();
+    emit();
+    return { ok: true, message: "" };
+  } catch {
+    const message = "Ce lien de réinitialisation n'a pas pu être vérifié. Demande un nouveau message.";
+    rememberRecoveryFailure(message);
+    forgetTokenHash();
+    emit();
+    return { ok: false, message };
+  }
+}
 
 export async function resetPassword(email, redirectTo) {
   if (!isConfigured()) {

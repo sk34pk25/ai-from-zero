@@ -56,6 +56,27 @@ export const OWNER_ID = "${OWNER_ID}";
       await route.fulfill({ status: 200, headers: CORS, json: {} });
       return;
     }
+    if (url.includes("/auth/v1/verify") && request.method() === "POST") {
+      const body = request.postDataJSON() || {};
+      if (body.token_hash === "expired-token") {
+        await route.fulfill({
+          status: 403,
+          headers: CORS,
+          json: {
+            code: "otp_expired",
+            error_code: "otp_expired",
+            msg: "Email link is invalid or has expired",
+          },
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        headers: CORS,
+        json: sessionFor(userId, "patrik@example.com"),
+      });
+      return;
+    }
     if (url.includes("/auth/v1/user")) {
       await route.fulfill({ status: 200, headers: CORS, json: { id: userId, aud: "authenticated", email: "patrik@example.com" } });
       return;
