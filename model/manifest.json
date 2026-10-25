@@ -1,0 +1,31 @@
+{
+  "files": [
+    "model/__init__.py",
+    "model/__main__.py",
+    "model/attention.py",
+    "model/autograd.py",
+    "model/backbone.py",
+    "model/bench.py",
+    "model/bigram.py",
+    "model/bpe.py",
+    "model/datasets.py",
+    "model/experiment.py",
+    "model/export_js.py",
+    "model/finetune.py",
+    "model/gpt_sample.py",
+    "model/gpt_train.py",
+    "model/live.py",
+    "model/lora.py",
+    "model/mathutil.py",
+    "model/memory.py",
+    "model/mlp.py",
+    "model/moe.py",
+    "model/multimodal.py",
+    "model/ssm.py",
+    "model/stats.py",
+    "model/tiny_lm.py",
+    "model/tokenizer.py",
+    "model/train.py",
+    "model/transformer.py"
+  ]
+}

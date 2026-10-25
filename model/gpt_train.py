@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -16,6 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from model.autograd import Tensor, cross_entropy, embedding, layernorm
+from model.bpe import BPETokenizer
 from model.mathutil import cross_entropy as numpy_cross_entropy
 from model.tokenizer import CharTokenizer
 from model.transformer import GPTConfig, TinyGPT, generate
@@ -153,6 +155,26 @@ class AdamW:
             tensor.data -= self.lr * update
 
 
+def scheduled_lr(step: int, total: int, base: float, warmup: int, schedule: str, min_ratio: float = 0.1) -> float:
+    """Pas constant, ou montée linéaire puis décroissance cosinus jusqu'à min_ratio * base."""
+    if base <= 0:
+        raise ValueError("le pas d'apprentissage doit être positif")
+    if schedule == "constant":
+        return base
+    if schedule != "cosine":
+        raise ValueError("schedule doit être constant ou cosine")
+    if warmup < 0 or total < 1 or not 0 <= min_ratio <= 1:
+        raise ValueError("warmup, total ou min_ratio invalide")
+    if step < warmup:
+        return base * float(step + 1) / float(max(warmup, 1))
+    if total <= warmup:
+        return base
+    progress = (step - warmup) / float(total - warmup)
+    cosine = 0.5 * (1.0 + math.cos(math.pi * min(max(progress, 0.0), 1.0)))
+    floor = base * min_ratio
+    return floor + (base - floor) * cosine
+
+
 def split_ids(ids: np.ndarray, val_ratio: float = 0.1) -> tuple[np.ndarray, np.ndarray]:
     if not 0 < val_ratio < 0.5:
         raise ValueError("val_ratio doit être entre 0 et 0.5")
@@ -167,28 +189,35 @@ def sample_batch(ids: np.ndarray, block: int, batch: int, rng: np.random.Generat
     return np.stack([ids[start : start + block + 1] for start in starts])
 
 
-def corpus_loss(model: TinyGPT, ids: np.ndarray, block: int) -> float:
+def corpus_loss(model: TinyGPT, ids: np.ndarray, block: int, max_windows: int | None = None, spread: bool = False) -> float:
     if len(ids) <= block:
         raise ValueError("pas assez de tokens pour évaluer")
-    losses: list[float] = []
-    weights: list[int] = []
-    start = 0
-    while start + block < len(ids):
-        window = ids[start : start + block + 1][None, :]
-        losses.append(numpy_sequence_loss(model, window))
-        weights.append(block)
-        start += block
-    return float(np.average(losses, weights=weights))
+    starts = list(range(0, len(ids) - block, block))
+    if max_windows is not None and len(starts) > max_windows:
+        if spread:
+            picked = np.linspace(0, len(starts) - 1, max_windows).astype(int)
+            starts = [starts[int(index)] for index in picked]
+        else:
+            starts = starts[:max_windows]
+    losses = [numpy_sequence_loss(model, ids[start : start + block + 1][None, :]) for start in starts]
+    return float(np.average(losses, weights=[block] * len(losses)))
 
 
-def clip_prompt(tokenizer: CharTokenizer, prompt: str, block: int) -> np.ndarray:
+def _can_encode(tokenizer, prompt: str) -> bool:
+    try:
+        return bool(tokenizer.encode(prompt))
+    except KeyError:
+        return False
+
+
+def clip_prompt(tokenizer: CharTokenizer | BPETokenizer, prompt: str, block: int) -> np.ndarray:
     ids = tokenizer.encode(prompt)
     if not ids:
         raise ValueError("le prompt est vide")
     return np.asarray(ids[-block:], dtype=np.int64)[None, :]
 
 
-def sample_text(model: TinyGPT, tokenizer: CharTokenizer, prompt: str, steps: int, temperature: float = 0.8, top_k: int | None = 10, seed: int = 0) -> str:
+def sample_text(model: TinyGPT, tokenizer: CharTokenizer | BPETokenizer, prompt: str, steps: int, temperature: float = 0.8, top_k: int | None = 10, seed: int = 0) -> str:
     prompt_ids = clip_prompt(tokenizer, prompt, model.config.block_size)
     tokens = generate(model, prompt_ids, steps, np.random.default_rng(seed), temperature=temperature, top_k=top_k)
     return tokenizer.decode(tokens[0].tolist())
@@ -199,10 +228,15 @@ def save_checkpoint(path: Path, model: TinyGPT, tokenizer: CharTokenizer, histor
     payload: dict[str, np.ndarray] = {}
     for name, value in model.params.items():
         payload["p_" + name.replace(".", "__")] = np.asarray(value, dtype=np.float64)
+    if isinstance(tokenizer, BPETokenizer):
+        tokenizer_meta = {"kind": "bpe", "bpe": tokenizer.to_dict()}
+    else:
+        tokenizer_meta = {"kind": "char", "stoi": tokenizer.stoi}
     meta = {
         "config": asdict(model.config),
-        "stoi": tokenizer.stoi,
         "history": history,
+        "tokenizer": tokenizer_meta,
+        "stoi": tokenizer_meta.get("stoi", {}),
     }
     payload["meta"] = np.asarray(json.dumps(meta, ensure_ascii=False))
     np.savez_compressed(path, **payload)
@@ -216,7 +250,11 @@ def load_checkpoint(path: Path) -> tuple[TinyGPT, CharTokenizer, dict]:
     for name in model.params:
         key = "p_" + name.replace(".", "__")
         model.params[name] = np.asarray(archive[key], dtype=np.float64)
-    tokenizer = CharTokenizer.from_stoi({str(char): int(index) for char, index in meta["stoi"].items()})
+    tokenizer_meta = meta.get("tokenizer") or {"kind": "char", "stoi": meta["stoi"]}
+    if tokenizer_meta.get("kind") == "bpe":
+        tokenizer = BPETokenizer.from_dict(tokenizer_meta["bpe"])
+    else:
+        tokenizer = CharTokenizer.from_stoi({str(char): int(index) for char, index in tokenizer_meta["stoi"].items()})
     return model, tokenizer, meta["history"]
 
 
@@ -239,6 +277,12 @@ class GPTTrainResult:
     train_tokens: int
     val_tokens: int
     config: dict
+    learning_rate: float
+    schedule: str
+    warmup_steps: int
+    grad_clip: float
+    weight_decay: float
+    batch_size: int
 
 
 def _attention_snapshot(model: TinyGPT, tokenizer: CharTokenizer, prompt: str) -> dict:
@@ -274,10 +318,22 @@ def train_gpt(
     weight_decay: float = 0.01,
     val_every: int = 20,
     sample: bool = True,
-) -> tuple[TinyGPT, CharTokenizer, GPTTrainResult]:
+    tokenizer: CharTokenizer | BPETokenizer | None = None,
+    on_step=None,
+    eval_windows: int | None = None,
+    prompts: tuple[tuple[str, float, int], ...] | None = None,
+    schedule: str = "constant",
+    warmup: int = 0,
+    clip: float = 1.0,
+    min_ratio: float = 0.1,
+    eval_spread: bool = False,
+    verbose: bool = False,
+    sample_tokens: int = 96,
+) -> tuple[TinyGPT, CharTokenizer | BPETokenizer, GPTTrainResult]:
     if steps < 2:
         raise ValueError("au moins deux pas pour comparer le début et la fin")
-    tokenizer = CharTokenizer(text)
+    if tokenizer is None:
+        tokenizer = CharTokenizer(text)
     ids = np.asarray(tokenizer.encode(text), dtype=np.int64)
     train_ids, val_ids = split_ids(ids)
     if len(val_ids) <= block or len(train_ids) <= block:
@@ -297,39 +353,50 @@ def train_gpt(
     params = bind_parameters(model)
     optimizer = AdamW(params, lr=lr, weight_decay=weight_decay)
     rng = np.random.default_rng(seed)
-    train_start = corpus_loss(model, train_ids, block)
-    val_start = corpus_loss(model, val_ids, block)
+    train_start = corpus_loss(model, train_ids, block, eval_windows, spread=eval_spread)
+    val_start = corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread)
     batch_losses: list[float] = []
     val_losses: list[float] = []
     val_steps: list[int] = []
     started = time.perf_counter()
     for step in range(steps):
+        optimizer.lr = scheduled_lr(step, steps, lr, warmup, schedule, min_ratio)
         for tensor in params.values():
             tensor.zero_grad()
         window = sample_batch(train_ids, block, batch, rng)
         loss = sequence_loss(params, window, config)
         loss.backward()
-        optimizer.step()
+        if not np.isfinite(loss.data):
+            raise FloatingPointError(f"perte non finie au pas {step}")
+        optimizer.step(clip=clip)
         batch_losses.append(float(loss.data))
+        if on_step is not None:
+            on_step(step, batch_losses[-1])
         if step % val_every == 0 or step == steps - 1:
-            val_losses.append(corpus_loss(model, val_ids, block))
+            val_losses.append(corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread))
             val_steps.append(step)
+            if verbose:
+                print(
+                    f"step {step} batch {batch_losses[-1]:.3f} val {val_losses[-1]:.3f} lr {optimizer.lr:.6f}",
+                    flush=True,
+                )
     seconds = time.perf_counter() - started
-    train_end = corpus_loss(model, train_ids, block)
-    val_end = corpus_loss(model, val_ids, block)
+    train_end = corpus_loss(model, train_ids, block, eval_windows, spread=eval_spread)
+    val_end = corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread)
     samples: list[dict] = []
     attention = {"prompt": "", "layer": 0, "head": 0, "tokens": [], "last_row": [], "matrix": []}
     if sample:
-        for prompt, temperature, top_k in (("le chat ", 0.8, 8), ("le chien ", 0.6, 5), ("le loup ", 0.3, 3)):
-            if any(char not in tokenizer.stoi for char in prompt):
+        chosen_prompts = prompts or (("le chat ", 0.8, 8), ("le chien ", 0.6, 5), ("le loup ", 0.3, 3))
+        for prompt, temperature, top_k in chosen_prompts:
+            if not _can_encode(tokenizer, prompt):
                 continue
             samples.append({
                 "prompt": prompt,
                 "temperature": temperature,
                 "top_k": top_k,
-                "text": sample_text(model, tokenizer, prompt, steps=96, temperature=temperature, top_k=top_k, seed=seed),
+                "text": sample_text(model, tokenizer, prompt, steps=sample_tokens, temperature=temperature, top_k=top_k, seed=seed),
             })
-        probe = "le chat " if all(char in tokenizer.stoi for char in "le chat ") else text[:12]
+        probe = "le chat " if _can_encode(tokenizer, "le chat ") else text[:12]
         attention = _attention_snapshot(model, tokenizer, probe)
     result = GPTTrainResult(
         train_loss_start=train_start,
@@ -349,6 +416,12 @@ def train_gpt(
         train_tokens=int(train_ids.size),
         val_tokens=int(val_ids.size),
         config=asdict(config),
+        learning_rate=lr,
+        schedule=schedule,
+        warmup_steps=warmup,
+        grad_clip=clip,
+        weight_decay=weight_decay,
+        batch_size=batch,
     )
     return model, tokenizer, result
 
@@ -374,6 +447,12 @@ def result_payload(result: GPTTrainResult, corpus: str) -> dict:
         "samples": result.samples,
         "attention": result.attention,
         "config": result.config,
+        "learning_rate": result.learning_rate,
+        "schedule": result.schedule,
+        "warmup_steps": result.warmup_steps,
+        "grad_clip": result.grad_clip,
+        "weight_decay": result.weight_decay,
+        "batch_size": result.batch_size,
     }
 
 
@@ -390,8 +469,25 @@ def main() -> None:
     parser.add_argument("--heads", type=int, default=4)
     parser.add_argument("--lr", type=float, default=3e-3)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--dataset", default=None, help="id préparé par python -m model.datasets prepare")
+    parser.add_argument("--plan", type=Path, default=None, help="JSON d'étapes pretrain puis sft")
+    parser.add_argument("--bpe-merges", type=int, default=0, help="si > 0, entraîne un BPE au lieu du tokenizer caractère")
+    parser.add_argument("--bpe", type=Path, default=None, help="BPE déjà sauvegardé")
+    parser.add_argument("--eval-windows", type=int, default=0, help="plafonne l'évaluation, 0 = corpus entier")
     args = parser.parse_args()
-    text = args.data.read_text(encoding="utf-8")
+    if args.plan is not None:
+        _run_plan(args)
+        return
+    if args.dataset:
+        from model.datasets import prepared_corpus
+        text = prepared_corpus(args.dataset)
+    else:
+        text = args.data.read_text(encoding="utf-8")
+    tokenizer = None
+    if args.bpe is not None:
+        tokenizer = BPETokenizer.load(args.bpe)
+    elif args.bpe_merges > 0:
+        tokenizer = BPETokenizer.train(text, args.bpe_merges)
     model, tokenizer, result = train_gpt(
         text,
         steps=args.steps,
@@ -402,8 +498,14 @@ def main() -> None:
         n_heads=args.heads,
         n_layers=args.layers,
         seed=args.seed,
+        tokenizer=tokenizer,
+        eval_windows=args.eval_windows or None,
     )
-    history = result_payload(result, str(args.data.relative_to(ROOT) if args.data.is_relative_to(ROOT) else args.data))
+    corpus_label = args.dataset or str(args.data.relative_to(ROOT) if args.data.is_relative_to(ROOT) else args.data)
+    history = result_payload(result, corpus_label)
+    history["tokenizer_kind"] = "bpe" if isinstance(tokenizer, BPETokenizer) else "char"
+    if isinstance(tokenizer, BPETokenizer):
+        history["bpe_merges"] = len(tokenizer.merges)
     save_checkpoint(args.checkpoint, model, tokenizer, history)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(history, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -415,6 +517,58 @@ def main() -> None:
     for sample in result.samples:
         print("---", sample["prompt"], sample["temperature"], sample["top_k"])
         print(sample["text"])
+
+
+def _run_plan(args) -> None:
+    """Enchaîne des jeux préparés. mode pretrain puis sft, dans l'ordre du fichier."""
+    from model.datasets import prepared_corpus
+    from model.finetune import finetune, load_instructions
+
+    plan = json.loads(args.plan.read_text(encoding="utf-8"))
+    items = plan["items"] if isinstance(plan, dict) else plan
+    model = None
+    tokenizer = None
+    reports = []
+    for item in items:
+        mode = item.get("mode", "pretrain")
+        if mode == "pretrain":
+            text = prepared_corpus(item["id"]) if item.get("id") else Path(item["text"]).read_text(encoding="utf-8")
+            if tokenizer is None and item.get("bpe_merges"):
+                tokenizer = BPETokenizer.train(text, int(item["bpe_merges"]))
+            model, tokenizer, result = train_gpt(
+                text,
+                steps=int(item.get("steps", args.steps)),
+                lr=float(item.get("lr", args.lr)),
+                batch=int(item.get("batch", args.batch)),
+                block=int(item.get("block", args.block)),
+                d_model=int(item.get("d_model", args.d_model)),
+                n_heads=int(item.get("heads", args.heads)),
+                n_layers=int(item.get("layers", args.layers)),
+                seed=args.seed,
+                tokenizer=tokenizer,
+                eval_windows=int(item.get("eval_windows", args.eval_windows or 0)) or None,
+                sample=bool(item.get("sample", False)),
+            )
+            reports.append({"id": item.get("id"), "mode": mode, "train_loss_end": result.train_loss_end, "val_loss_end": result.val_loss_end})
+        elif mode == "sft":
+            if model is None or tokenizer is None:
+                raise ValueError("le plan SFT arrive avant un pré-entraînement")
+            rows = load_instructions(item["instructions"])
+            tuned = finetune(
+                model,
+                tokenizer,
+                rows,
+                steps=int(item.get("steps", 20)),
+                lr=float(item.get("lr", 1e-3)),
+                seed=args.seed,
+                lora_rank=item.get("lora_rank"),
+            )
+            reports.append({"id": item.get("id"), "mode": mode, "loss_end": tuned["loss_end"], "trainable": tuned["trainable"]})
+        else:
+            raise ValueError(mode)
+    if model is not None and tokenizer is not None:
+        save_checkpoint(args.checkpoint, model, tokenizer, {"plan": reports})
+    print(json.dumps(reports, ensure_ascii=False))
 
 
 if __name__ == "__main__":

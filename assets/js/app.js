@@ -1,12 +1,13 @@
 import { indexCurriculum, levelProgress, neighbors } from "./curriculum.js";
 import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
-import { completionStats, emptyProgress, normalizeProgress, PROGRESS_KEY, stepsLabel } from "./progress.js";
+import { isOwner, onAuth, restoreSession, upsertRow } from "./auth.js";
+import { completionStats, emptyProgress, normalizeProgress, PROGRESS_KEY, reviewQueue, stepsLabel } from "./progress.js";
 import { parseHash } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
 import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
 import { modifierLabel } from "./text.js";
-import { mountTrainingRun, mountVisual } from "./visuals.js";
+import { mountChatRun, mountTrainingRun, mountVisual } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
 
@@ -18,6 +19,11 @@ const state = {
   hintCount: 0,
   solutionOpen: false,
   gptRun: null,
+  finetuneRun: null,
+  owner: false,
+  quizzes: {},
+  exercises: {},
+  pageTicket: 0,
   searchActive: 0,
   searchHits: [],
   selectedPart: null,
@@ -98,9 +104,16 @@ async function boot() {
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     state.index = indexCurriculum(data);
-    state.gptRun = await loadTrainingRun();
-    state.done = new Set(loadDone());
     state.selectedPart = state.index.architecture[0]?.id ?? null;
+    onAuth(() => {
+      state.owner = isOwner();
+      applyStoredProgress();
+      updateAccountLink();
+      if (state.route.name !== "connexion") render({ scroll: "keep" });
+    });
+    await restoreSession();
+    state.owner = isOwner();
+    applyStoredProgress();
     render({ scroll: "top" });
   } catch {
     els.main.replaceChildren(
@@ -112,9 +125,9 @@ async function boot() {
   }
 }
 
-async function loadTrainingRun() {
+async function loadJsonReport(path) {
   try {
-    const response = await fetch(new URL("data/gpt_run.json", document.baseURI));
+    const response = await fetch(new URL(path, document.baseURI));
     if (!response.ok) return null;
     return await response.json();
   } catch {
@@ -122,15 +135,52 @@ async function loadTrainingRun() {
   }
 }
 
-function loadDone() {
+let reportsPromise = null;
+
+function ensureTrainingReports() {
+  if (!reportsPromise) {
+    reportsPromise = Promise.all([loadTrainingRun(), loadFinetuneRun()]).then(([gpt, chat]) => {
+      state.gptRun = gpt;
+      state.finetuneRun = chat;
+    });
+  }
+  return reportsPromise;
+}
+
+async function loadTrainingRun() {
+  return loadJsonReport("data/gpt_run.json");
+}
+
+async function loadFinetuneRun() {
+  return loadJsonReport("data/finetune_run.json");
+}
+
+function applyStoredProgress() {
+  if (!state.owner || !state.index) {
+    state.done = new Set();
+    state.quizzes = {};
+    state.exercises = {};
+    return;
+  }
   const stored = normalizeProgress(readJson(localStorage, PROGRESS_KEY, emptyProgress()));
-  const known = new Set(state.index ? state.index.orderedIds : []);
-  return state.index ? stored.done.filter((id) => known.has(id)) : stored.done;
+  const known = new Set(state.index.orderedIds);
+  state.done = new Set(stored.done.filter((id) => known.has(id)));
+  state.quizzes = stored.quizzes || {};
+  state.exercises = stored.exercises || {};
 }
 
 function persistDone() {
+  if (!state.owner) return;
   const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
-  writeJson(localStorage, PROGRESS_KEY, { v: 1, done: ordered });
+  writeJson(localStorage, PROGRESS_KEY, {
+    v: 1,
+    done: ordered,
+    quizzes: state.quizzes,
+    exercises: state.exercises,
+  });
+  upsertRow("progress", { id: 1, done: ordered }, "id").catch(() => {
+    toast("L'enregistrement distant a été refusé.");
+  });
 }
 
 function readReview() {
@@ -140,6 +190,7 @@ function readReview() {
 }
 
 function writeReviewStamp(id, present) {
+  if (!state.owner) return;
   const map = readReview();
   if (present) {
     if (!map[id]) map[id] = Date.now();
@@ -319,6 +370,12 @@ function paintSearchResults() {
   items[state.searchActive]?.scrollIntoView({ block: "nearest" });
 }
 
+function levelsHeading(count) {
+  const words = ["Zéro", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix", "Onze", "Douze", "Treize", "Quatorze", "Quinze"];
+  const word = words[count] || String(count);
+  return `${word} niveaux, un seul laboratoire`;
+}
+
 function stats() {
   return completionStats(state.index.orderedIds, [...state.done]);
 }
@@ -335,8 +392,10 @@ function render({ scroll }) {
   }
   state.route = route;
   state.lastRouteKey = routeKey;
+  state.pageTicket += 1;
+  const ticket = state.pageTicket;
   paintChrome();
-  paintMain(route);
+  paintMain(route, ticket);
   if (scroll === "top") window.scrollTo(0, 0);
   else window.scrollTo(0, y);
   if (scroll === "top") {
@@ -353,7 +412,14 @@ function render({ scroll }) {
   }
 }
 
+function updateAccountLink() {
+  const link = document.querySelector("#account-link");
+  if (!link) return;
+  link.textContent = state.owner ? "Compte" : "Connexion";
+}
+
 function paintChrome() {
+  updateAccountLink();
   const { count, percent, nextId, total } = stats();
   els.progressValue.textContent = `${percent}%`;
   els.progressBar.value = percent;
@@ -397,14 +463,42 @@ function activeLevelId() {
   return null;
 }
 
-function paintMain(route) {
+function paintMain(route, ticket) {
   if (route.name === "home") paintHome();
   else if (route.name === "level") paintLevel(route.id);
-  else if (route.name === "lesson") paintLesson(route.id);
-  else if (route.name === "model") paintModel();
+  else if (route.name === "lesson") {
+    paintLesson(route.id);
+    import("./lesson-tools.js")
+      .then((mod) => {
+        if (ticket !== state.pageTicket) return;
+        return mod.attachLessonTools(els.main, route.id, state.owner);
+      })
+      .catch(() => {});
+  } else if (route.name === "model") paintModel();
   else if (route.name === "track") paintTrack();
+  else if (route.name === "playground") paintAsync(ticket, () => import("./page-playground.js"), (mod) => mod.paintPlayground(els.main));
+  else if (route.name === "ide") paintAsync(ticket, () => import("./page-ide.js"), (mod) => mod.paintIde(els.main, { owner: state.owner }));
+  else if (route.name === "connexion") paintAsync(ticket, () => import("./page-connexion.js"), (mod) => mod.paintConnexion(els.main));
+  else if (route.name === "about") paintAsync(ticket, () => import("./page-about.js"), (mod) => mod.paintAbout(els.main));
+  else if (route.name === "donnees") paintAsync(ticket, () => import("./page-donnees.js"), (mod) => mod.paintDonnees(els.main, { owner: state.owner }));
   else paintNotFound(route.path);
   document.title = pageTitle(route);
+}
+
+function paintAsync(ticket, loader, paint) {
+  els.main.replaceChildren(h("p", { class: "lead", text: "Chargement…" }));
+  loader()
+    .then((mod) => {
+      if (ticket !== state.pageTicket) return null;
+      return paint(mod);
+    })
+    .catch(() => {
+      if (ticket !== state.pageTicket) return;
+      els.main.replaceChildren(
+        h("h1", { text: "Page indisponible" }),
+        h("p", { text: "Ce module n'a pas pu être chargé." }),
+      );
+    });
 }
 
 function pageTitle(route) {
@@ -419,6 +513,11 @@ function pageTitle(route) {
   }
   if (route.name === "model") return `Mon modèle · ${base}`;
   if (route.name === "track") return `Construire mon LLM · ${base}`;
+  if (route.name === "playground") return `Playground · ${base}`;
+  if (route.name === "ide") return `IDE · ${base}`;
+  if (route.name === "connexion") return `Connexion · ${base}`;
+  if (route.name === "about") return `À propos · ${base}`;
+  if (route.name === "donnees") return `Données · ${base}`;
   return `${base} — le parcours pour construire la tienne`;
 }
 
@@ -439,7 +538,7 @@ function paintHome() {
     h("div", { class: "panel-head" }, [
       h("div", {}, [
         h("p", { class: "eyebrow", text: "Roadmap" }),
-        h("h2", { id: "roadmap-title", text: "Treize niveaux, un seul laboratoire" }),
+        h("h2", { id: "roadmap-title", text: levelsHeading(state.index.levels.length) }),
         h("p", { text: "Chaque niveau ajoute une brique au même projet. Rien n'est laissé au statut « planifié »." }),
       ]),
       h("p", { class: "legend", text: `${count} / ${total} étapes` }),
@@ -594,7 +693,15 @@ function lessonBody(lesson, grade, done, around) {
       ...paragraphs(lesson.exercise),
       h("div", { class: "aid-actions" }, [
         h("button", { type: "button", "data-hint-button": "true", onClick: () => revealHint(lesson) }, "Indice suivant"),
-        h("button", { type: "button", "data-solution-button": "true", onClick: toggleSolution }, "Voir une correction"),
+        h("button", {
+          type: "button",
+          "data-solution-button": "true",
+          disabled: !state.owner,
+          onClick: () => {
+            if (!state.owner) return;
+            toggleSolution();
+          },
+        }, state.owner ? "Voir une correction" : "Réservé au propriétaire"),
       ]),
       h("ol", { id: "hint-list", "aria-live": "polite" }),
       h("div", { id: "solution", hidden: true }, paragraphs(lesson.solution || "")),
@@ -648,12 +755,24 @@ function codeBlock(section) {
   });
   copyLabel = h("span", { text: "Copier" });
   button.append(copyLabel);
+  const openIde = h("button", {
+    type: "button",
+    class: "copy-button",
+    disabled: !state.owner,
+    onClick: async () => {
+      if (!state.owner) return;
+      const mod = await import("./page-ide.js");
+      mod.stashSnippet(code);
+      window.location.hash = "#/ide";
+    },
+  }, state.owner ? "Ouvrir dans l'IDE" : "Réservé au propriétaire");
   const pre = h("pre");
   pre.append(h("code", { class: `language-${section.lang || "text"}`, text: code }));
   return h("section", { class: "block block-code" }, [
     h("div", { class: "code-head" }, [
       h("h2", { text: section.heading || "Exemple" }),
       h("span", { class: "code-lang", text: section.lang || "texte" }),
+      openIde,
       button,
     ]),
     pre,
@@ -672,8 +791,17 @@ function quizBlock(lesson, grade) {
       class: classes.join(" "),
       "data-choice": String(index),
       "aria-pressed": selected ? "true" : "false",
+      disabled: !state.owner,
       onClick: () => {
+        if (!state.owner) return;
         state.quizChoice = index;
+        state.quizzes[lesson.id] = { correct: index === lesson.quiz.answer };
+        persistDone();
+        upsertRow("quiz_results", {
+          lesson_id: lesson.id,
+          choice: index,
+          correct: index === lesson.quiz.answer,
+        }, "lesson_id").catch(() => toast("L'enregistrement distant a été refusé."));
         render({ scroll: "keep" });
       },
     }, choice);
@@ -685,10 +813,35 @@ function quizBlock(lesson, grade) {
   });
   return h("section", { class: "quiz", "aria-labelledby": "quiz-title" }, [
     h("h2", { id: "quiz-title", text: "Quiz" }),
+    state.owner ? null : h("p", { class: "lock-note", text: "Réservé au propriétaire. Les réponses et la progression ne sont pas enregistrées pour un visiteur." }),
     h("p", { id: "quiz-question", text: quiz.question }),
     h("div", { role: "group", "aria-labelledby": "quiz-question" }, options),
     feedback,
+    state.owner && grade.correct ? correctionMark() : null,
   ]);
+}
+
+function correctionMark() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 64 64");
+  svg.setAttribute("class", "correction-mark");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Schéma de la bonne réponse");
+  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circle.setAttribute("cx", "32");
+  circle.setAttribute("cy", "32");
+  circle.setAttribute("r", "22");
+  circle.setAttribute("fill", "none");
+  circle.setAttribute("stroke", "currentColor");
+  circle.setAttribute("stroke-width", "3");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", "M20 33 l8 8 16-18");
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", "currentColor");
+  path.setAttribute("stroke-width", "3");
+  path.setAttribute("stroke-linecap", "round");
+  svg.append(circle, path);
+  return svg;
 }
 
 function feedbackText(lesson, grade) {
@@ -698,6 +851,10 @@ function feedbackText(lesson, grade) {
 }
 
 function toggleLesson(id) {
+  if (!state.owner) {
+    toast("Réservé au propriétaire.");
+    return;
+  }
   if (state.done.has(id)) {
     state.done.delete(id);
     writeReviewStamp(id, false);
@@ -794,12 +951,17 @@ function restoreLessonAids(article, lesson) {
 }
 
 function reviewBlock() {
-  if (state.done.size === 0) return null;
+  if (!state.owner || state.done.size === 0) return null;
   const stamps = readReview();
-  const items = [...state.done]
-    .map((id) => ({ id, at: Number(stamps[id]) || 0, item: state.index.byId.get(id) }))
+  const queue = reviewQueue(state.index.orderedIds, {
+    done: [...state.done],
+    quizzes: state.quizzes,
+    exercises: state.exercises,
+    stamps,
+  });
+  const items = queue
+    .map((id) => ({ id, item: state.index.byId.get(id) }))
     .filter((row) => row.item)
-    .sort((a, b) => a.at - b.at)
     .slice(0, 3);
   if (items.length === 0) return null;
   return h("section", { class: "panel review-panel", "aria-labelledby": "review-title" }, [
@@ -840,6 +1002,12 @@ function paintTrack() {
   const pre = h("pre");
   pre.append(h("code", { text: sample }));
   const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
+  const chatHost = h("div", { class: "visual-host", "data-chat-host": "true" });
+  const reportsReady = Boolean(state.gptRun && state.finetuneRun);
+  if (!reportsReady) {
+    runHost.append(h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }));
+    chatHost.append(h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }));
+  }
   els.main.replaceChildren(
     crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
     h("p", { class: "eyebrow", text: "Fil rouge" }),
@@ -850,11 +1018,17 @@ function paintTrack() {
       h("p", { text: state.gptRun?.label || "Un entraînement CPU déjà fait dans ce dépôt. Les nombres et les phrases viennent de ce run, pas d'un dessin." }),
       runHost,
     ]),
+    h("section", { class: "callout callout-build", "aria-labelledby": "chat-title" }, [
+      h("h2", { id: "chat-title", text: "Dialogue ajusté" }),
+      h("p", { text: state.finetuneRun?.label || "L'ajustement question-réponse est dans data/finetune_run.json." }),
+      chatHost,
+    ]),
     h("p", { class: "track-progress", text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.` }),
     list,
     h("section", { class: "callout callout-build" }, [
       h("h2", { text: "Lancer l'entraînement" }),
-      h("p", { text: "Depuis la racine du dépôt. gpt_train.py entraîne TinyGPT (embeddings, blocs, tête) avec l'autograd NumPy et AdamW. gpt_sample.py tire une suite. Le petit modèle de tiny_lm.py reste l'étape d'avant, une seule tête." }),
+      h("p", { text: "Depuis la racine du dépôt. gpt_train.py entraîne TinyGPT avec l'autograd NumPy et AdamW. --dataset lit un jeu préparé, --plan enchaîne les étapes. gpt_sample.py tire une suite." }),
+      h("p", {}, [h("a", { href: "#/donnees", text: "Ouvrir le catalogue des jeux." })]),
       pre,
     ]),
     h("section", { class: "callout" }, [
@@ -862,7 +1036,17 @@ function paintTrack() {
       h("p", { text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet." }),
     ]),
   );
-  mountTrainingRun(runHost, state.gptRun);
+  if (reportsReady) {
+    mountTrainingRun(runHost, state.gptRun);
+    mountChatRun(chatHost, state.finetuneRun);
+    return;
+  }
+  const ticket = state.pageTicket;
+  ensureTrainingReports().then(() => {
+    if (ticket !== state.pageTicket) return;
+    mountTrainingRun(runHost, state.gptRun);
+    mountChatRun(chatHost, state.finetuneRun);
+  });
 }
 
 function paintNotFound(path) {
@@ -888,6 +1072,10 @@ function crumb(items) {
 }
 
 function onPlacement() {
+  if (!state.owner) {
+    toast("Réservé au propriétaire.");
+    return;
+  }
   const level = state.index?.levels.find((entry) => entry.id === 0);
   if (!level) return;
   const ok = window.confirm("Marquer les 20 étapes du niveau 0 (fondations numériques) comme déjà connues sur cet appareil ?");
@@ -902,6 +1090,10 @@ function onPlacement() {
 }
 
 function onReset() {
+  if (!state.owner) {
+    toast("Réservé au propriétaire.");
+    return;
+  }
   const ok = window.confirm("Effacer toute la progression enregistrée dans ce navigateur ?");
   if (!ok) return;
   state.done = new Set();

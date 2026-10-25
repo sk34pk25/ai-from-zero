@@ -19,6 +19,7 @@ Un parcours francophone pour partir d'aucune base en informatique et arriver à 
 - [10 — Mémoire, retrieval et calcul adaptatif](#10--mémoire-retrieval-et-calcul-adaptatif) — 8 étapes
 - [11 — Frontière de la recherche](#11--frontière-de-la-recherche) — 8 étapes
 - [12 — Concevoir ton architecture](#12--concevoir-ton-architecture) — 12 étapes
+- [13 — Tokenizer BPE, données et ajustement](#13--tokenizer-bpe-données-et-ajustement) — 8 étapes
 
 ## 0 — Fondations numériques
 
@@ -285,6 +286,23 @@ Formuler une hypothèse, la mesurer contre une baseline, et documenter le compro
 | 12.10 | Analyser un échec | Un test rouge, ou une métrique pire que la baseline, est un résultat. Le cacher casse le portfolio plus sûrement qu'un modèle moyen. Analyser, c'est relier l'échec à une cause que tu peux nommer. | Le fil rouge garde les lignes perdantes. L'analyse tient dans le nom du facteur, pas dans un adjectif. |
 | 12.11 | Itérer une fois | Itérer, c'est changer un facteur après avoir lu une ligne, pas empiler des idées. Une itération tient dans une nouvelle configuration et une nouvelle mesure sur le même banc. | Le fil rouge s'autorise une itération seulement quand elle ajoute une ligne sur le même banc. Le README comptera ces lignes, pas les idées écartées. |
 | 12.12 | Documenter la candidate | La dernière étape du parcours est un texte que quelqu'un d'autre peut vérifier. Il dit l'hypothèse, la baseline, les tests verts, les colonnes, et les limites. Il ne dit pas qu'un article a été reproduit. | Le projet final est cette fiche, branchée sur Backbone et sur les tests. Le parcours s'arrête quand la fiche et le code disent la même chose. |
+
+## 13 — Tokenizer BPE, données et ajustement
+
+Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.
+
+**Projet :** Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py.
+
+| Étape | Titre | Pourquoi | Fil rouge |
+| --- | --- | --- | --- |
+| 13.1 | Fusionner les paires | Le tokenizer caractère donne un identifiant par lettre. C'est clair, et c'est trop long : un mot courant devient une suite de pas. Le BPE recolle les paires fréquentes pour que le modèle voie des morceaux de mots, sans ouvrir une bibliothèque. | Le fil rouge de ce niveau remplace, quand c'est utile, le vocabulaire caractère par ce BPE. Le playground et l'ajustement réutilisent le même encode et le même decode. |
+| 13.2 | Garder le vocabulaire | Un vocabulaire qui change entre l'entraînement et l'échantillonnage produit des identifiants faux. Il faut écrire les fusions, les relire, et refuser un caractère jamais vu. | Le run publié écrit model/data/bpe.json quand le BPE est retenu. Le rapport data/gpt_run.json dit si le choix final est bpe ou char. |
+| 13.3 | Choisir le texte | Le modèle n'apprend que le texte qu'on lui donne. Un catalogue vérifié évite de mélanger un jouet, un livre du domaine public et un dump qu'on n'a pas le droit de redistribuer. | gpt_train.py --dataset lit un jeu déjà préparé. --plan enchaîne le pré-entraînement puis l'ajustement, dans l'ordre du fichier JSON. |
+| 13.4 | Le playground | Lire une courbe dans un JSON ne montre pas le prochain token. Le playground rejoue le forward dans le navigateur, avec la température, le top-k et les poids d'attention du dernier pas. | Le même export existe pour le checkpoint de dialogue, data/chat_browser.json, quand l'ajustement a pu être exporté. |
+| 13.5 | Des questions et des réponses | Continuer un roman n'apprend pas à répondre. Il faut des paires question réponse, courtes, dont on connaît la provenance, avant d'ouvrir un grand jeu d'instructions. | L'étape suivante masque la perte sur la question. Le plan d'entraînement peut enchaîner un livre puis ce fichier. |
+| 13.6 | Masquer la question | Si la perte compte toute la ligne, le modèle est récompensé pour réciter la question. On veut qu'il apprenne la réponse, tout en voyant la question. | gpt_train.py --plan lit d'abord les étapes pretrain, puis une étape sft qui pointe vers le fichier d'instructions. |
+| 13.7 | Ajuster sans tout bouger | Réécrire toutes les matrices sur un petit jeu d'instructions écrase vite le texte déjà appris. LoRA ajoute une correction de petit rang, et on compare les deux sur le même exemple. | Le run publié choisit, pour le checkpoint de dialogue, la recette dont la perte de fin est la plus basse, et il écrit l'échantillon à côté. |
+| 13.8 | Continuer le dialogue | Une perte qui descend ne fait pas un assistant. Il faut lire la suite générée, dire ce qu'elle recolle du jeu d'instructions, et ce qu'elle ne sait pas faire. | La piste s'arrête sur cette comparaison. Les gros jeux restent des fiches : on sait d'où ils viennent, et on ne prétend pas les avoir tous entraînés ici. |
 
 ## Critères de sortie
 

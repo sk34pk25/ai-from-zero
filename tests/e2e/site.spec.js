@@ -4,6 +4,8 @@ import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+import { installOwner, signInAs } from "./session.js";
+
 const curriculum = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
 const lessons = curriculum.levels.flatMap((level) => level.steps);
 
@@ -34,6 +36,7 @@ test("l'accueil s'affiche et la navigation ouvre un niveau", async ({ page }) =>
 });
 
 test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
+  test.setTimeout(180_000);
   const errors = trackErrors(page);
   await page.goto("/#/lecon/0.1");
   await expect(page.locator("[data-lesson-id='0.1']")).toBeVisible();
@@ -55,6 +58,8 @@ test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
 test("le quiz refuse une mauvaise réponse puis enregistre la bonne", async ({ page }) => {
   const lesson = lessons.find((item) => item.id === "1.6");
   const wrong = (lesson.quiz.answer + 1) % 4;
+  await installOwner(page);
+  await signInAs(page);
   await page.goto(`/#/lecon/${lesson.id}`);
   const complete = page.getByRole("button", { name: "Marquer comme terminée" });
   await expect(complete).toBeDisabled();
@@ -126,6 +131,8 @@ test("le menu mobile s'ouvre", async ({ page }) => {
 
 test("les indices survivent au quiz et la piste LLM s'affiche", async ({ page }) => {
   const errors = trackErrors(page);
+  await installOwner(page);
+  await signInAs(page);
   await page.goto("/#/lecon/1.14");
   await page.getByRole("button", { name: "Indice suivant" }).click();
   await page.getByRole("button", { name: "Indice suivant" }).click();
@@ -169,12 +176,13 @@ test("chaque famille de visuel interactif répond", async ({ page }) => {
     else if (lesson.visual === "moe") await host.getByRole("button").first().click();
     else if (lesson.visual === "tokenize") await host.getByLabel("Texte à découper").fill("bonjour");
     else if (lesson.visual === "retrieve") await host.getByLabel("Question à comparer aux documents").fill("tokenizer");
+    else if (lesson.visual === "bpe") await host.getByRole("button", { name: "Fusionner" }).click();
     else await host.locator("input[type=range]").press("ArrowRight");
     if (lesson.visual === "retrieve") await expect(host.locator("li").first()).toContainText("tokenizer");
     else await expect(host.locator(".visual-readout")).not.toHaveText(before);
   }
   expect([...seen].sort()).toEqual(
-    ["attention", "bigram", "descent", "embed", "loss", "moe", "patches", "relu", "retrieve", "scan", "softmax", "tokenize", "transformer"].sort(),
+    ["attention", "bigram", "bpe", "descent", "embed", "lora", "loss", "moe", "patches", "relu", "retrieve", "scan", "softmax", "tokenize", "transformer"].sort(),
   );
   expect(errors).toEqual([]);
 });
@@ -185,6 +193,8 @@ test("axe ne signale rien sur les écrans principaux", async ({ page }) => {
   await page.goto("/#/lecon/4.5");
   await axe(page);
   await page.goto("/#/construire");
+  await expect(page.locator("[data-run-host]")).toContainText("Validation");
+  await expect(page.locator("[data-chat-host]")).toContainText("LoRA");
   await axe(page);
   await page.goto("/#/modele");
   await axe(page);
@@ -219,6 +229,15 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     ["piste-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/construire"],
     ["piste-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/construire"],
     ["piste-mobile-sombre.png", { width: 390, height: 844 }, "dark", "/#/construire"],
+    ["donnees-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/donnees"],
+    ["donnees-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/donnees"],
+    ["donnees-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/donnees"],
+    ["playground-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/playground"],
+    ["playground-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/playground"],
+    ["propos-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/a-propos"],
+    ["ide-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/ide"],
+    ["ide-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/ide"],
+    ["connexion-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/connexion"],
   ];
   for (const [name, viewport, theme, url] of shots) {
     await page.setViewportSize(viewport);
@@ -232,6 +251,10 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     }
     if (url.includes("/parcours")) {
       await page.locator("#roadmap").evaluate((node) => node.scrollIntoView({ block: "start", behavior: "instant" }));
+    }
+    if (url.includes("/construire")) {
+      await expect(page.locator("[data-run-host]")).toContainText("Validation");
+      await expect(page.locator("[data-chat-host]")).toContainText("LoRA");
     }
     await page.screenshot({ path: `docs/images/${name}`, animations: "disabled" });
   }
