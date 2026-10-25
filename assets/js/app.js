@@ -1,0 +1,730 @@
+import { indexCurriculum, levelProgress, neighbors } from "./curriculum.js";
+import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
+import { gradeQuiz } from "./quiz.js";
+import { completionStats, emptyProgress, normalizeProgress, PROGRESS_KEY, stepsLabel } from "./progress.js";
+import { parseHash } from "./router.js";
+import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
+import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
+import { modifierLabel } from "./text.js";
+
+const state = {
+  index: null,
+  done: new Set(),
+  route: { name: "home" },
+  quizChoice: null,
+  searchActive: 0,
+  searchHits: [],
+  selectedPart: null,
+  lastRouteKey: "",
+};
+
+const els = {};
+
+document.addEventListener("DOMContentLoaded", () => {
+  cacheElements();
+  bindChrome();
+  applyTheme(resolveTheme(localStorage.getItem(THEME_KEY), false), false);
+  boot();
+});
+
+function cacheElements() {
+  els.main = document.querySelector("#main");
+  els.nav = document.querySelector("#course-nav");
+  els.progressValue = document.querySelector("#progress-value");
+  els.progressBar = document.querySelector("#progress-bar");
+  els.progressMeta = document.querySelector("#progress-meta");
+  els.continueLink = document.querySelector("#continue-link");
+  els.menu = document.querySelector("#menu-button");
+  els.sidebar = document.querySelector("#sidebar");
+  els.scrim = document.querySelector("#scrim");
+  els.theme = document.querySelector("#theme-toggle");
+  els.themeLabel = document.querySelector("#theme-label");
+  els.searchOpen = document.querySelector("#search-open");
+  els.searchKbd = document.querySelector("#search-kbd");
+  els.dialog = document.querySelector("#search-dialog");
+  els.searchInput = document.querySelector("#search-input");
+  els.searchResults = document.querySelector("#search-results");
+  els.searchEmpty = document.querySelector("#search-empty");
+  els.searchClose = document.querySelector("#search-close");
+  els.toast = document.querySelector("#toast");
+  els.placement = document.querySelector("#placement-button");
+  els.reset = document.querySelector("#reset-button");
+}
+
+function bindChrome() {
+  const label = modifierLabel(navigator.userAgent);
+  els.searchKbd.textContent = `${label} K`;
+  els.menu.addEventListener("click", () => {
+    const open = !els.sidebar.classList.contains("is-open");
+    setMenu(open);
+  });
+  els.scrim.addEventListener("click", () => setMenu(false));
+  els.theme.addEventListener("click", () => {
+    const next = toggleTheme(document.documentElement.dataset.theme || "dark");
+    applyTheme(next, true);
+  });
+  els.searchOpen.addEventListener("click", openSearch);
+  els.searchClose.addEventListener("click", closeSearch);
+  els.searchInput.addEventListener("input", () => {
+    state.searchActive = 0;
+    paintSearchResults();
+  });
+  els.searchInput.addEventListener("keydown", onSearchKeydown);
+  els.placement.addEventListener("click", onPlacement);
+  els.reset.addEventListener("click", onReset);
+  els.dialog.addEventListener("click", (event) => {
+    if (event.target === els.dialog) closeSearch();
+  });
+  document.addEventListener("keydown", onGlobalKeydown);
+  window.addEventListener("hashchange", () => {
+    closeSearch();
+    setMenu(false);
+    render({ scroll: "top" });
+  });
+  window.addEventListener("resize", syncSidebar);
+  syncSidebar();
+}
+
+async function boot() {
+  try {
+    const response = await fetch(new URL("data/curriculum.json", document.baseURI));
+    if (!response.ok) throw new Error(String(response.status));
+    const data = await response.json();
+    state.index = indexCurriculum(data);
+    state.done = new Set(loadDone());
+    state.selectedPart = state.index.architecture[0]?.id ?? null;
+    render({ scroll: "top" });
+  } catch {
+    els.main.replaceChildren(
+      h("h1", { text: "Parcours indisponible" }),
+      h("p", {
+        text: "Le fichier data/curriculum.json n'a pas pu être chargé. Ouvre le site avec un serveur local, par exemple : python3 -m http.server.",
+      }),
+    );
+  }
+}
+
+function loadDone() {
+  const stored = normalizeProgress(readJson(localStorage, PROGRESS_KEY, emptyProgress()));
+  const known = new Set(state.index ? state.index.orderedIds : []);
+  return state.index ? stored.done.filter((id) => known.has(id)) : stored.done;
+}
+
+function persistDone() {
+  const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
+  writeJson(localStorage, PROGRESS_KEY, { v: 1, done: ordered });
+}
+
+function currentTheme() {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+function applyTheme(theme, store) {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", theme === "light" ? "#f4f0e7" : "#14120f");
+  if (store) localStorage.setItem(THEME_KEY, theme);
+  if (els.theme) {
+    const toLight = theme === "dark";
+    const label = toLight ? "Activer le thème clair" : "Activer le thème sombre";
+    els.theme.setAttribute("aria-label", label);
+    els.theme.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    els.themeLabel.textContent = label;
+    els.theme.replaceChildren(els.themeLabel, svgIcon(theme === "dark" ? ICONS.sun : ICONS.moon));
+  }
+}
+
+function setMenu(open) {
+  els.sidebar.classList.toggle("is-open", open);
+  els.scrim.hidden = !open;
+  els.menu.setAttribute("aria-expanded", open ? "true" : "false");
+  document.body.classList.toggle("menu-open", open);
+  syncSidebar();
+}
+
+function syncSidebar() {
+  const mobile = window.matchMedia("(max-width: 960px)").matches;
+  const open = els.sidebar.classList.contains("is-open");
+  if (mobile && !open) els.sidebar.setAttribute("inert", "");
+  else els.sidebar.removeAttribute("inert");
+}
+
+function onGlobalKeydown(event) {
+  const key = event.key.toLowerCase();
+  if ((event.metaKey || event.ctrlKey) && key === "k") {
+    event.preventDefault();
+    if (els.dialog.hidden) openSearch();
+    else closeSearch();
+    return;
+  }
+  if (event.key === "/" && !isTyping(event.target) && els.dialog.hidden) {
+    event.preventDefault();
+    openSearch();
+    return;
+  }
+  if (event.key === "Escape") {
+    if (!els.dialog.hidden) {
+      event.preventDefault();
+      closeSearch();
+      return;
+    }
+    if (els.sidebar.classList.contains("is-open")) setMenu(false);
+  }
+}
+
+function isTyping(target) {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable;
+}
+
+function openSearch() {
+  state.returnFocus = document.activeElement;
+  els.dialog.hidden = false;
+  document.body.classList.add("search-open");
+  els.searchInput.value = "";
+  state.searchActive = 0;
+  paintSearchResults();
+  els.searchInput.focus();
+}
+
+function closeSearch() {
+  if (els.dialog.hidden) return;
+  els.dialog.hidden = true;
+  document.body.classList.remove("search-open");
+  els.searchInput.setAttribute("aria-expanded", "false");
+  els.searchInput.removeAttribute("aria-activedescendant");
+  const back = state.returnFocus;
+  if (back instanceof HTMLElement) back.focus();
+}
+
+function onSearchKeydown(event) {
+  const count = state.searchHits.length;
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    state.searchActive = moveActiveIndex(state.searchActive, 1, count);
+    paintSearchResults();
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    state.searchActive = moveActiveIndex(state.searchActive, -1, count);
+    paintSearchResults();
+  } else if (event.key === "Home") {
+    event.preventDefault();
+    state.searchActive = 0;
+    paintSearchResults();
+  } else if (event.key === "End") {
+    event.preventDefault();
+    state.searchActive = Math.max(0, count - 1);
+    paintSearchResults();
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    const hit = state.searchHits[state.searchActive];
+    if (hit) location.hash = `#/lecon/${hit.entry.lesson.id}`;
+  } else if (event.key === "Tab") {
+    trapSearchTab(event);
+  }
+}
+
+function trapSearchTab(event) {
+  const items = [...els.dialog.querySelectorAll("button, input, a[href]")].filter((node) => !node.hasAttribute("disabled"));
+  if (items.length === 0) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function entries() {
+  return state.index.lessons.map((item) => ({
+    ...item,
+    text: lessonSearchText(item.lesson, item.level.title),
+  }));
+}
+
+function paintSearchResults() {
+  const query = els.searchInput.value;
+  state.searchHits = searchLessons(entries(), query, 24);
+  if (state.searchActive >= state.searchHits.length) state.searchActive = 0;
+  const items = state.searchHits.map((hit, index) => {
+    const { lesson, level } = hit.entry;
+    const active = index === state.searchActive;
+    const option = h("li", {
+      id: `search-option-${index}`,
+      role: "option",
+      class: active ? "is-active" : "",
+      "aria-selected": active ? "true" : "false",
+    });
+    const link = h("a", { href: `#/lecon/${lesson.id}` }, [
+      h("span", { class: "result-id", text: lesson.id }),
+      h("span", { class: "result-copy" }, [
+        h("strong", { text: lesson.title }),
+        h("small", { text: `Niveau ${level.id} · ${level.title}` }),
+      ]),
+    ]);
+    option.append(link);
+    return option;
+  });
+  if (items.length === 0) {
+    els.searchResults.replaceChildren();
+    els.searchEmpty.hidden = false;
+    els.searchEmpty.textContent = "Aucun résultat. Essaie « gradient », « tokenizer » ou « Mamba ».";
+    els.searchInput.setAttribute("aria-expanded", "false");
+    els.searchInput.removeAttribute("aria-activedescendant");
+    return;
+  }
+  els.searchEmpty.hidden = true;
+  els.searchResults.replaceChildren(...items);
+  els.searchInput.setAttribute("aria-expanded", "true");
+  els.searchInput.setAttribute("aria-activedescendant", `search-option-${state.searchActive}`);
+  items[state.searchActive]?.scrollIntoView({ block: "nearest" });
+}
+
+function stats() {
+  return completionStats(state.index.orderedIds, [...state.done]);
+}
+
+function render({ scroll }) {
+  const y = window.scrollY;
+  const route = parseHash(location.hash);
+  const routeKey = JSON.stringify(route);
+  const routeChanged = routeKey !== state.lastRouteKey;
+  if (routeChanged) state.quizChoice = null;
+  state.route = route;
+  state.lastRouteKey = routeKey;
+  paintChrome();
+  paintMain(route);
+  if (scroll === "top") window.scrollTo(0, 0);
+  else window.scrollTo(0, y);
+  if (scroll === "top") {
+    const heading = els.main.querySelector("h1");
+    if (heading && routeChanged) {
+      if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+      heading.focus({ preventScroll: true });
+    }
+  } else if (state.quizChoice != null) {
+    els.main.querySelector(`[data-choice="${state.quizChoice}"]`)?.focus({ preventScroll: true });
+  }
+  if (route.focus === "roadmap") {
+    document.querySelector("#roadmap")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }
+}
+
+function paintChrome() {
+  const { count, percent, nextId, total } = stats();
+  els.progressValue.textContent = `${percent}%`;
+  els.progressBar.value = percent;
+  els.progressBar.setAttribute("aria-valuenow", String(percent));
+  els.progressBar.setAttribute("aria-valuemin", "0");
+  els.progressBar.setAttribute("aria-valuemax", "100");
+  els.progressMeta.textContent = count === 0 ? stepsLabel(0) : `${stepsLabel(count)} sur ${total}`;
+  if (nextId) {
+    els.continueLink.href = `#/lecon/${nextId}`;
+    els.continueLink.textContent = count === 0 ? "Commencer" : "Continuer";
+  } else {
+    els.continueLink.href = "#/modele";
+    els.continueLink.textContent = "Voir le modèle";
+  }
+  const activeLevel = activeLevelId();
+  const links = state.index.levels.map((level) => {
+    const progress = levelProgress(level, state.done);
+    const current = level.id === activeLevel;
+    const link = h("a", {
+      href: `#/niveau/${level.id}`,
+      class: current ? "nav-level is-active" : "nav-level",
+    });
+    if (current) link.setAttribute("aria-current", "page");
+    appendChildren(link, [
+      h("span", { class: "nav-index", text: String(level.id).padStart(2, "0") }),
+      h("span", { class: "nav-name", text: level.title }),
+      h("span", { class: "nav-count", text: `${progress.count}/${progress.total}` }),
+    ]);
+    return link;
+  });
+  els.nav.replaceChildren(...links);
+}
+
+function activeLevelId() {
+  if (state.route.name === "level") return state.route.id;
+  if (state.route.name === "lesson") return state.index.byId.get(state.route.id)?.level.id ?? null;
+  return null;
+}
+
+function paintMain(route) {
+  if (route.name === "home") paintHome();
+  else if (route.name === "level") paintLevel(route.id);
+  else if (route.name === "lesson") paintLesson(route.id);
+  else if (route.name === "model") paintModel();
+  else paintNotFound(route.path);
+  document.title = pageTitle(route);
+}
+
+function pageTitle(route) {
+  const base = "AI From Zero";
+  if (route.name === "lesson") {
+    const item = state.index.byId.get(route.id);
+    return item ? `${item.lesson.id} ${item.lesson.title} · ${base}` : base;
+  }
+  if (route.name === "level") {
+    const level = state.index.levels.find((entry) => entry.id === route.id);
+    return level ? `Niveau ${level.id} · ${level.title} · ${base}` : base;
+  }
+  if (route.name === "model") return `Mon modèle · ${base}`;
+  return `${base} — le parcours pour construire la tienne`;
+}
+
+function paintHome() {
+  const { count, total, percent, nextId } = stats();
+  const next = nextId ? state.index.byId.get(nextId) : null;
+  const heroActions = [
+    h("a", { class: "button button-primary", href: nextId ? `#/lecon/${nextId}` : "#/modele" }, nextId ? (count === 0 ? "Commencer le parcours" : "Reprendre le parcours") : "Voir le modèle"),
+    h("a", { class: "button button-secondary", href: "#/parcours" }, "Voir la roadmap"),
+  ];
+  const cards = [
+    statCard("Progression", `${percent} %`, stepsLabel(count)),
+    statCard("Prochaine étape", next ? next.lesson.id : "Terminé", next ? next.lesson.title : "Toutes les étapes sont cochées"),
+    statCard("Fil rouge", "model/", "Tokenizer, bigramme, Transformer, MoE, SSM"),
+  ];
+  const roadmap = h("section", { class: "panel", id: "roadmap", "aria-labelledby": "roadmap-title" }, [
+    h("div", { class: "panel-head" }, [
+      h("div", {}, [
+        h("p", { class: "eyebrow", text: "Roadmap" }),
+        h("h2", { id: "roadmap-title", text: "Treize niveaux, un seul laboratoire" }),
+        h("p", { text: "Chaque niveau ajoute une brique au même projet. Rien n'est laissé au statut « planifié »." }),
+      ]),
+      h("p", { class: "legend", text: `${count} / ${total} étapes` }),
+    ]),
+    h("div", { class: "roadmap" }, state.index.levels.map((level) => levelCard(level))),
+  ]);
+  els.main.replaceChildren(
+    h("section", { class: "hero" }, [
+      h("div", {}, [
+        h("p", { class: "eyebrow", text: "Laboratoire francophone" }),
+        h("h1", {}, ["De zéro à ta propre ", h("em", { text: "architecture" }), "."]),
+        h("p", { class: "lead", text: state.index.meta.description }),
+        h("div", { class: "hero-actions" }, heroActions),
+      ]),
+      h("ol", { class: "hero-levels", "aria-label": "Aperçu des niveaux" }, state.index.levels.map((level) => h("li", {}, [
+        h("span", { text: String(level.id).padStart(2, "0") }),
+        h("span", { text: level.title }),
+      ]))),
+    ]),
+    h("div", { class: "stat-grid" }, cards),
+    roadmap,
+  );
+}
+
+function statCard(kicker, value, detail) {
+  return h("article", { class: "stat" }, [
+    h("p", { class: "eyebrow", text: kicker }),
+    h("p", { class: "stat-value", text: value }),
+    h("p", { text: detail }),
+  ]);
+}
+
+function levelCard(level) {
+  const progress = levelProgress(level, state.done);
+  const ratio = progress.total === 0 ? 0 : progress.count / progress.total;
+  const link = h("a", {
+    class: ratio === 1 ? "road-card is-done" : progress.count > 0 ? "road-card is-current" : "road-card",
+    href: `#/niveau/${level.id}`,
+  }, [
+    h("span", { class: "road-index", text: String(level.id).padStart(2, "0") }),
+    h("span", { class: "road-title", text: level.title }),
+    h("span", { class: "road-meta", text: `${progress.count}/${progress.total} · ${level.steps.length} étapes` }),
+    h("span", { class: "road-bar", "aria-hidden": "true" }, [
+      h("span", { style: `transform: scaleX(${ratio})` }),
+    ]),
+  ]);
+  return link;
+}
+
+function paintLevel(id) {
+  const level = state.index.levels.find((entry) => entry.id === id);
+  if (!level) {
+    paintNotFound(`/niveau/${id}`);
+    return;
+  }
+  const progress = levelProgress(level, state.done);
+  const list = h("ol", { class: "chapter-list" });
+  for (const step of level.steps) {
+    const done = state.done.has(step.id);
+    const item = h("li");
+    const link = h("a", { class: done ? "chapter is-done" : "chapter", href: `#/lecon/${step.id}` }, [
+      h("span", { class: "chapter-id", text: step.id }),
+      h("span", { class: "chapter-copy" }, [
+        h("span", { class: "chapter-title", text: step.title }),
+        h("span", { class: "chapter-tag", text: `${step.tag} · ${step.minutes} min` }),
+      ]),
+      h("span", { class: "chapter-state", text: done ? "Terminée" : "À faire" }),
+    ]);
+    item.append(link);
+    list.append(item);
+  }
+  els.main.replaceChildren(
+    crumb([{ href: "#/", label: "Accueil" }, { label: `Niveau ${level.id}` }]),
+    h("p", { class: "eyebrow", text: `Niveau ${level.id}` }),
+    h("h1", { text: level.title }),
+    h("p", { class: "lead", text: level.summary }),
+    h("section", { class: "callout callout-build" }, [
+      h("h2", { text: "Projet du niveau" }),
+      h("p", { text: level.project }),
+      h("p", { class: "muted", text: `${stepsLabel(progress.count)} sur ${progress.total}.` }),
+    ]),
+    list,
+  );
+}
+
+function paintLesson(id) {
+  const item = state.index.byId.get(id);
+  if (!item) {
+    paintNotFound(`/lecon/${id}`);
+    return;
+  }
+  const { lesson, level } = item;
+  const around = neighbors(state.index.orderedIds, lesson.id);
+  const done = state.done.has(lesson.id);
+  const grade = gradeQuiz(lesson.quiz.answer, state.quizChoice);
+  const article = h("article", { class: "lesson", "data-lesson-id": lesson.id });
+  appendChildren(article, [
+    crumb([
+      { href: "#/", label: "Accueil" },
+      { href: `#/niveau/${level.id}`, label: `Niveau ${level.id}` },
+      { label: lesson.id },
+    ]),
+    h("p", { class: "eyebrow", text: `${lesson.tag} · ${lesson.minutes} min` }),
+    h("h1", { text: lesson.title }),
+    h("div", { class: "lesson-grid" }, [
+      h("div", { class: "lesson-main" }, lessonBody(lesson, grade, done, around)),
+      h("aside", { class: "lesson-aside", "aria-label": "Repères de l'étape" }, [
+        h("p", { class: "eyebrow", text: "Objectifs" }),
+        h("ul", {}, lesson.objectives.map((goal) => h("li", { text: goal }))),
+        h("p", { class: "eyebrow", text: "Prérequis" }),
+        h("p", { text: lesson.prereq }),
+        h("p", { class: "eyebrow", text: "Niveau" }),
+        h("p", {}, [h("a", { href: `#/niveau/${level.id}`, text: level.title })]),
+      ]),
+    ]),
+  ]);
+  els.main.replaceChildren(article);
+}
+
+function lessonBody(lesson, grade, done, around) {
+  const nodes = [
+    h("section", { class: "callout callout-why" }, [
+      h("h2", { text: "Pourquoi cette étape" }),
+      h("p", { text: lesson.why }),
+    ]),
+  ];
+  for (const section of lesson.sections) {
+    if (section.kind === "code") nodes.push(codeBlock(section));
+    else {
+      nodes.push(h("section", { class: `block block-${section.kind}` }, [
+        h("h2", { text: section.heading }),
+        ...paragraphs(section.text),
+      ]));
+    }
+  }
+  nodes.push(
+    h("section", { class: "callout callout-exercise" }, [
+      h("h2", { text: "Exercice" }),
+      ...paragraphs(lesson.exercise),
+    ]),
+    h("section", { class: "callout callout-build" }, [
+      h("h2", { text: "Fil rouge" }),
+      ...paragraphs(lesson.build),
+    ]),
+    quizBlock(lesson, grade),
+    h("div", { class: "lesson-actions" }, [
+      around.prev ? h("a", { class: "button button-secondary", href: `#/lecon/${around.prev}` }, "Étape précédente") : h("span", {}),
+      h("button", {
+        type: "button",
+        class: "button button-primary",
+        disabled: !done && !grade.correct,
+        onClick: () => toggleLesson(lesson.id),
+      }, done ? "Retirer des étapes terminées" : "Marquer comme terminée"),
+      around.next ? h("a", { class: "button button-secondary", href: `#/lecon/${around.next}` }, "Étape suivante") : h("a", { class: "button button-secondary", href: "#/modele" }, "Voir le modèle"),
+    ]),
+  );
+  return nodes;
+}
+
+function paragraphs(text) {
+  return String(text)
+    .split(/\n{2,}/)
+    .filter((part) => part.trim())
+    .map((part) => h("p", { text: part.trim() }));
+}
+
+function codeBlock(section) {
+  const code = section.code ?? "";
+  let copyLabel;
+  const button = h("button", {
+    type: "button",
+    class: "copy-button",
+    onClick: async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        copyLabel.textContent = "Copié";
+      } catch {
+        copyLabel.textContent = "Copie indisponible";
+      }
+    },
+  });
+  copyLabel = h("span", { text: "Copier" });
+  button.append(copyLabel);
+  const pre = h("pre");
+  pre.append(h("code", { class: `language-${section.lang || "text"}`, text: code }));
+  return h("section", { class: "block block-code" }, [
+    h("div", { class: "code-head" }, [
+      h("h2", { text: section.heading || "Exemple" }),
+      h("span", { class: "code-lang", text: section.lang || "texte" }),
+      button,
+    ]),
+    pre,
+  ]);
+}
+
+function quizBlock(lesson, grade) {
+  const quiz = lesson.quiz;
+  const options = quiz.choices.map((choice, index) => {
+    const selected = state.quizChoice === index;
+    const classes = ["quiz-choice"];
+    if (selected && grade.correct) classes.push("is-correct");
+    if (selected && grade.status === "incorrect") classes.push("is-wrong");
+    return h("button", {
+      type: "button",
+      class: classes.join(" "),
+      "data-choice": String(index),
+      "aria-pressed": selected ? "true" : "false",
+      onClick: () => {
+        state.quizChoice = index;
+        render({ scroll: "keep" });
+      },
+    }, choice);
+  });
+  const feedback = h("p", {
+    class: `quiz-feedback is-${grade.status}`,
+    role: "status",
+    text: feedbackText(lesson, grade),
+  });
+  return h("section", { class: "quiz", "aria-labelledby": "quiz-title" }, [
+    h("h2", { id: "quiz-title", text: "Quiz" }),
+    h("p", { id: "quiz-question", text: quiz.question }),
+    h("div", { role: "group", "aria-labelledby": "quiz-question" }, options),
+    feedback,
+  ]);
+}
+
+function feedbackText(lesson, grade) {
+  if (grade.status === "unanswered") return "Choisis une réponse. L'étape se coche après la bonne réponse.";
+  if (grade.correct) return `Bonne réponse. ${lesson.quiz.explanation}`;
+  return "Ce n'est pas la bonne réponse. Relis l'explication de l'étape et réessaie.";
+}
+
+function toggleLesson(id) {
+  if (state.done.has(id)) state.done.delete(id);
+  else state.done.add(id);
+  persistDone();
+  toast(state.done.has(id) ? "Étape enregistrée sur cet appareil." : "Étape retirée de la progression.");
+  render({ scroll: "keep" });
+}
+
+function paintModel() {
+  const parts = state.index.architecture;
+  const selected = parts.find((part) => part.id === state.selectedPart) ?? parts[0];
+  const list = h("div", { class: "pipeline", role: "list" });
+  for (const part of parts) {
+    const unlocked = state.done.has(part.step);
+    const pressed = selected?.id === part.id;
+    list.append(h("button", {
+      type: "button",
+      role: "listitem",
+      class: `component${unlocked ? " is-on" : ""}${pressed ? " is-selected" : ""}`,
+      "aria-pressed": pressed ? "true" : "false",
+      onClick: () => {
+        state.selectedPart = part.id;
+        render({ scroll: "keep" });
+      },
+    }, [
+      h("span", { class: "eyebrow", text: unlocked ? "Acquis" : "Verrouillé" }),
+      h("strong", { text: part.name }),
+      h("span", { text: `Étape ${part.step}` }),
+    ]));
+  }
+  const detail = h("section", { class: "component-info", "aria-live": "polite" }, [
+    h("p", { class: "eyebrow", text: "Inspecteur" }),
+    h("h2", { text: selected ? selected.name : "Composant" }),
+    h("p", { text: selected ? selected.summary : "" }),
+    selected ? h("p", {}, [
+      "Introduit à l'étape ",
+      h("a", { href: `#/lecon/${selected.step}`, text: selected.step }),
+      state.done.has(selected.step) ? ". Cette brique est débloquée." : ". Termine cette étape pour la débloquer.",
+    ]) : null,
+    h("p", { text: "Le code de référence est dans le dossier model/ du dépôt, couvert par pytest." }),
+  ]);
+  els.main.replaceChildren(
+    crumb([{ href: "#/", label: "Accueil" }, { label: "Mon modèle" }]),
+    h("p", { class: "eyebrow", text: "Fil rouge" }),
+    h("h1", { text: "Architecture évolutive" }),
+    h("p", { class: "lead", text: "Les briques se débloquent quand l'étape qui les introduit est terminée. Le code correspondant est dans le dossier model/." }),
+    h("div", { class: "model-shell" }, [list, detail]),
+  );
+}
+
+function paintNotFound(path) {
+  els.main.replaceChildren(
+    h("p", { class: "eyebrow", text: "Introuvable" }),
+    h("h1", { text: "Cette adresse ne mène nulle part" }),
+    h("p", { class: "lead", text: `Aucun contenu pour ${path || "cette route"}.` }),
+    h("a", { class: "button button-primary", href: "#/" }, "Retour à l'accueil"),
+  );
+}
+
+function crumb(items) {
+  const nav = h("nav", { class: "breadcrumb", "aria-label": "Fil d'Ariane" });
+  const list = h("ol");
+  items.forEach((item, index) => {
+    const li = h("li");
+    if (item.href && index < items.length - 1) li.append(h("a", { href: item.href, text: item.label }));
+    else li.append(h("span", { text: item.label }));
+    list.append(li);
+  });
+  nav.append(list);
+  return nav;
+}
+
+function onPlacement() {
+  const level = state.index?.levels.find((entry) => entry.id === 0);
+  if (!level) return;
+  const ok = window.confirm("Marquer les 20 étapes du niveau 0 (fondations numériques) comme déjà connues sur cet appareil ?");
+  if (!ok) return;
+  for (const step of level.steps) state.done.add(step.id);
+  persistDone();
+  toast("Fondations marquées comme connues.");
+  render({ scroll: "keep" });
+}
+
+function onReset() {
+  const ok = window.confirm("Effacer toute la progression enregistrée dans ce navigateur ?");
+  if (!ok) return;
+  state.done = new Set();
+  persistDone();
+  toast("Progression effacée.");
+  render({ scroll: "keep" });
+}
+
+let toastTimer = 0;
+function toast(message) {
+  els.toast.textContent = message;
+  els.toast.hidden = false;
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    els.toast.hidden = true;
+  }, 2800);
+}
