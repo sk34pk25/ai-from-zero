@@ -6,7 +6,7 @@ import { parseHash } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
 import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
 import { modifierLabel } from "./text.js";
-import { mountVisual } from "./visuals.js";
+import { mountTrainingRun, mountVisual } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
 
@@ -17,6 +17,7 @@ const state = {
   quizChoice: null,
   hintCount: 0,
   solutionOpen: false,
+  gptRun: null,
   searchActive: 0,
   searchHits: [],
   selectedPart: null,
@@ -97,6 +98,7 @@ async function boot() {
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     state.index = indexCurriculum(data);
+    state.gptRun = await loadTrainingRun();
     state.done = new Set(loadDone());
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     render({ scroll: "top" });
@@ -107,6 +109,16 @@ async function boot() {
         text: "Le fichier data/curriculum.json n'a pas pu être chargé. Ouvre le site avec un serveur local, par exemple : python3 -m http.server.",
       }),
     );
+  }
+}
+
+async function loadTrainingRun() {
+  try {
+    const response = await fetch(new URL("data/gpt_run.json", document.baseURI));
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
   }
 }
 
@@ -822,29 +834,35 @@ function paintTrack() {
     list.append(item);
   });
   const sample = [
-    "from model.tiny_lm import train_tiny_lm",
-    "result = train_tiny_lm('abababababababab', steps=40, lr=0.8, attention=True)",
-    "print(result.loss_start, result.loss_end, result.generated)",
+    "python3 -m model.gpt_train --steps 400",
+    "python3 -m model.gpt_sample --prompt \"le chat \"",
   ].join("\n");
   const pre = h("pre");
   pre.append(h("code", { text: sample }));
+  const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
   els.main.replaceChildren(
     crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
     h("p", { class: "eyebrow", text: "Fil rouge" }),
     h("h1", { text: "Construire ton LLM" }),
-    h("p", { class: "lead", text: "Onze étapes, d'un dossier vide jusqu'à un petit modèle dont la perte descend vraiment. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste." }),
+    h("p", { class: "lead", text: `${stages.length} étapes, d'un dossier vide jusqu'à un petit GPT entraîné par rétropropagation. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste.` }),
+    h("section", { class: "callout callout-build", "aria-labelledby": "run-title" }, [
+      h("h2", { id: "run-title", text: "Entraînement réel" }),
+      h("p", { text: state.gptRun?.label || "Un entraînement CPU déjà fait dans ce dépôt. Les nombres et les phrases viennent de ce run, pas d'un dessin." }),
+      runHost,
+    ]),
     h("p", { class: "track-progress", text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.` }),
     list,
     h("section", { class: "callout callout-build" }, [
       h("h2", { text: "Lancer l'entraînement" }),
-      h("p", { text: "Depuis la racine du dépôt. Le gradient est celui de model/autograd.py : il traverse le produit, et avec attention=True le masque causal et le softmax. pytest vérifie que la perte baisse." }),
+      h("p", { text: "Depuis la racine du dépôt. gpt_train.py entraîne TinyGPT (embeddings, blocs, tête) avec l'autograd NumPy et AdamW. gpt_sample.py tire une suite. Le petit modèle de tiny_lm.py reste l'étape d'avant, une seule tête." }),
       pre,
     ]),
     h("section", { class: "callout" }, [
       h("h2", { text: "Ce que cette piste n'entraîne pas" }),
-      h("p", { text: "TinyGPT dans transformer.py reste un forward de référence. Le dos interchangeable compare des formes, il n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet." }),
+      h("p", { text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet." }),
     ]),
   );
+  mountTrainingRun(runHost, state.gptRun);
 }
 
 function paintNotFound(path) {

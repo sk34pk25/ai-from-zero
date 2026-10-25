@@ -27,6 +27,8 @@ python3 -m pytest
 | `bigram.py` | bigramme lissé, perplexité, échantillonnage | 3 |
 | `attention.py` | attention causale, RoPE | 4–5 |
 | `transformer.py` | TinyGPT : pré-norme, résidus, options modernes, cache KV | 4–5 |
+| `gpt_train.py` | entraînement AdamW du decoder standard, checkpoint, rapport | 4 |
+| `gpt_sample.py` | température et top-k depuis le checkpoint | 3–4 |
 | `bench.py` | octets, FLOPs, tableau qualité / temps / RAM | 6 |
 | `moe.py` | experts, routeur top-k, capacité, perte d'équilibre | 7 |
 | `ssm.py` | scan sélectif et scan affine parallèle | 8 |
@@ -37,7 +39,8 @@ python3 -m pytest
 
 ## Ce que le laboratoire ne prétend pas faire
 
-- L'attention entraînable est celle de `tiny_lm.py` (une tête, masque causal, rétropropagation réelle). TinyGPT dans `transformer.py` reste un forward de référence : il n'est pas entraîné de bout en bout.
+- TinyGPT s'entraîne dans sa forme decoder standard : positions absolues, LayerNorm, GELU, attention multi-têtes, résidus, tête de langage. Le gradient est celui de `autograd.py`, l'optimiseur est AdamW. RoPE, RMSNorm, SwiGLU, GQA et le cache KV restent des forwards.
+- `tiny_lm.py` reste le modèle à une tête, utile avant le bloc complet.
 - Le dos `ssm` est un scan sélectif réduit, pas un bloc Mamba (pas de convolution courte, pas de kernel CUDA).
 - L'image s'arrête au découpage en patches. Il n'y a pas d'encodeur audio, ni de décodeur d'image.
 - La mémoire est un sac de mots, pas un embedding entraîné.

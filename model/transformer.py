@@ -2,6 +2,9 @@
 
 Les variantes modernes (RoPE, RMSNorm, SwiGLU, GQA, weight tying) sont des options
 du même module : c'est le fil rouge des niveaux 4 et 5.
+
+L'entraînement du decoder standard (positions absolues, LayerNorm, GELU,
+attention multi-têtes) passe par model.gpt_train et l'autograd NumPy.
 """
 
 from __future__ import annotations
@@ -105,6 +108,8 @@ class TinyGPT:
         positions = np.arange(past, past + time)
         if self.config.pos == "absolute":
             hidden = hidden + self.params["pos"][positions]
+        if getattr(self, "keep_attention", False):
+            self._last_weights = []
         new_cache: list[dict[str, np.ndarray]] = []
         for layer in range(self.config.n_layers):
             attended, keys, values = self._attention(self._norm(hidden, layer, 1), layer, positions, None if cache is None else cache[layer])
@@ -166,6 +171,8 @@ class TinyGPT:
         allowed = np.arange(key.shape[2])[None, :] <= positions[:, None]
         scores = np.where(allowed, scores, -1e9)
         weights = _softmax_last(scores)
+        if getattr(self, "keep_attention", False):
+            self._last_weights.append(weights)
         context = weights @ value_for_attn
         context = context.transpose(0, 2, 1, 3).reshape(batch, time, heads * head_dim)
         return context @ self.params[f"{prefix}.wo"], key, value

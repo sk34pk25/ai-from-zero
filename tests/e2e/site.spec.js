@@ -138,6 +138,8 @@ test("les indices survivent au quiz et la piste LLM s'affiche", async ({ page })
   await expect(page.locator("#solution")).toBeHidden();
   await page.goto("/#/construire");
   await expect(page.locator("h1")).toHaveText("Construire ton LLM");
+  await expect(page.getByRole("heading", { name: "Entraînement réel" })).toBeVisible();
+  await expect(page.locator("[data-run-host]")).toContainText("Validation");
   await expect(page.locator(".track-step")).toHaveCount(curriculum.track.length);
   await expect(page.getByRole("link", { name: "4.4" })).toBeVisible();
   await page.getByRole("link", { name: "4.4" }).click();

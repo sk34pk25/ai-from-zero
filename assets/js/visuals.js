@@ -493,6 +493,68 @@ const MOUNTS = {
   compare: (host) => staticFigure(host, ["Mesuré ici — un test du dépôt", "Lu ailleurs — un article, sans le chiffre", "La fiche ne mélange pas les deux"]),
 };
 
+function lossLine(values, steps, className, min, max, totalSteps) {
+  const span = Math.max(max - min, 1e-6);
+  const denom = Math.max(totalSteps - 1, 1);
+  const points = values.map((value, index) => {
+    const step = steps ? steps[index] : index;
+    const x = 16 + (step / denom) * 288;
+    const y = 128 - ((value - min) / span) * 104;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const node = svgEl("polyline", { points, fill: "none", "stroke-width": "2.5" });
+  node.setAttribute("class", className);
+  return node;
+}
+
+export function mountTrainingRun(host, run) {
+  host.replaceChildren();
+  if (!run || !Array.isArray(run.batch_losses) || run.batch_losses.length < 2) {
+    host.append(readout("Le compte-rendu data/gpt_run.json n'est pas disponible."));
+    return;
+  }
+  const train = run.batch_losses.map(Number);
+  const val = (run.val_losses || []).map(Number);
+  const all = val.length ? train.concat(val) : train;
+  const min = Math.min(...all);
+  const max = Math.max(...all);
+  const canvas = svgCanvas(
+    `Courbe réelle. Train de ${Number(run.train_loss_start).toFixed(2)} à ${Number(run.train_loss_end).toFixed(2)}. Validation de ${Number(run.val_loss_start).toFixed(2)} à ${Number(run.val_loss_end).toFixed(2)}.`,
+    320,
+    150,
+  );
+  canvas.append(lossLine(train, null, "is-train", min, max, train.length));
+  if (val.length) canvas.append(lossLine(val, run.val_steps || null, "is-val", min, max, train.length));
+  const summary = readout(
+    `${run.steps} pas en ${run.seconds} s. ${run.parameter_count} paramètres, vocabulaire ${run.vocab_size}, ${run.dataset_chars} caractères. Train ${Number(run.train_loss_start).toFixed(3)} à ${Number(run.train_loss_end).toFixed(3)}. Validation ${Number(run.val_loss_start).toFixed(3)} à ${Number(run.val_loss_end).toFixed(3)}. La ligne cuivrée est le lot, la verte est la validation.`,
+  );
+  host.append(canvas, summary);
+  for (const sample of run.samples || []) {
+    const caption = readout(`Température ${sample.temperature}, top-k ${sample.top_k}. Texte tiré du checkpoint de cet entraînement.`);
+    const body = document.createElement("p");
+    body.className = "run-sample";
+    body.textContent = sample.text;
+    host.append(caption, body);
+  }
+  const attention = run.attention;
+  if (attention && Array.isArray(attention.tokens) && Array.isArray(attention.last_row)) {
+    const board = document.createElement("div");
+    board.className = "token-board";
+    attention.tokens.forEach((token, index) => {
+      const chip = document.createElement("span");
+      chip.className = "token-chip";
+      const shown = token === " " ? "espace" : token;
+      const weight = Number(attention.last_row[index] || 0);
+      chip.textContent = `${shown} ${weight.toFixed(2)}`;
+      board.append(chip);
+    });
+    host.append(
+      readout(`Poids réels, couche ${attention.layer} tête ${attention.head}, dernière position de « ${attention.prompt} ». Ce n'est pas le masque uniforme de la leçon.`),
+      board,
+    );
+  }
+}
+
 export function mountVisual(host, lesson) {
   host.replaceChildren();
   const kind = lesson.visual in MOUNTS ? lesson.visual : "flow";

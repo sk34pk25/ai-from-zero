@@ -99,6 +99,8 @@ test("le curriculum commité a 149 leçons et des réponses réparties", () => {
     assert.ok(step.review.includes(step.title));
   }
   assert.deepEqual(counts, [37, 38, 37, 37]);
-  assert.equal(data.track.length, 11);
+  assert.equal(data.track.length, 15);
   assert.equal(data.track.some((stage) => stage.file === "model/tiny_lm.py"), true);
+  assert.equal(data.track.at(-1).file, "model/gpt_sample.py");
+  assert.equal(data.track.some((stage) => stage.file === "model/gpt_train.py"), true);
 });

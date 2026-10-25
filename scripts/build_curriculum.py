@@ -179,6 +179,10 @@ TRACK = [
     {"id": "echantillon", "title": "Échantillonner", "step": "3.9", "file": "model/tiny_lm.py", "summary": "Générer, c'est répéter : lire les scores du dernier pas, tirer un token, le recoller."},
     {"id": "evaluer", "title": "Évaluer sans tricher", "step": "11.2", "file": "model/experiment.py", "summary": "La fin de la séquence reste cachée. La baseline uniforme vaut la taille du vocabulaire."},
     {"id": "elargir", "title": "Élargir sans se raconter d'histoires", "step": "12.8", "file": "model/backbone.py", "summary": "Le dos interchangeable compare des formes. Il n'est pas, lui, entraîné de bout en bout."},
+    {"id": "tetes", "title": "L'attention multi-têtes", "step": "4.7", "file": "model/transformer.py", "summary": "Plusieurs têtes relisent le passé en parallèle. Dans TinyGPT, le gradient traverse chacune."},
+    {"id": "bloc", "title": "Le bloc decoder complet", "step": "4.11", "file": "model/transformer.py", "summary": "Norme, attention causale, résidu, norme, MLP GELU, résidu. Puis les embeddings, les blocs empilés et la tête."},
+    {"id": "gpt", "title": "Entraîner ton GPT", "step": "4.14", "file": "model/gpt_train.py", "summary": "AdamW, découpage train/val, perte, checkpoint. Le corpus français est model/data/francais.txt."},
+    {"id": "suite", "title": "Échantillonner ton GPT", "step": "3.9", "file": "model/gpt_sample.py", "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné."},
 ]
 
 

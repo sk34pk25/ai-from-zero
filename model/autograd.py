@@ -112,9 +112,11 @@ class Tensor:
 
         def backward() -> None:
             if self.requires_grad:
-                self.grad += result.grad @ np.swapaxes(other_t.data, -1, -2)
+                grad = result.grad @ np.swapaxes(other_t.data, -1, -2)
+                self.grad += _unbroadcast(grad, self.data.shape)
             if other_t.requires_grad:
-                other_t.grad += np.swapaxes(self.data, -1, -2) @ result.grad
+                grad = np.swapaxes(self.data, -1, -2) @ result.grad
+                other_t.grad += _unbroadcast(grad, other_t.data.shape)
 
         result = self._binary(other_t, out, backward)
         return result
@@ -133,6 +135,52 @@ class Tensor:
 
     def mean(self) -> Tensor:
         return self.sum() * (1.0 / self.data.size)
+
+    def reshape(self, *shape: int) -> Tensor:
+        out = self.data.reshape(shape)
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += result.grad.reshape(self.data.shape)
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def permute(self, axes: tuple[int, ...]) -> Tensor:
+        out = np.transpose(self.data, axes)
+        inverse = tuple(int(axis) for axis in np.argsort(axes))
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += np.transpose(result.grad, inverse)
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def gelu(self) -> Tensor:
+        """Approximation tanh, la même que model.mathutil.gelu."""
+        values = self.data
+        scale = float(np.sqrt(2.0 / np.pi))
+        inner = scale * (values + 0.044715 * values**3)
+        tanh_inner = np.tanh(inner)
+        out = 0.5 * values * (1.0 + tanh_inner)
+
+        def backward() -> None:
+            if not self.requires_grad:
+                return
+            sech2 = 1.0 - tanh_inner**2
+            d_inner = scale * (1.0 + 3.0 * 0.044715 * values**2)
+            local = 0.5 * (1.0 + tanh_inner) + 0.5 * values * sech2 * d_inner
+            self.grad += result.grad * local
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
 
     def relu(self) -> Tensor:
         mask = self.data > 0
@@ -179,6 +227,36 @@ class Tensor:
         result._prev = (self,) if self.requires_grad else ()
         result._backward = backward
         return result
+
+
+def layernorm(values: Tensor, gain: Tensor, bias: Tensor, eps: float = 1e-5) -> Tensor:
+    """LayerNorm sur le dernier axe. Même formule que model.mathutil.layernorm."""
+    data = values.data
+    mean = np.mean(data, axis=-1, keepdims=True)
+    centered = data - mean
+    var = np.mean(centered**2, axis=-1, keepdims=True)
+    inv_std = 1.0 / np.sqrt(var + eps)
+    normalized = centered * inv_std
+    out = normalized * gain.data + bias.data
+
+    def backward() -> None:
+        grad = result.grad
+        reduce_axes = tuple(range(grad.ndim - 1))
+        if gain.requires_grad:
+            gained = grad * normalized
+            gain.grad += gained if not reduce_axes else gained.sum(axis=reduce_axes)
+        if bias.requires_grad:
+            bias.grad += grad if not reduce_axes else grad.sum(axis=reduce_axes)
+        if values.requires_grad:
+            d_normalized = grad * gain.data
+            mean_d = np.mean(d_normalized, axis=-1, keepdims=True)
+            mean_d_norm = np.mean(d_normalized * normalized, axis=-1, keepdims=True)
+            values.grad += (d_normalized - mean_d - normalized * mean_d_norm) * inv_std
+
+    result = Tensor(out, requires_grad=values.requires_grad or gain.requires_grad or bias.requires_grad)
+    result._prev = tuple(node for node in (values, gain, bias) if node.requires_grad)
+    result._backward = backward
+    return result
 
 
 def embedding(table: Tensor, indices: np.ndarray) -> Tensor:
