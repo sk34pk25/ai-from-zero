@@ -758,7 +758,10 @@ p code, li code {
 
 @media (max-width: 960px) {
   .menu-button { display: grid; }
-  .layout { grid-template-columns: 1fr; }
+  .layout {
+    grid-template-columns: 1fr;
+    min-height: calc(100vh - var(--header));
+  }
   .sidebar {
     position: fixed;
     z-index: 30;

@@ -193,6 +193,8 @@ test("axe ne signale rien sur les écrans principaux", async ({ page }) => {
   await page.goto("/#/lecon/4.5");
   await axe(page);
   await page.goto("/#/construire");
+  await expect(page.locator("[data-run-host]")).toContainText("Validation");
+  await expect(page.locator("[data-chat-host]")).toContainText("LoRA");
   await axe(page);
   await page.goto("/#/modele");
   await axe(page);
@@ -249,6 +251,10 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     }
     if (url.includes("/parcours")) {
       await page.locator("#roadmap").evaluate((node) => node.scrollIntoView({ block: "start", behavior: "instant" }));
+    }
+    if (url.includes("/construire")) {
+      await expect(page.locator("[data-run-host]")).toContainText("Validation");
+      await expect(page.locator("[data-chat-host]")).toContainText("LoRA");
     }
     await page.screenshot({ path: `docs/images/${name}`, animations: "disabled" });
   }

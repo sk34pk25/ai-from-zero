@@ -104,8 +104,6 @@ async function boot() {
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     state.index = indexCurriculum(data);
-    state.gptRun = await loadTrainingRun();
-    state.finetuneRun = await loadFinetuneRun();
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     onAuth(() => {
       state.owner = isOwner();
@@ -135,6 +133,18 @@ async function loadJsonReport(path) {
   } catch {
     return null;
   }
+}
+
+let reportsPromise = null;
+
+function ensureTrainingReports() {
+  if (!reportsPromise) {
+    reportsPromise = Promise.all([loadTrainingRun(), loadFinetuneRun()]).then(([gpt, chat]) => {
+      state.gptRun = gpt;
+      state.finetuneRun = chat;
+    });
+  }
+  return reportsPromise;
 }
 
 async function loadTrainingRun() {
@@ -993,6 +1003,11 @@ function paintTrack() {
   pre.append(h("code", { text: sample }));
   const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
   const chatHost = h("div", { class: "visual-host", "data-chat-host": "true" });
+  const reportsReady = Boolean(state.gptRun && state.finetuneRun);
+  if (!reportsReady) {
+    runHost.append(h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }));
+    chatHost.append(h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }));
+  }
   els.main.replaceChildren(
     crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
     h("p", { class: "eyebrow", text: "Fil rouge" }),
@@ -1021,8 +1036,17 @@ function paintTrack() {
       h("p", { text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet." }),
     ]),
   );
-  mountTrainingRun(runHost, state.gptRun);
-  mountChatRun(chatHost, state.finetuneRun);
+  if (reportsReady) {
+    mountTrainingRun(runHost, state.gptRun);
+    mountChatRun(chatHost, state.finetuneRun);
+    return;
+  }
+  const ticket = state.pageTicket;
+  ensureTrainingReports().then(() => {
+    if (ticket !== state.pageTicket) return;
+    mountTrainingRun(runHost, state.gptRun);
+    mountChatRun(chatHost, state.finetuneRun);
+  });
 }
 
 function paintNotFound(path) {
