@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { installOwner, OTHER_ID } from "./session.js";
+import { installOwner, OTHER_ID, signInAs } from "./session.js";
 
 const IMPLICIT = "/#access_token=aaa.bbb.ccc&expires_in=3600&refresh_token=refresh-1&token_type=bearer&type=recovery";
 
@@ -188,6 +188,154 @@ test("un autre compte ne choisit pas le mot de passe du propriétaire", async ({
   await page.goto(IMPLICIT);
   await expect(page.locator("main")).toContainText("pas le propriétaire");
   await expect(page.locator("#new-password")).toHaveCount(0);
+});
+
+test("une 429 explique la limite, arme le délai, et un second clic n'envoie rien", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await installOwner(page);
+  let recovers = 0;
+  await page.route(/\/auth\/v1\/recover/, async (route) => {
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "*",
+          "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+        },
+      });
+      return;
+    }
+    recovers += 1;
+    await route.fulfill({
+      status: 429,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-headers": "*",
+        "content-type": "application/json",
+        "x-supabase-api-version": "2024-01-01",
+      },
+      json: {
+        code: "over_email_send_rate_limit",
+        error_code: "over_email_send_rate_limit",
+        msg: "email rate limit exceeded",
+      },
+    });
+  });
+  await page.goto("/#/connexion");
+  await expect(page.locator("#recovery-hint")).toContainText("indésirables");
+  await page.getByLabel("Adresse e-mail").fill("patrik@example.com");
+  await page.getByRole("button", { name: "Mot de passe oublié" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("Limite horaire du courrier");
+  await expect(page.locator(".quiz-feedback")).toContainText("environ une heure");
+  await expect(page.locator(".quiz-feedback")).toContainText("précédent");
+  await expect(page.locator(".quiz-feedback")).not.toHaveText("Le message n'a pas pu être envoyé.");
+  await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeDisabled();
+  expect(recovers).toBe(1);
+  const until = await page.evaluate(() => Number(localStorage.getItem("afz-recovery-email-until")));
+  expect(until).toBeGreaterThan(Date.now() + 50 * 60 * 1000);
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeDisabled();
+  await expect(page.locator(".quiz-feedback")).toContainText("déjà été demandé");
+  expect(recovers).toBe(1);
+  await page.screenshot({ path: "docs/images/reset-limite-mobile.png", animations: "disabled" });
+});
+
+test("une panne réseau ne consomme pas le délai d'une heure", async ({ page }) => {
+  await installOwner(page);
+  await page.route(/\/auth\/v1\/recover/, (route) => route.abort("failed"));
+  await page.goto("/#/connexion");
+  await page.getByLabel("Adresse e-mail").fill("patrik@example.com");
+  await page.getByRole("button", { name: "Mot de passe oublié" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("réseau");
+  await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeEnabled();
+  const until = await page.evaluate(() => localStorage.getItem("afz-recovery-email-until"));
+  expect(until).toBeNull();
+});
+
+test("un HTML périmé recharge sans perdre token_hash", async ({ page }) => {
+  await installOwner(page);
+  await page.route(/\/version\.json(?:\?.*)?$/, (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ version: "future-version" }),
+  }));
+  const reloaded = page.waitForRequest((request) => {
+    const url = request.url();
+    return request.method() === "GET"
+      && url.includes("token_hash=hash-1")
+      && url.includes("type=recovery")
+      && url.includes("v=future-version");
+  });
+  await page.goto("/?token_hash=hash-1&type=recovery");
+  await reloaded;
+  await expect(page.getByRole("button", { name: "Vérifier le lien" })).toBeVisible();
+  await expect(page).toHaveURL(/[?&]v=future-version/);
+  await expect(page).toHaveURL(/#\/nouveau-mot-de-passe/);
+});
+
+test("le propriétaire change son mot de passe sans e-mail", async ({ page }) => {
+  const errors = trackErrors(page);
+  await installOwner(page);
+  const updates = [];
+  const userGets = [];
+  page.on("request", (request) => {
+    if (!request.url().includes("/auth/v1/user")) return;
+    if (request.method() === "PUT") updates.push(request.postDataJSON());
+    if (request.method() === "GET") userGets.push(request.url());
+  });
+  await page.goto("/#/changer-mot-de-passe");
+  await expect(page.locator("h1")).toHaveText("Changer mon mot de passe");
+  await expect(page.locator("#account-new-password")).toHaveCount(0);
+  await expect(page.locator("main")).toContainText("sans e-mail");
+  await signInAs(page);
+  await page.getByRole("link", { name: "Changer mon mot de passe" }).click();
+  await expect(page).toHaveURL(/#\/changer-mot-de-passe$/);
+  await expect(page.locator("#account-new-password")).toBeVisible();
+  await page.getByLabel("Nouveau mot de passe").fill("court");
+  await page.getByLabel("Confirmer le mot de passe").fill("court");
+  await page.getByRole("button", { name: "Enregistrer le mot de passe" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("12 caractères");
+  expect(updates).toEqual([]);
+  await page.getByLabel("Nouveau mot de passe").fill("un-mot-de-passe-solide");
+  await page.getByLabel("Confirmer le mot de passe").fill("un-autre-mot");
+  await page.getByRole("button", { name: "Enregistrer le mot de passe" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("ne correspondent pas");
+  expect(updates).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByLabel("Confirmer le mot de passe").fill("un-mot-de-passe-solide");
+  await page.getByRole("button", { name: "Enregistrer le mot de passe" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("Aucun e-mail n'a été envoyé");
+  expect(updates).toHaveLength(1);
+  expect(updates[0].password).toBe("un-mot-de-passe-solide");
+  expect(userGets.length).toBeGreaterThan(0);
+  await page.screenshot({ path: "docs/images/mot-de-passe-mobile.png", animations: "disabled" });
+  expect(errors).toEqual([]);
+});
+
+test("une session refusée n'enregistre pas le mot de passe", async ({ page }) => {
+  await installOwner(page);
+  await page.route(/\/auth\/v1\/user(?:\?.*)?$/, async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.fallback();
+      return;
+    }
+    await route.fulfill({
+      status: 401,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-headers": "*",
+        "content-type": "application/json",
+      },
+      json: { code: "bad_jwt", message: "invalid claim" },
+    });
+  });
+  await signInAs(page);
+  await page.goto("/#/changer-mot-de-passe");
+  await page.getByLabel("Nouveau mot de passe").fill("un-mot-de-passe-solide");
+  await page.getByLabel("Confirmer le mot de passe").fill("un-mot-de-passe-solide");
+  await page.getByRole("button", { name: "Enregistrer le mot de passe" }).click();
+  await expect(page.locator(".quiz-feedback")).toContainText("session");
 });
 
 test("mot de passe oublié envoie le redirectTo de la route dédiée", async ({ page }) => {

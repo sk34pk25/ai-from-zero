@@ -1,6 +1,6 @@
 /** Catalogue public des jeux. Le plan d'entraînement n'est enregistré que par le propriétaire. */
 
-import { upsertRow } from "./auth.js";
+import { selectRows, upsertRow } from "./auth.js";
 import { h } from "./dom.js";
 
 const STAGES = [
@@ -65,6 +65,7 @@ function formatSize(row) {
 }
 
 export async function paintDonnees(main, ctx) {
+  const stamp = main.dataset.paint;
   main.replaceChildren(
     h("p", { class: "eyebrow", text: "Entraînement" }),
     h("h1", { text: "Catalogue des jeux" }),
@@ -74,8 +75,20 @@ export async function paintDonnees(main, ctx) {
     const response = await fetch(new URL("data/datasets.json", document.baseURI));
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
-    paintCatalog(main, data, ctx);
+    let savedIds = [];
+    if (ctx.owner) {
+      try {
+        const rows = await selectRows("training_plans");
+        const ids = rows?.[0]?.dataset_ids;
+        if (Array.isArray(ids)) savedIds = ids.filter((id) => typeof id === "string");
+      } catch {
+        savedIds = [];
+      }
+    }
+    if (main.dataset.paint !== stamp) return;
+    paintCatalog(main, data, ctx, savedIds);
   } catch {
+    if (main.dataset.paint !== stamp) return;
     main.replaceChildren(
       h("h1", { text: "Catalogue indisponible" }),
       h("p", { text: "data/datasets.json n'a pas pu être lu. Ouvre le site avec un serveur local." }),
@@ -83,9 +96,9 @@ export async function paintDonnees(main, ctx) {
   }
 }
 
-function paintCatalog(main, data, ctx) {
+function paintCatalog(main, data, ctx, savedIds = []) {
   const rows = [...data.datasets].sort((a, b) => a.order - b.order);
-  const selected = new Set();
+  const selected = new Set(savedIds);
   const filters = { stage: "tous", language: "tous", licence: "tous", size: "tous", runtime: "tous" };
   const config = { tokenizer: "bpe", runtime: "cpu" };
 

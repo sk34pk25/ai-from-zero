@@ -1,14 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { nextCacheUrl } from "../../assets/js/cache-bust.js";
 import {
+  RECOVERY_EMAIL_COOLDOWN_MS,
+  RECOVERY_EMAIL_LOCK_KEY,
+  RECOVERY_EMAIL_RATE_LIMIT,
+  RECOVERY_EMAIL_SENT,
+  RECOVERY_EMAIL_UNTIL_KEY,
+  claimRecoverySend,
   cleanAuthLocation,
+  formatRecoveryWait,
   isEmailAddress,
   normalizeImplicitHref,
   passwordProblems,
   passwordResetRedirect,
   readAuthReturn,
+  recoveryCooldownMessage,
+  recoveryCooldownRemaining,
   recoveryErrorMessage,
+  resetEmailFailure,
+  settleRecoverySend,
 } from "../../assets/js/auth-return.js";
 
 const site = "https://sk34pk25.github.io/ai-from-zero/";
@@ -142,6 +154,73 @@ test("token_hash reste un jeton à confirmer, pas une session", () => {
   assert.equal(parsed.type, "recovery");
   assert.equal(cleanAuthLocation(href).includes("token_hash"), false);
   assert.equal(cleanAuthLocation(`${site}?recovery=1#access_token=aaa`), `${site}#/nouveau-mot-de-passe`);
+});
+
+function memoryStorage(initial = {}) {
+  const data = new Map(Object.entries(initial).map(([key, value]) => [key, String(value)]));
+  return {
+    getItem(key) { return data.has(key) ? data.get(key) : null; },
+    setItem(key, value) { data.set(key, String(value)); },
+    removeItem(key) { data.delete(key); },
+  };
+}
+
+test("une 429 explique la limite horaire, le réseau et otp_expired aussi", () => {
+  const limited = resetEmailFailure({ status: 429, code: "over_email_send_rate_limit", message: "email rate limit exceeded" });
+  assert.equal(limited.code, "over_email_send_rate_limit");
+  assert.match(limited.message, /environ une heure/);
+  assert.match(limited.message, /précédent/);
+  assert.match(limited.message, /indésirables/);
+  assert.equal(limited.message, RECOVERY_EMAIL_RATE_LIMIT);
+  assert.equal(limited.message.includes("Le message n'a pas pu être envoyé."), false);
+
+  const byMessage = resetEmailFailure({ status: 429, message: "email rate limit exceeded" });
+  assert.equal(byMessage.code, "over_email_send_rate_limit");
+
+  const network = resetEmailFailure({ name: "AuthRetryableFetchError", status: 0, message: "Failed to fetch" });
+  assert.equal(network.code, "network");
+  assert.match(network.message, /réseau/);
+  assert.match(network.message, /indésirables/);
+
+  const expired = resetEmailFailure({ status: 403, code: "otp_expired", message: "Email link is invalid or has expired" });
+  assert.equal(expired.code, "otp_expired");
+  assert.match(expired.message, /expiré/);
+});
+
+test("le délai local bloque un second envoi pendant une heure", () => {
+  const storage = memoryStorage();
+  const now = 1_700_000_000_000;
+  assert.equal(claimRecoverySend(storage, now).blocked, false);
+  assert.equal(claimRecoverySend(storage, now + 1000).reason, "busy");
+  settleRecoverySend(storage, "sent", now);
+  assert.equal(storage.getItem(RECOVERY_EMAIL_LOCK_KEY), null);
+  assert.equal(Number(storage.getItem(RECOVERY_EMAIL_UNTIL_KEY)), now + RECOVERY_EMAIL_COOLDOWN_MS);
+  assert.equal(recoveryCooldownRemaining(storage, now + 1000), RECOVERY_EMAIL_COOLDOWN_MS - 1000);
+  assert.match(recoveryCooldownMessage(45 * 60 * 1000), /45 min/);
+  assert.match(recoveryCooldownMessage(RECOVERY_EMAIL_COOLDOWN_MS), /1 heure/);
+  assert.equal(formatRecoveryWait(5 * 60 * 1000 + 3000), "5 min 3 s");
+  settleRecoverySend(storage, "failed", now + 5000);
+  assert.equal(recoveryCooldownRemaining(storage, now + 5000) > 0, true);
+  const fresh = memoryStorage({ [RECOVERY_EMAIL_LOCK_KEY]: String(now + 10_000) });
+  settleRecoverySend(fresh, "failed", now);
+  assert.equal(recoveryCooldownRemaining(fresh, now), 0);
+  assert.equal(fresh.getItem(RECOVERY_EMAIL_LOCK_KEY), null);
+  assert.match(RECOVERY_EMAIL_SENT, /message de réinitialisation/);
+  assert.match(RECOVERY_EMAIL_SENT, /indésirables/);
+});
+
+test("un HTML périmé recharge sans perdre le fragment ni le jeton", () => {
+  const doubled = `${site}#/nouveau-mot-de-passe#access_token=aaa&refresh_token=bbb&type=recovery`;
+  const next = nextCacheUrl(doubled, "old", "new");
+  assert.match(next, /[?&]v=new/);
+  assert.match(next, /#\/nouveau-mot-de-passe#access_token=aaa/);
+  assert.equal(nextCacheUrl(doubled, "new", "new"), "");
+  const token = `${site}?token_hash=hash-1&type=recovery`;
+  const stamped = nextCacheUrl(token, "old", "new");
+  assert.match(stamped, /token_hash=hash-1/);
+  assert.match(stamped, /type=recovery/);
+  assert.match(stamped, /[?&]v=new/);
+  assert.equal(nextCacheUrl(`${token}&v=new`, "old", "new"), "");
 });
 
 test("le mot de passe exige 12 caractères et la même confirmation", () => {

@@ -20,6 +20,7 @@ export function normalizeProgress(raw) {
     for (const [id, row] of Object.entries(raw.quizzes)) {
       if (typeof id !== "string" || !row || typeof row.correct !== "boolean") continue;
       quizzes[id] = { correct: row.correct };
+      if (Number.isInteger(row.choice) && row.choice >= 0 && row.choice <= 3) quizzes[id].choice = row.choice;
     }
   }
   const exercises = {};

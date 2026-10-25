@@ -18,6 +18,60 @@
   }
 })();
 </script>
+<script>
+(function () {
+  var expected = "b1fff15402db";
+  var arrival = location.href;
+  fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (response) {
+    return response.ok ? response.json() : null;
+  }).then(function (data) {
+    var remote = data && data.version;
+    if (!remote || remote === expected) return;
+    var url = new URL(arrival);
+    if (url.searchParams.get("v") === remote) return;
+    url.searchParams.set("v", remote);
+    if (url.toString() === location.href) return;
+    location.replace(url.toString());
+  }).catch(function () {});
+})();
+</script>
+<script type="importmap" id="afz-importmap">
+{
+  "scopes": {
+    "./assets/js/": {
+      "../config.js": "./assets/config.js?v=b1fff15402db",
+      "../vendor/editor.js": "./assets/vendor/editor.js?v=b1fff15402db",
+      "../vendor/supabase.js": "./assets/vendor/supabase.js?v=b1fff15402db",
+      "./auth-return.js": "./assets/js/auth-return.js?v=b1fff15402db",
+      "./auth.js": "./assets/js/auth.js?v=b1fff15402db",
+      "./bpe.js": "./assets/js/bpe.js?v=b1fff15402db",
+      "./curriculum.js": "./assets/js/curriculum.js?v=b1fff15402db",
+      "./dom.js": "./assets/js/dom.js?v=b1fff15402db",
+      "./gpt.js": "./assets/js/gpt.js?v=b1fff15402db",
+      "./lesson-tools.js": "./assets/js/lesson-tools.js?v=b1fff15402db",
+      "./manipulators.js": "./assets/js/manipulators.js?v=b1fff15402db",
+      "./page-about.js": "./assets/js/page-about.js?v=b1fff15402db",
+      "./page-connexion.js": "./assets/js/page-connexion.js?v=b1fff15402db",
+      "./page-donnees.js": "./assets/js/page-donnees.js?v=b1fff15402db",
+      "./page-ide.js": "./assets/js/page-ide.js?v=b1fff15402db",
+      "./page-password.js": "./assets/js/page-password.js?v=b1fff15402db",
+      "./page-playground.js": "./assets/js/page-playground.js?v=b1fff15402db",
+      "./page-recovery.js": "./assets/js/page-recovery.js?v=b1fff15402db",
+      "./progress.js": "./assets/js/progress.js?v=b1fff15402db",
+      "./pybridge.js": "./assets/js/pybridge.js?v=b1fff15402db",
+      "./quiz.js": "./assets/js/quiz.js?v=b1fff15402db",
+      "./recovery-mail.js": "./assets/js/recovery-mail.js?v=b1fff15402db",
+      "./router.js": "./assets/js/router.js?v=b1fff15402db",
+      "./search.js": "./assets/js/search.js?v=b1fff15402db",
+      "./storage.js": "./assets/js/storage.js?v=b1fff15402db",
+      "./text.js": "./assets/js/text.js?v=b1fff15402db",
+      "./version.js": "./assets/js/version.js?v=b1fff15402db",
+      "./visuals.js": "./assets/js/visuals.js?v=b1fff15402db",
+      "./zipstore.js": "./assets/js/zipstore.js?v=b1fff15402db"
+    }
+  }
+}
+</script>
 <meta name="theme-color" content="#14120f">
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="AI From Zero : parcours francophone pour partir de zéro en informatique et concevoir sa propre architecture d'IA, du Python jusqu'au Transformer, au MoE et aux SSM.">
@@ -27,18 +81,18 @@
 <meta property="og:type" content="website">
 <title>AI From Zero — le parcours pour construire la tienne</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v=b1fff15402db">
 <link rel="preload" href="data/curriculum.json" as="fetch" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/app.js">
-<link rel="modulepreload" href="assets/js/visuals.js">
-<link rel="modulepreload" href="assets/js/curriculum.js">
-<link rel="modulepreload" href="assets/js/dom.js">
-<link rel="modulepreload" href="assets/js/quiz.js">
-<link rel="modulepreload" href="assets/js/progress.js">
-<link rel="modulepreload" href="assets/js/router.js">
-<link rel="modulepreload" href="assets/js/search.js">
-<link rel="modulepreload" href="assets/js/storage.js">
-<link rel="modulepreload" href="assets/js/text.js">
+<link rel="modulepreload" href="assets/js/app.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/visuals.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/curriculum.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/dom.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/quiz.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/progress.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/router.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/search.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/storage.js?v=b1fff15402db" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/text.js?v=b1fff15402db" crossorigin="anonymous">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -56,7 +110,10 @@
 <span class="search-label">Rechercher une notion</span>
 <kbd id="search-kbd">Ctrl K</kbd>
 </button>
-<a class="account-link" id="account-link" href="#/connexion">Connexion</a>
+<a class="account-link" id="account-link" href="#/connexion">
+<svg class="icon account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+<span class="account-label">Connexion</span>
+</a>
 <button type="button" class="icon-button" id="theme-toggle" aria-pressed="true" aria-label="Activer le thème clair">
 <span class="visually-hidden" id="theme-label">Activer le thème clair</span>
 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg>
@@ -123,6 +180,6 @@
 </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script type="module" src="assets/js/app.js"></script>
+<script type="module" src="assets/js/app.js?v=b1fff15402db"></script>
 </body>
 </html>

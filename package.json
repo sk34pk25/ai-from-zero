@@ -6,7 +6,8 @@
     "test": "node --test tests/js/*.test.js",
     "test:e2e": "playwright test",
     "validate:html": "html-validate index.html",
-    "lighthouse": "node scripts/lighthouse.mjs"
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "stamp": "node scripts/stamp-assets.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

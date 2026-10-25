@@ -45,6 +45,12 @@ Dans Authentication → URL Configuration, l'adresse du site reste `https://sk34
 
 Le bouton « Mot de passe oublié » envoie `redirectTo` égal à `https://sk34pk25.github.io/ai-from-zero/?recovery=1`, sans fragment. GoTrue ajoute les jetons implicites en collant `#` à la fin de `redirect_to`. Quand cette adresse contenait déjà `#/nouveau-mot-de-passe`, le navigateur recevait deux fragments (`…/#/nouveau-mot-de-passe#access_token=…&type=recovery`). `URLSearchParams` ne voyait plus `access_token`, et la page annonçait à tort que le lien n'avait pas fonctionné. Les messages déjà partis avec l'ancienne adresse restent lisibles : le site sépare le second fragment, réécrit un fragment unique, puis laisse le client Supabase ouvrir la session. Les prochains messages n'ont plus qu'un seul `#`.
 
+Le projet garde le courrier intégré de Supabase. Il n'y a pas de SMTP externe : ce service n'envoie que quelques messages par heure, et la limite ne se relève pas sans changer de transporteur. Le site le dit en français. Une réponse `429` / `over_email_send_rate_limit` explique d'attendre environ une heure, que le message précédent peut encore être valable, et de regarder les courriers indésirables. Le même texte apparaît si le navigateur est hors ligne. Un délai d'une heure est écrit dans `localStorage` (`afz-recovery-email-until`) dès qu'un envoi part ou que la limite répond, pour qu'un second clic ne consomme pas le quota. Un verrou de 30 secondes (`afz-recovery-email-lock`) couvre le temps de la requête.
+
+Une fois connecté, « Changer mon mot de passe » (`#/changer-mot-de-passe`, depuis la page Compte) appelle `updateUser({ password })` après `getUser()`. Aucun e-mail n'est envoyé. Le mot de passe fait 12 caractères minimum et doit être confirmé.
+
+Les feuilles et les modules portent `?v=` (contenu hashé par `node scripts/stamp-assets.mjs`). Un script dans `index.html` lit `version.json` sans cache et, si le HTML servi est celui d'un déploiement précédent, recharge l'adresse d'arrivée — jetons compris — avec `?v=` à jour. GitHub Pages garde les fichiers environ 10 minutes (`Cache-Control: max-age=600`) : le premier déploiement de ce contrôle attend cette fenêtre ; les suivants se rechargent seuls.
+
 Le flux PKCE (`?code=`) et les erreurs (`error_code=otp_expired`) sont inchangés. La page retire les jetons de l'adresse, ouvre la session, puis appelle `updateUser({ password })`.
 
 ### Modèle d'e-mail recommandé
@@ -62,6 +68,16 @@ Dans Authentication → Emails → Reset password, remplacer le corps par exacte
 Le clic ouvre le site. Le jeton n'est envoyé à Supabase qu'au bouton « Vérifier le lien » (`verifyOtp`). Un simple `GET` ne le consomme pas. Ne pas placer `{{ .TokenHash }}` après un `#`. Ne pas laisser `{{ .ConfirmationURL }}` dans ce modèle si le scanner doit être ignoré. Ce lien n'est pas une redirection GoTrue : la liste des redirections ne le concerne pas.
 
 Si la liste est un jour réduite à des adresses exactes, ajouter `https://sk34pk25.github.io/ai-from-zero/?recovery=1`. Pour un essai en local, ajouter aussi `http://127.0.0.1:4173/**`.
+
+## Réglages du tableau de bord
+
+Rien à changer pour le courrier : le SMTP intégré reste en place, volontairement. Ne pas brancher un SMTP tiers. La limite horaire ne peut pas être relevée dans ce mode ; le site la rend visible et bloque les clics.
+
+À vérifier, sans y toucher si c'est déjà le cas :
+
+- Authentication → Sign In / Up : inscriptions désactivées.
+- Authentication → URL Configuration : site `https://sk34pk25.github.io/ai-from-zero/` et redirection `https://sk34pk25.github.io/ai-from-zero/**` (le `?recovery=1` est déjà couvert).
+- Authentication → Emails → Reset password : le modèle à `token_hash` ci-dessus, si les liens sont encore consommés par un scanner. Ce n'est pas un changement d'adresse de redirection.
 
 ## À retenir
 

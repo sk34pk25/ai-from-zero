@@ -4,6 +4,7 @@ import { h } from "./dom.js";
 import { decodeIds, encodePrompt, forward, loadModel, sampleIndex, softmax1, topIndices } from "./gpt.js";
 
 export async function paintPlayground(main) {
+  const stamp = main.dataset.paint;
   main.replaceChildren(
     h("p", { class: "eyebrow", text: "Modèle" }),
     h("h1", { text: "Playground" }),
@@ -20,6 +21,7 @@ export async function paintPlayground(main) {
   } catch {
     models.dialogue = null;
   }
+  if (main.dataset.paint !== stamp) return;
   paintReady(main, models);
 }
 

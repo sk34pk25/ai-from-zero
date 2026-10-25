@@ -10,11 +10,11 @@ import {
   isPasswordSaved,
   isRecoveryPending,
   leaveRecovery,
-  resetPassword,
   updatePassword,
 } from "./auth.js";
-import { isEmailAddress, passwordProblems, passwordResetRedirect } from "./auth-return.js";
+import { isEmailAddress, passwordProblems } from "./auth-return.js";
 import { h } from "./dom.js";
+import { recoveryHint, sendRecoveryEmail, watchRecoveryCooldown } from "./recovery-mail.js";
 
 let leaveTimer = 0;
 
@@ -31,32 +31,33 @@ function requestForm(status, label) {
     required: true,
     spellcheck: "false",
   });
+  const button = h("button", { type: "submit", class: "button button-primary" }, label);
   const form = h("form", { class: "login-form", novalidate: true }, [
     h("label", { for: "recovery-email" }, ["Adresse e-mail", email]),
-    h("button", { type: "submit", class: "button button-primary" }, label),
+    recoveryHint(),
+    button,
   ]);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!isEmailAddress(email.value)) {
+      status.dataset.mode = "auth";
       status.textContent = email.value.trim()
         ? "Cette adresse e-mail n'est pas valable."
         : "Indique l'adresse du compte propriétaire.";
       status.className = "quiz-feedback is-incorrect";
       return;
     }
-    status.textContent = "Envoi…";
-    status.className = "quiz-feedback";
-    const redirectTo = passwordResetRedirect(document.baseURI);
-    const result = await resetPassword(email.value, redirectTo);
-    status.textContent = result.message;
-    status.className = result.ok ? "quiz-feedback is-correct" : "quiz-feedback is-incorrect";
+    await sendRecoveryEmail(email.value, status, button);
   });
   return form;
 }
 
 function paintRequest(main, lead, tone) {
   const status = statusNode("", tone === "incorrect" ? "incorrect" : "");
-  if (tone === "incorrect") status.textContent = lead;
+  if (tone === "incorrect") {
+    status.textContent = lead;
+    status.dataset.mode = "error";
+  }
   main.replaceChildren(
     h("p", { class: "eyebrow", text: "Compte" }),
     h("h1", { text: "Choisir un nouveau mot de passe" }),
@@ -69,6 +70,8 @@ function paintRequest(main, lead, tone) {
     requestForm(status, "Envoyer un nouveau lien"),
     status,
   );
+  const button = main.querySelector("button[type=submit]");
+  if (button) watchRecoveryCooldown(status, button);
 }
 
 function scheduleLeave() {
