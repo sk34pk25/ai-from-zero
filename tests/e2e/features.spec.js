@@ -4,6 +4,21 @@ import { expect, test } from "@playwright/test";
 import { installOwner, OWNER_ID, signInAs } from "./session.js";
 
 test("le visiteur reste en lecture seule", async ({ page }) => {
+  const hits = [];
+  const errors = [];
+  page.on("request", (request) => {
+    if (request.url().includes("supabase.co")) hits.push(request.url());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  await page.goto("/#/connexion");
+  await expect(page.locator("h1")).toHaveText("Compte propriétaire");
+  await expect(page.locator("#login-email")).toBeVisible();
+  await expect(page.locator("#login-password")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Se connecter" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeVisible();
   await page.goto("/#/lecon/1.6");
   await expect(page.locator(".lock-note")).toContainText("Réservé au propriétaire");
   await expect(page.locator("[data-choice='0']")).toBeDisabled();
@@ -18,6 +33,8 @@ test("le visiteur reste en lecture seule", async ({ page }) => {
   }));
   expect(storage.keys.filter((key) => key !== "afz-theme")).toEqual([]);
   expect(storage.databases).not.toContain("afz-ide");
+  expect(hits).toEqual([]);
+  expect(errors).toEqual([]);
 });
 
 test("un autre compte ne déverrouille pas, le propriétaire oui", async ({ page }) => {

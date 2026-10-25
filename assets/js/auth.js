@@ -26,6 +26,35 @@ export function isConfigured(config = publicConfig()) {
   return config.url.startsWith("https://") && config.anonKey.length >= 20 && config.ownerId.length >= 8;
 }
 
+const AUTH_CALLBACK = ["access_token", "refresh_token", "error", "error_description", "error_code", "code"];
+
+/** Vrai seulement si une session, un vérificateur PKCE ou un retour Auth
+ * est déjà là. Un visiteur anonyme ne charge pas le client : le bundle
+ * pèse trop lourd pour Lighthouse, et l'initialisation irait interroger
+ * Supabase à chaque page. */
+export function shouldOpenAuthClient(config, href, storage) {
+  try {
+    const url = new URL(href);
+    const hash = url.hash.startsWith("#") ? url.hash.slice(1) : "";
+    const hashParams = new URLSearchParams(hash.includes("=") ? hash : "");
+    if (AUTH_CALLBACK.some((name) => url.searchParams.has(name) || hashParams.has(name))) return true;
+    const ref = new URL(config.url).hostname.split(".")[0];
+    const prefix = `sb-${ref}-`;
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (key && key.startsWith(prefix)) return true;
+    }
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+function hasAuthWork() {
+  if (typeof window === "undefined" || !window.localStorage) return false;
+  return shouldOpenAuthClient(publicConfig(), window.location.href, window.localStorage);
+}
+
 export function currentUser() {
   return user;
 }
@@ -62,7 +91,7 @@ async function clientOf() {
 }
 
 export async function restoreSession() {
-  if (!isConfigured()) {
+  if (!isConfigured() || !hasAuthWork()) {
     user = null;
     return null;
   }

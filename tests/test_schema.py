@@ -11,6 +11,7 @@ def test_rls_covers_every_owner_table():
     tables = ["ide_files", "progress", "quiz_results", "training_runs", "training_plans"]
     assert "auth.uid()" in SCHEMA
     assert "service_role" not in SCHEMA
+    assert "set search_path = ''" in SCHEMA
     assert "00000000-0000-0000-0000-000000000000" in SCHEMA
     for table in tables:
         assert f"alter table public.{table} enable row level security;" in SCHEMA
