@@ -42,6 +42,15 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
     routeFromHref("https://sk34pk25.github.io/ai-from-zero/?error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired"),
     { name: "recovery" },
   );
+  const doubled = routeFromHref(
+    "https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe#access_token=secret-token&expires_in=3600&refresh_token=secret-refresh&token_type=bearer&type=recovery",
+  );
+  assert.deepEqual(doubled, { name: "recovery" });
+  assert.equal(JSON.stringify(doubled).includes("secret"), false);
+  assert.deepEqual(
+    routeFromHref("https://sk34pk25.github.io/ai-from-zero/?token_hash=secret-hash&type=recovery"),
+    { name: "recovery" },
+  );
 });
 
 test("0.10 se trie après 0.9", () => {

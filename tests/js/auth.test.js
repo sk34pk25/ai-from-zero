@@ -37,4 +37,16 @@ test("une session stockée ou un retour Auth ouvre le client", () => {
     true,
   );
   assert.equal(shouldOpenAuthClient(config, "https://sk34pk25.github.io/ai-from-zero/?code=abc", storageOf([])), true);
+  assert.equal(
+    shouldOpenAuthClient(
+      config,
+      "https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe#access_token=jeton&refresh_token=autre&type=recovery",
+      storageOf([]),
+    ),
+    true,
+  );
+  assert.equal(
+    shouldOpenAuthClient(config, "https://sk34pk25.github.io/ai-from-zero/?token_hash=hash&type=recovery", storageOf([])),
+    true,
+  );
 });

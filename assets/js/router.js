@@ -1,6 +1,7 @@
 /** Routes hash : partageables, et le bouton retour du navigateur fonctionne.
  *
- * Un fragment Supabase (`#access_token=…&type=recovery`) n'est pas une route.
+ * Un fragment Supabase (`#access_token=…&type=recovery`, ou un second
+ * `#` collé après `#/nouveau-mot-de-passe`) n'est pas une route.
  * Il est reconnu avant le reste, sinon le routeur afficherait une 404
  * et le jeton se retrouverait dans le texte de la page.
  */

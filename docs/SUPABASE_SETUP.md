@@ -41,13 +41,27 @@ Si l'une de ces trois chaînes est vide, la page Connexion explique que le site 
 
 ## Mot de passe oublié
 
-Dans Authentication → URL Configuration, l'adresse du site est `https://sk34pk25.github.io/ai-from-zero/` et la liste des redirections autorisées contient `https://sk34pk25.github.io/ai-from-zero/**`. Ce joker couvre la route de retour. Rien à changer dans le tableau de bord pour le site déjà en ligne.
+Dans Authentication → URL Configuration, l'adresse du site reste `https://sk34pk25.github.io/ai-from-zero/` et la liste des redirections autorisées garde `https://sk34pk25.github.io/ai-from-zero/**`. Ce joker couvre déjà `https://sk34pk25.github.io/ai-from-zero/?recovery=1`. Aucune nouvelle adresse n'est obligatoire pour le site publié.
 
-Le bouton « Mot de passe oublié » envoie le message Supabase avec `redirectTo` égal à `https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe` (le sous-chemin GitHub Pages est conservé, la route est dans le fragment). Le modèle d'e-mail par défaut, celui qui utilise `{{ .ConfirmationURL }}`, porte déjà cette adresse : ne pas le remplacer par un lien `{{ .TokenHash }}`, le site n'a pas de route serveur pour l'échanger.
+Le bouton « Mot de passe oublié » envoie `redirectTo` égal à `https://sk34pk25.github.io/ai-from-zero/?recovery=1`, sans fragment. GoTrue ajoute les jetons implicites en collant `#` à la fin de `redirect_to`. Quand cette adresse contenait déjà `#/nouveau-mot-de-passe`, le navigateur recevait deux fragments (`…/#/nouveau-mot-de-passe#access_token=…&type=recovery`). `URLSearchParams` ne voyait plus `access_token`, et la page annonçait à tort que le lien n'avait pas fonctionné. Les messages déjà partis avec l'ancienne adresse restent lisibles : le site sépare le second fragment, réécrit un fragment unique, puis laisse le client Supabase ouvrir la session. Les prochains messages n'ont plus qu'un seul `#`.
 
-Au clic, Supabase renvoie le navigateur de deux façons possibles. Le flux implicite (celui du client JavaScript) remplace le fragment par `#access_token=…&type=recovery`. Le flux PKCE ajoute `?code=`. Une erreur, par exemple `error_code=otp_expired`, arrive dans le fragment ou dans la query. Le routeur hash ne doit pas lire ces jetons comme un chemin : la page « Choisir un nouveau mot de passe » les retire, ouvre la session, puis appelle `updateUser({ password })`.
+Le flux PKCE (`?code=`) et les erreurs (`error_code=otp_expired`) sont inchangés. La page retire les jetons de l'adresse, ouvre la session, puis appelle `updateUser({ password })`.
 
-Si la liste des redirections est un jour réduite à des adresses exactes, ajouter `https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe`. Pour un essai en local, ajouter aussi `http://127.0.0.1:4173/**`.
+### Modèle d'e-mail recommandé
+
+Le modèle par défaut utilise `{{ .ConfirmationURL }}`, qui pointe vers `GET /auth/v1/verify`. Un scanner de liens (Gmail) consomme ce jeton à usage unique avant le destinataire. Changer le modèle n'est pas nécessaire pour réparer le double fragment. C'est le moyen d'empêcher le scanner de brûler le lien.
+
+Dans Authentication → Emails → Reset password, remplacer le corps par exactement :
+
+```html
+<h2>Nouveau mot de passe</h2>
+<p>Suis ce lien pour choisir un nouveau mot de passe :</p>
+<p><a href="https://sk34pk25.github.io/ai-from-zero/?token_hash={{ .TokenHash }}&type=recovery">Choisir un nouveau mot de passe</a></p>
+```
+
+Le clic ouvre le site. Le jeton n'est envoyé à Supabase qu'au bouton « Vérifier le lien » (`verifyOtp`). Un simple `GET` ne le consomme pas. Ne pas placer `{{ .TokenHash }}` après un `#`. Ne pas laisser `{{ .ConfirmationURL }}` dans ce modèle si le scanner doit être ignoré. Ce lien n'est pas une redirection GoTrue : la liste des redirections ne le concerne pas.
+
+Si la liste est un jour réduite à des adresses exactes, ajouter `https://sk34pk25.github.io/ai-from-zero/?recovery=1`. Pour un essai en local, ajouter aussi `http://127.0.0.1:4173/**`.
 
 ## À retenir
 
