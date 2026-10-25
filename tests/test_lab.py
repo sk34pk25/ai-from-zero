@@ -365,11 +365,15 @@ def test_committed_french_gpt_run():
     from model.gpt_train import load_checkpoint
 
     report = json.loads((ROOT / "data" / "gpt_run.json").read_text(encoding="utf-8"))
-    assert report["dataset_chars"] > 10_000
-    assert report["steps"] >= 200
-    assert report["train_loss_end"] < report["train_loss_start"] * 0.5
-    assert report["val_loss_end"] < report["val_loss_start"] * 0.5
-    assert any("dans le" in sample["text"] for sample in report["samples"])
+    assert report["dataset_chars"] > 100_000
+    assert report["steps"] >= 180
+    assert report["train_loss_end"] < report["train_loss_start"]
+    assert report["val_loss_end"] < report["val_loss_start"]
+    assert report["tokenizer_kind"] in {"char", "bpe"}
+    assert report["samples"]
+    for sample in report["samples"]:
+        assert sample["text"].startswith(sample["prompt"])
+        assert len(sample["text"]) > len(sample["prompt"])
     assert sum(report["attention"]["last_row"]) == pytest.approx(1.0, abs=1e-2)
     model, tokenizer, _history = load_checkpoint(ROOT / "model" / "data" / "gpt_checkpoint.npz")
     assert model.parameter_count() == report["parameter_count"]

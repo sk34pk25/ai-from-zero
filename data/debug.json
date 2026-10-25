@@ -1,0 +1,17 @@
+[
+  {
+    "lessonId": "1.12",
+    "caption": "Une perte et un gradient, vus ligne à ligne. La trace est rejouée ensuite : la page ne se fige pas pendant le calcul.",
+    "code": "import numpy as np\nperte = np.array([1.2, 0.7, 0.4])\ngradient = perte - np.array([1.2, 1.2, 0.7])\n"
+  },
+  {
+    "lessonId": "3.5",
+    "caption": "Un softmax à température basse. Le tableau des poids s'affiche avec sa forme.",
+    "code": "import numpy as np\nscores = np.array([1.0, 2.0, 0.1])\ntemperature = 0.5\npoids = np.exp(scores / temperature)\npoids = poids / poids.sum()\n"
+  },
+  {
+    "lessonId": "4.4",
+    "caption": "Deux scores et un masque. La deuxième colonne de la première ligne est éteinte.",
+    "code": "import numpy as np\nscores = np.array([[0.2, -1e9], [0.4, 0.1]])\ndecale = scores - scores.max(axis=1, keepdims=True)\nattention = np.exp(decale)\nattention = attention / attention.sum(axis=1, keepdims=True)\n"
+  }
+]

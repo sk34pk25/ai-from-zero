@@ -1,0 +1,86 @@
+[
+  {
+    "lessonId": "0.20",
+    "prompt": "Écris moyenne(xs), la somme divisée par la longueur. Le contrôle appelle moyenne([2, 4]).",
+    "starter": "def moyenne(xs):\n    return sum(xs) / len(xs)\n",
+    "check": "assert moyenne([2, 4]) == 3\n"
+  },
+  {
+    "lessonId": "1.17",
+    "prompt": "Écris pas(x, gradient, lr) qui retire lr fois le gradient. Le contrôle attend 0.5.",
+    "starter": "def pas(x, gradient, lr):\n    return x - lr * gradient\n",
+    "check": "assert pas(1, 1, 0.5) == 0.5\n"
+  },
+  {
+    "lessonId": "2.11",
+    "prompt": "Compte les caractères distincts. Le contrôle attend 2 pour « abab ».",
+    "starter": "def distincts(texte):\n    return len(set(texte))\n",
+    "check": "assert distincts('abab') == 2\n"
+  },
+  {
+    "lessonId": "3.11",
+    "prompt": "La perplexité uniforme vaut la taille du vocabulaire. Renvoie-la.",
+    "starter": "def uniforme(taille):\n    return taille\n",
+    "check": "assert uniforme(4) == 4\n"
+  },
+  {
+    "lessonId": "4.14",
+    "prompt": "Un masque causal : la colonne n'est visible que si elle est avant ou sur la ligne.",
+    "starter": "def visible(ligne, colonne):\n    return colonne <= ligne\n",
+    "check": "assert visible(1, 1) and not visible(0, 1)\n"
+  },
+  {
+    "lessonId": "5.9",
+    "prompt": "Le résidu ajoute l'entrée et la branche. Renvoie la somme.",
+    "starter": "def residu(entree, branche):\n    return entree + branche\n",
+    "check": "assert residu(2, 3) == 5\n"
+  },
+  {
+    "lessonId": "6.12",
+    "prompt": "Le coût dessiné de l'attention suit le carré de la longueur.",
+    "starter": "def cout(longueur):\n    return longueur * longueur\n",
+    "check": "assert cout(3) == 9\n"
+  },
+  {
+    "lessonId": "7.9",
+    "prompt": "Le routeur ne calcule que k experts. Renvoie k s'il ne dépasse pas le total.",
+    "starter": "def actifs(total, k):\n    return min(total, k)\n",
+    "check": "assert actifs(4, 2) == 2\n"
+  },
+  {
+    "lessonId": "8.9",
+    "prompt": "L'oubli multiplie l'état. Renvoie etat * oubli.",
+    "starter": "def etat_suivant(etat, oubli):\n    return etat * oubli\n",
+    "check": "assert etat_suivant(2, 0.5) == 1\n"
+  },
+  {
+    "lessonId": "9.9",
+    "prompt": "Un patch est un bloc, pas une ligne. Compte les patches d'un carré.",
+    "starter": "def patches(cote, taille):\n    return (cote // taille) * (cote // taille)\n",
+    "check": "assert patches(4, 2) == 4\n"
+  },
+  {
+    "lessonId": "10.8",
+    "prompt": "Le contexte ajouté est la question plus le document choisi.",
+    "starter": "def contexte(question, document):\n    return question + ' ' + document\n",
+    "check": "assert contexte('ou', 'ici') == 'ou ici'\n"
+  },
+  {
+    "lessonId": "11.8",
+    "prompt": "L'écart est la variante moins la baseline.",
+    "starter": "def ecart(variante, baseline):\n    return variante - baseline\n",
+    "check": "assert ecart(3, 1) == 2\n"
+  },
+  {
+    "lessonId": "12.12",
+    "prompt": "Les trois dos partagent la même forme. Renvoie-la.",
+    "starter": "def forme(batch, temps, dim):\n    return (batch, temps, dim)\n",
+    "check": "assert forme(2, 4, 8) == (2, 4, 8)\n"
+  },
+  {
+    "lessonId": "13.8",
+    "prompt": "La frontière de la réponse commence après la question. Renvoie l'index de « Réponse ».",
+    "starter": "def frontiere(texte):\n    return texte.index('Réponse')\n",
+    "check": "assert frontiere('Question : a\\nRéponse : b') > 0\n"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "label": "Ajustement réel sur le jeu d'instructions écrit pour le cours.",
+  "full": {
+    "loss_start": 4.235627863047521,
+    "loss_end": 4.081771496492872,
+    "trainable": 247424,
+    "steps": 20,
+    "examples": 30
+  },
+  "lora": {
+    "loss_start": 4.235627863047521,
+    "loss_end": 4.328811215785854,
+    "trainable": 18432,
+    "steps": 20,
+    "examples": 30,
+    "lora_rank": 4
+  },
+  "chosen": "full",
+  "sample_prompt": "Question : qu'est-ce qu'un token\nRéponse :",
+  "sample": "Question : qu'est-ce qu'un token\nRéponse : m m matatatatatat m m m m m m m m m m m"
+}

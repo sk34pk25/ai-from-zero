@@ -11284,6 +11284,614 @@
           }
         }
       ]
+    },
+    {
+      "id": 13,
+      "title": "Tokenizer BPE, données et ajustement",
+      "summary": "Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.",
+      "project": "Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py.",
+      "steps": [
+        {
+          "id": "13.1",
+          "title": "Fusionner les paires",
+          "tag": "BPE",
+          "minutes": 35,
+          "why": "Le tokenizer caractère donne un identifiant par lettre. C'est clair, et c'est trop long : un mot courant devient une suite de pas. Le BPE recolle les paires fréquentes pour que le modèle voie des morceaux de mots, sans ouvrir une bibliothèque.",
+          "objectives": [
+            "Compter les paires voisines",
+            "Choisir la paire gagnante sans ambiguïté",
+            "Relire le texte après une fusion"
+          ],
+          "prereq": "Le tokenizer caractère du niveau 2.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Tu vois « le » partout. Au lieu de payer deux jetons, l et e, tu colles la paire et tu lui donnes un seul numéro. Tu recommences avec la nouvelle paire la plus fréquente."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Paire : deux morceaux voisins. Fusion : ces deux morceaux deviennent un seul token. Fréquence : le nombre de fois où la paire apparaît. Égalité : deux paires aussi fréquentes, départagées par l'ordre des caractères."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "model/bpe.py commence par les caractères triés. À chaque tour il compte les paires, puis prend le minimum de la clé (moins la fréquence, morceau gauche, morceau droit). La fréquence la plus haute gagne. Si deux paires sont à égalité, la plus petite dans l'ordre du dictionnaire gagne. La fusion avance de gauche à droite et ne réutilise pas un morceau déjà collé dans le même tour. Deux entraînements sur le même texte et le même nombre de fusions produisent le même vocabulaire. C'est le point que le test vérifie."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.bpe import BPETokenizer\ntok = BPETokenizer.train(\"le chat le chat\", 8)\nprint(tok.decode(tok.encode(\"le chat\")))"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Change le nombre de fusions. Avec zéro, tu retrouves le tokenizer caractère. Avec trop, tu colles des phrases entières qui ne serviront plus sur un texte nouveau."
+            }
+          ],
+          "exercise": "Sur le texte abab, une seule fusion doit coller ab, pas ba, parce que les deux paires n'ont pas la même place dans le départage. Vérifie-le avec train.",
+          "build": "Le fil rouge de ce niveau remplace, quand c'est utile, le vocabulaire caractère par ce BPE. Le playground et l'ajustement réutilisent le même encode et le même decode.",
+          "visual": "bpe",
+          "visualCaption": "Chaque fusion recolle la paire la plus fréquente. À égalité, la paire la plus petite dans l'ordre du dictionnaire gagne.",
+          "interactive": true,
+          "codeFile": "model/bpe.py",
+          "takeaways": [
+            "La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort.",
+            "Pourquoi cette étape arrive maintenant : Le tokenizer caractère donne un identifiant par lettre.",
+            "Le fichier à ouvrir à côté du cours est model/bpe.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Il tire au hasard une des deux paires ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Il garde toujours la paire la plus à droite ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Il refuse d'entraîner tant que les fréquences diffèrent ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Comment le BPE du laboratoire départage-t-il deux paires de même fréquence ?",
+            "Ouvre model/bpe.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Il garde la paire la plus petite dans l'ordre des morceaux. La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort. Pour la rendre concrète, relie-la à model/bpe.py et à l'exercice : Sur le texte abab, une seule fusion doit coller ab, pas ba, parce que les deux paires n'ont pas la même place dans le départage. Vérifie-le avec train.",
+          "review": "Sans rouvrir la page, explique « Fusionner les paires » en une phrase, puis dis ce que model/bpe.py en garde vraiment.",
+          "quiz": {
+            "question": "Comment le BPE du laboratoire départage-t-il deux paires de même fréquence ?",
+            "choices": [
+              "Il tire au hasard une des deux paires",
+              "Il garde toujours la paire la plus à droite",
+              "Il garde la paire la plus petite dans l'ordre des morceaux",
+              "Il refuse d'entraîner tant que les fréquences diffèrent"
+            ],
+            "answer": 2,
+            "explanation": "La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort."
+          }
+        },
+        {
+          "id": "13.2",
+          "title": "Garder le vocabulaire",
+          "tag": "BPE",
+          "minutes": 25,
+          "why": "Un vocabulaire qui change entre l'entraînement et l'échantillonnage produit des identifiants faux. Il faut écrire les fusions, les relire, et refuser un caractère jamais vu.",
+          "objectives": [
+            "Sauver le vocabulaire et les fusions",
+            "Recharger le même encode",
+            "Lire l'erreur sur un caractère inconnu"
+          ],
+          "prereq": "Une fusion déjà entraînée.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Le carnet des collages doit voyager avec le modèle. Sans lui, le numéro 40 ne veut plus dire la même chose. Tu le ranges à côté des poids, pas dans ta tête."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Vocabulaire : le dictionnaire morceau vers identifiant. Fusions : la liste ordonnée des paires apprises. itos : l'identifiant vers le morceau, pour décoder. Caractère inconnu : un signe absent du vocabulaire de départ."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "save écrit un JSON avec vocab et merges. load et from_dict reconstruisent le tokenizer sans réapprendre. encode applique les fusions dans l'ordre enregistré, pas dans un ordre recalculé. Si le texte contient un caractère absent, encode lève KeyError au lieu d'inventer un identifiant. decode recolle les morceaux. Le checkpoint du GPT range ce dictionnaire à côté des poids, pour que gpt_sample et le playground parlent du même vocabulaire."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.bpe import BPETokenizer\ntok = BPETokenizer.train(\"bonjour bonjour\", 4)\ntok.save(\"model/data/bpe.json\")\nautre = BPETokenizer.load(\"model/data/bpe.json\")\nprint(autre.encode(\"bonjour\") == tok.encode(\"bonjour\"))"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Ajoute un caractère absent, par exemple un emoji, et regarde l'erreur. Le laboratoire ne le remplace pas tout seul pendant l'entraînement."
+            }
+          ],
+          "exercise": "Entraîne, sauve, recharge, et compare encode sur une phrase du corpus. Les deux listes doivent être égales.",
+          "build": "Le run publié écrit model/data/bpe.json quand le BPE est retenu. Le rapport data/gpt_run.json dit si le choix final est bpe ou char.",
+          "visual": "bpe",
+          "visualCaption": "Chaque fusion recolle la paire la plus fréquente. À égalité, la paire la plus petite dans l'ordre du dictionnaire gagne.",
+          "interactive": true,
+          "codeFile": "model/bpe.py",
+          "takeaways": [
+            "Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu.",
+            "Pourquoi cette étape arrive maintenant : Un vocabulaire qui change entre l'entraînement et l'échantillonnage produit des identifiants faux.",
+            "Le fichier à ouvrir à côté du cours est model/bpe.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Il remplace le caractère par zéro ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Il réentraîne une fusion supplémentaire ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Il ignore le caractère et continue ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Que fait encode si un caractère n'a jamais été vu à l'entraînement du BPE ?",
+            "Ouvre model/bpe.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Il lève KeyError au lieu d'inventer un identifiant. Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu. Pour la rendre concrète, relie-la à model/bpe.py et à l'exercice : Entraîne, sauve, recharge, et compare encode sur une phrase du corpus. Les deux listes doivent être égales.",
+          "review": "Sans rouvrir la page, explique « Garder le vocabulaire » en une phrase, puis dis ce que model/bpe.py en garde vraiment.",
+          "quiz": {
+            "question": "Que fait encode si un caractère n'a jamais été vu à l'entraînement du BPE ?",
+            "choices": [
+              "Il remplace le caractère par zéro",
+              "Il réentraîne une fusion supplémentaire",
+              "Il ignore le caractère et continue",
+              "Il lève KeyError au lieu d'inventer un identifiant"
+            ],
+            "answer": 3,
+            "explanation": "Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu."
+          }
+        },
+        {
+          "id": "13.3",
+          "title": "Choisir le texte",
+          "tag": "Données",
+          "minutes": 30,
+          "why": "Le modèle n'apprend que le texte qu'on lui donne. Un catalogue vérifié évite de mélanger un jouet, un livre du domaine public et un dump qu'on n'a pas le droit de redistribuer.",
+          "objectives": [
+            "Lire l'ordre recommandé des jeux",
+            "Repérer une licence et une réserve",
+            "Préparer un extrait sans le versionner"
+          ],
+          "prereq": "Le BPE sait s'enregistrer.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Tu ne verses pas la bibliothèque entière dans la casserole. Tu suis une recette : d'abord une goutte, puis un livre, puis, seulement si la machine suit, un plus grand texte."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Catalogue : data/datasets.json, la liste tenue à jour. Étape : 1 jouet, 2 petit corpus, 3 grand corpus, 4 instructions, 5 dialogue, 6 évaluation. Gated : un jeu qu'il faut accepter à la main. Préparer : nettoyer, couper train et val, écrire la licence à côté."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "Chaque fiche a une URL https, une licence lue à la source, une langue, une taille, un format et une compatibilité. La compatibilité dit si le tokenizer caractère ou le BPE est le bon, et si le jeu tient dans le navigateur, sur le CPU NumPy, ou s'il demande un GPU. python -m model.datasets list affiche l'ordre. prepare télécharge, vérifie le sha256 quand il est connu, retire l'en-tête Gutenberg, et écrit train.txt, val.txt et ATTRIBUTION.md. Les gros fichiers restent hors du dépôt. --max-mb prélève un échantillon. Un jeu gated ou un parquet n'est pas téléchargé en silence."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.datasets import load_catalog, validate_catalog\nerreurs = validate_catalog(load_catalog())\nprint(erreurs)"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Ouvre #/donnees. Change le tokenizer et le lieu d'entraînement. Une fiche trop grosse pour le navigateur doit le dire avant que tu lances quoi que ce soit."
+            }
+          ],
+          "exercise": "Repère un jeu français de l'étape 2 et un jeu marqué gated. Dis lequel le laboratoire accepte de préparer tout seul.",
+          "build": "gpt_train.py --dataset lit un jeu déjà préparé. --plan enchaîne le pré-entraînement puis l'ajustement, dans l'ordre du fichier JSON.",
+          "visual": "bars",
+          "visualCaption": "Trois colonnes, trois unités. On ne les additionne pas.",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "takeaways": [
+            "Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés.",
+            "Pourquoi cette étape arrive maintenant : Le modèle n'apprend que le texte qu'on lui donne.",
+            "Le fichier à ouvrir à côté du cours est model/bench.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Dans un dossier de fichiers téléchargés et commités ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Sur une page sans licence ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Dans le cache du navigateur du visiteur ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Où est la liste des jeux que ce dépôt accepte de citer ?",
+            "Ouvre model/bench.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Dans data/datasets.json, vérifiée par des URL https. Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés. Pour la rendre concrète, relie-la à model/bench.py et à l'exercice : Repère un jeu français de l'étape 2 et un jeu marqué gated. Dis lequel le laboratoire accepte de préparer tout seul.",
+          "review": "Sans rouvrir la page, explique « Choisir le texte » en une phrase, puis dis ce que model/bench.py en garde vraiment.",
+          "quiz": {
+            "question": "Où est la liste des jeux que ce dépôt accepte de citer ?",
+            "choices": [
+              "Dans data/datasets.json, vérifiée par des URL https",
+              "Dans un dossier de fichiers téléchargés et commités",
+              "Sur une page sans licence",
+              "Dans le cache du navigateur du visiteur"
+            ],
+            "answer": 0,
+            "explanation": "Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés."
+          }
+        },
+        {
+          "id": "13.4",
+          "title": "Le playground",
+          "tag": "Playground",
+          "minutes": 30,
+          "why": "Lire une courbe dans un JSON ne montre pas le prochain token. Le playground rejoue le forward dans le navigateur, avec la température, le top-k et les poids d'attention du dernier pas.",
+          "objectives": [
+            "Charger les poids exportés",
+            "Lire la barre du token suivant",
+            "Relier la température au tirage"
+          ],
+          "prereq": "Un checkpoint déjà entraîné.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Le modèle pose ses jetons sur la table, un par un. Tu vois lequel il préfère, et tu peux le forcer à choisir plus largement."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Export : data/gpt_browser.json, poids en float32 et logits de référence. Température : un diviseur des scores, avant le softmax. Top-k : on ne tire que parmi les k scores les plus hauts. Attention : la ligne du dernier pas, tête 0 de la dernière couche."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "model/export_js.py arrondit les poids en float32, reconstruit le TinyGPT, et calcule les logits du prompt sur cette copie. Le JavaScript refait le même calcul : embedding, positions absolues, LayerNorm, attention causale, GELU, tête. Le test compare ces logits, pas une capture dessinée. La température 0 prend l'argmax. Une température plus haute étale la masse. Le playground est public et ne écrit rien dans le stockage du visiteur."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.export_js import export_browser\nfrom model.gpt_train import load_checkpoint\nmodele, tok, _ = load_checkpoint(\"model/data/gpt_checkpoint.npz\")\nexport_browser(modele, tok, \"data/gpt_browser.json\", \"Le \")"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Dans #/playground, lance un prompt court. Compare le premier token à température 0 et à température 1. Le premier doit être stable."
+            }
+          ],
+          "exercise": "Explique pourquoi les logits de référence sont recalculés après l'arrondi float32, et pas sur les float64 d'origine.",
+          "build": "Le même export existe pour le checkpoint de dialogue, data/chat_browser.json, quand l'ajustement a pu être exporté.",
+          "visual": "loss",
+          "visualCaption": "Chaque pas d'entraînement doit faire descendre la perte. Si elle monte, le pas est trop grand ou le gradient est faux.",
+          "interactive": true,
+          "codeFile": "model/tiny_lm.py",
+          "takeaways": [
+            "Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là.",
+            "Pourquoi cette étape arrive maintenant : Lire une courbe dans un JSON ne montre pas le prochain token.",
+            "Le fichier à ouvrir à côté du cours est model/tiny_lm.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Pour augmenter la taille du vocabulaire ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Pour entraîner un pas de plus dans le navigateur ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Pour cacher la température ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Pourquoi le playground recalcule-t-il les logits après l'arrondi float32 ?",
+            "Ouvre model/tiny_lm.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Pour comparer le JavaScript au même point de départ que les poids servis. Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là. Pour la rendre concrète, relie-la à model/tiny_lm.py et à l'exercice : Explique pourquoi les logits de référence sont recalculés après l'arrondi float32, et pas sur les float64 d'origine.",
+          "review": "Sans rouvrir la page, explique « Le playground » en une phrase, puis dis ce que model/tiny_lm.py en garde vraiment.",
+          "quiz": {
+            "question": "Pourquoi le playground recalcule-t-il les logits après l'arrondi float32 ?",
+            "choices": [
+              "Pour augmenter la taille du vocabulaire",
+              "Pour entraîner un pas de plus dans le navigateur",
+              "Pour comparer le JavaScript au même point de départ que les poids servis",
+              "Pour cacher la température"
+            ],
+            "answer": 2,
+            "explanation": "Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là."
+          }
+        },
+        {
+          "id": "13.5",
+          "title": "Des questions et des réponses",
+          "tag": "Ajustement",
+          "minutes": 25,
+          "why": "Continuer un roman n'apprend pas à répondre. Il faut des paires question réponse, courtes, dont on connaît la provenance, avant d'ouvrir un grand jeu d'instructions.",
+          "objectives": [
+            "Lire le format Question / Réponse",
+            "Distinguer le jouet du cours et un jeu externe",
+            "Voir ce qu'une consigne apprend"
+          ],
+          "prereq": "Le playground sait tirer une suite.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Tu montres la question, puis seulement la réponse compte comme devoir. Le modèle voit le contexte, il n'est pas noté sur la copie de la question."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Instruction : une consigne et une réponse attendue. SFT : l'ajustement supervisé après le pré-entraînement. Jouet : model/data/instructions_fr.json, écrit pour le cours. Jeu externe : une fiche du catalogue, avec sa licence."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "Le format du laboratoire est « Question : … » puis « Réponse : … ». Le fichier instructions_fr.json est un petit jeu original, sous la même licence MIT que le code, et il n'est pas présenté comme un corpus public externe. Les jeux d'instructions du catalogue, Dolly, Alpaca, Aya, OpenAssistant, ont chacun une licence vérifiée et des réserves : partage à l'identique, usage non commercial, ou fichier trop gros pour ce CPU. On ne les mélange pas avec le jouet sans relire la fiche."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.finetune import load_instructions\nrows = load_instructions(\"model/data/instructions_fr.json\")\nprint(rows[0][\"question\"])\nprint(rows[0][\"answer\"])"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Lis trois paires. Si la réponse est une définition du cours, le modèle pourra la recopier. Il ne devient pas pour autant un assistant général."
+            }
+          ],
+          "exercise": "Écris une paire nouvelle sur le même format, puis dis si elle a sa place dans le jouet MIT ou s'il faudrait une fiche de catalogue.",
+          "build": "L'étape suivante masque la perte sur la question. Le plan d'entraînement peut enchaîner un livre puis ce fichier.",
+          "visual": "flow",
+          "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+          "interactive": false,
+          "codeFile": "model/train.py",
+          "takeaways": [
+            "Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence.",
+            "Pourquoi cette étape arrive maintenant : Continuer un roman n'apprend pas à répondre.",
+            "Le fichier à ouvrir à côté du cours est model/train.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Une copie d'Alpaca redistribuée ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Le dump de Wikipédia en français ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Un jeu gated à télécharger à la main ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Quelle est la place de instructions_fr.json dans ce dépôt ?",
+            "Ouvre model/train.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Un petit jeu original pour le cours, pas un corpus externe. Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence. Pour la rendre concrète, relie-la à model/train.py et à l'exercice : Écris une paire nouvelle sur le même format, puis dis si elle a sa place dans le jouet MIT ou s'il faudrait une fiche de catalogue.",
+          "review": "Sans rouvrir la page, explique « Des questions et des réponses » en une phrase, puis dis ce que model/train.py en garde vraiment.",
+          "quiz": {
+            "question": "Quelle est la place de instructions_fr.json dans ce dépôt ?",
+            "choices": [
+              "Une copie d'Alpaca redistribuée",
+              "Le dump de Wikipédia en français",
+              "Un jeu gated à télécharger à la main",
+              "Un petit jeu original pour le cours, pas un corpus externe"
+            ],
+            "answer": 3,
+            "explanation": "Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence."
+          }
+        },
+        {
+          "id": "13.6",
+          "title": "Masquer la question",
+          "tag": "Ajustement",
+          "minutes": 35,
+          "why": "Si la perte compte toute la ligne, le modèle est récompensé pour réciter la question. On veut qu'il apprenne la réponse, tout en voyant la question.",
+          "objectives": [
+            "Couper la cible au début de la réponse",
+            "Comprendre le masque quand le BPE recolle par-dessus la frontière",
+            "Lire une perte qui descend sur les réponses"
+          ],
+          "prereq": "Le format Question / Réponse.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "L'énoncé reste au tableau. Seule la phrase de l'élève est corrigée. On ne retire pas l'énoncé : sans lui, la réponse n'a pas de sens."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Masque : 1 sur les tokens de la réponse, 0 sur ceux de la question. Cible décalée : le token suivant, comme dans le pré-entraînement. Frontière : le caractère où « Réponse : » commence. Perte masquée : la moyenne ne compte que les positions à 1."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "example_ids repère la frontière en caractères, puis marque un token seulement si son début est après cette frontière. Un collage BPE qui chevauche la frontière ne fait pas entrer la question dans la cible. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.finetune import format_pair\nprint(format_pair(\"salut\", \"bonjour\")[0])"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Sur une paire très répétée, la perte de fin doit être plus basse que la perte de départ. Sur trente paires vues vingt pas, attends une baisse modeste, pas une conversation."
+            }
+          ],
+          "exercise": "Dis pourquoi un masque qui vaudrait 1 partout réapprendrait surtout à recopier « Question : ».",
+          "build": "gpt_train.py --plan lit d'abord les étapes pretrain, puis une étape sft qui pointe vers le fichier d'instructions.",
+          "visual": "loss",
+          "visualCaption": "Chaque pas d'entraînement doit faire descendre la perte. Si elle monte, le pas est trop grand ou le gradient est faux.",
+          "interactive": true,
+          "codeFile": "model/tiny_lm.py",
+          "takeaways": [
+            "La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière.",
+            "Pourquoi cette étape arrive maintenant : Si la perte compte toute la ligne, le modèle est récompensé pour réciter la question.",
+            "Le fichier à ouvrir à côté du cours est model/tiny_lm.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Tous les tokens de la ligne ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Seulement le premier token de la question ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Aucun : l'ajustement ne calcule pas de perte ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Quels tokens entrent dans la perte pendant l'ajustement ?",
+            "Ouvre model/tiny_lm.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Ceux dont le début est dans la réponse, pas dans la question. La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière. Pour la rendre concrète, relie-la à model/tiny_lm.py et à l'exercice : Dis pourquoi un masque qui vaudrait 1 partout réapprendrait surtout à recopier « Question : ».",
+          "review": "Sans rouvrir la page, explique « Masquer la question » en une phrase, puis dis ce que model/tiny_lm.py en garde vraiment.",
+          "quiz": {
+            "question": "Quels tokens entrent dans la perte pendant l'ajustement ?",
+            "choices": [
+              "Ceux dont le début est dans la réponse, pas dans la question",
+              "Tous les tokens de la ligne",
+              "Seulement le premier token de la question",
+              "Aucun : l'ajustement ne calcule pas de perte"
+            ],
+            "answer": 0,
+            "explanation": "La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière."
+          }
+        },
+        {
+          "id": "13.7",
+          "title": "Ajuster sans tout bouger",
+          "tag": "LoRA",
+          "minutes": 35,
+          "why": "Réécrire toutes les matrices sur un petit jeu d'instructions écrase vite le texte déjà appris. LoRA ajoute une correction de petit rang, et on compare les deux sur le même exemple.",
+          "objectives": [
+            "Voir la forme de A et de B",
+            "Compter les poids vraiment entraînés",
+            "Comparer LoRA et l'ajustement complet"
+          ],
+          "prereq": "Une perte déjà masquée.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Tu laisses le meuble en place et tu ajoutes un tiroir. Le tiroir est petit. Au début il est vide, donc le meuble ne change pas."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "LoRA : une correction BA, de rang r, ajoutée à une matrice gelée. A : le facteur qui reçoit du hasard. B : le facteur qui commence à zéro. Rang : la largeur du tiroir. Gel : les poids de base ne reçoivent pas de gradient."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "model/lora.py vise les matrices wq, wk, wv, wo, w1 et w2. A est tirée petite, B est nulle, donc le produit vaut zéro au premier pas : la sortie ne change pas avant l'apprentissage. Le rang r décide du nombre de valeurs entraînées. finetune avec lora_rank gèle la base, entraîne A et B, puis écrit la matrice fusionnée dans le modèle. compare_finetunes lance les deux recettes. Le rapport data/finetune_run.json donne les deux pertes et le nombre de poids. Moins de poids ne veut pas dire une meilleure réponse : on lit les deux nombres."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "import numpy as np\nfrom model.lora import init_lora, trainable_count\nfacteurs = init_lora({\"l0.wq\": np.zeros((2, 2))}, rank=1, seed=0)\nprint(trainable_count(facteurs))"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Au rang 1, B reste nul tant que personne ne l'entraîne. La correction ajoutée au poids de base est donc nulle. Le test du dépôt le vérifie."
+            }
+          ],
+          "exercise": "Sur un modèle jouet, compare le nombre de poids entraînés en ajustement complet et en LoRA. Le second doit être plus petit.",
+          "build": "Le run publié choisit, pour le checkpoint de dialogue, la recette dont la perte de fin est la plus basse, et il écrit l'échantillon à côté.",
+          "visual": "lora",
+          "visualCaption": "La matrice de départ reste gelée. Deux petits facteurs ajoutent une correction de rang faible.",
+          "interactive": true,
+          "codeFile": "model/lora.py",
+          "takeaways": [
+            "A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice.",
+            "Pourquoi cette étape arrive maintenant : Réécrire toutes les matrices sur un petit jeu d'instructions écrase vite le texte déjà appris.",
+            "Le fichier à ouvrir à côté du cours est model/lora.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Parce que A est une matrice identité ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Parce que le rang est toujours égal à la largeur ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Parce que la base est détruite ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Pourquoi la correction LoRA vaut-elle zéro au premier pas ?",
+            "Ouvre model/lora.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Parce que B commence à zéro, donc le produit BA est nul. A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice. Pour la rendre concrète, relie-la à model/lora.py et à l'exercice : Sur un modèle jouet, compare le nombre de poids entraînés en ajustement complet et en LoRA. Le second doit être plus petit.",
+          "review": "Sans rouvrir la page, explique « Ajuster sans tout bouger » en une phrase, puis dis ce que model/lora.py en garde vraiment.",
+          "quiz": {
+            "question": "Pourquoi la correction LoRA vaut-elle zéro au premier pas ?",
+            "choices": [
+              "Parce que A est une matrice identité",
+              "Parce que B commence à zéro, donc le produit BA est nul",
+              "Parce que le rang est toujours égal à la largeur",
+              "Parce que la base est détruite"
+            ],
+            "answer": 1,
+            "explanation": "A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice."
+          }
+        },
+        {
+          "id": "13.8",
+          "title": "Continuer le dialogue",
+          "tag": "Dialogue",
+          "minutes": 25,
+          "why": "Une perte qui descend ne fait pas un assistant. Il faut lire la suite générée, dire ce qu'elle recolle du jeu d'instructions, et ce qu'elle ne sait pas faire.",
+          "objectives": [
+            "Tirer une réponse à température nulle",
+            "Lire le rapport d'ajustement",
+            "Dire la limite du petit jeu"
+          ],
+          "prereq": "LoRA et l'ajustement complet ont été comparés.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Tu poses une question du cours et tu écoutes. Si la réponse répète une fiche, le masque a fait son travail. Si elle part dans le roman, le pré-entraînement parle plus fort."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Température nulle : le token le plus probable, sans tirage. Échantillon : le texte écrit dans finetune_run.json. Rapport : pertes de départ et de fin, nombre de poids, recette retenue. Limite : le modèle n'a vu que le corpus préparé et les paires du cours."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "Après compare_finetunes, le script garde la recette à la perte la plus basse et tire une suite depuis « Question : … Réponse : ». Le playground peut charger ce second export en mode dialogue. Ce n'est pas une évaluation PIAF : PIAF est dans le catalogue pour mesurer la compréhension, et son parquet n'est pas décodé par prepare. Un visiteur peut lire le playground. Lancer un entraînement dans l'IDE, répondre aux quiz, ou enregistrer un plan de données reste réservé au propriétaire, et les tables Supabase refusent les autres comptes."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.gpt_train import sample_text\ninvite = \"Question : qu'est-ce qu'un token\\nRéponse :\"\nprint(invite)"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Compare une réponse à température 0 et une réponse à température 0,8. La première doit être stable d'un lancement à l'autre, avec la même graine."
+            }
+          ],
+          "exercise": "Écris, en une phrase, ce que cet échantillon prouve, et une chose qu'il ne prouve pas. Par exemple : il recolle une définition vue, il ne prouve pas un assistant général.",
+          "build": "La piste s'arrête sur cette comparaison. Les gros jeux restent des fiches : on sait d'où ils viennent, et on ne prétend pas les avoir tous entraînés ici.",
+          "visual": "transformer",
+          "visualCaption": "Un bloc relit, ajoute le résidu, transforme, puis ajoute encore. La forme ne change pas.",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "takeaways": [
+            "L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté.",
+            "Pourquoi cette étape arrive maintenant : Une perte qui descend ne fait pas un assistant.",
+            "Le fichier à ouvrir à côté du cours est model/transformer.py."
+          ],
+          "pitfalls": [
+            "Le piège le plus proche est de retenir « Que le modèle a lu tout Wikipédia ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+            "Deuxième confusion : « Que LoRA bat toujours l'ajustement complet ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+            "Troisième réflexe : « Que la licence des jeux externes n'a plus d'importance ». Vérifie la forme des tableaux et, s'il y a un futur, le masque."
+          ],
+          "hints": [
+            "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+            "Garde la question sous les yeux, sans regarder les choix : Que prouve un échantillon de dialogue sur ce petit jeu ?",
+            "Ouvre model/transformer.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
+          ],
+          "solution": "La réponse courte est : Qu'on peut relire une suite tirée du checkpoint ajusté, pas qu'un assistant général existe. L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté. Pour la rendre concrète, relie-la à model/transformer.py et à l'exercice : Écris, en une phrase, ce que cet échantillon prouve, et une chose qu'il ne prouve pas. Par exemple : il recolle une définition vue, il ne prouve pas un assistant général.",
+          "review": "Sans rouvrir la page, explique « Continuer le dialogue » en une phrase, puis dis ce que model/transformer.py en garde vraiment.",
+          "quiz": {
+            "question": "Que prouve un échantillon de dialogue sur ce petit jeu ?",
+            "choices": [
+              "Que le modèle a lu tout Wikipédia",
+              "Que LoRA bat toujours l'ajustement complet",
+              "Que la licence des jeux externes n'a plus d'importance",
+              "Qu'on peut relire une suite tirée du checkpoint ajusté, pas qu'un assistant général existe"
+            ],
+            "answer": 3,
+            "explanation": "L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté."
+          }
+        }
+      ]
     }
   ],
   "architecture": [
@@ -11483,6 +12091,41 @@
       "step": "3.9",
       "file": "model/gpt_sample.py",
       "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné."
+    },
+    {
+      "id": "bpe",
+      "title": "Apprendre le BPE",
+      "step": "13.1",
+      "file": "model/bpe.py",
+      "summary": "Les fusions sont déterministes. Le même texte et le même nombre de fusions redonnent le même vocabulaire."
+    },
+    {
+      "id": "catalogue",
+      "title": "Choisir un jeu de données",
+      "step": "13.3",
+      "file": "model/datasets.py",
+      "summary": "data/datasets.json est la liste vérifiée. prepare écrit un train et un val, avec la licence à côté."
+    },
+    {
+      "id": "playground",
+      "title": "Lire le modèle dans le navigateur",
+      "step": "13.4",
+      "file": "model/export_js.py",
+      "summary": "Les poids float32 et les logits de référence partent dans le playground. Le JavaScript refait le même forward."
+    },
+    {
+      "id": "masque",
+      "title": "Ajuster avec un masque",
+      "step": "13.6",
+      "file": "model/finetune.py",
+      "summary": "La perte ne compte que les tokens de la réponse. La question reste visible, elle n'est pas apprise comme une cible."
+    },
+    {
+      "id": "lora",
+      "title": "Ajuster avec LoRA",
+      "step": "13.7",
+      "file": "model/lora.py",
+      "summary": "Deux petits facteurs par matrice ciblée. On compare leur perte à un ajustement de tous les poids."
     }
   ]
 }

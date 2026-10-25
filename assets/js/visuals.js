@@ -472,6 +472,49 @@ function staticFigure(host, lines) {
   host.append(list);
 }
 
+function mountBpe(host) {
+  const note = readout("");
+  let tokens = ["a", "b", "a", "b"];
+  const board = document.createElement("div");
+  board.className = "token-board";
+  const paint = () => {
+    board.replaceChildren();
+    for (const token of tokens) {
+      const chip = document.createElement("span");
+      chip.className = "token-chip";
+      chip.textContent = token;
+      board.append(chip);
+    }
+    note.textContent = `Morceaux : ${tokens.join(" ")}. La paire ab est la plus fréquente.`;
+  };
+  const merge = button("Fusionner", () => {
+    const next = [];
+    for (let index = 0; index < tokens.length; index += 1) {
+      if (tokens[index] === "a" && tokens[index + 1] === "b") {
+        next.push("ab");
+        index += 1;
+      } else next.push(tokens[index]);
+    }
+    tokens = next;
+    paint();
+  });
+  host.append(board, merge, note);
+  paint();
+}
+
+function mountLora(host) {
+  const input = range({ min: "1", max: "8", value: "2", "aria-label": "Rang LoRA" });
+  const note = readout("");
+  const paint = () => {
+    const rank = Number(input.value);
+    const base = 64 * 64;
+    note.textContent = `Rang ${rank}. Une matrice ${64}×${64} gelée, ${64 * rank + rank * 64} valeurs entraînées au lieu de ${base}.`;
+  };
+  input.addEventListener("input", paint);
+  host.append(control("Rang", input), note);
+  paint();
+}
+
 const MOUNTS = {
   tokenize: mountTokenize,
   softmax: mountSoftmax,
@@ -486,6 +529,8 @@ const MOUNTS = {
   patches: mountPatches,
   relu: mountRelu,
   retrieve: mountRetrieve,
+  bpe: mountBpe,
+  lora: mountLora,
   machine: (host) => staticFigure(host, ["CPU — calcule", "RAM — garde les tableaux vivants", "Disque — garde le texte et les poids"]),
   flow: (host) => staticFigure(host, ["Entrée", "Transformation", "Sortie — note la forme avant et après"]),
   bars: (host) => staticFigure(host, ["Qualité — une métrique nommée", "Temps — des secondes, pas des FLOPs", "Mémoire — des octets estimés"]),

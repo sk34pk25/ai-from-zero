@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { compareStepIds, indexCurriculum, neighbors } from "../../assets/js/curriculum.js";
-import { completionStats, normalizeProgress, stepsLabel } from "../../assets/js/progress.js";
+import { completionStats, normalizeProgress, reviewQueue, stepsLabel } from "../../assets/js/progress.js";
 import { gradeQuiz } from "../../assets/js/quiz.js";
 import { hrefFor, parseHash } from "../../assets/js/router.js";
 import { moveActiveIndex, searchLessons } from "../../assets/js/search.js";
@@ -22,6 +22,11 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
   assert.equal(hrefFor({ name: "lesson", id: "4.5" }), "#/lecon/4.5");
   assert.equal(hrefFor({ name: "home", focus: "roadmap" }), "#/parcours");
   assert.equal(hrefFor({ name: "track" }), "#/construire");
+  assert.deepEqual(parseHash("#/donnees"), { name: "donnees" });
+  assert.deepEqual(parseHash("#/playground"), { name: "playground" });
+  assert.deepEqual(parseHash("#/ide"), { name: "ide" });
+  assert.equal(hrefFor({ name: "about" }), "#/a-propos");
+  assert.equal(hrefFor({ name: "connexion" }), "#/connexion");
 });
 
 test("0.10 se trie après 0.9", () => {
@@ -57,6 +62,12 @@ test("le quiz et la progression", () => {
   assert.equal(stepsLabel(0), "Aucune étape terminée");
   assert.equal(stepsLabel(1), "1 étape terminée");
   assert.equal(stepsLabel(2), "2 étapes terminées");
+  assert.deepEqual(reviewQueue(["0.1", "0.2", "0.3"], {
+    done: ["0.2", "0.3"],
+    quizzes: { "0.1": { correct: false } },
+    exercises: {},
+    stamps: { "0.3": 1, "0.2": 5 },
+  }), ["0.1", "0.3", "0.2"]);
 });
 
 test("le thème, le raccourci et l'échappement", () => {
@@ -76,11 +87,11 @@ test("la navigation clavier de la recherche boucle", () => {
   assert.equal(moveActiveIndex(0, 1, 0), -1);
 });
 
-test("le curriculum commité a 149 leçons et des réponses réparties", () => {
+test("le curriculum commité a 157 leçons et des réponses réparties", () => {
   const data = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
   const steps = data.levels.flatMap((level) => level.steps);
-  assert.equal(steps.length, 149);
-  assert.deepEqual(data.levels.map((level) => level.steps.length), [20, 17, 11, 11, 14, 9, 12, 9, 9, 9, 8, 8, 12]);
+  assert.equal(steps.length, 157);
+  assert.deepEqual(data.levels.map((level) => level.steps.length), [20, 17, 11, 11, 14, 9, 12, 9, 9, 9, 8, 8, 12, 8]);
   const counts = [0, 0, 0, 0];
   for (const step of steps) {
     assert.equal(step.quiz.choices.length, 4);
@@ -98,9 +109,10 @@ test("le curriculum commité a 149 leçons et des réponses réparties", () => {
     assert.ok(step.codeFile.startsWith("model/"));
     assert.ok(step.review.includes(step.title));
   }
-  assert.deepEqual(counts, [37, 38, 37, 37]);
-  assert.equal(data.track.length, 15);
+  assert.deepEqual(counts, [39, 39, 39, 40]);
+  assert.equal(data.track.length, 20);
   assert.equal(data.track.some((stage) => stage.file === "model/tiny_lm.py"), true);
-  assert.equal(data.track.at(-1).file, "model/gpt_sample.py");
+  assert.equal(data.track.some((stage) => stage.file === "model/gpt_sample.py"), true);
+  assert.equal(data.track.at(-1).file, "model/lora.py");
   assert.equal(data.track.some((stage) => stage.file === "model/gpt_train.py"), true);
 });

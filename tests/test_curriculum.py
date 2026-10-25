@@ -28,9 +28,9 @@ def test_sources_json_and_docs_match():
 def test_every_step_is_real_and_answers_move():
     data = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
     steps = [step for level in data["levels"] for step in level["steps"]]
-    assert len(steps) == 149
+    assert len(steps) == 157
     counts = Counter(step["quiz"]["answer"] for step in steps)
-    assert counts == {0: 37, 1: 38, 2: 37, 3: 37}
+    assert counts == {0: 39, 1: 39, 2: 39, 3: 40}
     blob = json.dumps(data, ensure_ascii=False)
     assert "Planifié" not in blob
     for step in steps:

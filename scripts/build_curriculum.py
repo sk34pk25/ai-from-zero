@@ -48,6 +48,7 @@ LEVELS = [
     (10, "Mémoire, retrieval et calcul adaptatif", "Dépasser la fenêtre de contexte par une mémoire qu'on peut éteindre et mesurer.", "Une recherche par similarité et un contexte construit à partir des extraits. Référence : model/memory.py."),
     (11, "Frontière de la recherche", "Lire une idée récente, la réduire à une expérience, et dire ce qui n'a pas été reproduit.", "Un comparateur baseline / variante. Référence : model/experiment.py."),
     (12, "Concevoir ton architecture", "Formuler une hypothèse, la mesurer contre une baseline, et documenter le compromis.", "Trois dos interchangeables — Transformer, SSM, hybride — avec la même forme de sortie."),
+    (13, "Tokenizer BPE, données et ajustement", "Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.", "Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py."),
 ]
 
 ARCHITECTURE = [
@@ -123,6 +124,8 @@ INTERACTIVE = {
     "patches",
     "relu",
     "retrieve",
+    "bpe",
+    "lora",
 }
 
 VISUAL_CAPTION = {
@@ -144,6 +147,8 @@ VISUAL_CAPTION = {
     "compare": "Deux colonnes : ce qui est mesuré ici, et ce qui reste une lecture.",
     "machine": "CPU, mémoire, disque : trois ressources, trois façons de saturer.",
     "flow": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+    "bpe": "Chaque fusion recolle la paire la plus fréquente. À égalité, la paire la plus petite dans l'ordre du dictionnaire gagne.",
+    "lora": "La matrice de départ reste gelée. Deux petits facteurs ajoutent une correction de rang faible.",
 }
 
 CODE_FILE = {
@@ -165,6 +170,8 @@ CODE_FILE = {
     "compare": "model/experiment.py",
     "machine": "model/stats.py",
     "flow": "model/train.py",
+    "bpe": "model/bpe.py",
+    "lora": "model/lora.py",
 }
 
 TRACK = [
@@ -183,6 +190,11 @@ TRACK = [
     {"id": "bloc", "title": "Le bloc decoder complet", "step": "4.11", "file": "model/transformer.py", "summary": "Norme, attention causale, résidu, norme, MLP GELU, résidu. Puis les embeddings, les blocs empilés et la tête."},
     {"id": "gpt", "title": "Entraîner ton GPT", "step": "4.14", "file": "model/gpt_train.py", "summary": "AdamW, découpage train/val, perte, checkpoint. Le corpus français est model/data/francais.txt."},
     {"id": "suite", "title": "Échantillonner ton GPT", "step": "3.9", "file": "model/gpt_sample.py", "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné."},
+    {"id": "bpe", "title": "Apprendre le BPE", "step": "13.1", "file": "model/bpe.py", "summary": "Les fusions sont déterministes. Le même texte et le même nombre de fusions redonnent le même vocabulaire."},
+    {"id": "catalogue", "title": "Choisir un jeu de données", "step": "13.3", "file": "model/datasets.py", "summary": "data/datasets.json est la liste vérifiée. prepare écrit un train et un val, avec la licence à côté."},
+    {"id": "playground", "title": "Lire le modèle dans le navigateur", "step": "13.4", "file": "model/export_js.py", "summary": "Les poids float32 et les logits de référence partent dans le playground. Le JavaScript refait le même forward."},
+    {"id": "masque", "title": "Ajuster avec un masque", "step": "13.6", "file": "model/finetune.py", "summary": "La perte ne compte que les tokens de la réponse. La question reste visible, elle n'est pas apprise comme une cible."},
+    {"id": "lora", "title": "Ajuster avec LoRA", "step": "13.7", "file": "model/lora.py", "summary": "Deux petits facteurs par matrice ciblée. On compare leur perte à un ajustement de tous les poids."},
 ]
 
 
@@ -393,7 +405,7 @@ def build_data() -> dict:
     levels = []
     for level_id, title, summary, project in LEVELS:
         steps = sorted(by_level[level_id], key=lambda step: [int(part) for part in step["id"].split(".")])
-        expected = {"0": 20, "1": 17, "2": 11, "3": 11, "4": 14, "5": 9, "6": 12, "7": 9, "8": 9, "9": 9, "10": 8, "11": 8, "12": 12}[str(level_id)]
+        expected = {"0": 20, "1": 17, "2": 11, "3": 11, "4": 14, "5": 9, "6": 12, "7": 9, "8": 9, "9": 9, "10": 8, "11": 8, "12": 12, "13": 8}[str(level_id)]
         ids = [step["id"] for step in steps]
         if ids != [f"{level_id}.{index}" for index in range(1, expected + 1)]:
             raise SystemExit(f"Niveau {level_id} incomplet : {ids}")

@@ -15,7 +15,33 @@ export function normalizeProgress(raw) {
     seen.add(id);
     done.push(id);
   }
-  return { v: 1, done };
+  const quizzes = {};
+  if (raw?.quizzes && typeof raw.quizzes === "object" && !Array.isArray(raw.quizzes)) {
+    for (const [id, row] of Object.entries(raw.quizzes)) {
+      if (typeof id !== "string" || !row || typeof row.correct !== "boolean") continue;
+      quizzes[id] = { correct: row.correct };
+    }
+  }
+  const exercises = {};
+  if (raw?.exercises && typeof raw.exercises === "object" && !Array.isArray(raw.exercises)) {
+    for (const [id, row] of Object.entries(raw.exercises)) {
+      if (typeof id !== "string" || !row || typeof row.ok !== "boolean") continue;
+      exercises[id] = { ok: row.ok };
+    }
+  }
+  return { v: 1, done, quizzes, exercises };
+}
+
+export function reviewQueue(orderedIds, progress) {
+  const known = new Set(orderedIds);
+  const quizzes = progress?.quizzes || {};
+  const exercises = progress?.exercises || {};
+  const failed = orderedIds.filter((id) => quizzes[id]?.correct === false || exercises[id]?.ok === false);
+  const failedSet = new Set(failed);
+  const stamps = progress?.stamps || {};
+  const rest = (progress?.done || []).filter((id) => known.has(id) && !failedSet.has(id));
+  rest.sort((a, b) => (Number(stamps[a]) || 0) - (Number(stamps[b]) || 0));
+  return [...failed, ...rest];
 }
 
 export function completionStats(orderedIds, doneIds) {

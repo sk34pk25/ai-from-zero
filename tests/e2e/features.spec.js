@@ -1,0 +1,133 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+
+import { installOwner, OWNER_ID, signInAs } from "./session.js";
+
+test("le visiteur reste en lecture seule", async ({ page }) => {
+  await page.goto("/#/lecon/1.6");
+  await expect(page.locator(".lock-note")).toContainText("Réservé au propriétaire");
+  await expect(page.locator("[data-choice='0']")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Ouvrir dans l'IDE" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Activer le thème clair" }).click();
+  await page.goto("/#/ide");
+  await expect(page.locator("#ide-lock")).toContainText("Réservé au propriétaire");
+  await expect(page.locator("#ide-run")).toBeDisabled();
+  const storage = await page.evaluate(async () => ({
+    keys: Object.keys(localStorage),
+    databases: (await indexedDB.databases()).map((item) => item.name),
+  }));
+  expect(storage.keys.filter((key) => key !== "afz-theme")).toEqual([]);
+  expect(storage.databases).not.toContain("afz-ide");
+});
+
+test("un autre compte ne déverrouille pas, le propriétaire oui", async ({ page }) => {
+  const writes = await installOwner(page);
+  await signInAs(page, "autre@example.com");
+  await page.goto("/#/ide");
+  await expect(page.locator("#ide-run")).toBeDisabled();
+  await page.goto("/#/connexion");
+  await page.getByRole("button", { name: "Se déconnecter" }).click().catch(() => {});
+  await signInAs(page);
+  await page.goto("/#/donnees");
+  await expect(page.locator("h1")).toHaveText("Catalogue des jeux");
+  await page.locator("#stage-filter").selectOption("6");
+  await expect(page.locator("article[data-dataset-id='piaf']")).toBeVisible();
+  await expect(page.locator("article[data-dataset-id='tinystories']")).toHaveCount(0);
+  await page.locator("#stage-filter").selectOption("tous");
+  await page.locator("#language-filter").selectOption("fr");
+  await expect(page.locator("article[data-dataset-id='tinystories']")).toHaveCount(0);
+  await expect(page.locator("article[data-dataset-id='pg-candide']")).toBeVisible();
+  await page.locator("#language-filter").selectOption("tous");
+  await page.locator("#config-tokenizer").selectOption("char");
+  await page.locator("#config-runtime").selectOption("browser");
+  await expect(page.locator("article[data-dataset-id='frwiki'] .compat-warning")).toContainText("navigateur");
+  await expect(page.locator("article[data-dataset-id='piaf'] .compat-warning")).toContainText("caractère");
+  await page.locator("article[data-dataset-id='jouet-francais'] input").check();
+  await page.locator("#save-plan").click();
+  await expect(page.locator("#plan-status")).toContainText("Plan enregistré");
+  const saved = writes.filter((request) => request.url().includes("/rest/v1/training_plans"));
+  expect(saved.length).toBeGreaterThan(0);
+  const request = saved.at(-1);
+  expect(request.url()).toContain("on_conflict=id");
+  expect(request.headers().prefer || "").toContain("merge-duplicates");
+  expect(request.headers().authorization || "").toContain("token-");
+  expect(request.postDataJSON().dataset_ids).toContain("jouet-francais");
+  expect(OWNER_ID.length).toBeGreaterThan(8);
+});
+
+test("la déconnexion referme la session", async ({ page }) => {
+  await installOwner(page);
+  await signInAs(page);
+  await page.goto("/#/connexion");
+  await page.getByRole("button", { name: "Se déconnecter" }).click();
+  await expect(page.locator("h1")).toHaveText("Compte propriétaire");
+  await page.goto("/#/lecon/1.6");
+  await expect(page.locator("[data-choice='0']")).toBeDisabled();
+});
+
+test("le catalogue, le playground, l'à propos et une figure passent axe", async ({ page }) => {
+  await page.goto("/#/donnees");
+  await expect(page.locator("h1")).toHaveText("Catalogue des jeux");
+  await page.locator("#size-filter").selectOption("petit");
+  await expect(page.locator("article[data-dataset-id='jouet-francais']")).toBeVisible();
+  let results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+  await page.goto("/#/a-propos");
+  await expect(page.locator("h1")).toHaveText("Patrik Skala");
+  await expect(page.locator("main")).toContainText("ENI");
+  await expect(page.locator("main")).toContainText("23 novembre 2026");
+  results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+  await page.goto("/#/playground");
+  await expect(page.locator("h1")).toHaveText("Playground");
+  results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+  await page.goto("/#/lecon/2.5");
+  await expect(page.locator("[data-manipulator='2.5']")).toBeVisible();
+  const before = await page.locator("[data-manipulator='2.5'] .manip-readout").innerText();
+  await page.locator("[data-manipulator='2.5']").getByRole("button", { name: "Avancer le jeton" }).click();
+  await expect(page.locator("[data-manipulator='2.5'] .manip-readout")).not.toHaveText(before);
+  await page.goto("/#/lecon/0.1");
+  const load = page.locator("[data-manipulator='0.1'] input[type=range]");
+  const loadBefore = await page.locator("[data-manipulator='0.1'] .manip-readout").innerText();
+  await load.press("ArrowRight");
+  await expect(page.locator("[data-manipulator='0.1'] .manip-readout")).not.toHaveText(loadBefore);
+});
+
+test("le propriétaire ouvre l'IDE, importe le modèle, entraîne et s'arrête", async ({ page }) => {
+  test.setTimeout(240_000);
+  const writes = await installOwner(page);
+  await signInAs(page);
+  await page.goto("/#/lecon/13.1");
+  await page.getByRole("button", { name: "Ouvrir dans l'IDE" }).click();
+  await expect(page).toHaveURL(/#\/ide$/);
+  await expect(page.locator(".cm-content, #ide-fallback")).toBeVisible();
+  const editor = page.locator(".cm-content");
+  if (await editor.count()) {
+    await editor.click();
+    await page.keyboard.press("Control+A");
+    await page.keyboard.insertText("print('bonjour ide')\n");
+  } else {
+    await page.locator("#ide-fallback").fill("print('bonjour ide')\n");
+  }
+  await page.locator("#ide-run").click();
+  await expect(page.locator("#ide-output")).toContainText("bonjour ide", { timeout: 180_000 });
+  if (await editor.count()) {
+    await editor.click();
+    await page.keyboard.press("Control+A");
+    await page.keyboard.insertText("import model\nprint(model.__version__)\n");
+  } else {
+    await page.locator("#ide-fallback").fill("import model\nprint(model.__version__)\n");
+  }
+  await page.locator("#ide-run").click();
+  await expect(page.locator("#ide-output")).toContainText("1.0.0", { timeout: 180_000 });
+  await page.locator("#ide-train").click();
+  await expect(page.locator("#ide-loss")).toContainText("Pas", { timeout: 180_000 });
+  await expect(page.locator("#ide-chart .loss-bar").first()).toBeVisible();
+  await page.locator("#ide-train-stop").click();
+  await page.locator("#ide-save").click();
+  await expect.poll(() => writes.some((request) => request.url().includes("/rest/v1/ide_files"))).toBeTruthy();
+  const saved = writes.filter((request) => request.url().includes("/rest/v1/ide_files")).at(-1);
+  expect(saved.headers().prefer || "").toContain("merge-duplicates");
+  expect(saved.postDataJSON().path.length).toBeGreaterThan(3);
+});

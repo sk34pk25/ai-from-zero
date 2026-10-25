@@ -101,10 +101,10 @@ try {
       .sort((a, b) => a.score - b.score);
     writeFileSync("lighthouse-report.json", JSON.stringify({ scores, mobileScores, url: result.lhr.requestedUrl, weak }, null, 2));
     console.log(JSON.stringify({ desktop: scores, mobile: mobileScores }));
-    const failed = Object.entries(scores).filter(([, score]) => score < 90);
-    const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 90);
+    const failed = Object.entries(scores).filter(([, score]) => score < 95);
+    const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 95);
     if (failed.length || mobileFailed.length) {
-      console.error("Scores sous 90 :", { desktop: failed, mobile: mobileFailed });
+      console.error("Scores sous 95 :", { desktop: failed, mobile: mobileFailed });
       process.exitCode = 1;
     }
   } finally {

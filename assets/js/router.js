@@ -12,6 +12,11 @@ export function parseHash(hash) {
   if (normalized === "/parcours") return { name: "home", focus: "roadmap" };
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
+  if (normalized === "/playground") return { name: "playground" };
+  if (normalized === "/ide") return { name: "ide" };
+  if (normalized === "/connexion") return { name: "connexion" };
+  if (normalized === "/a-propos") return { name: "about" };
+  if (normalized === "/donnees") return { name: "donnees" };
   const lesson = normalized.match(LESSON);
   if (lesson) return { name: "lesson", id: lesson[1] };
   const level = normalized.match(LEVEL);
@@ -27,6 +32,16 @@ export function hrefFor(route) {
       return "#/modele";
     case "track":
       return "#/construire";
+    case "playground":
+      return "#/playground";
+    case "ide":
+      return "#/ide";
+    case "connexion":
+      return "#/connexion";
+    case "about":
+      return "#/a-propos";
+    case "donnees":
+      return "#/donnees";
     case "lesson":
       return `#/lecon/${route.id}`;
     case "level":

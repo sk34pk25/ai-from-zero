@@ -1,0 +1,656 @@
+{
+  "checkedOn": "2026-10-25",
+  "note": "Chaque URL a été vérifiée par un GET ou un HEAD le 2026-10-25. Les jeux non vérifiés ne sont pas listés.",
+  "datasets": [
+    {
+      "id": "jouet-francais",
+      "name": "Jouet « le chat » du dépôt",
+      "url": "https://raw.githubusercontent.com/sk34pk25/ai-from-zero/main/model/data/francais.txt",
+      "licence": "MIT",
+      "licenceUrl": "https://raw.githubusercontent.com/sk34pk25/ai-from-zero/main/LICENSE",
+      "language": "fr",
+      "sizeMb": 0.017,
+      "approxChars": 16752,
+      "format": "txt",
+      "stage": 1,
+      "order": 1,
+      "prerequisites": [],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": true,
+        "needsGpu": false,
+        "ramMb": 64,
+        "minutes": 1
+      },
+      "teaches": "Vérifier qu'un tokenizer caractère et un petit GPT descendent la perte, sur un texte répété.",
+      "caveats": [
+        "Texte synthétique écrit pour le cours, pas du français réel.",
+        "Une perte très basse ici ne prouve pas que le modèle sait parler."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "39cd4d227ff10401e961f7dd69613d6a7432e6a4c5653f5804b967635bc7cc6b"
+    },
+    {
+      "id": "pg-candide",
+      "name": "Candide, ou l'Optimisme",
+      "url": "https://www.gutenberg.org/cache/epub/4650/pg4650.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.234,
+      "approxChars": 201499,
+      "format": "txt",
+      "stage": 2,
+      "order": 2,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": true,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 3
+      },
+      "teaches": "Voltaire, 1759. Une satire courte, bon deuxième texte après le jouet.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "1cc10ab3268a76aa01bd3f9722ae2ae0e5e36b869a18b0bb0832b75bc0327806"
+    },
+    {
+      "id": "pg-lune",
+      "name": "De la Terre à la Lune",
+      "url": "https://www.gutenberg.org/cache/epub/799/pg799.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.378,
+      "approxChars": 341253,
+      "format": "txt",
+      "stage": 2,
+      "order": 3,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": true,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 3
+      },
+      "teaches": "Jules Verne. Récit d'aventure, phrases plus longues.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "b647a30294f786cc8b502748fd1d1dd17486fadc16ff4d91147b4a7b2402d270"
+    },
+    {
+      "id": "pg-tour-monde",
+      "name": "Le Tour du monde en quatre-vingts jours",
+      "url": "https://www.gutenberg.org/cache/epub/800/pg800.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.462,
+      "approxChars": 421446,
+      "format": "txt",
+      "stage": 2,
+      "order": 4,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": true,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 3
+      },
+      "teaches": "Jules Verne. Dialogue et récit, vocabulaire de voyage.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "bd89ef4c406ae063a1eeba2ec0689532e8c83ecfb1fce742cdd22bc47cb888da"
+    },
+    {
+      "id": "pg-bovary",
+      "name": "Madame Bovary",
+      "url": "https://www.gutenberg.org/cache/epub/14155/pg14155.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.752,
+      "approxChars": 683723,
+      "format": "txt",
+      "stage": 2,
+      "order": 5,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 8
+      },
+      "teaches": "Gustave Flaubert. Prose littéraire, trop long pour le navigateur.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "93f0a2259dbaf5fde6e7b96adc22346d52f80eb1e9319336c8381a045efe40cd"
+    },
+    {
+      "id": "pg-miserables-1",
+      "name": "Les Misérables, tome I",
+      "url": "https://www.gutenberg.org/cache/epub/17489/pg17489.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.71,
+      "approxChars": 658310,
+      "format": "txt",
+      "stage": 2,
+      "order": 6,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 8
+      },
+      "teaches": "Victor Hugo. Long, utile une fois le BPE en place.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "a5de514ba7b9f2e1790e7e259c4e8b7a35ae1d29e4bf9a5f8767039c58b80503"
+    },
+    {
+      "id": "pg-vingt-mille",
+      "name": "Vingt mille lieues sous les mers",
+      "url": "https://www.gutenberg.org/cache/epub/5097/pg5097.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 0.943,
+      "approxChars": 881065,
+      "format": "txt",
+      "stage": 2,
+      "order": 7,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 8
+      },
+      "teaches": "Jules Verne. Gros roman, à échantillonner sur CPU.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "53507b025cd3580f4fbfa546baabb36f25adfb48b581c5b5016d91ad69d36c68"
+    },
+    {
+      "id": "pg-mousquetaires",
+      "name": "Les Trois Mousquetaires",
+      "url": "https://www.gutenberg.org/cache/epub/13951/pg13951.txt",
+      "licence": "Texte original dans le domaine public. L'édition Project Gutenberg est distribuée sous la Project Gutenberg License.",
+      "licenceUrl": "https://www.gutenberg.org/policy/license.html",
+      "language": "fr",
+      "sizeMb": 1.451,
+      "approxChars": 1323308,
+      "format": "txt",
+      "stage": 2,
+      "order": 8,
+      "prerequisites": [
+        "jouet-francais"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 8
+      },
+      "teaches": "Alexandre Dumas. Le plus long de la sélection, CPU avec --max-mb.",
+      "caveats": [
+        "Conserver l'en-tête de licence Project Gutenberg si tu redistribues le fichier brut.",
+        "Français littéraire du XVIIIe ou XIXe siècle : le modèle recopiera ce style, pas le français contemporain.",
+        "Le sha256 porte sur le fichier brut téléchargé, avant retrait de l'en-tête."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "sha256": "46c01913219e6ff165256b8cbcaec7034b004f785a147341911b3caee70ccfcc"
+    },
+    {
+      "id": "tinystories",
+      "name": "TinyStories (train)",
+      "url": "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-train.txt",
+      "cardUrl": "https://huggingface.co/datasets/roneneldan/TinyStories",
+      "licence": "CDLA-Sharing-1.0",
+      "licenceUrl": "https://cdla.dev/sharing-1-0/",
+      "language": "en",
+      "sizeMb": 1924.282,
+      "approxChars": null,
+      "format": "txt",
+      "stage": 3,
+      "order": 9,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 2048,
+        "minutes": 20
+      },
+      "teaches": "Un petit modèle peut apprendre une narration simple quand le texte est étroit et répétitif. Utile comme contraste avec le français.",
+      "caveats": [
+        "Anglais, pas français.",
+        "Partage à l'identique (CDLA-Sharing-1.0) : une redistribution du texte suit cette licence.",
+        "1,8 Go : entraîne avec --max-mb, ne commite pas le fichier.",
+        "Histoires synthétiques, vocabulaire d'enfant."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "frwiki",
+      "name": "Wikipédia en français (dump pages-articles)",
+      "url": "https://dumps.wikimedia.org/frwiki/latest/frwiki-latest-pages-articles.xml.bz2",
+      "licence": "GFDL 1.3 et Creative Commons Attribution-ShareAlike 4.0",
+      "licenceUrl": "https://dumps.wikimedia.org/legal.html",
+      "language": "fr",
+      "sizeMb": 7024.771,
+      "approxChars": null,
+      "format": "xml.bz2",
+      "stage": 3,
+      "order": 10,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": true,
+        "ramMb": 16000,
+        "minutes": 9999
+      },
+      "teaches": "Du français encyclopédique large. Le laboratoire ne le décode pas : c'est l'étape où il faut un extrait ou un autre outil.",
+      "caveats": [
+        "Partage à l'identique : une œuvre dérivée du texte reprend CC BY-SA 4.0 et/ou GFDL.",
+        "Le dump change : l'URL latest n'est pas figée.",
+        "7 Go compressés, XML MediaWiki, pas un texte prêt à entraîner.",
+        "Biais de Wikipédia : sujets, sources et style des contributeurs."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "frwikisource",
+      "name": "Wikisource en français (dump pages-articles)",
+      "url": "https://dumps.wikimedia.org/frwikisource/latest/frwikisource-latest-pages-articles.xml.bz2",
+      "licence": "GFDL 1.3 et Creative Commons Attribution-ShareAlike 4.0",
+      "licenceUrl": "https://dumps.wikimedia.org/legal.html",
+      "language": "fr",
+      "sizeMb": 2589.641,
+      "approxChars": null,
+      "format": "xml.bz2",
+      "stage": 3,
+      "order": 11,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": true,
+        "ramMb": 8000,
+        "minutes": 9999
+      },
+      "teaches": "Des œuvres déjà relues, souvent dans le domaine public, mais le dump reste du XML à extraire.",
+      "caveats": [
+        "Même double licence que les dumps Wikimedia pour le texte original des contributeurs.",
+        "Certaines pages sont des fac-similés ou des notes, pas seulement l'œuvre.",
+        "2,4 Go compressés. Le laboratoire refuse de le préparer tel quel."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "fineweb-2",
+      "name": "FineWeb 2",
+      "url": "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2",
+      "licence": "Open Data Commons Attribution (ODC-By) 1.0",
+      "licenceUrl": "https://opendatacommons.org/licenses/by/1-0/",
+      "language": "multi",
+      "sizeMb": 49168360.025,
+      "approxChars": null,
+      "format": "parquet",
+      "stage": 3,
+      "order": 12,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": true,
+        "ramMb": 64000,
+        "minutes": 9999
+      },
+      "teaches": "Du web filtré, multilingue, avec un découpage fra. C'est l'échelle où ce CPU NumPy n'est plus le bon outil.",
+      "caveats": [
+        "Le dépôt entier fait des dizaines de téraoctets : la taille ci-dessus est le usedStorage Hugging Face vérifié, pas seulement le français.",
+        "Le français est le découpage fra, à l'intérieur du jeu.",
+        "ODC-By exige l'attribution.",
+        "Texte du web : qualité inégale, biais, données personnelles possibles.",
+        "Parquet : prepare ne le décode pas."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "oscar-2301",
+      "name": "OSCAR 23.01",
+      "url": "https://huggingface.co/datasets/oscar-corpus/OSCAR-2301",
+      "licence": "CC0-1.0 (champ license de la fiche Hugging Face)",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "language": "multi",
+      "sizeMb": 4035354.085,
+      "approxChars": null,
+      "format": "parquet",
+      "stage": 3,
+      "order": 13,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": true,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": true,
+        "ramMb": 64000,
+        "minutes": 9999
+      },
+      "teaches": "Un crawl web multilingue. Utile pour voir ce qu'est un corpus bruité, pas pour le petit CPU.",
+      "caveats": [
+        "Accès manuel (gated) : la fiche API publique indique cc0-1.0, le README a renvoyé 401 sans compte.",
+        "Le texte crawlé peut contenir des droits d'auteur que la dédicace CC0 du jeu ne fait pas disparaître.",
+        "Ne pas télécharger automatiquement.",
+        "Plusieurs téraoctets."
+      ],
+      "gated": true,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "dolly-15k",
+      "name": "Databricks Dolly 15k",
+      "url": "https://huggingface.co/datasets/databricks/databricks-dolly-15k/resolve/main/databricks-dolly-15k.jsonl",
+      "cardUrl": "https://huggingface.co/datasets/databricks/databricks-dolly-15k",
+      "licence": "CC BY-SA 3.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0/legalcode",
+      "language": "en",
+      "sizeMb": 13.085,
+      "approxChars": null,
+      "format": "jsonl",
+      "stage": 4,
+      "order": 14,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 512,
+        "minutes": 15
+      },
+      "teaches": "Le format instruction / réponse, en anglais, avec des extraits Wikipédia sous la même licence.",
+      "caveats": [
+        "Anglais.",
+        "Partage à l'identique.",
+        "Certaines réponses s'appuient sur Wikipédia (CC BY-SA).",
+        "Trop gros pour Pyodide ; --max-mb possible.",
+        "Qualité variable : les consignes d'annotation étaient courtes."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "alpaca",
+      "name": "Stanford Alpaca (données)",
+      "url": "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/alpaca_data.json",
+      "licence": "CC BY-NC 4.0",
+      "licenceUrl": "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/DATA_LICENSE",
+      "language": "en",
+      "sizeMb": 22.774,
+      "approxChars": null,
+      "format": "json",
+      "stage": 4,
+      "order": 15,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 512,
+        "minutes": 15
+      },
+      "teaches": "Un jeu d'instructions généré par un modèle, utile pour voir le format, pas comme vérité.",
+      "caveats": [
+        "Non commercial (CC BY-NC 4.0).",
+        "Anglais.",
+        "Produit par text-davinci-003 : biais et erreurs du modèle source.",
+        "22 Mo : hors navigateur, acceptable sur CPU avec --max-mb."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25",
+      "restricted": true
+    },
+    {
+      "id": "aya",
+      "name": "Aya Dataset",
+      "url": "https://huggingface.co/datasets/CohereForAI/aya_dataset/resolve/main/data/train-00000-of-00001.parquet",
+      "cardUrl": "https://huggingface.co/datasets/CohereForAI/aya_dataset",
+      "licence": "Apache-2.0",
+      "licenceUrl": "https://opensource.org/license/apache-2-0",
+      "language": "multi",
+      "sizeMb": 137.196,
+      "approxChars": null,
+      "format": "parquet",
+      "stage": 4,
+      "order": 16,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 1024,
+        "minutes": 40
+      },
+      "teaches": "Des instructions humaines dans 65 langues. La fiche indique le français (code fra, niveau High).",
+      "caveats": [
+        "Parquet : prepare ne le décode pas.",
+        "131 Mo pour le train seul.",
+        "Multilingue : le français n'est qu'une partie.",
+        "Apache-2.0 sur le jeu, tel que la fiche le déclare."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "oasst1",
+      "name": "OpenAssistant Conversations 1 (ready)",
+      "url": "https://huggingface.co/datasets/OpenAssistant/oasst1/resolve/main/2023-04-12_oasst_ready.messages.jsonl.gz",
+      "cardUrl": "https://huggingface.co/datasets/OpenAssistant/oasst1",
+      "licence": "Apache-2.0",
+      "licenceUrl": "https://opensource.org/license/apache-2-0",
+      "language": "multi",
+      "sizeMb": 34.196,
+      "approxChars": null,
+      "format": "jsonl.gz",
+      "stage": 5,
+      "order": 17,
+      "prerequisites": [
+        "dolly-15k"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 1024,
+        "minutes": 20
+      },
+      "teaches": "Des tours de dialogue réels, dans 35 langues, avec des arbres de messages.",
+      "caveats": [
+        "Multilingue, l'anglais domine.",
+        "Le fichier gzip doit être téléchargé en entier.",
+        "Qualité inégale, messages modérés mais pas parfaits.",
+        "34 Mo compressés."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "oasst2",
+      "name": "OpenAssistant Conversations 2 (ready)",
+      "url": "https://huggingface.co/datasets/OpenAssistant/oasst2/resolve/main/2023-11-05_oasst2_ready.messages.jsonl.gz",
+      "cardUrl": "https://huggingface.co/datasets/OpenAssistant/oasst2",
+      "licence": "Apache-2.0",
+      "licenceUrl": "https://opensource.org/license/apache-2-0",
+      "language": "multi",
+      "sizeMb": 54.302,
+      "approxChars": null,
+      "format": "jsonl.gz",
+      "stage": 5,
+      "order": 18,
+      "prerequisites": [
+        "oasst1"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": true,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 1024,
+        "minutes": 25
+      },
+      "teaches": "La suite d'oasst1, même geste de dialogue, un peu plus de messages.",
+      "caveats": [
+        "Mêmes limites qu'oasst1.",
+        "54 Mo compressés, hors navigateur.",
+        "Pas un corpus français dédié."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    },
+    {
+      "id": "piaf",
+      "name": "PIAF",
+      "url": "https://huggingface.co/datasets/etalab-ia/piaf/resolve/main/plain_text/train-00000-of-00001.parquet",
+      "cardUrl": "https://huggingface.co/datasets/etalab-ia/piaf",
+      "licence": "MIT",
+      "licenceUrl": "https://raw.githubusercontent.com/etalab/piaf/master/LICENSE",
+      "language": "fr",
+      "sizeMb": 0.65,
+      "approxChars": null,
+      "format": "parquet",
+      "stage": 6,
+      "order": 19,
+      "prerequisites": [
+        "pg-candide"
+      ],
+      "compatibility": {
+        "char": false,
+        "bpe": true,
+        "numpyCpu": false,
+        "pyodide": false,
+        "needsGpu": false,
+        "ramMb": 256,
+        "minutes": 5
+      },
+      "teaches": "Évaluer la compréhension écrite en français (questions sur Wikipédia), pas continuer du texte.",
+      "caveats": [
+        "Le champ license de la fiche et le fichier LICENSE du dépôt GitHub disent MIT. La section Licensing Information du README est encore un placeholder.",
+        "Parquet : prepare ne le décode pas.",
+        "3835 questions dans la version décrite par la fiche, trop petit pour pré-entraîner.",
+        "Les passages viennent de Wikipédia : si tu republies les contextes, regarde aussi CC BY-SA."
+      ],
+      "gated": false,
+      "checkedOn": "2026-10-25"
+    }
+  ]
+}
