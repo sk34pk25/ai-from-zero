@@ -28,6 +28,17 @@
 <title>AI From Zero — le parcours pour construire la tienne</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="preload" href="data/curriculum.json" as="fetch" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/app.js">
+<link rel="modulepreload" href="assets/js/visuals.js">
+<link rel="modulepreload" href="assets/js/curriculum.js">
+<link rel="modulepreload" href="assets/js/dom.js">
+<link rel="modulepreload" href="assets/js/quiz.js">
+<link rel="modulepreload" href="assets/js/progress.js">
+<link rel="modulepreload" href="assets/js/router.js">
+<link rel="modulepreload" href="assets/js/search.js">
+<link rel="modulepreload" href="assets/js/storage.js">
+<link rel="modulepreload" href="assets/js/text.js">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -61,6 +72,7 @@
 <p id="progress-meta">Aucune étape terminée</p>
 </div>
 <a class="button button-primary" id="continue-link" href="#/lecon/0.1">Commencer</a>
+<a class="button button-secondary side-track" id="track-link" href="#/construire">Construire mon LLM</a>
 <p class="side-title" id="nav-title">Parcours</p>
 <nav id="course-nav" aria-labelledby="nav-title"></nav>
 <div class="side-actions">
@@ -70,7 +82,11 @@
 </aside>
 <div class="scrim" id="scrim" hidden></div>
 <main id="main" tabindex="-1">
-<p id="boot">Chargement du parcours…</p>
+<section class="hero hero-boot">
+<p class="eyebrow">Laboratoire francophone</p>
+<h1>De zéro à ta propre <em>architecture</em>.</h1>
+<p class="lead" id="boot">Chargement du parcours…</p>
+</section>
 <noscript>
 <p>JavaScript est nécessaire pour afficher les leçons. Le plan du parcours est versionné dans le dépôt, fichier <code>docs/CURRICULUM.md</code>.</p>
 </noscript>

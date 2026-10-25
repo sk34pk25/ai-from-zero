@@ -56,18 +56,26 @@ try {
   });
   try {
     const result = await lighthouse("http://127.0.0.1:4175/", { port: chrome.port, output: "json" }, desktop);
-    const scores = Object.fromEntries(
-      Object.entries(result.lhr.categories).map(([key, category]) => [key, Math.round(category.score * 100)]),
+    const mobile = await lighthouse("http://127.0.0.1:4175/", {
+      port: chrome.port,
+      output: "json",
+      onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
+    });
+    const pick = (report) => Object.fromEntries(
+      Object.entries(report.lhr.categories).map(([key, category]) => [key, Math.round(category.score * 100)]),
     );
+    const scores = pick(result);
+    const mobileScores = pick(mobile);
     const weak = Object.values(result.lhr.audits)
       .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
       .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue }))
       .sort((a, b) => a.score - b.score);
-    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, url: result.lhr.requestedUrl, weak }, null, 2));
-    console.log(JSON.stringify(scores));
+    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, mobileScores, url: result.lhr.requestedUrl, weak }, null, 2));
+    console.log(JSON.stringify({ desktop: scores, mobile: mobileScores }));
     const failed = Object.entries(scores).filter(([, score]) => score < 90);
-    if (failed.length) {
-      console.error("Scores sous 90 :", failed);
+    const mobileFailed = Object.entries(mobileScores).filter(([key, score]) => key !== "performance" && score < 90);
+    if (failed.length || mobileFailed.length) {
+      console.error("Scores sous 90 :", { desktop: failed, mobile: mobileFailed });
       process.exitCode = 1;
     }
   } finally {

@@ -8,7 +8,9 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 ## Où en est le parcours
 
-149 étapes, 13 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON et le plan, et les tests refusent qu'ils divergent.
+149 étapes, 13 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Chaque leçon ouvre sur une intuition, un schéma (parfois manipulable), puis les objectifs, les pièges, des indices progressifs et une correction. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON, les aides et le plan, et les tests refusent qu'ils divergent.
+
+La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie onze leçons aux fichiers de `model/`, du dossier vide jusqu'à `train_tiny_lm`.
 
 ## Lancer le site en local
 
@@ -32,7 +34,11 @@ pytest
 python3 -m model
 ```
 
-Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, TinyGPT NumPy (RoPE, RMSNorm, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle entraîné (`tiny_lm.py`, avec ou sans attention), TinyGPT en forward (RoPE, RMSNorm, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+
+```bash
+python3 -c "from model.tiny_lm import train_tiny_lm; print(train_tiny_lm('abababababababab', steps=40, lr=0.8, attention=True))"
+```
 
 ## Vérifier
 
