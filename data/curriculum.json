@@ -11692,7 +11692,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "example_ids repère la frontière en caractères, puis marque un token seulement si son début est après cette frontière. Un collage BPE qui chevauche la frontière ne fait pas entrer la question dans la cible. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété."
+              "text": "example_ids encode la question et la réponse à part, puis colle les identifiants. Le prompt encodé au moment de répondre est alors le même préfixe qu'à l'entraînement : une fusion BPE ne recolle pas la fin de « Réponse : » avec le premier mot de la réponse. La perte ne tombe que sur les identifiants de la réponse. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété."
             },
             {
               "kind": "code",
@@ -11713,7 +11713,7 @@
           "interactive": true,
           "codeFile": "model/tiny_lm.py",
           "takeaways": [
-            "La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière.",
+            "La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière.",
             "Pourquoi cette étape arrive maintenant : Si la perte compte toute la ligne, le modèle est récompensé pour réciter la question.",
             "Le fichier à ouvrir à côté du cours est model/tiny_lm.py."
           ],
@@ -11727,7 +11727,7 @@
             "Garde la question sous les yeux, sans regarder les choix : Quels tokens entrent dans la perte pendant l'ajustement ?",
             "Ouvre model/tiny_lm.py et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre."
           ],
-          "solution": "La réponse courte est : Ceux dont le début est dans la réponse, pas dans la question. La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière. Pour la rendre concrète, relie-la à model/tiny_lm.py et à l'exercice : Dis pourquoi un masque qui vaudrait 1 partout réapprendrait surtout à recopier « Question : ».",
+          "solution": "La réponse courte est : Ceux dont le début est dans la réponse, pas dans la question. La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière. Pour la rendre concrète, relie-la à model/tiny_lm.py et à l'exercice : Dis pourquoi un masque qui vaudrait 1 partout réapprendrait surtout à recopier « Question : ».",
           "review": "Sans rouvrir la page, explique « Masquer la question » en une phrase, puis dis ce que model/tiny_lm.py en garde vraiment.",
           "quiz": {
             "question": "Quels tokens entrent dans la perte pendant l'ajustement ?",
@@ -11738,7 +11738,7 @@
               "Aucun : l'ajustement ne calcule pas de perte"
             ],
             "answer": 0,
-            "explanation": "La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière."
+            "explanation": "La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière."
           }
         },
         {

@@ -15,7 +15,7 @@ from model.bpe import BPETokenizer
 from model.datasets import dataset_by_id, load_catalog, prepare_id, prepared_corpus
 from model.export_js import export_browser
 from model.finetune import compare_finetunes, example_ids, load_instructions
-from model.gpt_train import result_payload, sample_text, save_checkpoint, train_gpt
+from model.gpt_train import load_checkpoint, result_payload, sample_text, save_checkpoint, train_gpt
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -144,7 +144,92 @@ def _chat_sample(model, tokenizer, question: str) -> dict:
     return {"question": question, "prompt": prompt, "temperature": 0.0, "top_k": 1, "text": text, "error": error}
 
 
-def main() -> None:
+def run_dialogue(model, tokenizer, rows, attempts: list[dict] | None = None) -> tuple[dict, object]:
+    """Ajuste le dialogue. Le premier essai long est précédé d'un court sondage de pas LoRA."""
+    probes = []
+    for rate, rank in ((2e-3, 32), (8e-4, 32), (3e-3, 16)):
+        compared = compare_finetunes(
+            model, tokenizer, rows, steps=400, lr=1e-3, lora_lr=rate, rank=rank, seed=4,
+        )
+        probes.append({
+            "lora_lr": rate,
+            "rank": rank,
+            "steps": 400,
+            "eval_loss_end": compared["lora"]["eval_loss_end"],
+            "eval_loss_start": compared["lora"]["eval_loss_start"],
+        })
+        print(f"probe lora lr {rate} rank {rank} {probes[-1]['eval_loss_start']:.3f}->{probes[-1]['eval_loss_end']:.3f}", flush=True)
+    best_probe = min(probes, key=lambda item: item["eval_loss_end"])
+    sft_steps = 4000
+    print(f"sft long steps {sft_steps} lora lr {best_probe['lora_lr']} rank {best_probe['rank']}", flush=True)
+    planned = compare_finetunes(
+        model,
+        tokenizer,
+        rows,
+        steps=sft_steps,
+        lr=1e-3,
+        lora_lr=best_probe["lora_lr"],
+        rank=best_probe["rank"],
+        seed=5,
+        verbose=True,
+    )
+    for side, rate in (("full", 1e-3), ("lora", best_probe["lora_lr"])):
+        planned[side]["lr"] = rate
+    attempt = _attempt_summary("aligned", planned)
+    attempt["lora_probe"] = probes
+    stored = list(attempts or [])
+    stored.append(attempt)
+    best_side = min(("full", "lora"), key=lambda side: attempt[side]["eval_loss_end"])
+    chat_model = planned[f"{best_side}_model"]
+    samples = []
+    for question in CHAT_QUESTIONS:
+        sample = _chat_sample(chat_model, tokenizer, question)
+        sample["reference"] = next(row["answer"] for row in rows if row["question"] == question)
+        samples.append(sample)
+    held = _chat_sample(chat_model, tokenizer, HELD_OUT)
+    report = {
+        "label": "Ajustement réel sur les paires écrites pour le cours. Licence MIT. Température 0, trois questions fixées avant le tirage.",
+        "full": attempt["full"],
+        "lora": attempt["lora"],
+        "attempts": stored,
+        "lora_probes": probes,
+        "chosen": best_side,
+        "chosen_attempt": "aligned",
+        "chosen_eval_loss": attempt[best_side]["eval_loss_end"],
+        "instructions": "model/data/instructions_fr.json",
+        "instruction_licence": "MIT, comme le code. Paires écrites pour le cours, pas un jeu externe.",
+        "examples_written": len(rows),
+        "fit": _fit_report(tokenizer, rows, chat_model.config.block_size),
+        "samples": samples,
+        "sample_prompt": samples[0]["prompt"],
+        "sample": samples[0]["text"],
+        "held_out": held,
+        "held_out_note": "Cette question n'est pas dans le fichier d'instructions. Elle montre la limite, elle n'est pas choisie parmi plusieurs tirages.",
+    }
+    return report, chat_model
+
+
+def write_chat(report: dict, chat_model, tokenizer) -> None:
+    (ROOT / "data" / "finetune_run.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    chat_path = ROOT / "model" / "data" / "chat_checkpoint.npz"
+    save_checkpoint(chat_path, chat_model, tokenizer, report)
+    export_browser(chat_model, tokenizer, ROOT / "data" / "chat_browser.json", report["sample_prompt"])
+    print(
+        f"chat {report['chosen_attempt']} {report['chosen']} "
+        f"eval {report['chosen_eval_loss']:.3f} checkpoint {chat_path.stat().st_size}",
+        flush=True,
+    )
+    for sample in report["samples"]:
+        print("---", sample["question"], flush=True)
+        print(sample["text"], flush=True)
+    print("--- held out", flush=True)
+    print(report["held_out"]["text"], flush=True)
+
+
+def pretrain() -> tuple[object, object]:
     started = time.perf_counter()
     text, books = load_books()
     print("corpus", len(text), "books", len(books), flush=True)
@@ -228,102 +313,28 @@ def main() -> None:
         encoding="utf-8",
     )
     export_browser(model, tokenizer, ROOT / "data" / "gpt_browser.json", PROMPTS[1][0])
-    print("checkpoint", checkpoint.stat().st_size, flush=True)
+    print("checkpoint", checkpoint.stat().st_size, f"total {time.perf_counter() - started:.1f}s", flush=True)
+    return model, tokenizer
 
+
+def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Entraîne ou réajuste le modèle publié.")
+    parser.add_argument("--finetune-only", action="store_true")
+    args = parser.parse_args()
     rows = load_instructions(INSTRUCTIONS)
-    print("instructions", _fit_report(tokenizer, rows, model.config.block_size), flush=True)
-    probe_started = time.perf_counter()
-    compare_finetunes(model, tokenizer, rows[:4], steps=6, lr=1e-3, lora_lr=8e-3, rank=8, seed=0)
-    per_pair = (time.perf_counter() - probe_started) / 12
-    sft_steps = int((8 * 60) / max(per_pair, 1e-3))
-    sft_steps = max(400, min(sft_steps, 1600))
-    print(f"sft {per_pair:.3f}s/step -> {sft_steps} steps", flush=True)
-
-    attempts = []
-    models = {}
-    planned = compare_finetunes(
-        model,
-        tokenizer,
-        rows,
-        steps=sft_steps,
-        lr=1e-3,
-        lora_lr=8e-3,
-        rank=16,
-        seed=2,
-        verbose=True,
-    )
-    for side in ("full", "lora"):
-        planned[side]["lr"] = 1e-3 if side == "full" else 8e-3
-    attempts.append(_attempt_summary("planned", planned))
-    models[("planned", "full")] = planned["full_model"]
-    models[("planned", "lora")] = planned["lora_model"]
-    print(
-        f"full eval {planned['full']['eval_loss_start']:.3f}->{planned['full']['eval_loss_end']:.3f} "
-        f"lora eval {planned['lora']['eval_loss_start']:.3f}->{planned['lora']['eval_loss_end']:.3f}",
-        flush=True,
-    )
-    if planned["lora"]["eval_loss_end"] >= planned["lora"]["eval_loss_start"] or planned["full"]["eval_loss_end"] >= planned["full"]["eval_loss_start"]:
-        print("un des deux n'a pas baissé la perte moyenne, second essai documenté", flush=True)
-        second = compare_finetunes(
-            model,
-            tokenizer,
-            rows,
-            steps=sft_steps,
-            lr=3e-4,
-            lora_lr=3e-3,
-            rank=32,
-            seed=3,
-            verbose=True,
-        )
-        for side, rate in (("full", 3e-4), ("lora", 3e-3)):
-            second[side]["lr"] = rate
-        attempts.append(_attempt_summary("retry-lower-lr", second))
-        models[("retry-lower-lr", "full")] = second["full_model"]
-        models[("retry-lower-lr", "lora")] = second["lora_model"]
-
-    best_name, best_side = min(
-        models,
-        key=lambda key: next(item for item in attempts if item["name"] == key[0])[key[1]]["eval_loss_end"],
-    )
-    chat_model = models[(best_name, best_side)]
-    chosen_attempt = next(item for item in attempts if item["name"] == best_name)
-    samples = [_chat_sample(chat_model, tokenizer, question) for question in CHAT_QUESTIONS]
-    held = _chat_sample(chat_model, tokenizer, HELD_OUT)
-    report = {
-        "label": "Ajustement réel sur les paires écrites pour le cours. Licence MIT. Température 0, trois questions fixées avant le tirage.",
-        "full": next(item["full"] for item in attempts if item["name"] == "planned"),
-        "lora": next(item["lora"] for item in attempts if item["name"] == "planned"),
-        "attempts": attempts,
-        "chosen": best_side,
-        "chosen_attempt": best_name,
-        "chosen_eval_loss": chosen_attempt[best_side]["eval_loss_end"],
-        "instructions": "model/data/instructions_fr.json",
-        "instruction_licence": "MIT, comme le code. Paires écrites pour le cours, pas un jeu externe.",
-        "examples_written": len(rows),
-        "fit": _fit_report(tokenizer, rows, model.config.block_size),
-        "samples": samples,
-        "sample_prompt": samples[0]["prompt"],
-        "sample": samples[0]["text"],
-        "held_out": held,
-        "held_out_note": "Cette question n'est pas dans le fichier d'instructions. Elle montre la limite, elle n'est pas choisie parmi plusieurs tirages.",
-    }
-    if best_name != "planned":
-        report["exported_full"] = chosen_attempt["full"]
-        report["exported_lora"] = chosen_attempt["lora"]
-    (ROOT / "data" / "finetune_run.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    chat_path = ROOT / "model" / "data" / "chat_checkpoint.npz"
-    save_checkpoint(chat_path, chat_model, tokenizer, report)
-    export_browser(chat_model, tokenizer, ROOT / "data" / "chat_browser.json", samples[0]["prompt"])
-    print("chat", best_name, best_side, "checkpoint", chat_path.stat().st_size, flush=True)
-    for sample in samples:
-        print("---", sample["question"], flush=True)
-        print(sample["text"], flush=True)
-    print("--- held out", flush=True)
-    print(held["text"], flush=True)
-    print(f"total {time.perf_counter() - started:.1f}s", flush=True)
+    if args.finetune_only:
+        model, tokenizer, _history = load_checkpoint(ROOT / "model" / "data" / "gpt_checkpoint.npz")
+        previous = []
+        report_path = ROOT / "data" / "finetune_run.json"
+        if report_path.exists():
+            previous = json.loads(report_path.read_text(encoding="utf-8")).get("attempts", [])
+        report, chat_model = run_dialogue(model, tokenizer, rows, previous)
+    else:
+        model, tokenizer = pretrain()
+        report, chat_model = run_dialogue(model, tokenizer, rows, None)
+    write_chat(report, chat_model, tokenizer)
 
 
 if __name__ == "__main__":

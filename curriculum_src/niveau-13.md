@@ -230,7 +230,7 @@ L'énoncé reste au tableau. Seule la phrase de l'élève est corrigée. On ne r
 @VOCAB
 Masque : 1 sur les tokens de la réponse, 0 sur ceux de la question. Cible décalée : le token suivant, comme dans le pré-entraînement. Frontière : le caractère où « Réponse : » commence. Perte masquée : la moyenne ne compte que les positions à 1.
 @EXPLAIN
-example_ids repère la frontière en caractères, puis marque un token seulement si son début est après cette frontière. Un collage BPE qui chevauche la frontière ne fait pas entrer la question dans la cible. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété.
+example_ids encode la question et la réponse à part, puis colle les identifiants. Le prompt encodé au moment de répondre est alors le même préfixe qu'à l'entraînement : une fusion BPE ne recolle pas la fin de « Réponse : » avec le premier mot de la réponse. La perte ne tombe que sur les identifiants de la réponse. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété.
 @LANG python
 @CODE
 :::
@@ -252,7 +252,7 @@ Ceux dont le début est dans la réponse, pas dans la question
 - Seulement le premier token de la question
 - Aucun : l'ajustement ne calcule pas de perte
 @EXPLANATION
-La question est le contexte. La cible commence à la réponse, même si une fusion BPE touche la frontière.
+La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière.
 @@@
 @ID 13.7
 @TITLE Ajuster sans tout bouger

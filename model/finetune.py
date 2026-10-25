@@ -40,30 +40,25 @@ def load_instructions(path: str | Path) -> list[dict[str, str]]:
 
 
 def example_ids(tokenizer, question: str, answer: str) -> tuple[list[int], list[bool]] | None:
+    """Encode la question et la réponse séparément.
+
+    Une fusion BPE ne traverse pas la frontière. Le préfixe est donc le même
+    au moment de répondre, quand on n'encode que la question.
+    """
     prompt, full = format_pair(question, answer)
+    answer_text = full[len(prompt):]
     try:
-        ids = tokenizer.encode(full)
+        prompt_ids = tokenizer.encode(prompt)
+        answer_ids = tokenizer.encode(answer_text)
     except KeyError:
         return None
-    strings = [_token_string(tokenizer, index) for index in ids]
-    cursor = 0
-    answer_token = []
-    for piece in strings:
-        start = cursor
-        cursor += len(piece)
-        answer_token.append(start >= len(prompt))
-    if len(ids) < 2 or not any(answer_token):
+    ids = prompt_ids + answer_ids
+    if len(ids) < 2 or not answer_ids:
         return None
-    mask = answer_token[1:]
+    mask = [index + 1 >= len(prompt_ids) for index in range(len(ids) - 1)]
     if not any(mask):
         return None
     return ids, mask
-
-
-def _token_string(tokenizer, index: int) -> str:
-    if hasattr(tokenizer, "token_string"):
-        return tokenizer.token_string(index)
-    return tokenizer.itos[int(index)]
 
 
 def masked_cross_entropy(logits: Tensor, targets: np.ndarray, mask: np.ndarray) -> Tensor:

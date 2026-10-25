@@ -55,6 +55,21 @@ def test_cosine_schedule_warms_up_then_falls():
     assert scheduled_lr(99, 100, base, 10, "constant") == pytest.approx(base)
 
 
+def test_prompt_tokens_stay_a_prefix_under_bpe():
+    from model.bpe import BPETokenizer
+    from model.finetune import example_ids, format_pair
+
+    text = "Question : salut\nRéponse : bonjour\n" * 6
+    tokenizer = BPETokenizer.train(text, 10)
+    built = example_ids(tokenizer, "salut", "bonjour")
+    assert built is not None
+    ids, mask = built
+    prompt_ids = tokenizer.encode(format_pair("salut", "bonjour")[0])
+    assert ids[: len(prompt_ids)] == prompt_ids
+    assert mask[len(prompt_ids) - 1]
+    assert not any(mask[: len(prompt_ids) - 1])
+
+
 def test_full_finetune_and_lora_both_train():
     text = "Question : salut\nRéponse : bonjour\n" * 8
     tokenizer = CharTokenizer(text)
