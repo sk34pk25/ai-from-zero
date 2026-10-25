@@ -1,6 +1,7 @@
 /** Connexion propriétaire. Pas de formulaire d'inscription. */
 
 import { isConfigured, isOwner, resetPassword, signIn, signOut } from "./auth.js";
+import { isEmailAddress, passwordResetRedirect } from "./auth-return.js";
 import { h } from "./dom.js";
 
 export function paintConnexion(main) {
@@ -51,9 +52,13 @@ export function paintConnexion(main) {
     type: "button",
     class: "button button-secondary",
     onClick: async () => {
-      const target = new URL(document.baseURI);
-      target.hash = "#/connexion";
-      const result = await resetPassword(email.value || "", target.toString());
+      if (!isEmailAddress(email.value)) {
+        status.textContent = email.value.trim()
+          ? "Cette adresse e-mail n'est pas valable."
+          : "Indique l'adresse du compte propriétaire.";
+        return;
+      }
+      const result = await resetPassword(email.value, passwordResetRedirect(document.baseURI));
       status.textContent = result.message;
     },
   }, "Mot de passe oublié");

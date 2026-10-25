@@ -44,8 +44,20 @@ export const OWNER_ID = "${OWNER_ID}";
       await route.fulfill({ status: 200, headers: CORS, json: sessionFor(id, email) });
       return;
     }
+    if (url.includes("/auth/v1/user") && request.method() === "PUT") {
+      await route.fulfill({
+        status: 200,
+        headers: CORS,
+        json: { id: userId, aud: "authenticated", email: "patrik@example.com" },
+      });
+      return;
+    }
+    if (url.includes("/auth/v1/recover") && request.method() === "POST") {
+      await route.fulfill({ status: 200, headers: CORS, json: {} });
+      return;
+    }
     if (url.includes("/auth/v1/user")) {
-      await route.fulfill({ status: 200, headers: CORS, json: { id: userId, aud: "authenticated" } });
+      await route.fulfill({ status: 200, headers: CORS, json: { id: userId, aud: "authenticated", email: "patrik@example.com" } });
       return;
     }
     await route.fulfill({ status: 201, headers: CORS, json: [] });

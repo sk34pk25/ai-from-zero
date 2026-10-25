@@ -41,9 +41,13 @@ Si l'une de ces trois chaînes est vide, la page Connexion explique que le site 
 
 ## Mot de passe oublié
 
-Dans Authentication → URL Configuration, ajoute l'adresse du site publié, par exemple `https://sk34pk25.github.io/ai-from-zero/`, dans les redirections autorisées.
+Dans Authentication → URL Configuration, l'adresse du site est `https://sk34pk25.github.io/ai-from-zero/` et la liste des redirections autorisées contient `https://sk34pk25.github.io/ai-from-zero/**`. Ce joker couvre la route de retour. Rien à changer dans le tableau de bord pour le site déjà en ligne.
 
-Le bouton « Mot de passe oublié » envoie le message de Supabase. Le lien doit ramener sur `/#/connexion`.
+Le bouton « Mot de passe oublié » envoie le message Supabase avec `redirectTo` égal à `https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe` (le sous-chemin GitHub Pages est conservé, la route est dans le fragment). Le modèle d'e-mail par défaut, celui qui utilise `{{ .ConfirmationURL }}`, porte déjà cette adresse : ne pas le remplacer par un lien `{{ .TokenHash }}`, le site n'a pas de route serveur pour l'échanger.
+
+Au clic, Supabase renvoie le navigateur de deux façons possibles. Le flux implicite (celui du client JavaScript) remplace le fragment par `#access_token=…&type=recovery`. Le flux PKCE ajoute `?code=`. Une erreur, par exemple `error_code=otp_expired`, arrive dans le fragment ou dans la query. Le routeur hash ne doit pas lire ces jetons comme un chemin : la page « Choisir un nouveau mot de passe » les retire, ouvre la session, puis appelle `updateUser({ password })`.
+
+Si la liste des redirections est un jour réduite à des adresses exactes, ajouter `https://sk34pk25.github.io/ai-from-zero/#/nouveau-mot-de-passe`. Pour un essai en local, ajouter aussi `http://127.0.0.1:4173/**`.
 
 ## À retenir
 

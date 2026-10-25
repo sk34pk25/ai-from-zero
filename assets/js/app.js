@@ -1,9 +1,9 @@
 import { indexCurriculum, levelProgress, neighbors } from "./curriculum.js";
 import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
-import { isOwner, onAuth, restoreSession, upsertRow } from "./auth.js";
+import { isOwner, isPasswordRecovery, onAuth, preserveRecoveryHash, restoreSession, upsertRow } from "./auth.js";
 import { completionStats, emptyProgress, normalizeProgress, PROGRESS_KEY, reviewQueue, stepsLabel } from "./progress.js";
-import { parseHash } from "./router.js";
+import { routeFromHref } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
 import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
 import { modifierLabel } from "./text.js";
@@ -90,6 +90,7 @@ function bindChrome() {
   });
   document.addEventListener("keydown", onGlobalKeydown);
   window.addEventListener("hashchange", () => {
+    preserveRecoveryHash();
     closeSearch();
     setMenu(false);
     render({ scroll: "top" });
@@ -109,7 +110,9 @@ async function boot() {
       state.owner = isOwner();
       applyStoredProgress();
       updateAccountLink();
-      if (state.route.name !== "connexion") render({ scroll: "keep" });
+      const next = routeFromHref(location.href);
+      if (next.name === "connexion" && !isPasswordRecovery()) return;
+      render({ scroll: "keep" });
     });
     await restoreSession();
     state.owner = isOwner();
@@ -382,7 +385,7 @@ function stats() {
 
 function render({ scroll }) {
   const y = window.scrollY;
-  const route = parseHash(location.hash);
+  const route = routeFromHref(location.href);
   const routeKey = JSON.stringify(route);
   const routeChanged = routeKey !== state.lastRouteKey;
   if (routeChanged) {
@@ -479,10 +482,37 @@ function paintMain(route, ticket) {
   else if (route.name === "playground") paintAsync(ticket, () => import("./page-playground.js"), (mod) => mod.paintPlayground(els.main));
   else if (route.name === "ide") paintAsync(ticket, () => import("./page-ide.js"), (mod) => mod.paintIde(els.main, { owner: state.owner }));
   else if (route.name === "connexion") paintAsync(ticket, () => import("./page-connexion.js"), (mod) => mod.paintConnexion(els.main));
+  else if (route.name === "recovery") paintRecovery(ticket);
   else if (route.name === "about") paintAsync(ticket, () => import("./page-about.js"), (mod) => mod.paintAbout(els.main));
   else if (route.name === "donnees") paintAsync(ticket, () => import("./page-donnees.js"), (mod) => mod.paintDonnees(els.main, { owner: state.owner }));
   else paintNotFound(route.path);
   document.title = pageTitle(route);
+}
+
+let recoveryModule = null;
+
+function paintRecovery(ticket) {
+  const paint = (mod) => {
+    if (ticket !== state.pageTicket) return;
+    mod.paintRecovery(els.main);
+  };
+  if (recoveryModule) {
+    paint(recoveryModule);
+    return;
+  }
+  els.main.replaceChildren(h("p", { class: "lead", text: "Chargement…" }));
+  import("./page-recovery.js")
+    .then((mod) => {
+      recoveryModule = mod;
+      paint(mod);
+    })
+    .catch(() => {
+      if (ticket !== state.pageTicket) return;
+      els.main.replaceChildren(
+        h("h1", { text: "Page indisponible" }),
+        h("p", { text: "Ce module n'a pas pu être chargé." }),
+      );
+    });
 }
 
 function paintAsync(ticket, loader, paint) {
@@ -516,6 +546,7 @@ function pageTitle(route) {
   if (route.name === "playground") return `Playground · ${base}`;
   if (route.name === "ide") return `IDE · ${base}`;
   if (route.name === "connexion") return `Connexion · ${base}`;
+  if (route.name === "recovery") return `Nouveau mot de passe · ${base}`;
   if (route.name === "about") return `À propos · ${base}`;
   if (route.name === "donnees") return `Données · ${base}`;
   return `${base} — le parcours pour construire la tienne`;
