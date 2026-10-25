@@ -259,6 +259,43 @@ def test_ablation_keeps_names():
     assert rows[1]["loss"] < rows[0]["loss"]
 
 
+def test_tiny_lm_trains_with_real_backward():
+    from model.autograd import Tensor
+    from model.tiny_lm import TinyLM, train_tiny_lm
+    from model.tokenizer import CharTokenizer
+
+    text = "abababababababab"
+    linear = train_tiny_lm(text, steps=40, lr=0.8, seed=0, attention=False)
+    assert linear.loss_end < linear.loss_start * 0.5
+    attended = train_tiny_lm(text, steps=40, lr=0.8, seed=0, attention=True, d_model=8)
+    assert attended.loss_end < attended.loss_start * 0.5
+    assert attended.vocab_size == 2
+    assert attended.generated
+
+    tokenizer = CharTokenizer(text)
+    ids = tokenizer.encode(text)
+    model = TinyLM(tokenizer.vocab_size, d_model=8, seed=1, attention=True)
+    prefix = model.logits(ids)[0].copy()
+    flipped = ids[:-1] + [0 if ids[-1] != 0 else 1]
+    assert np.allclose(prefix, model.logits(flipped)[0])
+
+    left = Tensor(np.array([[0.2, -0.1], [0.4, 0.3]]))
+    right = Tensor(np.array([[0.5, -0.2], [0.1, 0.7]]))
+    (left.matmul(right).sum()).backward()
+    saved = right.grad.copy()
+    eps = 1e-5
+    numeric = np.zeros_like(right.data)
+    for index in np.ndindex(right.data.shape):
+        plus = right.data.copy()
+        minus = right.data.copy()
+        plus[index] += eps
+        minus[index] -= eps
+        higher = float(left.matmul(Tensor(plus)).sum().data)
+        lower = float(left.matmul(Tensor(minus)).sum().data)
+        numeric[index] = (higher - lower) / (2 * eps)
+    assert np.allclose(saved, numeric, atol=1e-6)
+
+
 def test_uniform_cross_entropy_is_log_vocab():
     logits = np.zeros((4, 5))
     targets = np.array([0, 1, 2, 3])

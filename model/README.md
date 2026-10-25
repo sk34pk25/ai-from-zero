@@ -19,6 +19,8 @@ python3 -m pytest
 | Module | Rôle | Étapes |
 | --- | --- | --- |
 | `mathutil.py` | softmax, entropie croisée et sa dérivée, SiLU, GELU, normes | 0–1, 5 |
+| `autograd.py` | tenseur, opérations, rétropropagation réelle | 1 |
+| `tiny_lm.py` | petit modèle entraîné, attention optionnelle, échantillon | 1, 3, 4 |
 | `stats.py` | lire une colonne, résumer, écrire un rapport | 0 |
 | `mlp.py`, `train.py` | neurone, régression, tête linéaire entraînée par descente | 1 |
 | `tokenizer.py` | tokenizer caractère, mini-BPE, visualiseur | 2 |
@@ -35,7 +37,7 @@ python3 -m pytest
 
 ## Ce que le laboratoire ne prétend pas faire
 
-- Pas de rétropropagation complète à travers l'attention. Le forward du Transformer est réel ; le gradient testé est celui de l'entropie croisée, et l'entraînement testé est celui d'une tête linéaire convexe.
+- L'attention entraînable est celle de `tiny_lm.py` (une tête, masque causal, rétropropagation réelle). TinyGPT dans `transformer.py` reste un forward de référence : il n'est pas entraîné de bout en bout.
 - Le dos `ssm` est un scan sélectif réduit, pas un bloc Mamba (pas de convolution courte, pas de kernel CUDA).
 - L'image s'arrête au découpage en patches. Il n'y a pas d'encodeur audio, ni de décodeur d'image.
 - La mémoire est un sac de mots, pas un embedding entraîné.

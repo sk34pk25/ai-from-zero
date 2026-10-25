@@ -109,6 +109,163 @@ def bullets(value: str) -> list[str]:
     return items
 
 
+INTERACTIVE = {
+    "tokenize",
+    "softmax",
+    "descent",
+    "loss",
+    "attention",
+    "transformer",
+    "moe",
+    "scan",
+    "embed",
+    "bigram",
+    "patches",
+    "relu",
+    "retrieve",
+}
+
+VISUAL_CAPTION = {
+    "tokenize": "Joue avec le texte : chaque caractère reçoit un identifiant stable, comme le tokenizer du laboratoire.",
+    "softmax": "Des scores deviennent une distribution. La température étale ou concentre la masse.",
+    "descent": "Le point descend la pente. Un pas trop grand dépasse le creux, un pas trop petit traîne.",
+    "loss": "Chaque pas d'entraînement doit faire descendre la perte. Si elle monte, le pas est trop grand ou le gradient est faux.",
+    "attention": "Choisis une position. Elle ne regarde que son passé : le futur reste masqué.",
+    "transformer": "Un bloc relit, ajoute le résidu, transforme, puis ajoute encore. La forme ne change pas.",
+    "moe": "Chaque token n'entre que dans l'expert au score le plus haut. Les autres restent en mémoire.",
+    "scan": "L'état se met à jour. Plus l'oubli est fort, moins le premier pas survit à la fin.",
+    "embed": "Deux vecteurs proches ont un produit scalaire élevé. L'ordre des coordonnées compte.",
+    "bigram": "La ligne du token courant est une distribution sur le token suivant.",
+    "patches": "Le carré en haut à gauche n'est pas le début de la première ligne : c'est un bloc.",
+    "relu": "Sous zéro, la sortie est nulle. Au-dessus, la valeur passe telle quelle.",
+    "retrieve": "La question et les documents sont comparés par les mots qu'ils partagent.",
+    "bars": "Trois colonnes, trois unités. On ne les additionne pas.",
+    "stack": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
+    "compare": "Deux colonnes : ce qui est mesuré ici, et ce qui reste une lecture.",
+    "machine": "CPU, mémoire, disque : trois ressources, trois façons de saturer.",
+    "flow": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+}
+
+CODE_FILE = {
+    "tokenize": "model/tokenizer.py",
+    "softmax": "model/mathutil.py",
+    "descent": "model/tiny_lm.py",
+    "loss": "model/tiny_lm.py",
+    "attention": "model/tiny_lm.py",
+    "transformer": "model/transformer.py",
+    "moe": "model/moe.py",
+    "scan": "model/ssm.py",
+    "embed": "model/tiny_lm.py",
+    "bigram": "model/bigram.py",
+    "patches": "model/multimodal.py",
+    "relu": "model/mlp.py",
+    "retrieve": "model/memory.py",
+    "bars": "model/bench.py",
+    "stack": "model/backbone.py",
+    "compare": "model/experiment.py",
+    "machine": "model/stats.py",
+    "flow": "model/train.py",
+}
+
+TRACK = [
+    {"id": "dossier", "title": "Un dossier vide", "step": "0.3", "file": "model/README.md", "summary": "Tu sais où tu es dans le terminal, et tu lances les commandes depuis la racine du dépôt."},
+    {"id": "nombres", "title": "Lire des nombres", "step": "0.15", "file": "model/stats.py", "summary": "Le premier programme utile lit une colonne et écrit un résumé. Rien n'est encore un modèle."},
+    {"id": "descente", "title": "Une perte qui descend", "step": "1.14", "file": "model/tiny_lm.py", "summary": "Une tête linéaire apprend par descente. Le gradient est calculé, pas deviné."},
+    {"id": "tokenizer", "title": "Du texte aux identifiants", "step": "2.5", "file": "model/tokenizer.py", "summary": "Le tokenizer caractère est la frontière. Sans lui, le modèle ne voit que des lettres brutes."},
+    {"id": "bigramme", "title": "La baseline", "step": "3.2", "file": "model/bigram.py", "summary": "Avant le réseau, le bigramme lissé donne la perplexité à battre."},
+    {"id": "autograd", "title": "La rétropropagation", "step": "1.12", "file": "model/autograd.py", "summary": "Chaque opération se souvient de son gradient. C'est le moteur de l'entraînement."},
+    {"id": "entrainement", "title": "Entraîner le petit modèle", "step": "3.8", "file": "model/tiny_lm.py", "summary": "train_tiny_lm lit un texte, descend la perte, puis propose une suite."},
+    {"id": "attention", "title": "L'attention entraînable", "step": "4.4", "file": "model/tiny_lm.py", "summary": "Avec attention=True, le même entraînement traverse le masque causal et le softmax."},
+    {"id": "echantillon", "title": "Échantillonner", "step": "3.9", "file": "model/tiny_lm.py", "summary": "Générer, c'est répéter : lire les scores du dernier pas, tirer un token, le recoller."},
+    {"id": "evaluer", "title": "Évaluer sans tricher", "step": "11.2", "file": "model/experiment.py", "summary": "La fin de la séquence reste cachée. La baseline uniforme vaut la taille du vocabulaire."},
+    {"id": "elargir", "title": "Élargir sans se raconter d'histoires", "step": "12.8", "file": "model/backbone.py", "summary": "Le dos interchangeable compare des formes. Il n'est pas, lui, entraîné de bout en bout."},
+]
+
+
+def visual_for(step_id: str, title: str) -> str:
+    level, index = (int(part) for part in step_id.split("."))
+    low = title.lower()
+    if level == 2 and index >= 4:
+        return "embed" if index >= 9 else "tokenize"
+    if "softmax" in low or step_id in {"3.5", "0.19"}:
+        return "softmax"
+    if step_id in {"1.12", "1.13", "1.14", "0.20"} or "gradient" in low or "descente" in low:
+        return "descent"
+    if step_id in {"1.6", "1.7", "1.8"} or "relu" in low or "activation" in low:
+        return "relu"
+    if any(word in low for word in ("perplex", "loss", "entrop")) or step_id in {"1.9", "1.10", "1.11", "3.6", "3.7", "3.10"}:
+        return "loss"
+    if level == 4 and index <= 8:
+        return "attention"
+    if level in {4, 5}:
+        return "transformer"
+    if level == 7:
+        return "moe"
+    if level == 8:
+        return "scan"
+    if level == 9 and index in {2, 3, 6, 7}:
+        return "patches"
+    if level == 9:
+        return "stack"
+    if level == 3 and index <= 4:
+        return "bigram"
+    if level == 3:
+        return "loss"
+    if "vecteur" in low or "embedding" in low or "matrice" in low:
+        return "embed"
+    if level == 6:
+        return "bars"
+    if level == 10:
+        return "retrieve"
+    if level == 11:
+        return "compare"
+    if level == 12:
+        return "stack"
+    if level == 0 and index <= 5:
+        return "machine"
+    if level <= 1:
+        return "flow"
+    return "flow"
+
+
+def learning_aids(fields: dict[str, str], correct: str, wrong: list[str], visual: str) -> dict:
+    title = fields["title"].strip()
+    code_file = CODE_FILE[visual]
+    explanation = fields["explanation"].strip()
+    why_first = fields["why"].strip().split(".")[0].strip()
+    takeaways = [
+        explanation,
+        f"Pourquoi cette étape arrive maintenant : {why_first}.",
+        f"Le fichier à ouvrir à côté du cours est {code_file}.",
+    ]
+    pitfalls = [
+        f"Le piège le plus proche est de retenir « {wrong[0]} ». La phrase ressemble à l'étape, mais elle décrit autre chose.",
+        f"Deuxième confusion : « {wrong[1]} ». Si ce mot te rassure trop vite, reviens au schéma avant la formule.",
+        f"Troisième réflexe : « {wrong[2]} ». Vérifie la forme des tableaux et, s'il y a un futur, le masque.",
+    ]
+    hints = [
+        "Ferme le code. Raconte l'intuition avec une image : un carnet, un réservoir, une file, une pente.",
+        f"Garde la question sous les yeux, sans regarder les choix : {fields['question'].strip()}",
+        f"Ouvre {code_file} et cherche la fonction citée dans le fil rouge. Le nom doit correspondre au geste, pas seulement au chapitre.",
+    ]
+    solution = (
+        f"La réponse courte est : {correct}. {explanation} "
+        f"Pour la rendre concrète, relie-la à {code_file} et à l'exercice : {fields['exercise'].strip()}"
+    )
+    review = f"Sans rouvrir la page, explique « {title} » en une phrase, puis dis ce que {code_file} en garde vraiment."
+    return {
+        "visual": visual,
+        "visualCaption": VISUAL_CAPTION[visual],
+        "interactive": visual in INTERACTIVE,
+        "codeFile": code_file,
+        "takeaways": takeaways,
+        "pitfalls": pitfalls,
+        "hints": hints,
+        "solution": solution,
+        "review": review,
+    }
+
+
 def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     required = ["id", "title", "tag", "minutes", "why", "objectives", "prereq", "intuition", "vocab", "explain", "code", "experiment", "exercise", "build", "question", "correct", "wrong", "explanation"]
     missing = [key for key in required if not fields.get(key, "").strip()]
@@ -144,6 +301,10 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
         code = code[: code.rfind(":::")].rstrip("\n")
     if len(code.strip()) < 40:
         raise SystemExit(f"{fields['id']} : exemple de code trop court")
+    visual = fields.get("visual", "").strip() or visual_for(fields["id"].strip(), fields["title"].strip())
+    if visual not in VISUAL_CAPTION:
+        raise SystemExit(f"{fields['id']} : visuel inconnu {visual}")
+    aids = learning_aids(fields, fields["correct"].strip(), wrong, visual)
     return {
         "id": fields["id"].strip(),
         "title": fields["title"].strip(),
@@ -161,6 +322,7 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
         ],
         "exercise": fields["exercise"].strip(),
         "build": fields["build"].strip(),
+        **aids,
         "quiz": {
             "question": fields["question"].strip(),
             "choices": choices,
@@ -232,7 +394,7 @@ def build_data() -> dict:
         if ids != [f"{level_id}.{index}" for index in range(1, expected + 1)]:
             raise SystemExit(f"Niveau {level_id} incomplet : {ids}")
         levels.append({"id": level_id, "title": title, "summary": summary, "project": project, "steps": steps})
-    return {"meta": META, "levels": levels, "architecture": ARCHITECTURE}
+    return {"meta": META, "levels": levels, "architecture": ARCHITECTURE, "track": TRACK}
 
 
 def main() -> None:

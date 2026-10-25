@@ -1,0 +1,248 @@
+"""Autograd minimal sur des tableaux NumPy.
+
+Chaque opération enregistre comment renvoyer le gradient à ses parents.
+C'est assez pour entraîner un petit modèle de langage, attention comprise,
+sans PyTorch. Ce n'est pas un remplaçant de torch.autograd : pas de batch
+de dimensions arbitraires exotiques, pas de checkpoint, pas de GPU.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+
+
+def _as_tensor(value: "Tensor | np.ndarray | float") -> "Tensor":
+    if isinstance(value, Tensor):
+        return value
+    return Tensor(value, requires_grad=False)
+
+
+def _unbroadcast(grad: np.ndarray, shape: tuple[int, ...]) -> np.ndarray:
+    while grad.ndim > len(shape):
+        grad = grad.sum(axis=0)
+    for axis, size in enumerate(shape):
+        if size == 1 and grad.shape[axis] != 1:
+            grad = grad.sum(axis=axis, keepdims=True)
+    return grad.reshape(shape)
+
+
+class Tensor:
+    def __init__(self, data: np.ndarray | float, requires_grad: bool = True):
+        self.data = np.asarray(data, dtype=np.float64)
+        self.requires_grad = requires_grad
+        self.grad = np.zeros_like(self.data) if requires_grad else None
+        self._prev: tuple[Tensor, ...] = ()
+        self._backward = lambda: None
+
+    def __repr__(self) -> str:
+        return f"Tensor(shape={self.data.shape}, grad={self.requires_grad})"
+
+    def zero_grad(self) -> None:
+        if self.requires_grad:
+            self.grad = np.zeros_like(self.data)
+
+    def backward(self) -> None:
+        if self.data.size != 1:
+            raise ValueError("backward part d'un scalaire")
+        if not self.requires_grad:
+            raise ValueError("ce tenseur ne suit pas le gradient")
+        self.grad = np.ones_like(self.data)
+        order: list[Tensor] = []
+        seen: set[int] = set()
+
+        def visit(node: Tensor) -> None:
+            if id(node) in seen:
+                return
+            seen.add(id(node))
+            for parent in node._prev:
+                visit(parent)
+            order.append(node)
+
+        visit(self)
+        for node in reversed(order):
+            node._backward()
+
+    def _binary(self, other: Tensor, out: np.ndarray, backward) -> Tensor:
+        result = Tensor(out, requires_grad=self.requires_grad or other.requires_grad)
+        result._prev = tuple(node for node in (self, other) if node.requires_grad)
+        result._backward = backward
+        return result
+
+    def __add__(self, other: Tensor | float) -> Tensor:
+        other_t = _as_tensor(other)
+        out = self.data + other_t.data
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += _unbroadcast(result.grad, self.data.shape)
+            if other_t.requires_grad:
+                other_t.grad += _unbroadcast(result.grad, other_t.data.shape)
+
+        result = self._binary(other_t, out, backward)
+        return result
+
+    def __radd__(self, other: float) -> Tensor:
+        return self + other
+
+    def __sub__(self, other: Tensor | float) -> Tensor:
+        return self + (other * -1.0 if isinstance(other, Tensor) else -other)
+
+    def __mul__(self, other: Tensor | float) -> Tensor:
+        other_t = _as_tensor(other)
+        out = self.data * other_t.data
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += _unbroadcast(result.grad * other_t.data, self.data.shape)
+            if other_t.requires_grad:
+                other_t.grad += _unbroadcast(result.grad * self.data, other_t.data.shape)
+
+        result = self._binary(other_t, out, backward)
+        return result
+
+    def __rmul__(self, other: float) -> Tensor:
+        return self * other
+
+    def __neg__(self) -> Tensor:
+        return self * -1.0
+
+    def matmul(self, other: Tensor) -> Tensor:
+        other_t = _as_tensor(other)
+        out = self.data @ other_t.data
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += result.grad @ np.swapaxes(other_t.data, -1, -2)
+            if other_t.requires_grad:
+                other_t.grad += np.swapaxes(self.data, -1, -2) @ result.grad
+
+        result = self._binary(other_t, out, backward)
+        return result
+
+    def sum(self) -> Tensor:
+        out = np.asarray(self.data.sum())
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += np.ones_like(self.data) * result.grad
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def mean(self) -> Tensor:
+        return self.sum() * (1.0 / self.data.size)
+
+    def relu(self) -> Tensor:
+        mask = self.data > 0
+        out = self.data * mask
+
+        def backward() -> None:
+            if self.requires_grad:
+                self.grad += result.grad * mask
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def softmax(self, axis: int = -1) -> Tensor:
+        shifted = self.data - np.max(self.data, axis=axis, keepdims=True)
+        exp = np.exp(shifted)
+        probs = exp / np.sum(exp, axis=axis, keepdims=True)
+
+        def backward() -> None:
+            if not self.requires_grad:
+                return
+            grad = result.grad
+            dot = np.sum(grad * probs, axis=axis, keepdims=True)
+            self.grad += probs * (grad - dot)
+
+        result = Tensor(probs, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def log_softmax(self, axis: int = -1) -> Tensor:
+        shifted = self.data - np.max(self.data, axis=axis, keepdims=True)
+        log_z = np.log(np.sum(np.exp(shifted), axis=axis, keepdims=True))
+        out = shifted - log_z
+
+        def backward() -> None:
+            if not self.requires_grad:
+                return
+            probs = np.exp(out)
+            self.grad += result.grad - probs * np.sum(result.grad, axis=axis, keepdims=True)
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+
+def embedding(table: Tensor, indices: np.ndarray) -> Tensor:
+    """Sélectionne des lignes. Le gradient est dispersé vers les lignes lues."""
+    rows = np.asarray(indices, dtype=np.int64)
+    out = table.data[rows]
+
+    def backward() -> None:
+        if table.requires_grad:
+            np.add.at(table.grad, rows, result.grad)
+
+    result = Tensor(out, requires_grad=table.requires_grad)
+    result._prev = (table,) if table.requires_grad else ()
+    result._backward = backward
+    return result
+
+
+def cross_entropy(logits: Tensor, targets: np.ndarray) -> Tensor:
+    """Entropie croisée moyenne. logits (N, V), targets (N,)."""
+    labels = np.asarray(targets, dtype=np.int64)
+    if logits.data.ndim != 2 or labels.shape != (logits.data.shape[0],):
+        raise ValueError("cross_entropy attend logits (N, V) et targets (N,)")
+    log_probs = logits.log_softmax(axis=-1)
+    picked = log_probs.data[np.arange(labels.shape[0]), labels]
+    loss_value = -picked.mean()
+
+    def backward() -> None:
+        if not log_probs.requires_grad:
+            return
+        grad = np.zeros_like(log_probs.data)
+        grad[np.arange(labels.shape[0]), labels] = -1.0 / labels.shape[0]
+        log_probs.grad += grad * result.grad
+
+    result = Tensor(loss_value, requires_grad=logits.requires_grad)
+    result._prev = (log_probs,) if logits.requires_grad else ()
+    result._backward = backward
+    return result
+
+
+def causal_attention(hidden: Tensor, wq: Tensor, wk: Tensor, wv: Tensor) -> Tensor:
+    """Une tête causale. hidden est (T, D). Le futur reçoit un score très négatif."""
+    query = hidden.matmul(wq)
+    key = hidden.matmul(wk)
+    value = hidden.matmul(wv)
+    scale = float(query.data.shape[-1]) ** -0.5
+    scores = query.matmul(key.transpose()) * scale
+    time = scores.data.shape[-1]
+    mask = np.triu(np.ones((time, time), dtype=np.float64), k=1) * -1e9
+    weights = (scores + mask).softmax(axis=-1)
+    return weights.matmul(value)
+
+
+def _transpose_backward(source: Tensor) -> Tensor:
+    out = np.swapaxes(source.data, -1, -2)
+
+    def backward() -> None:
+        if source.requires_grad:
+            source.grad += np.swapaxes(result.grad, -1, -2)
+
+    result = Tensor(out, requires_grad=source.requires_grad)
+    result._prev = (source,) if source.requires_grad else ()
+    result._backward = backward
+    return result
+
+
+# La méthode transpose est posée après la classe pour garder causal_attention lisible.
+Tensor.transpose = lambda self: _transpose_backward(self)  # type: ignore[method-assign]
