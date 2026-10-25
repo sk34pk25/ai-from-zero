@@ -10,12 +10,18 @@
 
 import { OWNER_ID, SUPABASE_ANON_KEY, SUPABASE_URL } from "../config.js";
 import {
+  RECOVERY_EMAIL_BUSY,
+  RECOVERY_EMAIL_SENT,
   RECOVERY_HASH,
+  claimRecoverySend,
   cleanAuthLocation,
   normalizeImplicitHref,
   passwordResetRedirect,
   readAuthReturn,
+  recoveryCooldownMessage,
   recoveryErrorMessage,
+  resetEmailFailure,
+  settleRecoverySend,
 } from "./auth-return.js";
 
 const listeners = new Set();
@@ -24,6 +30,7 @@ let user = null;
 let recoveryNotice = null;
 let passwordRecovery = false;
 let passwordSaved = false;
+let accountPasswordNoticeText = "";
 let holdRecoveryRoute = false;
 
 export function publicConfig() {
@@ -171,6 +178,10 @@ export function isPasswordSaved() {
   return passwordSaved;
 }
 
+export function accountPasswordNotice() {
+  return accountPasswordNoticeText;
+}
+
 export function isRecoveryPending() {
   return holdRecoveryRoute && !recoveryNotice && !isOwner();
 }
@@ -315,29 +326,98 @@ export function leaveRecovery(hash) {
   window.location.replace(target);
 }
 
-export async function updatePassword(password) {
+async function assertCurrentSession(supabase, recovery) {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    const sessionUser = data?.user ?? null;
+    if (error || !sessionUser || sessionUser.id !== publicConfig().ownerId) {
+      return {
+        ok: false,
+        message: recovery
+          ? "La session de réinitialisation a expiré. Demande un nouveau lien."
+          : "La session a expiré. Reconnecte-toi pour changer le mot de passe.",
+      };
+    }
+    user = sessionUser;
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      message: recovery
+        ? "La session de réinitialisation n'a pas pu être vérifiée. Demande un nouveau lien."
+        : "La session n'a pas pu être vérifiée. Reconnecte-toi, puis réessaie. Aucun e-mail n'est envoyé.",
+    };
+  }
+}
+
+function passwordWriteFailure(error, recovery) {
+  const code = error?.code || "";
+  const text = error?.message || "";
+  if (code === "same_password" || /different from the old/i.test(text)) {
+    return { ok: false, code, message: "Le nouveau mot de passe doit être différent de l'ancien." };
+  }
+  if (code === "weak_password" || /weak password/i.test(text) || /at least/i.test(text)) {
+    return { ok: false, code, message: "Ce mot de passe est refusé. Utilise au moins 12 caractères." };
+  }
+  if (code === "reauthentication_needed" || code === "reauthentication_required" || /reauthentication/i.test(text)) {
+    return {
+      ok: false,
+      code: code || "reauthentication_needed",
+      message: recovery
+        ? "La session de réinitialisation n'est plus assez récente. Demande un nouveau lien."
+        : "Supabase demande une session toute récente. Déconnecte-toi, reconnecte-toi, puis réessaie ici. Aucun e-mail n'est envoyé.",
+    };
+  }
+  if (/session/i.test(text) || code === "session_not_found" || code === "session_expired") {
+    return {
+      ok: false,
+      code: code || "session",
+      message: recovery
+        ? "La session de réinitialisation a expiré. Demande un nouveau lien."
+        : "La session a expiré. Reconnecte-toi pour changer le mot de passe.",
+    };
+  }
+  if (error?.name === "AuthRetryableFetchError" || error?.status === 0 || /failed to fetch|network/i.test(text)) {
+    return {
+      ok: false,
+      code: "network",
+      message: "Le mot de passe n'a pas pu être enregistré : le réseau ou Supabase ne répond pas. Réessaie dans un moment.",
+    };
+  }
+  if (code) {
+    return { ok: false, code, message: `Le mot de passe n'a pas pu être enregistré (code ${code}).` };
+  }
+  return { ok: false, code: "unknown", message: "Le mot de passe n'a pas pu être enregistré." };
+}
+
+async function writePassword(password, { recovery }) {
   if (!isOwner()) {
     return { ok: false, message: "Réservé au propriétaire." };
   }
   const supabase = await clientOf();
-  const { error } = await supabase.auth.updateUser({ password });
-  if (error) {
-    const code = error.code || "";
-    const text = error.message || "";
-    if (code === "same_password" || /different from the old/i.test(text)) {
-      return { ok: false, message: "Le nouveau mot de passe doit être différent de l'ancien." };
-    }
-    if (code === "weak_password" || /weak password/i.test(text) || /at least/i.test(text)) {
-      return { ok: false, message: "Ce mot de passe est refusé. Utilise au moins 12 caractères." };
-    }
-    if (/session/i.test(text) || code === "session_not_found") {
-      return { ok: false, message: "La session de réinitialisation a expiré. Demande un nouveau lien." };
-    }
-    return { ok: false, message: "Le mot de passe n'a pas pu être enregistré." };
+  const session = await assertCurrentSession(supabase, recovery);
+  if (!session.ok) return session;
+  try {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return passwordWriteFailure(error, recovery);
+  } catch (error) {
+    return passwordWriteFailure(error, recovery);
   }
-  passwordSaved = true;
+  if (recovery) passwordSaved = true;
+  else accountPasswordNoticeText = "Mot de passe mis à jour. L'ancien ne fonctionne plus. Aucun e-mail n'a été envoyé.";
   emit();
-  return { ok: true, message: "Mot de passe mis à jour." };
+  return {
+    ok: true,
+    message: recovery ? "Mot de passe mis à jour." : accountPasswordNoticeText,
+  };
+}
+
+export async function updatePassword(password) {
+  return writePassword(password, { recovery: true });
+}
+
+export async function changePassword(password) {
+  return writePassword(password, { recovery: false });
 }
 
 export { passwordResetRedirect };
@@ -395,12 +475,32 @@ export async function confirmRecoveryLink() {
 
 export async function resetPassword(email, redirectTo) {
   if (!isConfigured()) {
-    return { ok: false, message: "Supabase n'est pas configuré : le message de réinitialisation ne peut pas partir." };
+    return { ok: false, code: "config", message: "Supabase n'est pas configuré : le message de réinitialisation ne peut pas partir." };
   }
-  const supabase = await clientOf();
-  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
-  if (error) return { ok: false, message: "Le message n'a pas pu être envoyé." };
-  return { ok: true, message: "Si ce compte existe, un message de réinitialisation a été envoyé." };
+  const storage = window.localStorage;
+  const target = redirectTo || passwordResetRedirect(document.baseURI);
+  const claim = claimRecoverySend(storage);
+  if (claim.blocked) {
+    return {
+      ok: false,
+      code: claim.reason === "busy" ? "busy" : "cooldown",
+      message: claim.reason === "busy" ? RECOVERY_EMAIL_BUSY : recoveryCooldownMessage(claim.remaining),
+    };
+  }
+  try {
+    const supabase = await clientOf();
+    const { error } = await supabase.auth.resetPasswordForEmail(String(email || "").trim(), { redirectTo: target });
+    if (error) {
+      const failure = resetEmailFailure(error);
+      settleRecoverySend(storage, failure.code === "over_email_send_rate_limit" ? "limited" : "failed");
+      return failure;
+    }
+    settleRecoverySend(storage, "sent");
+    return { ok: true, code: "sent", message: RECOVERY_EMAIL_SENT };
+  } catch (error) {
+    settleRecoverySend(storage, "failed");
+    return resetEmailFailure(error);
+  }
 }
 
 async function requireOwnerClient() {

@@ -31,6 +31,7 @@ export function parseHash(hash) {
   if (normalized === "/playground") return { name: "playground" };
   if (normalized === "/ide") return { name: "ide" };
   if (normalized === "/connexion") return { name: "connexion" };
+  if (normalized === "/changer-mot-de-passe") return { name: "password" };
   if (normalized === "/nouveau-mot-de-passe") return { name: "recovery" };
   if (normalized === "/a-propos") return { name: "about" };
   if (normalized === "/donnees") return { name: "donnees" };
@@ -55,6 +56,8 @@ export function hrefFor(route) {
       return "#/ide";
     case "connexion":
       return "#/connexion";
+    case "password":
+      return "#/changer-mot-de-passe";
     case "recovery":
       return "#/nouveau-mot-de-passe";
     case "about":

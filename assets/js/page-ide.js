@@ -1,6 +1,6 @@
 /** IDE statique. Le visiteur lit un fichier. Le propriétaire édite, exécute et entraîne. */
 
-import { upsertRow } from "./auth.js";
+import { insertRow, selectRows, upsertRow } from "./auth.js";
 import { h } from "./dom.js";
 import { request, stopWorker } from "./pybridge.js";
 import { zipStore } from "./zipstore.js";
@@ -8,6 +8,7 @@ import { zipStore } from "./zipstore.js";
 const SNIPPET_KEY = "afz-ide-snippet";
 
 export async function paintIde(main, ctx) {
+  const stamp = main.dataset.paint;
   main.replaceChildren(
     h("p", { class: "eyebrow", text: "Laboratoire" }),
     h("h1", { text: "IDE" }),
@@ -26,36 +27,53 @@ export async function paintIde(main, ctx) {
   } catch {
     files.set("model/__init__.py", "");
   }
+  if (main.dataset.paint !== stamp) return;
   if (ctx.owner) await hydrate(files);
+  if (main.dataset.paint !== stamp) return;
   paintShell(main, ctx, manifest.files, files);
 }
 
 async function hydrate(files) {
+  const localKeys = new Set();
   const db = await openDb();
-  if (!db) return;
-  await new Promise((resolve) => {
-    const tx = db.transaction("files", "readonly");
-    const store = tx.objectStore("files");
-    const request = store.getAllKeys();
-    request.onsuccess = () => {
-      const keys = request.result || [];
-      if (!keys.length) {
-        resolve();
-        return;
-      }
-      let left = keys.length;
-      for (const key of keys) {
-        const read = store.get(key);
-        read.onsuccess = () => {
-          if (typeof read.result === "string") files.set(key, read.result);
-          left -= 1;
-          if (left === 0) resolve();
-        };
-      }
-    };
-    request.onerror = () => resolve();
-  });
-  db.close();
+  if (db) {
+    await new Promise((resolve) => {
+      const tx = db.transaction("files", "readonly");
+      const store = tx.objectStore("files");
+      const request = store.getAllKeys();
+      request.onsuccess = () => {
+        const keys = request.result || [];
+        if (!keys.length) {
+          resolve();
+          return;
+        }
+        let left = keys.length;
+        for (const key of keys) {
+          const read = store.get(key);
+          read.onsuccess = () => {
+            if (typeof read.result === "string") {
+              files.set(key, read.result);
+              localKeys.add(key);
+            }
+            left -= 1;
+            if (left === 0) resolve();
+          };
+        }
+      };
+      request.onerror = () => resolve();
+    });
+    db.close();
+  }
+  try {
+    const rows = await selectRows("ide_files");
+    for (const row of rows || []) {
+      if (!row || typeof row.path !== "string" || typeof row.content !== "string") continue;
+      if (localKeys.has(row.path)) continue;
+      files.set(row.path, row.content);
+    }
+  } catch {
+    /* le dépôt local reste affiché si la lecture distante est refusée */
+  }
 }
 
 function paintShell(main, ctx, paths, files) {
@@ -171,6 +189,17 @@ function paintShell(main, ctx, paths, files) {
     if (!stopped) {
       const drawn = await request({ type: "train-sample" });
       sample.textContent = drawn.text || "";
+      if (lossValues.length) {
+        try {
+          await insertRow("training_runs", {
+            label: "ide-navigateur",
+            loss: lossValues,
+            sample: sample.textContent || "",
+          });
+        } catch {
+          output.textContent += "La courbe n'a pas été enregistrée à distance.\n";
+        }
+      }
     } else {
       lossText.textContent = "Entraînement arrêté. Le worker a été coupé, le pas en cours ne continue pas.";
     }

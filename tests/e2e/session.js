@@ -20,9 +20,14 @@ function sessionFor(id, email) {
   };
 }
 
-export async function installOwner(page, { userId = OWNER_ID } = {}) {
+function tableName(url) {
+  const match = new URL(url).pathname.match(/\/rest\/v1\/([^/]+)/);
+  return match ? match[1] : "";
+}
+
+export async function installOwner(page, { userId = OWNER_ID, tables = {} } = {}) {
   const writes = [];
-  await page.route("**/assets/config.js", (route) => route.fulfill({
+  await page.route(/\/assets\/config\.js(?:\?.*)?$/, (route) => route.fulfill({
     contentType: "text/javascript",
     body: `export const SUPABASE_URL = "https://example.supabase.co";
 export const SUPABASE_ANON_KEY = "abcdefghijklmnopqrstuvwxyz012345";
@@ -37,6 +42,11 @@ export const OWNER_ID = "${OWNER_ID}";
     }
     const url = request.url();
     if (request.method() === "POST" && url.includes("/rest/v1/")) writes.push(request);
+    if (request.method() === "GET" && url.includes("/rest/v1/")) {
+      const rows = tables[tableName(url)] || [];
+      await route.fulfill({ status: 200, headers: CORS, json: rows });
+      return;
+    }
     if (url.includes("/auth/v1/token")) {
       const body = request.postDataJSON() || {};
       const email = body.email || "patrik@example.com";

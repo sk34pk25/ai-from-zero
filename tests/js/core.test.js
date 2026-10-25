@@ -27,6 +27,8 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
   assert.deepEqual(parseHash("#/ide"), { name: "ide" });
   assert.equal(hrefFor({ name: "about" }), "#/a-propos");
   assert.equal(hrefFor({ name: "connexion" }), "#/connexion");
+  assert.deepEqual(parseHash("#/changer-mot-de-passe"), { name: "password" });
+  assert.equal(hrefFor({ name: "password" }), "#/changer-mot-de-passe");
   assert.deepEqual(parseHash("#/nouveau-mot-de-passe"), { name: "recovery" });
   assert.equal(hrefFor({ name: "recovery" }), "#/nouveau-mot-de-passe");
   const recovery = parseHash("#access_token=secret-token&refresh_token=secret-refresh&type=recovery");
@@ -80,6 +82,10 @@ test("le quiz et la progression", () => {
   assert.equal(gradeQuiz(2, 2).correct, true);
   assert.equal(gradeQuiz(2, 0).status, "incorrect");
   assert.deepEqual(normalizeProgress({ done: ["1.2", "1.2", 3, "0.1"] }).done, ["1.2", "0.1"]);
+  assert.deepEqual(
+    normalizeProgress({ done: [], quizzes: { "1.6": { correct: true, choice: 2 } } }).quizzes,
+    { "1.6": { correct: true, choice: 2 } },
+  );
   const stats = completionStats(["0.1", "0.2", "0.9"], ["0.1"]);
   assert.equal(stats.percent, 33);
   assert.equal(stats.nextId, "0.2");

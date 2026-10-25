@@ -1,10 +1,12 @@
 /** Un worker Pyodide pour l'IDE, les exercices et le pas à pas. L'arrêt tue le worker. */
 
+import { ASSET_VERSION } from "./version.js";
+
 let worker = null;
 let listener = null;
 
 export function getWorker() {
-  if (!worker) worker = new Worker(new URL("./pyworker.js", import.meta.url));
+  if (!worker) worker = new Worker(new URL(`./pyworker.js?v=${encodeURIComponent(ASSET_VERSION)}`, import.meta.url));
   return worker;
 }
 

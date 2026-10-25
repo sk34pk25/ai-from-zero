@@ -1,7 +1,7 @@
 import { indexCurriculum, levelProgress, neighbors } from "./curriculum.js";
 import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
-import { isOwner, isPasswordRecovery, onAuth, preserveRecoveryHash, restoreSession, upsertRow } from "./auth.js";
+import { isOwner, isPasswordRecovery, onAuth, preserveRecoveryHash, restoreSession, selectRows, upsertRow } from "./auth.js";
 import { completionStats, emptyProgress, normalizeProgress, PROGRESS_KEY, reviewQueue, stepsLabel } from "./progress.js";
 import { routeFromHref } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
@@ -107,11 +107,17 @@ async function boot() {
     state.index = indexCurriculum(data);
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     onAuth(() => {
+      const wasOwner = state.owner;
       state.owner = isOwner();
+      if (!state.owner) remotePullStarted = false;
       applyStoredProgress();
       updateAccountLink();
+      if (state.owner) pullRemote();
       const next = routeFromHref(location.href);
       if (next.name === "connexion" && !isPasswordRecovery()) return;
+      // Le formulaire affiche lui-même le résultat. Repeindre alors que
+      // le propriétaire ne change pas efface « Mot de passe mis à jour ».
+      if (next.name === "password" && wasOwner === state.owner) return;
       render({ scroll: "keep" });
     });
     await restoreSession();
@@ -184,6 +190,64 @@ function persistDone() {
   upsertRow("progress", { id: 1, done: ordered }, "id").catch(() => {
     toast("L'enregistrement distant a été refusé.");
   });
+}
+
+let remotePullStarted = false;
+
+function rememberProgressLocal() {
+  const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
+  writeJson(localStorage, PROGRESS_KEY, {
+    v: 1,
+    done: ordered,
+    quizzes: state.quizzes,
+    exercises: state.exercises,
+  });
+}
+
+async function pullRemote() {
+  if (remotePullStarted || !state.owner || !state.index) return;
+  remotePullStarted = true;
+  try {
+    const [progressRows, quizRows] = await Promise.all([
+      selectRows("progress"),
+      selectRows("quiz_results"),
+    ]);
+    const remoteDone = new Set(
+      (Array.isArray(progressRows?.[0]?.done) ? progressRows[0].done : []).filter((id) => typeof id === "string"),
+    );
+    let changed = false;
+    for (const id of remoteDone) {
+      if (state.index.byId.has(id) && !state.done.has(id)) {
+        state.done.add(id);
+        changed = true;
+      }
+    }
+    const localOnly = state.index.orderedIds.some((id) => state.done.has(id) && !remoteDone.has(id));
+    if (localOnly) {
+      const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
+      upsertRow("progress", { id: 1, done: ordered }, "id").catch(() => {});
+    }
+    for (const row of quizRows || []) {
+      if (!row || typeof row.lesson_id !== "string" || !state.index.byId.has(row.lesson_id)) continue;
+      const choice = Number.isInteger(row.choice) && row.choice >= 0 && row.choice <= 3 ? row.choice : null;
+      const correct = Boolean(row.correct);
+      const local = state.quizzes[row.lesson_id];
+      if (!local) {
+        state.quizzes[row.lesson_id] = choice == null ? { correct } : { correct, choice };
+        changed = true;
+      } else if (choice != null && !Number.isInteger(local.choice)) {
+        local.choice = choice;
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    rememberProgressLocal();
+    const quiet = state.route.name === "connexion" || state.route.name === "password" || state.route.name === "recovery";
+    if (quiet) paintChrome();
+    else render({ scroll: "keep" });
+  } catch {
+    /* la copie locale reste la référence si Supabase ne répond pas */
+  }
 }
 
 function readReview() {
@@ -392,11 +456,16 @@ function render({ scroll }) {
     state.quizChoice = null;
     state.hintCount = 0;
     state.solutionOpen = false;
+    if (route.name === "lesson") {
+      const saved = state.quizzes[route.id];
+      if (saved && Number.isInteger(saved.choice)) state.quizChoice = saved.choice;
+    }
   }
   state.route = route;
   state.lastRouteKey = routeKey;
   state.pageTicket += 1;
   const ticket = state.pageTicket;
+  els.main.dataset.paint = String(ticket);
   paintChrome();
   paintMain(route, ticket);
   if (scroll === "top") window.scrollTo(0, 0);
@@ -418,7 +487,10 @@ function render({ scroll }) {
 function updateAccountLink() {
   const link = document.querySelector("#account-link");
   if (!link) return;
-  link.textContent = state.owner ? "Compte" : "Connexion";
+  const label = link.querySelector(".account-label");
+  const text = state.owner ? "Compte" : "Connexion";
+  if (label) label.textContent = text;
+  else link.textContent = text;
 }
 
 function paintChrome() {
@@ -482,6 +554,7 @@ function paintMain(route, ticket) {
   else if (route.name === "playground") paintAsync(ticket, () => import("./page-playground.js"), (mod) => mod.paintPlayground(els.main));
   else if (route.name === "ide") paintAsync(ticket, () => import("./page-ide.js"), (mod) => mod.paintIde(els.main, { owner: state.owner }));
   else if (route.name === "connexion") paintAsync(ticket, () => import("./page-connexion.js"), (mod) => mod.paintConnexion(els.main));
+  else if (route.name === "password") paintAsync(ticket, () => import("./page-password.js"), (mod) => mod.paintPassword(els.main));
   else if (route.name === "recovery") paintRecovery(ticket);
   else if (route.name === "about") paintAsync(ticket, () => import("./page-about.js"), (mod) => mod.paintAbout(els.main));
   else if (route.name === "donnees") paintAsync(ticket, () => import("./page-donnees.js"), (mod) => mod.paintDonnees(els.main, { owner: state.owner }));
@@ -546,6 +619,7 @@ function pageTitle(route) {
   if (route.name === "playground") return `Playground · ${base}`;
   if (route.name === "ide") return `IDE · ${base}`;
   if (route.name === "connexion") return `Connexion · ${base}`;
+  if (route.name === "password") return `Mot de passe · ${base}`;
   if (route.name === "recovery") return `Nouveau mot de passe · ${base}`;
   if (route.name === "about") return `À propos · ${base}`;
   if (route.name === "donnees") return `Données · ${base}`;
@@ -826,7 +900,7 @@ function quizBlock(lesson, grade) {
       onClick: () => {
         if (!state.owner) return;
         state.quizChoice = index;
-        state.quizzes[lesson.id] = { correct: index === lesson.quiz.answer };
+        state.quizzes[lesson.id] = { correct: index === lesson.quiz.answer, choice: index };
         persistDone();
         upsertRow("quiz_results", {
           lesson_id: lesson.id,

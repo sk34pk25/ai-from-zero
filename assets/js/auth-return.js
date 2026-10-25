@@ -167,3 +167,118 @@ export function passwordProblems(password, confirmation) {
   if (password !== confirmation) return "Les deux mots de passe ne correspondent pas.";
   return "";
 }
+
+/** Le mail intégré de Supabase plafonne très bas (quelques envois par heure). */
+export const RECOVERY_EMAIL_COOLDOWN_MS = 60 * 60 * 1000;
+export const RECOVERY_EMAIL_LOCK_MS = 30 * 1000;
+export const RECOVERY_EMAIL_UNTIL_KEY = "afz-recovery-email-until";
+export const RECOVERY_EMAIL_LOCK_KEY = "afz-recovery-email-lock";
+
+export const RECOVERY_EMAIL_HINT = "Le courrier part du service intégré de Supabase, limité à quelques envois par heure. Le message précédent peut encore être valable. Pense aux courriers indésirables.";
+
+export const RECOVERY_EMAIL_SENT = "Si ce compte existe, un message de réinitialisation a été envoyé. Regarde la boîte de réception et les courriers indésirables. Un autre envoi sera possible dans environ une heure, pour ne pas épuiser ce quota.";
+
+export const RECOVERY_EMAIL_RATE_LIMIT = "Limite horaire du courrier atteinte. Le mail intégré de Supabase n'envoie que quelques messages par heure : attends environ une heure avant de réessayer. Le message précédent peut encore être valable. Vérifie aussi les courriers indésirables.";
+
+export const RECOVERY_EMAIL_NETWORK = "Le message n'a pas pu partir : le réseau ou Supabase ne répond pas. Réessaie dans un moment. Cet échec n'est pas compté comme un envoi. Si un message est déjà arrivé, il peut encore être valable (regarde aussi les courriers indésirables).";
+
+export const RECOVERY_EMAIL_BUSY = "Un envoi est déjà en cours. Patiente quelques secondes pour ne pas consommer le quota.";
+
+export function formatRecoveryWait(ms) {
+  const total = Math.max(0, Math.ceil(Number(ms) / 1000));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  if (hours > 0) {
+    if (minutes === 0) return hours === 1 ? "1 heure" : `${hours} heures`;
+    return `${hours} h ${String(minutes).padStart(2, "0")} min`;
+  }
+  if (minutes > 0) return seconds ? `${minutes} min ${seconds} s` : `${minutes} min`;
+  return `${seconds} s`;
+}
+
+export function recoveryCooldownMessage(remainingMs) {
+  return `Un envoi a déjà été demandé. Attends encore ${formatRecoveryWait(remainingMs)} avant un nouveau message (environ une heure entre deux envois). Le précédent peut encore être valable : vérifie la boîte et les courriers indésirables.`;
+}
+
+function storedNumber(storage, key) {
+  const value = Number(storage?.getItem?.(key) || 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+export function recoveryCooldownRemaining(storage, now = Date.now()) {
+  return Math.max(0, storedNumber(storage, RECOVERY_EMAIL_UNTIL_KEY) - now);
+}
+
+export function recoverySendBlocked(storage, now = Date.now()) {
+  const remaining = recoveryCooldownRemaining(storage, now);
+  if (remaining > 0) return { blocked: true, reason: "cooldown", remaining };
+  const lockRemaining = storedNumber(storage, RECOVERY_EMAIL_LOCK_KEY) - now;
+  if (lockRemaining > 0) return { blocked: true, reason: "busy", remaining: lockRemaining };
+  return { blocked: false, reason: "", remaining: 0 };
+}
+
+export function claimRecoverySend(storage, now = Date.now()) {
+  const blocked = recoverySendBlocked(storage, now);
+  if (blocked.blocked) return blocked;
+  storage.setItem(RECOVERY_EMAIL_LOCK_KEY, String(now + RECOVERY_EMAIL_LOCK_MS));
+  return { blocked: false, reason: "", remaining: 0 };
+}
+
+export function settleRecoverySend(storage, outcome, now = Date.now()) {
+  if (outcome === "sent" || outcome === "limited") {
+    storage.setItem(RECOVERY_EMAIL_UNTIL_KEY, String(now + RECOVERY_EMAIL_COOLDOWN_MS));
+  }
+  storage.removeItem(RECOVERY_EMAIL_LOCK_KEY);
+}
+
+export function resetEmailFailure(error) {
+  const status = Number(error?.status || 0);
+  const code = String(error?.code || "");
+  const name = String(error?.name || "");
+  const message = String(error?.message || "");
+  if (
+    status === 429
+    || code === "over_email_send_rate_limit"
+    || code === "over_request_rate_limit"
+    || /rate limit/i.test(message)
+  ) {
+    return { ok: false, code: "over_email_send_rate_limit", message: RECOVERY_EMAIL_RATE_LIMIT };
+  }
+  if (code === "otp_expired" || /otp.*expired|link is invalid or has expired/i.test(message)) {
+    return {
+      ok: false,
+      code: "otp_expired",
+      message: "Ce lien a expiré. Demande un nouveau message quand le délai d'attente est passé, et vérifie les courriers indésirables.",
+    };
+  }
+  if (code === "validation_failed" || code === "email_address_invalid" || /invalid.*email/i.test(message)) {
+    return { ok: false, code: code || "validation_failed", message: "Cette adresse e-mail n'est pas valable." };
+  }
+  if (
+    status === 0
+    || name === "AuthRetryableFetchError"
+    || /failed to fetch|networkerror|load failed|network request failed/i.test(message)
+  ) {
+    return { ok: false, code: "network", message: RECOVERY_EMAIL_NETWORK };
+  }
+  if (status >= 500 || code === "unexpected_failure") {
+    return {
+      ok: false,
+      code: code || "server",
+      message: "Supabase n'a pas pu préparer le message. Réessaie dans un moment. Si un message est déjà arrivé, il peut encore être valable : vérifie les courriers indésirables.",
+    };
+  }
+  if (code) {
+    return {
+      ok: false,
+      code,
+      message: `Le message n'a pas pu être envoyé (code ${code}). Réessaie plus tard, et vérifie les courriers indésirables.`,
+    };
+  }
+  return {
+    ok: false,
+    code: "unknown",
+    message: "Le message n'a pas pu être envoyé. Vérifie la connexion, puis réessaie. Regarde aussi les courriers indésirables si un message est déjà parti.",
+  };
+}
