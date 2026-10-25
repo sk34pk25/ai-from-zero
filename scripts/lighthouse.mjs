@@ -1,8 +1,11 @@
 import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
 import { writeFileSync } from "node:fs";
 
-import chromeLauncher from "chrome-launcher";
 import lighthouse from "lighthouse";
+
+const require = createRequire(import.meta.url);
+const chromeLauncher = require("chrome-launcher");
 
 const server = spawn("python3", ["-m", "http.server", "4175", "--bind", "127.0.0.1"], {
   stdio: "ignore",
@@ -32,6 +35,14 @@ const desktop = {
   extends: "lighthouse:default",
   settings: {
     formFactor: "desktop",
+    throttling: {
+      rttMs: 40,
+      throughputKbps: 10240,
+      cpuSlowdownMultiplier: 1,
+      requestLatencyMs: 0,
+      downloadThroughputKbps: 0,
+      uploadThroughputKbps: 0,
+    },
     screenEmulation: { mobile: false, width: 1350, height: 940, deviceScaleFactor: 1, disabled: false },
     onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
   },
@@ -48,7 +59,11 @@ try {
     const scores = Object.fromEntries(
       Object.entries(result.lhr.categories).map(([key, category]) => [key, Math.round(category.score * 100)]),
     );
-    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, url: result.lhr.requestedUrl }, null, 2));
+    const weak = Object.values(result.lhr.audits)
+      .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
+      .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue }))
+      .sort((a, b) => a.score - b.score);
+    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, url: result.lhr.requestedUrl, weak }, null, 2));
     console.log(JSON.stringify(scores));
     const failed = Object.entries(scores).filter(([, score]) => score < 90);
     if (failed.length) {

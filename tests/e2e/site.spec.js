@@ -90,7 +90,7 @@ test("la recherche se pilote au clavier", async ({ page }) => {
 
 test("Échap ferme la recherche et le thème survit au rechargement", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Rechercher dans le parcours" }).click();
+  await page.getByRole("button", { name: "Rechercher une notion" }).click();
   await page.keyboard.press("Escape");
   await expect(page.locator("#search-dialog")).toBeHidden();
   await page.getByRole("button", { name: "Activer le thème clair" }).click();
@@ -101,7 +101,7 @@ test("Échap ferme la recherche et le thème survit au rechargement", async ({ p
 });
 
 test("le bouton retour revient à l'accueil", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#/");
   await page.goto("/#/lecon/4.5");
   await expect(page.locator("[data-lesson-id='4.5']")).toBeVisible();
   await page.goBack();
@@ -128,7 +128,7 @@ test("axe ne signale rien sur les écrans principaux", async ({ page }) => {
   await axe(page);
   await page.goto("/#/modele");
   await axe(page);
-  await page.getByRole("button", { name: "Rechercher dans le parcours" }).click();
+  await page.getByRole("button", { name: "Rechercher une notion" }).click();
   await axe(page);
   await page.keyboard.press("Escape");
   await page.setViewportSize({ width: 390, height: 844 });
@@ -147,9 +147,9 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
   ];
   for (const [name, viewport, theme, url] of shots) {
     await page.setViewportSize(viewport);
-    await page.goto("/");
-    await page.evaluate((value) => localStorage.setItem("afz-theme", value), theme);
     await page.goto(url);
+    await page.evaluate((value) => localStorage.setItem("afz-theme", value), theme);
+    await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("h1")).toBeVisible();
     await page.screenshot({ path: `docs/images/${name}`, animations: "disabled" });

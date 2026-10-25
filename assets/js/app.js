@@ -254,21 +254,21 @@ function paintSearchResults() {
   const items = state.searchHits.map((hit, index) => {
     const { lesson, level } = hit.entry;
     const active = index === state.searchActive;
-    const option = h("li", {
+    return h("li", {
       id: `search-option-${index}`,
       role: "option",
       class: active ? "is-active" : "",
       "aria-selected": active ? "true" : "false",
-    });
-    const link = h("a", { href: `#/lecon/${lesson.id}` }, [
+      onClick: () => {
+        location.hash = `#/lecon/${lesson.id}`;
+      },
+    }, [
       h("span", { class: "result-id", text: lesson.id }),
       h("span", { class: "result-copy" }, [
         h("strong", { text: lesson.title }),
         h("small", { text: `Niveau ${level.id} · ${level.title}` }),
       ]),
     ]);
-    option.append(link);
-    return option;
   });
   if (items.length === 0) {
     els.searchResults.replaceChildren();
@@ -642,9 +642,8 @@ function paintModel() {
   for (const part of parts) {
     const unlocked = state.done.has(part.step);
     const pressed = selected?.id === part.id;
-    list.append(h("button", {
+    const button = h("button", {
       type: "button",
-      role: "listitem",
       class: `component${unlocked ? " is-on" : ""}${pressed ? " is-selected" : ""}`,
       "aria-pressed": pressed ? "true" : "false",
       onClick: () => {
@@ -655,7 +654,8 @@ function paintModel() {
       h("span", { class: "eyebrow", text: unlocked ? "Acquis" : "Verrouillé" }),
       h("strong", { text: part.name }),
       h("span", { text: `Étape ${part.step}` }),
-    ]));
+    ]);
+    list.append(h("div", { role: "listitem" }, [button]));
   }
   const detail = h("section", { class: "component-info", "aria-live": "polite" }, [
     h("p", { class: "eyebrow", text: "Inspecteur" }),
