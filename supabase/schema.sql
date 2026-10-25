@@ -1,7 +1,13 @@
 -- Schéma propriétaire pour AI From Zero.
 --
--- Avant d'exécuter : remplace l'UUID ci-dessous par l'id du compte créé
--- dans Authentication → Users. Le mode d'emploi est docs/SUPABASE_SETUP.md.
+-- Projet neuf : remplace l'UUID ci-dessous par l'id du compte créé dans
+-- Authentication → Users, puis exécute ce fichier. Le mode d'emploi est
+-- docs/SUPABASE_SETUP.md.
+--
+-- Le projet qffcqvwndnpdbrmqbjpz est déjà en place. Sa fonction is_owner()
+-- a le même corps, avec set search_path = '' et l'UUID du propriétaire
+-- (OWNER_ID dans assets/config.js). Ne pas réappliquer ce fichier tel quel
+-- sur ce projet : l'UUID nul remplacerait l'identifiant réel.
 --
 -- Le cadenas du site est une commodité d'interface. Ces politiques sont
 -- la protection réelle. Un anonyme, ou un autre utilisateur authentifié,
@@ -11,6 +17,7 @@ create or replace function public.is_owner()
 returns boolean
 language sql
 stable
+set search_path = ''
 as $$
   select auth.uid() = '00000000-0000-0000-0000-000000000000'::uuid;
 $$;

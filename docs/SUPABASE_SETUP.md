@@ -1,5 +1,7 @@
 # Brancher le compte propriétaire
 
+Le projet `qffcqvwndnpdbrmqbjpz` est configuré. `assets/config.js` contient l'URL `https://qffcqvwndnpdbrmqbjpz.supabase.co`, la clé anon publique et l'UUID du propriétaire. Les inscriptions sont désactivées, le compte propriétaire existe, et l'URL du site ainsi que les redirections autorisées pointent vers `https://sk34pk25.github.io/ai-from-zero/`. Le schéma est appliqué, RLS compris. En ligne, `is_owner()` compare `auth.uid()` à cet UUID et fixe `search_path` à une chaîne vide. Le fichier du dépôt garde l'UUID nul : ne pas le réexécuter tel quel sur ce projet.
+
 Le site reste lisible sans compte. L'IDE, les exercices, les quiz, la progression et le plan de données ne s'enregistrent que pour un utilisateur : celui dont l'identifiant est copié dans `assets/config.js`.
 
 Le cadenas affiché dans les pages empêche un visiteur de lancer ces actions dans son navigateur. Il ne protège pas le serveur. La protection des lignes est dans `supabase/schema.sql` : `auth.uid()` doit être cet identifiant.
@@ -17,8 +19,8 @@ Aucun mot de passe, aucune clé `service_role`, ne va dans le dépôt.
 ## Appliquer les tables
 
 1. Ouvre `supabase/schema.sql`.
-2. Remplace `00000000-0000-0000-0000-000000000000` par l'UUID copié. Il apparaît dans la fonction `is_owner`.
-3. Dans le projet Supabase, ouvre le SQL Editor, colle le fichier, exécute-le.
+2. Remplace `00000000-0000-0000-0000-000000000000` par l'UUID copié. Il apparaît dans la fonction `is_owner`. Le dépôt garde cet UUID nul, et la fonction y déclare `set search_path = ''`.
+3. Dans le projet Supabase, ouvre le SQL Editor, colle le fichier, exécute-le. Le projet déjà créé a cette étape derrière lui : réexécuter le fichier du dépôt y écraserait l'UUID réel.
 4. Vérifie que les tables `ide_files`, `progress`, `quiz_results`, `training_runs` et `training_plans` existent, et que RLS est activé.
 
 Un autre compte connecté, ou un visiteur anonyme, ne peut ni lire ni écrire ces tables.
@@ -35,7 +37,7 @@ export const SUPABASE_ANON_KEY = "la clé anon";
 export const OWNER_ID = "l'UUID de l'utilisateur";
 ```
 
-Tant que ces trois chaînes sont vides, la page Connexion explique que le site reste en lecture seule.
+Si l'une de ces trois chaînes est vide, la page Connexion explique que le site reste en lecture seule. Elles sont renseignées pour le site publié.
 
 ## Mot de passe oublié
 
