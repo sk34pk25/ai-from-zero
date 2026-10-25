@@ -1,0 +1,8 @@
+le modele apprend le prochain caractere.
+le modele apprend le prochain caractere.
+le chat dort. le chat mange. le chien dort.
+le chien mange. le modele apprend encore.
+un token est un nombre. un token est un nombre.
+la loss mesure l'erreur. la loss baisse.
+on compare toujours a une baseline.
+on compare toujours a une baseline.

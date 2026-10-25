@@ -1,0 +1,17 @@
+{
+  "name": "ai-from-zero",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/js/*.test.js",
+    "test:e2e": "playwright test",
+    "validate:html": "html-validate index.html",
+    "lighthouse": "node scripts/lighthouse.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.56.1",
+    "html-validate": "^9.5.3",
+    "lighthouse": "^12.8.2"
+  }
+}

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+node_modules/
+dist/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+lighthouse-report.json
+*.log
+.DS_Store
