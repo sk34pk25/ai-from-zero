@@ -225,6 +225,12 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("h1")).toBeVisible();
+    if (url.includes("/lecon/")) {
+      await page.locator("figure.visual").evaluate((node) => node.scrollIntoView({ block: "center", behavior: "instant" }));
+    }
+    if (url.includes("/parcours")) {
+      await page.locator("#roadmap").evaluate((node) => node.scrollIntoView({ block: "start", behavior: "instant" }));
+    }
     await page.screenshot({ path: `docs/images/${name}`, animations: "disabled" });
   }
 });

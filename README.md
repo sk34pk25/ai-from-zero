@@ -52,7 +52,7 @@ npm run test:e2e
 CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
 ```
 
-L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, axe) et Lighthouse.
+L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, visuels, axe) et Lighthouse. Le script Lighthouse sert les fichiers compressés, comme GitHub Pages, et refuse un score sous 90 au bureau comme sur mobile.
 
 ## Structure
 
