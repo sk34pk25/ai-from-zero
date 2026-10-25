@@ -1172,6 +1172,35 @@ p code, li code {
 
 .login-form { max-width: 28rem; }
 
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 650;
+}
+
+.password-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.password-field input { flex: 1; min-width: 0; }
+
+.password-toggle {
+  width: auto;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.login-hint {
+  margin: 0.15rem 0 0.2rem;
+  color: var(--faint);
+  font-size: 0.92rem;
+}
+
+.login-hint.is-ok { color: var(--good); }
+
 @media (max-width: 800px) {
   .stage-timeline, .ide-layout { grid-template-columns: 1fr; }
 }

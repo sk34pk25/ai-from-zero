@@ -1,10 +1,25 @@
-/** Routes hash : partageables, et le bouton retour du navigateur fonctionne. */
+/** Routes hash : partageables, et le bouton retour du navigateur fonctionne.
+ *
+ * Un fragment Supabase (`#access_token=…&type=recovery`) n'est pas une route.
+ * Il est reconnu avant le reste, sinon le routeur afficherait une 404
+ * et le jeton se retrouverait dans le texte de la page.
+ */
+
+import { readAuthReturn } from "./auth-return.js";
 
 const LESSON = /^\/lecon\/(\d+\.\d+)$/;
 const LEVEL = /^\/niveau\/(\d+)$/;
 
+export function routeFromHref(href) {
+  const auth = readAuthReturn(href);
+  if (auth.kind !== "none") return { name: "recovery" };
+  return parseHash(new URL(href).hash);
+}
+
 export function parseHash(hash) {
   const raw = String(hash ?? "").trim();
+  const auth = readAuthReturn(`https://afz.local/${raw.startsWith("#") || raw === "" ? raw : `#${raw}`}`);
+  if (auth.kind !== "none") return { name: "recovery" };
   const withoutHash = raw.startsWith("#") ? raw.slice(1) : raw;
   const path = withoutHash === "" ? "/" : withoutHash;
   const normalized = path.startsWith("/") ? path : `/${path}`;
@@ -15,6 +30,7 @@ export function parseHash(hash) {
   if (normalized === "/playground") return { name: "playground" };
   if (normalized === "/ide") return { name: "ide" };
   if (normalized === "/connexion") return { name: "connexion" };
+  if (normalized === "/nouveau-mot-de-passe") return { name: "recovery" };
   if (normalized === "/a-propos") return { name: "about" };
   if (normalized === "/donnees") return { name: "donnees" };
   const lesson = normalized.match(LESSON);
@@ -38,6 +54,8 @@ export function hrefFor(route) {
       return "#/ide";
     case "connexion":
       return "#/connexion";
+    case "recovery":
+      return "#/nouveau-mot-de-passe";
     case "about":
       return "#/a-propos";
     case "donnees":

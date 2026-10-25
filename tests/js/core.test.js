@@ -5,7 +5,7 @@ import test from "node:test";
 import { compareStepIds, indexCurriculum, neighbors } from "../../assets/js/curriculum.js";
 import { completionStats, normalizeProgress, reviewQueue, stepsLabel } from "../../assets/js/progress.js";
 import { gradeQuiz } from "../../assets/js/quiz.js";
-import { hrefFor, parseHash } from "../../assets/js/router.js";
+import { hrefFor, parseHash, routeFromHref } from "../../assets/js/router.js";
 import { moveActiveIndex, searchLessons } from "../../assets/js/search.js";
 import { resolveTheme, toggleTheme } from "../../assets/js/storage.js";
 import { escapeHtml, modifierLabel, normalize } from "../../assets/js/text.js";
@@ -27,6 +27,21 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
   assert.deepEqual(parseHash("#/ide"), { name: "ide" });
   assert.equal(hrefFor({ name: "about" }), "#/a-propos");
   assert.equal(hrefFor({ name: "connexion" }), "#/connexion");
+  assert.deepEqual(parseHash("#/nouveau-mot-de-passe"), { name: "recovery" });
+  assert.equal(hrefFor({ name: "recovery" }), "#/nouveau-mot-de-passe");
+  const recovery = parseHash("#access_token=secret-token&refresh_token=secret-refresh&type=recovery");
+  assert.deepEqual(recovery, { name: "recovery" });
+  assert.equal(JSON.stringify(recovery).includes("secret"), false);
+  assert.deepEqual(parseHash("#error=access_denied&error_code=otp_expired&error_description=expired"), { name: "recovery" });
+  assert.equal(parseHash("#/lecon/0.10").name, "lesson");
+  assert.deepEqual(
+    routeFromHref("https://sk34pk25.github.io/ai-from-zero/?code=abc#/connexion"),
+    { name: "recovery" },
+  );
+  assert.deepEqual(
+    routeFromHref("https://sk34pk25.github.io/ai-from-zero/?error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired"),
+    { name: "recovery" },
+  );
 });
 
 test("0.10 se trie après 0.9", () => {
