@@ -600,6 +600,38 @@ export function mountTrainingRun(host, run) {
   }
 }
 
+function formatLoss(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(3) : "—";
+}
+
+export function mountChatRun(host, run) {
+  host.replaceChildren();
+  if (!run || !Array.isArray(run.samples)) {
+    host.append(readout("Le compte-rendu data/finetune_run.json n'est pas disponible."));
+    return;
+  }
+  const full = run.full || {};
+  const lora = run.lora || {};
+  host.append(readout(
+    `Ajustement masqué sur les paires du cours. Complet, perte moyenne ${formatLoss(full.eval_loss_start)} à ${formatLoss(full.eval_loss_end)} (${formatLoss(full.loss_start)} à ${formatLoss(full.loss_end)} sur le premier et le dernier lot). LoRA, perte moyenne ${formatLoss(lora.eval_loss_start)} à ${formatLoss(lora.eval_loss_end)} (${formatLoss(lora.loss_start)} à ${formatLoss(lora.loss_end)} sur les lots). Export : ${run.chosen_attempt || "planned"} / ${run.chosen || ""}.`,
+  ));
+  for (const sample of run.samples) {
+    const caption = readout(`Température ${sample.temperature}, top-k ${sample.top_k}. Question fixée avant le tirage.`);
+    const body = document.createElement("p");
+    body.className = "run-sample";
+    body.textContent = sample.text || sample.error || "";
+    host.append(caption, body);
+  }
+  if (run.held_out && run.held_out.text) {
+    host.append(readout(run.held_out_note || "Question absente du jeu."));
+    const body = document.createElement("p");
+    body.className = "run-sample";
+    body.textContent = run.held_out.text;
+    host.append(body);
+  }
+}
+
 export function mountVisual(host, lesson) {
   host.replaceChildren();
   const kind = lesson.visual in MOUNTS ? lesson.visual : "flow";

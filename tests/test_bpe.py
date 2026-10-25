@@ -24,3 +24,28 @@ def test_tie_break_is_stable():
     again = BPETokenizer.train(text, 1)
     assert tokenizer.merges == again.merges
     assert tokenizer.decode(tokenizer.encode(text)) == text
+
+
+def test_indexed_bpe_matches_the_scan():
+    from model.bpe import reference_encode, reference_merges
+
+    samples = [
+        "abab",
+        "aaa",
+        "abcdabcd",
+        "ba ba ba",
+        "le chat chat dort dans le chat. le chien court.",
+        ("ab c ab c " * 40) + "zzz zzz",
+    ]
+    for text in samples:
+        merges = reference_merges(text, 8)
+        tokenizer = BPETokenizer.train(text, 8)
+        assert tokenizer.merges == merges
+        assert tokenizer.encode(text) == reference_encode(text, tokenizer.vocab, merges)
+        assert tokenizer.decode(tokenizer.encode(text)) == text
+    from pathlib import Path
+    prose = Path("model/data/francais.txt").read_text(encoding="utf-8")[:4000]
+    merges = reference_merges(prose, 20)
+    tokenizer = BPETokenizer.train(prose, 20)
+    assert tokenizer.merges == merges
+    assert tokenizer.encode(prose) == reference_encode(prose, tokenizer.vocab, merges)

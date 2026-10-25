@@ -1,5 +1,7 @@
 """LoRA et masque de perte, sur un modèle minuscule."""
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -27,6 +29,30 @@ def test_mask_matches_full_cross_entropy_and_ignores_prompt():
     assert float(masked.data) == pytest.approx(float(full.data))
     prompt_only = masked_cross_entropy(Tensor(logits.data.copy()), targets, np.array([0.0, 1.0]))
     assert float(prompt_only.data) != pytest.approx(float(full.data))
+
+
+def test_instruction_set_covers_the_course():
+    from model.finetune import load_instructions
+
+    rows = load_instructions(Path(__file__).resolve().parents[1] / "model" / "data" / "instructions_fr.json")
+    assert 150 <= len(rows) <= 300
+    questions = {row["question"] for row in rows}
+    assert len(questions) == len(rows)
+    assert "qu'est-ce qu'un token" in questions
+    assert "qu'est-ce que LoRA" in questions
+    assert "qui a écrit madame bovary" in questions
+    assert all(row["answer"] for row in rows)
+
+
+def test_cosine_schedule_warms_up_then_falls():
+    from model.gpt_train import scheduled_lr
+
+    base = 1e-3
+    assert scheduled_lr(0, 100, base, 10, "cosine") == pytest.approx(base / 10)
+    assert scheduled_lr(9, 100, base, 10, "cosine") == pytest.approx(base)
+    mid = scheduled_lr(54, 100, base, 10, "cosine")
+    assert base * 0.1 < mid < base
+    assert scheduled_lr(99, 100, base, 10, "constant") == pytest.approx(base)
 
 
 def test_full_finetune_and_lora_both_train():

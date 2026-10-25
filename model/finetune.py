@@ -118,11 +118,47 @@ def _prepare_rows(tokenizer, rows: list[dict[str, str]]) -> list[tuple[list[int]
     return prepared
 
 
-def _run_steps(effective_of, trainable: dict[str, Tensor], config, prepared, steps: int, lr: float, seed: int) -> list[float]:
+def _numpy_masked_loss(model: TinyGPT, tokens: np.ndarray, mask: np.ndarray) -> tuple[float, float]:
+    logits, _ = model.forward(tokens[:, :-1])
+    flat = np.asarray(logits, dtype=np.float64).reshape(-1, model.config.vocab_size)
+    targets = tokens[:, 1:].reshape(-1)
+    weights = np.asarray(mask, dtype=np.float64).reshape(-1)
+    shifted = flat - flat.max(axis=-1, keepdims=True)
+    log_probs = shifted - np.log(np.exp(shifted).sum(axis=-1, keepdims=True))
+    picked = log_probs[np.arange(targets.shape[0]), targets]
+    denom = float(weights.sum())
+    if denom <= 0:
+        return 0.0, 0.0
+    return -float(np.sum(picked * weights) / denom), denom
+
+
+def evaluate_instructions(model: TinyGPT, tokenizer, rows: list[dict[str, str]]) -> dict:
+    """Perte masquée moyenne sur tous les exemples qui tiennent dans le bloc."""
+    prepared = _prepare_rows(tokenizer, rows)
+    total = 0.0
+    weight = 0.0
+    kept = 0
+    for ids, mask in prepared:
+        packed = batch_from_ids(ids, mask, model.config.block_size)
+        if packed is None:
+            continue
+        tokens, weights = packed
+        loss, denom = _numpy_masked_loss(model, tokens, weights)
+        if denom <= 0:
+            continue
+        total += loss * denom
+        weight += denom
+        kept += 1
+    if weight <= 0:
+        raise ValueError("aucune cible d'évaluation")
+    return {"loss": total / weight, "examples": kept, "target_tokens": int(weight)}
+
+
+def _run_steps(effective_of, trainable: dict[str, Tensor], config, prepared, steps: int, lr: float, seed: int, verbose: bool = False) -> list[float]:
     optimizer = AdamW(trainable, lr=lr, weight_decay=0.0)
     rng = np.random.default_rng(seed)
     losses = []
-    for _ in range(steps):
+    for index in range(steps):
         for tensor in trainable.values():
             tensor.zero_grad()
         ids, mask = prepared[int(rng.integers(0, len(prepared)))]
@@ -132,18 +168,20 @@ def _run_steps(effective_of, trainable: dict[str, Tensor], config, prepared, ste
         tokens, weights = packed
         loss = masked_loss(effective_of(), tokens, weights, config)
         loss.backward()
-        optimizer.step()
+        optimizer.step(clip=1.0)
         losses.append(float(loss.data))
+        if verbose and (index % 50 == 0 or index == steps - 1):
+            print(f"sft {index} loss {losses[-1]:.3f}", flush=True)
     return losses
 
 
-def finetune(model: TinyGPT, tokenizer, rows: list[dict[str, str]], steps: int = 20, lr: float = 1e-3, seed: int = 0, lora_rank: int | None = None, scale: float = 1.0) -> dict:
+def finetune(model: TinyGPT, tokenizer, rows: list[dict[str, str]], steps: int = 20, lr: float = 1e-3, seed: int = 0, lora_rank: int | None = None, scale: float = 1.0, verbose: bool = False) -> dict:
     if steps < 1:
         raise ValueError("au moins un pas")
     prepared = _prepare_rows(tokenizer, rows)
     if lora_rank is None:
         base = bind_parameters(model)
-        losses = _run_steps(lambda: base, base, model.config, prepared, steps, lr, seed)
+        losses = _run_steps(lambda: base, base, model.config, prepared, steps, lr, seed, verbose)
         trained = int(sum(array.size for array in model.params.values()))
     else:
         numpy_params = {name: np.array(value, dtype=np.float64, copy=True) for name, value in model.params.items()}
@@ -167,7 +205,7 @@ def finetune(model: TinyGPT, tokenizer, rows: list[dict[str, str]], steps: int =
                 merged[name] = base[name] + (left.matmul(right) * factor_scale)
             return merged
 
-        losses = _run_steps(effective, trainable, model.config, prepared, steps, lr, seed)
+        losses = _run_steps(effective, trainable, model.config, prepared, steps, lr, seed, verbose)
         for name, (left, right, factor_scale) in adapters.items():
             model.params[name][...] = base[name].data + factor_scale * (left.data @ right.data)
         trained = trainable_count(factors)
@@ -182,11 +220,18 @@ def finetune(model: TinyGPT, tokenizer, rows: list[dict[str, str]], steps: int =
     }
 
 
-def compare_finetunes(model: TinyGPT, tokenizer, rows: list[dict], steps: int = 8, lr: float = 1e-3, rank: int = 2, seed: int = 0) -> dict:
+def compare_finetunes(model: TinyGPT, tokenizer, rows: list[dict], steps: int = 8, lr: float = 1e-3, rank: int = 2, seed: int = 0, lora_lr: float | None = None, verbose: bool = False) -> dict:
     full_model = TinyGPT(model.config)
     full_model.params = {name: np.array(value, dtype=np.float64, copy=True) for name, value in model.params.items()}
     lora_model = TinyGPT(model.config)
     lora_model.params = {name: np.array(value, dtype=np.float64, copy=True) for name, value in model.params.items()}
-    full = finetune(full_model, tokenizer, rows, steps=steps, lr=lr, seed=seed, lora_rank=None)
-    adapted = finetune(lora_model, tokenizer, rows, steps=steps, lr=lr, seed=seed, lora_rank=rank)
-    return {"full": full, "lora": adapted, "full_model": full_model, "lora_model": lora_model}
+    before = evaluate_instructions(full_model, tokenizer, rows)
+    full = finetune(full_model, tokenizer, rows, steps=steps, lr=lr, seed=seed, lora_rank=None, verbose=verbose)
+    full["eval_loss_start"] = before["loss"]
+    full["eval_loss_end"] = evaluate_instructions(full_model, tokenizer, rows)["loss"]
+    if verbose:
+        print("lora", flush=True)
+    adapted = finetune(lora_model, tokenizer, rows, steps=steps, lr=lr if lora_lr is None else lora_lr, seed=seed, lora_rank=rank, verbose=verbose)
+    adapted["eval_loss_start"] = before["loss"]
+    adapted["eval_loss_end"] = evaluate_instructions(lora_model, tokenizer, rows)["loss"]
+    return {"full": full, "lora": adapted, "full_model": full_model, "lora_model": lora_model, "eval_before": before}

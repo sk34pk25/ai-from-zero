@@ -7,7 +7,7 @@ import { parseHash } from "./router.js";
 import { lessonSearchText, moveActiveIndex, searchLessons } from "./search.js";
 import { readJson, resolveTheme, THEME_KEY, toggleTheme, writeJson } from "./storage.js";
 import { modifierLabel } from "./text.js";
-import { mountTrainingRun, mountVisual } from "./visuals.js";
+import { mountChatRun, mountTrainingRun, mountVisual } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
 
@@ -19,6 +19,7 @@ const state = {
   hintCount: 0,
   solutionOpen: false,
   gptRun: null,
+  finetuneRun: null,
   owner: false,
   quizzes: {},
   exercises: {},
@@ -104,6 +105,7 @@ async function boot() {
     const data = await response.json();
     state.index = indexCurriculum(data);
     state.gptRun = await loadTrainingRun();
+    state.finetuneRun = await loadFinetuneRun();
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     onAuth(() => {
       state.owner = isOwner();
@@ -125,14 +127,22 @@ async function boot() {
   }
 }
 
-async function loadTrainingRun() {
+async function loadJsonReport(path) {
   try {
-    const response = await fetch(new URL("data/gpt_run.json", document.baseURI));
+    const response = await fetch(new URL(path, document.baseURI));
     if (!response.ok) return null;
     return await response.json();
   } catch {
     return null;
   }
+}
+
+async function loadTrainingRun() {
+  return loadJsonReport("data/gpt_run.json");
+}
+
+async function loadFinetuneRun() {
+  return loadJsonReport("data/finetune_run.json");
 }
 
 function applyStoredProgress() {
@@ -982,6 +992,7 @@ function paintTrack() {
   const pre = h("pre");
   pre.append(h("code", { text: sample }));
   const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
+  const chatHost = h("div", { class: "visual-host", "data-chat-host": "true" });
   els.main.replaceChildren(
     crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
     h("p", { class: "eyebrow", text: "Fil rouge" }),
@@ -991,6 +1002,11 @@ function paintTrack() {
       h("h2", { id: "run-title", text: "Entraînement réel" }),
       h("p", { text: state.gptRun?.label || "Un entraînement CPU déjà fait dans ce dépôt. Les nombres et les phrases viennent de ce run, pas d'un dessin." }),
       runHost,
+    ]),
+    h("section", { class: "callout callout-build", "aria-labelledby": "chat-title" }, [
+      h("h2", { id: "chat-title", text: "Dialogue ajusté" }),
+      h("p", { text: state.finetuneRun?.label || "L'ajustement question-réponse est dans data/finetune_run.json." }),
+      chatHost,
     ]),
     h("p", { class: "track-progress", text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.` }),
     list,
@@ -1006,6 +1022,7 @@ function paintTrack() {
     ]),
   );
   mountTrainingRun(runHost, state.gptRun);
+  mountChatRun(chatHost, state.finetuneRun);
 }
 
 function paintNotFound(path) {

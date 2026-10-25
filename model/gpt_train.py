@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -154,6 +155,26 @@ class AdamW:
             tensor.data -= self.lr * update
 
 
+def scheduled_lr(step: int, total: int, base: float, warmup: int, schedule: str, min_ratio: float = 0.1) -> float:
+    """Pas constant, ou montée linéaire puis décroissance cosinus jusqu'à min_ratio * base."""
+    if base <= 0:
+        raise ValueError("le pas d'apprentissage doit être positif")
+    if schedule == "constant":
+        return base
+    if schedule != "cosine":
+        raise ValueError("schedule doit être constant ou cosine")
+    if warmup < 0 or total < 1 or not 0 <= min_ratio <= 1:
+        raise ValueError("warmup, total ou min_ratio invalide")
+    if step < warmup:
+        return base * float(step + 1) / float(max(warmup, 1))
+    if total <= warmup:
+        return base
+    progress = (step - warmup) / float(total - warmup)
+    cosine = 0.5 * (1.0 + math.cos(math.pi * min(max(progress, 0.0), 1.0)))
+    floor = base * min_ratio
+    return floor + (base - floor) * cosine
+
+
 def split_ids(ids: np.ndarray, val_ratio: float = 0.1) -> tuple[np.ndarray, np.ndarray]:
     if not 0 < val_ratio < 0.5:
         raise ValueError("val_ratio doit être entre 0 et 0.5")
@@ -168,20 +189,18 @@ def sample_batch(ids: np.ndarray, block: int, batch: int, rng: np.random.Generat
     return np.stack([ids[start : start + block + 1] for start in starts])
 
 
-def corpus_loss(model: TinyGPT, ids: np.ndarray, block: int, max_windows: int | None = None) -> float:
+def corpus_loss(model: TinyGPT, ids: np.ndarray, block: int, max_windows: int | None = None, spread: bool = False) -> float:
     if len(ids) <= block:
         raise ValueError("pas assez de tokens pour évaluer")
-    losses: list[float] = []
-    weights: list[int] = []
-    start = 0
-    while start + block < len(ids):
-        window = ids[start : start + block + 1][None, :]
-        losses.append(numpy_sequence_loss(model, window))
-        weights.append(block)
-        start += block
-        if max_windows is not None and len(losses) >= max_windows:
-            break
-    return float(np.average(losses, weights=weights))
+    starts = list(range(0, len(ids) - block, block))
+    if max_windows is not None and len(starts) > max_windows:
+        if spread:
+            picked = np.linspace(0, len(starts) - 1, max_windows).astype(int)
+            starts = [starts[int(index)] for index in picked]
+        else:
+            starts = starts[:max_windows]
+    losses = [numpy_sequence_loss(model, ids[start : start + block + 1][None, :]) for start in starts]
+    return float(np.average(losses, weights=[block] * len(losses)))
 
 
 def _can_encode(tokenizer, prompt: str) -> bool:
@@ -258,6 +277,12 @@ class GPTTrainResult:
     train_tokens: int
     val_tokens: int
     config: dict
+    learning_rate: float
+    schedule: str
+    warmup_steps: int
+    grad_clip: float
+    weight_decay: float
+    batch_size: int
 
 
 def _attention_snapshot(model: TinyGPT, tokenizer: CharTokenizer, prompt: str) -> dict:
@@ -297,6 +322,13 @@ def train_gpt(
     on_step=None,
     eval_windows: int | None = None,
     prompts: tuple[tuple[str, float, int], ...] | None = None,
+    schedule: str = "constant",
+    warmup: int = 0,
+    clip: float = 1.0,
+    min_ratio: float = 0.1,
+    eval_spread: bool = False,
+    verbose: bool = False,
+    sample_tokens: int = 96,
 ) -> tuple[TinyGPT, CharTokenizer | BPETokenizer, GPTTrainResult]:
     if steps < 2:
         raise ValueError("au moins deux pas pour comparer le début et la fin")
@@ -321,28 +353,36 @@ def train_gpt(
     params = bind_parameters(model)
     optimizer = AdamW(params, lr=lr, weight_decay=weight_decay)
     rng = np.random.default_rng(seed)
-    train_start = corpus_loss(model, train_ids, block, eval_windows)
-    val_start = corpus_loss(model, val_ids, block, eval_windows)
+    train_start = corpus_loss(model, train_ids, block, eval_windows, spread=eval_spread)
+    val_start = corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread)
     batch_losses: list[float] = []
     val_losses: list[float] = []
     val_steps: list[int] = []
     started = time.perf_counter()
     for step in range(steps):
+        optimizer.lr = scheduled_lr(step, steps, lr, warmup, schedule, min_ratio)
         for tensor in params.values():
             tensor.zero_grad()
         window = sample_batch(train_ids, block, batch, rng)
         loss = sequence_loss(params, window, config)
         loss.backward()
-        optimizer.step()
+        if not np.isfinite(loss.data):
+            raise FloatingPointError(f"perte non finie au pas {step}")
+        optimizer.step(clip=clip)
         batch_losses.append(float(loss.data))
         if on_step is not None:
             on_step(step, batch_losses[-1])
         if step % val_every == 0 or step == steps - 1:
-            val_losses.append(corpus_loss(model, val_ids, block, eval_windows))
+            val_losses.append(corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread))
             val_steps.append(step)
+            if verbose:
+                print(
+                    f"step {step} batch {batch_losses[-1]:.3f} val {val_losses[-1]:.3f} lr {optimizer.lr:.6f}",
+                    flush=True,
+                )
     seconds = time.perf_counter() - started
-    train_end = corpus_loss(model, train_ids, block, eval_windows)
-    val_end = corpus_loss(model, val_ids, block, eval_windows)
+    train_end = corpus_loss(model, train_ids, block, eval_windows, spread=eval_spread)
+    val_end = corpus_loss(model, val_ids, block, eval_windows, spread=eval_spread)
     samples: list[dict] = []
     attention = {"prompt": "", "layer": 0, "head": 0, "tokens": [], "last_row": [], "matrix": []}
     if sample:
@@ -354,7 +394,7 @@ def train_gpt(
                 "prompt": prompt,
                 "temperature": temperature,
                 "top_k": top_k,
-                "text": sample_text(model, tokenizer, prompt, steps=96, temperature=temperature, top_k=top_k, seed=seed),
+                "text": sample_text(model, tokenizer, prompt, steps=sample_tokens, temperature=temperature, top_k=top_k, seed=seed),
             })
         probe = "le chat " if _can_encode(tokenizer, "le chat ") else text[:12]
         attention = _attention_snapshot(model, tokenizer, probe)
@@ -376,6 +416,12 @@ def train_gpt(
         train_tokens=int(train_ids.size),
         val_tokens=int(val_ids.size),
         config=asdict(config),
+        learning_rate=lr,
+        schedule=schedule,
+        warmup_steps=warmup,
+        grad_clip=clip,
+        weight_decay=weight_decay,
+        batch_size=batch,
     )
     return model, tokenizer, result
 
@@ -401,6 +447,12 @@ def result_payload(result: GPTTrainResult, corpus: str) -> dict:
         "samples": result.samples,
         "attention": result.attention,
         "config": result.config,
+        "learning_rate": result.learning_rate,
+        "schedule": result.schedule,
+        "warmup_steps": result.warmup_steps,
+        "grad_clip": result.grad_clip,
+        "weight_decay": result.weight_decay,
+        "batch_size": result.batch_size,
     }
 
 
