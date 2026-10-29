@@ -85,3 +85,8 @@ Rien à changer pour le courrier : le SMTP intégré reste en place, volontairem
 - Les inscriptions publiques restent désactivées.
 - `assets/config.js` ne contient que l'URL, la clé anon et l'UUID.
 - Si l'interface est contournée, les politiques SQL refusent quand même l'écriture.
+
+
+## Protection contre les mots de passe compromis
+
+L'advisor du projet lié signalait cette option désactivée le 29 octobre 2026. La [documentation officielle](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) la réserve à Pro et aux offres supérieures. Vérifier sa disponibilité avant activation. Le code du site ne modifie aucun abonnement. Le formulaire exige 12 caractères ; ce contrôle client ne remplace pas la politique du serveur. Utiliser un mot de passe unique et vérifier les paramètres Auth effectifs. Les RLS restent indispensables.

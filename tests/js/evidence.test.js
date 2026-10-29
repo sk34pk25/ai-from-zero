@@ -38,3 +38,12 @@ test("les rapports distinguent train, validation et test et refusent les valeurs
   assert.equal(rows[0].test_final.test_loss, 2.7);
   assert.equal(rows[1].test_final, undefined);
 });
+
+
+test("le banc moderne ne montre le test que pour la position retenue", () => {
+ const report={format:"afz-modern-benchmark-v1",selected_position:"rope",runs:[{position:"absolute",seed:0,val_loss_end:2.5},{position:"rope",seed:0,val_loss_end:2.3}],test_final:[{seed:0,position:"rope",loss:2.4}]};
+ const rows=normalizeReports(report,"banc");
+ assert.equal(rows[0].test_loss,undefined); assert.equal(rows[1].test_loss,2.4);
+ assert.throws(()=>normalizeReports({...report,test_final:[{seed:0,loss:-1}]},"faux"));
+ assert.throws(()=>normalizeReports({...report,runs:[report.runs[0],report.runs[0]]},"doublon"));
+});

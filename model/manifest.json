@@ -7,6 +7,7 @@
     "model/autograd.py",
     "model/backbone.py",
     "model/bench.py",
+    "model/benchmark_modern.py",
     "model/bigram.py",
     "model/bpe.py",
     "model/byte_bpe.py",

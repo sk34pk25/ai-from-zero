@@ -102,6 +102,6 @@ def test_modern_variants_match_torch_gradients(variant):
         logits.reshape(-1, config.vocab_size), torch.tensor(batch[:, 1:]).reshape(-1)
     )
     reference.backward()
-    assert float(loss.data) == pytest.approx(float(reference), abs=1e-12)
+    assert float(loss.data) == pytest.approx(float(reference.detach()), abs=1e-12)
     for name, tensor in params.items():
         np.testing.assert_allclose(tensor.grad, weights[name].grad.numpy(), atol=1e-10, err_msg=name)

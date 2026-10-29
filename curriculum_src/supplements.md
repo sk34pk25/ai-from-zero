@@ -196,7 +196,7 @@ Pour savoir si un nouveau pneu rend le vélo plus rapide, tu refais le même par
 @VOCAB
 Baseline : la configuration de référence (positions absolues, LayerNorm, GELU). Variante : une seule modification par rapport à elle. Ablation : retirer ou remplacer une pièce pour mesurer son effet. Graine : nombre qui fixe le hasard. Écart entre graines : la variation due au seul hasard, à comparer à l'effet mesuré.
 @EXPLAIN
-Exemple pas à pas. On entraîne deux modèles sur le même texte, 120 pas, même graine, même largeur. La baseline utilise pos="absolute" ; la variante utilise pos="rope", sans table de positions. On lit ensuite val_loss_end pour chacun et le nombre de paramètres : la variante en a block_size × d_model de moins, puisque la table pos disparaît. Si la variante obtient une loss plus basse d'un écart plus petit que celui observé entre deux graines de la baseline, la conclusion honnête est « pas de différence mesurable ici ». Le gradient de chaque variante est vérifié dans tests/test_modern_training.py par différences finies et, en CI, contre PyTorch : une loss qui baisse n'est donc pas un accident du backward. Depuis le terminal, la même expérience se lance avec python -m model.gpt_train --pos rope, --ffn swiglu, --norm rms, --kv-heads 2 ou --tie-weights. Une seule option à la fois, sinon tu ne sauras pas laquelle a compté.
+Exemple pas à pas. On entraîne deux modèles sur le même texte, 120 pas, même graine, même largeur. La baseline utilise pos="absolute" ; la variante utilise pos="rope", sans table de positions. On lit ensuite val_loss_end pour chacun et le nombre de paramètres : la variante en a block_size × d_model de moins, puisque la table pos disparaît. Une graine ne suffit pas. Pour chaque graine appariée, calcule delta = loss_variante - loss_baseline, puis examine la moyenne et la dispersion de ces différences. Les fluctuations communes aux deux modèles peuvent s'annuler : la dispersion de la baseline seule ne suffit pas. Le texte répété de l'exemple est un diagnostic d'outillage, pas une validation indépendante. Le second banc décrit dans atelier/BANC_FR.md réserve des livres et des auteurs principaux, avec trois graines appariées et un test après sélection sur validation. Le gradient de chaque variante est vérifié dans tests/test_modern_training.py par différences finies et, en CI, contre PyTorch : une loss qui baisse n'est donc pas un accident du backward. Depuis le terminal, la même expérience se lance avec python -m model.gpt_train --pos rope, --ffn swiglu, --norm rms, --kv-heads 2 ou --tie-weights. Une seule option à la fois, sinon tu ne sauras pas laquelle a compté.
 @LANG python
 @CODE
 :::
@@ -213,7 +213,7 @@ assert mesures["rope"][1] == mesures["baseline"][1] - 16 * 16
 print(mesures)
 :::
 @EXPERIMENT
-Relance la comparaison avec seed=1 et seed=2. Note les six loss de validation dans un tableau. L'écart baseline/RoPE est-il plus grand que l'écart entre graines d'une même configuration ?
+Relance la comparaison avec seed=1 et seed=2. Note les six losses puis les trois différences RoPE−baseline. Examine leur moyenne et dispersion. Reprends ensuite l'expérience avec de vrais documents réservés.
 @EXERCISE
 Choisis une autre variante (ffn="swiglu" ou n_kv_heads=2 avec n_heads=4) et refais la comparaison sur trois graines. Rédige trois phrases : ce qui a été mesuré, le résultat, et ce que tu ne peux pas conclure.
 @BUILD
@@ -221,10 +221,10 @@ Ajoute la meilleure variante à ton plan d'expérience du niveau 12. Dans le rap
 @QUESTION
 La variante gagne 0,01 nat sur une graine, mais deux graines de la baseline diffèrent déjà de 0,03 nat. Que conclure ?
 @CORRECT
-Rien de mesurable : l'écart est plus petit que la variation due au hasard
+Une seule graine ne permet pas de conclure : comparer les différences appariées sur plusieurs graines
 @WRONG
 - La variante est meilleure, puisque sa loss est plus basse
 - La baseline est meilleure, puisqu'elle varie davantage
 - Il faut garder la graine la plus favorable à la variante
 @EXPLANATION
-Un effet ne se distingue du hasard que s'il dépasse la variation entre graines. Choisir la graine favorable reviendrait à sélectionner le résultat voulu au lieu de le mesurer.
+Il faut étudier les différences appariées : une petite différence peut être stable si les fluctuations des deux modèles sont communes. Avec une seule paire, la variabilité de cette différence reste inconnue. Choisir la graine favorable sélectionnerait le résultat voulu au lieu de le mesurer.

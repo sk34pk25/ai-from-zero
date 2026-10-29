@@ -179,6 +179,8 @@ function stamp() {
     "data/atelier.json",
     "data/atelier_reference_run.json",
     "data/benchmark_fr_run.json",
+    "data/benchmark_modern_run.json",
+    "data/benchmark_literature_protocol.json",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
     "model/manifest.json",
     ...readdirSync(join(root, "model"))

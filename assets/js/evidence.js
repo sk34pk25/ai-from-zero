@@ -36,6 +36,18 @@ export function normalizeReports(x, name) {
       test_final: r.width === x.selected_width ? x.test_final.find((t) => t.seed === r.seed) : undefined,
       dataset_note: `${x.dataset_note || x.limite || "Banc pédagogique"} · ${r.width === x.selected_width ? "largeur retenue sur validation" : "variante comparée sur validation"}` }));
   }
+  if (x.format === "afz-modern-benchmark-v1") {
+    if (!Array.isArray(x.runs) || !x.runs.length || x.runs.length > 100 || !["absolute", "rope"].includes(x.selected_position) || !Array.isArray(x.test_final)) throw new Error("Benchmark moderne incomplet");
+    if (x.test_final.some(r => !object(r) || !finite(r.loss) || !Number.isInteger(r.seed))) throw new Error("Tests documentaires invalides");
+    const pairs = new Set();
+    return x.runs.map(r => {
+      if (!object(r) || !["absolute", "rope"].includes(r.position) || !Number.isInteger(r.seed) || pairs.has(r.position + "/" + r.seed)) throw new Error("Runs modernes invalides");
+      pairs.add(r.position + "/" + r.seed);
+      const test = r.position === x.selected_position ? x.test_final.find(t => t.seed === r.seed) : undefined;
+      return measured({ ...r, name: `${name} · ${r.position}, graine ${r.seed}`, test_loss: test?.loss, test_final: test,
+        dataset_note: `${x.limite || "Livres réservés"} · ${test ? "test après sélection" : "validation seulement"}` });
+    });
+  }
   if (x.format === "afz-atelier-test-v1") {
     if (!finite(x.test_loss) || !sha(x.checkpoint_sha256) || typeof x.test_independent !== "boolean")
       throw new Error("Évaluation finale invalide");

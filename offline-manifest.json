@@ -1,5 +1,5 @@
 {
-  "version": "59c72e44b5a0",
+  "version": "5d278e875af6",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -67,6 +67,8 @@
     "data/atelier.json",
     "data/atelier_reference_run.json",
     "data/benchmark_fr_run.json",
+    "data/benchmark_modern_run.json",
+    "data/benchmark_literature_protocol.json",
     "atelier/BANC_FR.md",
     "atelier/EXTENSIONS.md",
     "atelier/FONDATIONS.md",
@@ -76,6 +78,7 @@
     "atelier/PANNES.md",
     "atelier/PROJET_FINAL.md",
     "atelier/README.md",
+    "atelier/RELECTURE.md",
     "atelier/artifacts.py",
     "atelier/benchmark.py",
     "atelier/benchmark/manifest.json",
@@ -105,6 +108,7 @@
     "model/autograd.py",
     "model/backbone.py",
     "model/bench.py",
+    "model/benchmark_modern.py",
     "model/bigram.py",
     "model/bpe.py",
     "model/byte_bpe.py",
