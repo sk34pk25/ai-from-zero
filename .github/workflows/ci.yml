@@ -40,6 +40,9 @@ jobs:
       - name: Tests de bout en bout
         run: npm run test:e2e
 
+      - name: Python et NumPy réels dans Chromium
+        run: npm run test:python-runtime
+
       - name: Lighthouse
         run: CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
 
@@ -56,6 +59,7 @@ jobs:
             docs/images/*.png
             lighthouse-report.json
             playwright-report/
+            playwright-runtime-report/
           if-no-files-found: ignore
 
   compatibility:
@@ -75,6 +79,16 @@ jobs:
       - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js tests/e2e/local.spec.js tests/e2e/reliability.spec.js
         env:
           PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+      - name: Python et NumPy réels
+        run: npm run test:python-runtime
+        env:
+          PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: python-runtime-${{ matrix.browser }}
+          path: playwright-runtime-report/
+          if-no-files-found: ignore
 
   torch-parity:
     runs-on: ubuntu-latest

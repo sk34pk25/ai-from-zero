@@ -13,10 +13,14 @@ export function practicalPanel(changed) {
   const area = h("textarea", { class: "ide-fallback", "aria-label": "Code de l’épreuve pratique", disabled: true });
   const status = h("p", { role: "status", text: "" });
   const run = h("button", { type: "button", class: "button button-primary", disabled: true }, "Vérifier mon programme");
+  const stop = h("button", {
+    type: "button", class: "button button-secondary", disabled: true,
+    onClick: () => bridge?.stopWorker(),
+  }, "Arrêter le contrôle");
   const node = h("section", { class: "panel placement-practice", hidden: true }, [
     h("h2", { text: "Une petite épreuve pratique" }), text,
     h("p", { text: "Le premier contrôle charge Python et NumPy depuis jsDelivr. Ton programme s’exécute dans un worker de ce navigateur ; le test ne l’enregistre pas. Sans réseau, réalise le mini-projet 0.23 sur ton ordinateur et conserve le niveau 0 à parcourir." }),
-    area, run, status, h("a", { href: "#/lecon/0.23", text: "Revoir le mini-projet et ses explications" }),
+    area, run, stop, status, h("a", { href: "#/lecon/0.23", text: "Revoir le mini-projet et ses explications" }),
   ]);
   const loaded = specification().then((spec) => {
     if (!current) return spec;
@@ -37,16 +41,18 @@ export function practicalPanel(changed) {
     try {
       bridge = await import("./pybridge.js");
       if (!current) return;
+      stop.disabled = false;
       const result = await bridge.request({ type: "run", code: source + "\n" + spec.check, files: [] });
       if (!current) return;
       passed = source === area.value && result.type === "done";
       status.textContent = passed ? "Cas publics réussis. Explique aussi ton raisonnement : ce contrôle ne certifie pas ta compréhension."
+        : result.cancelled ? "Contrôle arrêté. Tu peux modifier ton programme et relancer."
         : source !== area.value ? "Programme modifié pendant le contrôle : relance-le."
         : "Contrôle non réussi. " + (result.text || "Vérifie les calculs et les cas limites.");
     } catch {
       if (current) status.textContent = "Python indisponible : vérifie le réseau et réessaie, ou utilise le projet local.";
     } finally {
-      running = false; if (current) { run.disabled = false; changed(); }
+      running = false; if (current) { run.disabled = false; stop.disabled = true; changed(); }
     }
   });
   onLeave(() => { current = false; if (running) bridge?.stopWorker(); });
