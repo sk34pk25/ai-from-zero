@@ -25,6 +25,26 @@
         {
           "id": "0.1",
           "title": "Ordinateur, matériel, CPU, RAM et stockage",
+          "glance": {
+            "phrase": "Le stockage garde les fichiers, la RAM tient le travail en cours, le CPU calcule.",
+            "image": "Un atelier : étagères = stockage, plan de travail = RAM, artisan = CPU.",
+            "key": "1 paramètre float32 = 4 octets",
+            "trap": "« Plus de mémoire » : c'est souvent la RAM qui manque, pas le disque.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le code et les données sur le disque"
+              },
+              {
+                "title": "Charger",
+                "text": "les copier en RAM ou en VRAM"
+              },
+              {
+                "title": "Calculer",
+                "text": "le CPU ou le GPU travaille"
+              }
+            ]
+          },
           "tag": "Départ",
           "minutes": 15,
           "why": "Tout le laboratoire s'exécute sur une machine réelle. Sans distinguer qui calcule, qui garde le travail en cours et qui conserve les fichiers, les pannes futures — mémoire saturée, disque plein, entraînement lent — restent illisibles.",
@@ -99,6 +119,26 @@
         {
           "id": "0.2",
           "title": "Système, fichiers et chemins",
+          "glance": {
+            "phrase": "Un chemin dit où trouver un fichier, à partir du dossier où tu te trouves.",
+            "image": "Le disque est un arbre : dossiers = branches, fichiers = feuilles.",
+            "key": "notes/machine.txt part du dossier courant",
+            "trap": "Python cherche depuis le dossier de lancement, pas depuis l'éditeur.",
+            "steps": [
+              {
+                "title": "Situer",
+                "text": "le dossier courant"
+              },
+              {
+                "title": "Descendre",
+                "text": "dossier/sous-dossier/fichier"
+              },
+              {
+                "title": "Ouvrir",
+                "text": "le fichier trouvé"
+              }
+            ]
+          },
           "tag": "Départ",
           "minutes": 15,
           "why": "La plupart des erreurs de débutant ne sont pas des erreurs d'IA. Ce sont des fichiers introuvables, parce que le programme regarde dans un autre dossier que celui que tu imagines.",
@@ -173,6 +213,26 @@
         {
           "id": "0.3",
           "title": "Terminal et commandes",
+          "glance": {
+            "phrase": "Le terminal est une porte texte : tu tapes une commande, le système répond.",
+            "image": "Un GPS en ligne de commande : où suis-je, qu'y a-t-il ici, où aller.",
+            "key": "pwd · ls · cd",
+            "trap": "ls montre le contenu, il ne te déplace pas : c'est cd qui bouge.",
+            "steps": [
+              {
+                "title": "pwd",
+                "text": "où suis-je ?"
+              },
+              {
+                "title": "ls",
+                "text": "qu'y a-t-il ici ?"
+              },
+              {
+                "title": "cd",
+                "text": "j'entre dans un dossier"
+              }
+            ]
+          },
           "tag": "Outil",
           "minutes": 20,
           "why": "Installer Python, lancer un script, entraîner un modèle et versionner le projet passent par le terminal. On n'apprend ici que les commandes qui empêchent de se perdre.",
@@ -247,6 +307,26 @@
         {
           "id": "0.4",
           "title": "Installer et vérifier Python",
+          "glance": {
+            "phrase": "L'interpréteur Python lit ton fichier .py et exécute ses instructions.",
+            "image": "Un lecteur de recettes : le .py est la recette, Python la cuisine.",
+            "key": "python3 --version",
+            "trap": "Après l'installation, ouvre un NOUVEAU terminal, sinon Python reste introuvable.",
+            "steps": [
+              {
+                "title": "Installer",
+                "text": "Python 3.12 depuis python.org"
+              },
+              {
+                "title": "Vérifier",
+                "text": "python3 --version"
+              },
+              {
+                "title": "Tester",
+                "text": "python3 -c \"print(2 + 2)\""
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 20,
           "why": "Python est le langage du laboratoire. Avant d'écrire du code, on vérifie que le terminal trouve bien un interpréteur, et lequel. Supposer que « Python est installé » est une source de bugs silencieux.",
@@ -321,6 +401,26 @@
         {
           "id": "0.5",
           "title": "Premier programme",
+          "glance": {
+            "phrase": "Programmer, c'est écrire, exécuter, observer, puis corriger une seule chose.",
+            "image": "Une recette suivie à la lettre : la machine ne devine jamais.",
+            "key": "print(\"Bonjour\") affiche puis passe à la ligne",
+            "trap": "Les guillemets entourent le texte : sans eux, Python cherche un nom.",
+            "steps": [
+              {
+                "title": "Écrire",
+                "text": "une instruction"
+              },
+              {
+                "title": "Exécuter",
+                "text": "python3 fichier.py"
+              },
+              {
+                "title": "Observer",
+                "text": "comparer à l'attendu"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 15,
           "why": "Tout le futur modèle sera du code. Le geste qui compte, ici et jusqu'à la dernière architecture, est toujours le même : écrire, exécuter, observer, corriger une seule chose.",
@@ -395,6 +495,26 @@
         {
           "id": "0.6",
           "title": "Variables et types",
+          "glance": {
+            "phrase": "Une variable est une étiquette posée sur une valeur d'un certain type.",
+            "image": "Des étiquettes collées sur des boîtes : texte, entier, décimal.",
+            "key": "str · int · float",
+            "trap": "\"4\" est un texte, 4 un nombre : \"4\" + \"4\" donne \"44\".",
+            "steps": [
+              {
+                "title": "Nommer",
+                "text": "couches = 4"
+              },
+              {
+                "title": "Typer",
+                "text": "int, float ou str"
+              },
+              {
+                "title": "Vérifier",
+                "text": "type(couches)"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 25,
           "why": "Les poids, les pertes, les tokens et les hyperparamètres seront tous des valeurs nommées. Confondre un texte et un nombre produit des bugs qui n'ont rien à voir avec l'apprentissage.",
@@ -469,6 +589,26 @@
         {
           "id": "0.7",
           "title": "Conditions",
+          "glance": {
+            "phrase": "Une condition choisit quel bloc exécuter selon qu'une affirmation est vraie.",
+            "image": "Un aiguillage de train : une seule voie est prise.",
+            "key": "if · elif · else, indentés de 4 espaces",
+            "trap": "1.0 < 1.0 est faux : « strictement inférieur » exclut l'égalité.",
+            "steps": [
+              {
+                "title": "Tester",
+                "text": "loss < 1.0 ?"
+              },
+              {
+                "title": "Choisir",
+                "text": "le premier bloc vrai"
+              },
+              {
+                "title": "Exécuter",
+                "text": "seulement ce bloc"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 20,
           "why": "Le code du laboratoire devra décider : arrêter une boucle, refuser une forme de tenseur, choisir un dos Transformer ou SSM. Ces décisions sont des conditions.",
@@ -543,6 +683,26 @@
         {
           "id": "0.8",
           "title": "Boucles",
+          "glance": {
+            "phrase": "Une boucle répète le même bloc pour chaque élément ou chaque tour.",
+            "image": "Une piste d'athlétisme : même parcours, tour après tour.",
+            "key": "range(4) → 0, 1, 2, 3",
+            "trap": "range(4) s'arrête AVANT 4 : quatre tours, de 0 à 3.",
+            "steps": [
+              {
+                "title": "Démarrer",
+                "text": "step = 0"
+              },
+              {
+                "title": "Répéter",
+                "text": "le corps de la boucle"
+              },
+              {
+                "title": "S'arrêter",
+                "text": "avant la borne"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 20,
           "why": "Entraîner, c'est répéter un calcul. La boucle est la première forme de cette répétition, bien avant les optimiseurs et les epochs. Elle revient dans chaque entraînement.",
@@ -617,6 +777,26 @@
         {
           "id": "0.9",
           "title": "Fonctions",
+          "glance": {
+            "phrase": "Une fonction reçoit des entrées, fait un travail et RENVOIE un résultat.",
+            "image": "Une petite machine nommée : on y glisse x, il en sort x × x.",
+            "key": "def carre(x): return x * x",
+            "trap": "Sans return, la fonction renvoie None, même si elle a affiché quelque chose.",
+            "steps": [
+              {
+                "title": "Définir",
+                "text": "def nom(entrée):"
+              },
+              {
+                "title": "Calculer",
+                "text": "le corps de la fonction"
+              },
+              {
+                "title": "Renvoyer",
+                "text": "return résultat"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 25,
           "why": "Un modèle lisible est découpé en fonctions : une pour la loss, une pour un pas, une pour générer. Sans ce découpage, on ne peut ni tester ni remplacer une brique.",
@@ -691,6 +871,26 @@
         {
           "id": "0.10",
           "title": "Listes et dictionnaires",
+          "glance": {
+            "phrase": "Une liste range des éléments dans l'ordre, un dictionnaire les range par clé.",
+            "image": "Une liste = une file d'attente numérotée ; un dictionnaire = un carnet d'adresses.",
+            "key": "tokens[0] · config[\"dim\"]",
+            "trap": "Le premier élément est tokens[0], pas tokens[1].",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "[...] ou {clé: valeur}"
+              },
+              {
+                "title": "Lire",
+                "text": "par index ou par clé"
+              },
+              {
+                "title": "Modifier",
+                "text": "append ou nouvelle clé"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 30,
           "why": "Un corpus, une configuration et un historique de loss sont des collections. Le modèle ne manipule presque jamais un nombre isolé : il manipule des suites et des tables.",
@@ -776,6 +976,26 @@
         {
           "id": "0.11",
           "title": "Modules",
+          "glance": {
+            "phrase": "Un module est un fichier .py dont un autre fichier peut importer les noms.",
+            "image": "Une boîte à outils étiquetée : on prend seulement l'outil dont on a besoin.",
+            "key": "from model.mathutil import softmax",
+            "trap": "Lance depuis la racine du projet, sinon Python ne trouve pas le dossier model.",
+            "steps": [
+              {
+                "title": "Écrire",
+                "text": "outils.py avec une fonction"
+              },
+              {
+                "title": "Importer",
+                "text": "from outils import f"
+              },
+              {
+                "title": "Utiliser",
+                "text": "f(...) dans un autre fichier"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 20,
           "why": "Le laboratoire ne tient pas dans un seul fichier. Tokenizer, loss, entraînement et mesures doivent pouvoir changer séparément. Le module est cette frontière.",
@@ -850,6 +1070,26 @@
         {
           "id": "0.12",
           "title": "Erreurs et débogage",
+          "glance": {
+            "phrase": "Une erreur se lit de bas en haut : type, message, puis ligne fautive.",
+            "image": "Un récit d'enquête : la dernière ligne nomme le suspect.",
+            "key": "IndexError · NameError · KeyError",
+            "trap": "Changer dix lignes à la fois : tu ne sais plus laquelle a réparé.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "la dernière ligne"
+              },
+              {
+                "title": "Supposer",
+                "text": "une seule cause"
+              },
+              {
+                "title": "Tester",
+                "text": "une modification, puis relancer"
+              }
+            ]
+          },
           "tag": "Méthode",
           "minutes": 25,
           "why": "Construire un modèle, c'est lire des erreurs tous les jours. Le réflexe utile n'est pas d'en changer dix choses : c'est de nommer l'erreur, l'endroit, et une seule hypothèse.",
@@ -924,6 +1164,26 @@
         {
           "id": "0.13",
           "title": "Git et GitHub",
+          "glance": {
+            "phrase": "Un commit enregistre un état cohérent du projet, avec un message clair.",
+            "image": "Un album photo du projet : chaque photo a une légende.",
+            "key": "git status → git add → git commit",
+            "trap": "« wip » n'est pas un message : dis ce que le changement fait.",
+            "steps": [
+              {
+                "title": "Voir",
+                "text": "git status"
+              },
+              {
+                "title": "Préparer",
+                "text": "git add fichier"
+              },
+              {
+                "title": "Enregistrer",
+                "text": "git commit -m \"...\""
+              }
+            ]
+          },
           "tag": "Outil",
           "minutes": 30,
           "why": "Tu vas changer l'architecture des dizaines de fois. Sans historique, une régression ne se compare à rien. Git photographie des états cohérents. GitHub publie cet historique.",
@@ -998,6 +1258,26 @@
         {
           "id": "0.14",
           "title": "Environnement virtuel",
+          "glance": {
+            "phrase": "Un environnement virtuel donne au projet ses propres versions de paquets.",
+            "image": "Une valise par voyage : les affaires d'un projet ne se mélangent pas aux autres.",
+            "key": "python3 -m venv .venv",
+            "trap": "Oublier d'activer le venv : les paquets s'installent ailleurs.",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "python3 -m venv .venv"
+              },
+              {
+                "title": "Activer",
+                "text": "source .venv/bin/activate"
+              },
+              {
+                "title": "Installer",
+                "text": "pip install -r requirements.txt"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 25,
           "why": "NumPy et pytest ont des versions. Un environnement virtuel donne au projet son propre ensemble de paquets, pour qu'une installation ne casse pas un autre cours.",
@@ -1072,6 +1352,26 @@
         {
           "id": "0.15",
           "title": "NumPy et les tableaux",
+          "glance": {
+            "phrase": "NumPy calcule sur un tableau entier d'un coup, selon sa forme.",
+            "image": "Une grille de cases : la forme dit combien de lignes et de colonnes.",
+            "key": "x.shape → (2, 3)",
+            "trap": "reshape garde l'ordre des valeurs ; transpose échange les axes.",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "np.array ou np.arange"
+              },
+              {
+                "title": "Lire la forme",
+                "text": "x.shape"
+              },
+              {
+                "title": "Calculer",
+                "text": "toute la grille à la fois"
+              }
+            ]
+          },
           "tag": "NumPy",
           "minutes": 35,
           "why": "Un réseau ne boucle presque jamais sur chaque nombre en Python pur. Il applique une opération à un tableau entier. NumPy est cet outil, et tout le laboratoire model/ est écrit avec lui.",
@@ -1153,6 +1453,26 @@
         {
           "id": "0.16",
           "title": "Nombres et fonctions utiles",
+          "glance": {
+            "phrase": "Carré, exponentielle et logarithme reviendront dans chaque loss du parcours.",
+            "image": "Trois outils : le carré efface le signe, exp rend positif, log mesure le petit.",
+            "key": "log(exp(x)) = x",
+            "trap": "exp ne donne pas une probabilité : il faut encore diviser par la somme.",
+            "steps": [
+              {
+                "title": "Carré",
+                "text": "(-2)² = 4"
+              },
+              {
+                "title": "Exponentielle",
+                "text": "exp(0) = 1"
+              },
+              {
+                "title": "Logarithme",
+                "text": "log(exp(2)) = 2"
+              }
+            ]
+          },
           "tag": "Maths",
           "minutes": 30,
           "why": "Quelques fonctions reviendront sans cesse : carré, exponentielle, logarithme. On les voit ici nues, avant qu'elles ne se cachent dans une loss.",
@@ -1227,6 +1547,26 @@
         {
           "id": "0.17",
           "title": "Vecteurs",
+          "glance": {
+            "phrase": "Un vecteur est une liste de nombres ; le produit scalaire mesure leur accord.",
+            "image": "Deux flèches : plus elles pointent dans le même sens, plus le score est grand.",
+            "key": "[1,2,3] · [4,5,6] = 4 + 10 + 18 = 32",
+            "trap": "Les deux vecteurs doivent avoir la même taille pour le produit scalaire.",
+            "steps": [
+              {
+                "title": "Aligner",
+                "text": "composante par composante"
+              },
+              {
+                "title": "Multiplier",
+                "text": "1×4, 2×5, 3×6"
+              },
+              {
+                "title": "Additionner",
+                "text": "4 + 10 + 18 = 32"
+              }
+            ]
+          },
           "tag": "Maths",
           "minutes": 35,
           "why": "Un embedding est un vecteur. L'attention compare des vecteurs. Tant que « vecteur » reste un mot vague, le Transformer reste un dessin. On le calcule dans cette étape.",
@@ -1301,6 +1641,26 @@
         {
           "id": "0.18",
           "title": "Matrices",
+          "glance": {
+            "phrase": "Une matrice transforme un vecteur : chaque ligne donne une sortie.",
+            "image": "Une table de recettes : chaque ligne mélange les ingrédients à sa façon.",
+            "key": "(2, 3) @ (3, 4) → (2, 4)",
+            "trap": "Les dimensions intérieures doivent coïncider : (2,3) @ (2,3) est impossible.",
+            "steps": [
+              {
+                "title": "Vérifier",
+                "text": "dimensions intérieures égales"
+              },
+              {
+                "title": "Combiner",
+                "text": "ligne × colonne"
+              },
+              {
+                "title": "Obtenir",
+                "text": "la forme extérieure"
+              }
+            ]
+          },
           "tag": "Maths",
           "minutes": 40,
           "why": "Les poids d'une couche sont une matrice. Sans la règle des formes, on ne peut ni écrire un neurone vectoriel ni lire une erreur de multiplication.",
@@ -1386,6 +1746,26 @@
         {
           "id": "0.19",
           "title": "Probabilités",
+          "glance": {
+            "phrase": "Une distribution répartit 100 % de certitude entre plusieurs issues.",
+            "image": "Un gâteau partagé : des parts positives qui font exactement un gâteau.",
+            "key": "p ≥ 0 et somme(p) = 1",
+            "trap": "Un logit n'est pas une probabilité : il peut être négatif ou dépasser 1.",
+            "steps": [
+              {
+                "title": "Vérifier",
+                "text": "aucune valeur négative"
+              },
+              {
+                "title": "Additionner",
+                "text": "toutes les parts"
+              },
+              {
+                "title": "Comparer",
+                "text": "la somme vaut-elle 1 ?"
+              }
+            ]
+          },
           "tag": "Maths",
           "minutes": 35,
           "why": "Un modèle de langage ne choisit pas un mot au sens quotidien. Il propose une distribution sur les tokens suivants. Si cette idée est floue, softmax et la perplexité ne veulent rien dire.",
@@ -1460,6 +1840,26 @@
         {
           "id": "0.20",
           "title": "Dérivée intuitive",
+          "glance": {
+            "phrase": "La dérivée dit si la sortie monte ou descend quand on pousse un peu l'entrée.",
+            "image": "La pente d'une colline sous tes pieds.",
+            "key": "(f(x+ε) − f(x−ε)) / 2ε",
+            "trap": "Pente positive = la loss monte : pour descendre, on va dans l'autre sens.",
+            "steps": [
+              {
+                "title": "Pousser",
+                "text": "x + ε et x − ε"
+              },
+              {
+                "title": "Mesurer",
+                "text": "l'écart des sorties"
+              },
+              {
+                "title": "Diviser",
+                "text": "par 2ε pour la pente"
+              }
+            ]
+          },
           "tag": "Maths",
           "minutes": 40,
           "why": "Le gradient est une famille de dérivées. Avant le mot « gradient », il faut l'image : si j'augmente un peu ce poids, la loss monte-t-elle ou descend-elle ?",
@@ -1536,6 +1936,26 @@
         {
           "id": "0.21",
           "title": "Classes et objets",
+          "glance": {
+            "phrase": "Une classe est un moule ; chaque objet créé garde ses propres valeurs.",
+            "image": "Un moule à gaufres : chaque gaufre a sa garniture.",
+            "key": "self = l'objet sur lequel la méthode travaille",
+            "trap": "b = a ne copie rien : a et b désignent le même objet.",
+            "steps": [
+              {
+                "title": "Définir",
+                "text": "class Compteur:"
+              },
+              {
+                "title": "Construire",
+                "text": "a = Compteur(5)"
+              },
+              {
+                "title": "Appeler",
+                "text": "a.ajouter(2)"
+              }
+            ]
+          },
           "tag": "Python",
           "minutes": 40,
           "why": "Tout le laboratoire est écrit avec des classes : Tensor, TinyGPT, AdamW, le tokenizer. Sans savoir ce qu'est un objet, self ou une méthode, la rétropropagation du niveau 1 se lit comme une formule magique au lieu d'un mécanisme que tu peux suivre ligne par ligne.",
@@ -1611,6 +2031,26 @@
         {
           "id": "0.22",
           "title": "Vérifier son code avec assert et pytest",
+          "glance": {
+            "phrase": "Un test compare le résultat de ton code à une valeur calculée à la main.",
+            "image": "La balance de cuisine : on pèse au lieu de deviner.",
+            "key": "assert moyenne([2, 4, 9]) == 5",
+            "trap": "Ne change jamais l'attendu pour faire passer un test : relis le code.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "l'attendu à la main"
+              },
+              {
+                "title": "Écrire",
+                "text": "assert résultat == attendu"
+              },
+              {
+                "title": "Lancer",
+                "text": "python -m pytest"
+              }
+            ]
+          },
           "tag": "Méthode",
           "minutes": 30,
           "why": "Chaque brique du laboratoire est verrouillée par un test, et l'atelier se contrôle avec verifier.py. Savoir écrire une vérification, la lancer et lire son échec transforme « je crois que ça marche » en une preuve reproductible que tu peux relancer après chaque modification.",
@@ -1686,6 +2126,26 @@
         {
           "id": "0.23",
           "title": "Mini-projet : un carnet de mesures",
+          "glance": {
+            "phrase": "Tu assembles seul fichier, boucle, fonction, classe et tests dans un vrai petit outil.",
+            "image": "Un carnet de bord de vélo : chaque ligne est une sortie.",
+            "key": "lire → Carnet → rapport JSON",
+            "trap": "Écrire tout le code d'un coup : teste chaque brique avant la suivante.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le texte en nombres"
+              },
+              {
+                "title": "Calculer",
+                "text": "total, moyenne, record"
+              },
+              {
+                "title": "Rapporter",
+                "text": "un JSON stable"
+              }
+            ]
+          },
           "tag": "Projet",
           "minutes": 60,
           "why": "Avant d'attaquer l'apprentissage automatique, tu dois pouvoir assembler seul les briques du niveau 0 : fichier, boucle, dictionnaire, fonction, classe et test. Ce mini-projet est le point de contrôle : si tu le termines sans corrigé, la suite du parcours repose sur des bases solides.",
@@ -1779,6 +2239,26 @@
         {
           "id": "1.1",
           "title": "Qu'est-ce qu'apprendre ?",
+          "glance": {
+            "phrase": "Apprendre, c'est ajuster des nombres jusqu'à ce que l'erreur mesurée diminue.",
+            "image": "Une bascule à pommes dont le seuil glisse jusqu'à trier juste.",
+            "key": "y = w·x + b : w et b peuvent bouger",
+            "trap": "Des règles écrites à la main n'apprennent rien, même si elles marchent.",
+            "steps": [
+              {
+                "title": "Prédire",
+                "text": "avec les paramètres actuels"
+              },
+              {
+                "title": "Mesurer",
+                "text": "l'erreur par une loss"
+              },
+              {
+                "title": "Ajuster",
+                "text": "w et b, puis recommencer"
+              }
+            ]
+          },
           "tag": "Apprentissage",
           "minutes": 25,
           "why": "Avant d'écrire un réseau, il faut séparer un programme dont les règles sont écrites à la main et un programme dont certains nombres sont ajustés pour réduire une erreur mesurée.",
@@ -1853,6 +2333,26 @@
         {
           "id": "1.2",
           "title": "Données, features et labels",
+          "glance": {
+            "phrase": "Les features sont les indices, le label est la réponse à retrouver.",
+            "image": "Une fiche d'enquête : indices en haut, coupable en bas.",
+            "key": "X[i] → y[i], dans le même ordre",
+            "trap": "Mélanger y sans mélanger X : le modèle apprend un mensonge.",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "les features X"
+              },
+              {
+                "title": "Associer",
+                "text": "le label y de chaque ligne"
+              },
+              {
+                "title": "Garder",
+                "text": "l'ordre identique"
+              }
+            ]
+          },
           "tag": "Données",
           "minutes": 25,
           "why": "Un modèle n'apprend pas « les données » en général. Il apprend une relation entre ce qu'on lui donne et ce qu'on lui demande de retrouver. Si tu mélanges les deux, il triche sans que tu le voies.",
@@ -1927,6 +2427,26 @@
         {
           "id": "1.3",
           "title": "Train, validation et test",
+          "glance": {
+            "phrase": "On s'entraîne sur train, on choisit sur validation, on mesure une seule fois sur test.",
+            "image": "Exercices, examen blanc, puis vrai examen ouvert une seule fois.",
+            "key": "train 80 % · validation 10 % · test 10 %",
+            "trap": "Regarder le test pour décider : il ne mesure plus rien de nouveau.",
+            "steps": [
+              {
+                "title": "Apprendre",
+                "text": "sur train"
+              },
+              {
+                "title": "Choisir",
+                "text": "les réglages sur validation"
+              },
+              {
+                "title": "Mesurer",
+                "text": "une fois sur test"
+              }
+            ]
+          },
           "tag": "Méthode",
           "minutes": 30,
           "why": "Un modèle peut réciter ses exemples. Le découpage des données sert à ne pas confondre cette récitation avec une capacité à prédire du nouveau.",
@@ -2006,6 +2526,26 @@
         {
           "id": "1.4",
           "title": "Paramètres et hyperparamètres",
+          "glance": {
+            "phrase": "L'algorithme règle les paramètres ; toi, tu règles les hyperparamètres.",
+            "image": "Deux tableaux de boutons : celui de la machine et le tien.",
+            "key": "w, b = paramètres · learning rate = hyperparamètre",
+            "trap": "Le learning rate n'apprend pas : il fixe la taille des pas.",
+            "steps": [
+              {
+                "title": "Fixer",
+                "text": "lr, nombre de pas, largeur"
+              },
+              {
+                "title": "Entraîner",
+                "text": "les poids bougent seuls"
+              },
+              {
+                "title": "Comparer",
+                "text": "puis changer un réglage"
+              }
+            ]
+          },
           "tag": "Cœur",
           "minutes": 25,
           "why": "Dire « ce modèle a 7 milliards de paramètres » ne veut rien dire tant qu'on ne sait pas ce qu'est un paramètre, et ce qui n'en est pas. On le définit dans cette étape.",
@@ -2080,6 +2620,26 @@
         {
           "id": "1.5",
           "title": "Le neurone artificiel",
+          "glance": {
+            "phrase": "Un neurone multiplie chaque entrée par son poids, additionne et ajoute un biais.",
+            "image": "Une table de mixage : un bouton de volume par entrée.",
+            "key": "z = 2×0,5 + 3×(−0,2) + 0,1 = 0,5",
+            "trap": "Sans biais, la frontière de décision passe forcément par zéro.",
+            "steps": [
+              {
+                "title": "Pondérer",
+                "text": "chaque entrée × son poids"
+              },
+              {
+                "title": "Additionner",
+                "text": "toutes les contributions"
+              },
+              {
+                "title": "Décaler",
+                "text": "+ le biais b"
+              }
+            ]
+          },
           "tag": "Réseau",
           "minutes": 35,
           "why": "Un réseau large est une répétition de cette opération. La voir une fois, avec des nombres, enlève plus de mystère qu'un schéma de cent boîtes.",
@@ -2154,6 +2714,26 @@
         {
           "id": "1.6",
           "title": "Fonctions d'activation",
+          "glance": {
+            "phrase": "L'activation plie le calcul : sans elle, empiler des couches ne sert à rien.",
+            "image": "Une feuille qu'on plie : deux inclinaisons ne font jamais un pli.",
+            "key": "ReLU(x) = max(0, x)",
+            "trap": "ReLU(−3) vaut 0, pas −3 : les négatifs sont coupés.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "z, la somme pondérée"
+              },
+              {
+                "title": "Plier",
+                "text": "appliquer ReLU"
+              },
+              {
+                "title": "Transmettre",
+                "text": "à la couche suivante"
+              }
+            ]
+          },
           "tag": "Réseau",
           "minutes": 30,
           "why": "Sans fonction non linéaire, empiler des couches linéaires reste une seule couche linéaire. L'activation est ce qui donne de la pliure. On la voit ici avec ReLU.",
@@ -2228,6 +2808,26 @@
         {
           "id": "1.7",
           "title": "Un petit réseau",
+          "glance": {
+            "phrase": "Un réseau enchaîne couche, activation, couche : chacune change la représentation.",
+            "image": "Une chaîne de traduction : chaque étape réécrit le message.",
+            "key": "relu(x @ W1 + b1) @ W2 + b2",
+            "trap": "Retirer ReLU : les deux couches redeviennent une seule couche linéaire.",
+            "steps": [
+              {
+                "title": "Mélanger",
+                "text": "x @ W1 + b1"
+              },
+              {
+                "title": "Plier",
+                "text": "ReLU"
+              },
+              {
+                "title": "Sortir",
+                "text": "@ W2 + b2"
+              }
+            ]
+          },
           "tag": "Réseau",
           "minutes": 35,
           "why": "Le réseau est une composition : une couche, une activation, une autre couche. Le voir sur deux transformations prépare le bloc Transformer, qui sera la même idée avec d'autres pièces.",
@@ -2302,6 +2902,26 @@
         {
           "id": "1.8",
           "title": "Forward pass",
+          "glance": {
+            "phrase": "Le forward fait passer l'entrée à travers le modèle jusqu'à une prédiction.",
+            "image": "Lire le calcul à voix haute, de l'entrée vers la sortie.",
+            "key": "GPT : (batch, temps) → (batch, temps, vocabulaire)",
+            "trap": "Une forme juste ne prouve pas un calcul juste, mais une forme fausse prouve un bug.",
+            "steps": [
+              {
+                "title": "Entrer",
+                "text": "les données"
+              },
+              {
+                "title": "Traverser",
+                "text": "les couches"
+              },
+              {
+                "title": "Sortir",
+                "text": "la prédiction"
+              }
+            ]
+          },
           "tag": "Calcul",
           "minutes": 30,
           "why": "Avant de corriger un modèle, il doit produire une sortie. Ce trajet, de l'entrée vers la sortie, s'appelle le forward. Aucun poids ne change pendant ce trajet seul.",
@@ -2376,6 +2996,26 @@
         {
           "id": "1.9",
           "title": "Loss",
+          "glance": {
+            "phrase": "La loss résume l'erreur en un seul nombre à faire baisser.",
+            "image": "Une note sur 20 à l'envers : plus elle est basse, mieux c'est.",
+            "key": "(5 − 7)² = 4",
+            "trap": "Une loss qui baisse sur train peut monter sur validation.",
+            "steps": [
+              {
+                "title": "Comparer",
+                "text": "prédiction et cible"
+              },
+              {
+                "title": "Mettre au carré",
+                "text": "l'écart"
+              },
+              {
+                "title": "Moyenner",
+                "text": "sur les exemples"
+              }
+            ]
+          },
           "tag": "Apprentissage",
           "minutes": 30,
           "why": "Sans un nombre qui dit « c'est mieux » ou « c'est pire », aucun algorithme ne sait dans quel sens modifier un poids. Cette leçon nomme ce nombre : la loss.",
@@ -2450,6 +3090,26 @@
         {
           "id": "1.10",
           "title": "Gradient",
+          "glance": {
+            "phrase": "Le gradient indique, pour chaque paramètre, de quel côté la loss monte.",
+            "image": "Une flèche par bouton : « tourne par là et ça empire ».",
+            "key": "w ← w − lr × gradient",
+            "trap": "On va CONTRE le gradient : il montre la montée, pas la descente.",
+            "steps": [
+              {
+                "title": "Mesurer",
+                "text": "la pente pour chaque poids"
+              },
+              {
+                "title": "Inverser",
+                "text": "aller dans l'autre sens"
+              },
+              {
+                "title": "Doser",
+                "text": "multiplier par lr"
+              }
+            ]
+          },
           "tag": "Apprentissage",
           "minutes": 35,
           "why": "La dérivée disait comment une sortie bouge quand une entrée bouge. Le gradient dit comment la loss bouge quand chaque paramètre bouge. C'est la boussole de l'entraînement.",
@@ -2526,6 +3186,26 @@
         {
           "id": "1.11",
           "title": "Règle de chaîne",
+          "glance": {
+            "phrase": "Pour une fonction composée, on multiplie les dérivées de chaque maillon.",
+            "image": "Robinet → seau → fuite : effet total = produit des effets.",
+            "key": "dy/dx = dy/du × du/dx = 12 × 2 = 24",
+            "trap": "Oublier un maillon de la chaîne : la pente obtenue est inventée.",
+            "steps": [
+              {
+                "title": "Découper",
+                "text": "x → u → y"
+              },
+              {
+                "title": "Dériver",
+                "text": "chaque maillon seul"
+              },
+              {
+                "title": "Multiplier",
+                "text": "les dérivées"
+              }
+            ]
+          },
           "tag": "Apprentissage",
           "minutes": 35,
           "why": "La loss ne dépend presque jamais directement du premier poids. Elle dépend d'une sortie, qui dépend d'une couche, qui dépend du poids. La règle de chaîne assemble ces sensibilités.",
@@ -2602,6 +3282,26 @@
         {
           "id": "1.12",
           "title": "Backpropagation",
+          "glance": {
+            "phrase": "La rétropropagation calcule tous les gradients en une seule passe arrière.",
+            "image": "Remonter la rivière : chaque barrage dit qui l'a fait déborder.",
+            "key": "w·w + w en w = 3 → gradient 2w + 1 = 7",
+            "trap": "Un poids utilisé deux fois reçoit la SOMME de ses deux contributions.",
+            "steps": [
+              {
+                "title": "Forward",
+                "text": "garder les intermédiaires"
+              },
+              {
+                "title": "Partir",
+                "text": "de la loss, gradient 1"
+              },
+              {
+                "title": "Remonter",
+                "text": "opération par opération"
+              }
+            ]
+          },
           "tag": "Apprentissage",
           "minutes": 40,
           "why": "Recalculer une différence finie pour chaque paramètre d'un Transformer est hors de prix. La backpropagation réutilise les intermédiaires du forward pour obtenir tous les gradients en une passe arrière.",
@@ -2683,6 +3383,26 @@
         {
           "id": "1.13",
           "title": "Descente de gradient",
+          "glance": {
+            "phrase": "La descente de gradient fait un petit pas contre la pente, encore et encore.",
+            "image": "Descendre dans le brouillard en tâtant le sol à chaque pas.",
+            "key": "écart × (1 − 2·lr) à chaque pas",
+            "trap": "Un pas trop grand fait osciller ou diverger au lieu de descendre.",
+            "steps": [
+              {
+                "title": "Mesurer",
+                "text": "la pente"
+              },
+              {
+                "title": "Avancer",
+                "text": "w − lr × pente"
+              },
+              {
+                "title": "Recommencer",
+                "text": "jusqu'au creux"
+              }
+            ]
+          },
           "tag": "Optimisation",
           "minutes": 30,
           "why": "Avoir le gradient ne bouge encore aucun poids. La descente est la règle qui transforme ce vecteur en un pas. Sans cette règle, le gradient reste un diagnostic.",
@@ -2762,6 +3482,26 @@
         {
           "id": "1.14",
           "title": "Optimiseurs",
+          "glance": {
+            "phrase": "Un optimiseur transforme les gradients en pas, en gardant la mémoire des précédents.",
+            "image": "Une bille qui prend de l'élan quand la pente reste la même.",
+            "key": "Adam : moyennes m (gradient) et v (carré)",
+            "trap": "Oublier la correction de démarrage : les premiers pas sont faussés.",
+            "steps": [
+              {
+                "title": "Lisser",
+                "text": "m = moyenne des gradients"
+              },
+              {
+                "title": "Mettre à l'échelle",
+                "text": "par √v"
+              },
+              {
+                "title": "Avancer",
+                "text": "lr × m̂ / √v̂"
+              }
+            ]
+          },
           "tag": "Optimisation",
           "minutes": 30,
           "why": "La descente simple utilise le gradient nu. Un optimiseur peut le lisser, le mettre à l'échelle, ou garder une moyenne des pas précédents. Il faut savoir ce qu'on compare.",
@@ -2838,6 +3578,26 @@
         {
           "id": "1.15",
           "title": "Tenseurs et autograd",
+          "glance": {
+            "phrase": "Un tenseur se souvient de ses opérations pour calculer ses gradients tout seul.",
+            "image": "Un carnet de bord : chaque calcul est noté pour être relu à l'envers.",
+            "key": "requires_grad = « je veux les dérivées »",
+            "trap": "Un même poids lu deux fois cumule ses gradients : c'est voulu.",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "un Tensor suivi"
+              },
+              {
+                "title": "Calculer",
+                "text": "le graphe se construit"
+              },
+              {
+                "title": "backward()",
+                "text": "les gradients apparaissent"
+              }
+            ]
+          },
           "tag": "PyTorch",
           "minutes": 35,
           "why": "PyTorch automatise les tableaux et le backward que tu viens d'écrire à la main. Le voir après le calcul manuel évite de le prendre pour une boîte noire. Le laboratoire reste en NumPy pour être léger et explicite.",
@@ -2926,6 +3686,26 @@
         {
           "id": "1.16",
           "title": "Boucle d'entraînement",
+          "glance": {
+            "phrase": "Chaque tour d'entraînement : prédire, mesurer, effacer, remonter, avancer.",
+            "image": "Une routine sportive dont l'ordre des gestes ne change jamais.",
+            "key": "forward → loss → zero_grad → backward → step",
+            "trap": "Oublier la remise à zéro : les gradients s'additionnent d'un tour à l'autre.",
+            "steps": [
+              {
+                "title": "Prédire et mesurer",
+                "text": "forward puis loss"
+              },
+              {
+                "title": "Remonter",
+                "text": "zéro, puis backward"
+              },
+              {
+                "title": "Avancer",
+                "text": "optimiseur.step()"
+              }
+            ]
+          },
           "tag": "Entraînement",
           "minutes": 35,
           "why": "Les pièces sont là : forward, loss, backward, pas. La boucle les remet dans un ordre strict. Un ordre faux donne un modèle qui n'apprend pas, sans erreur de syntaxe.",
@@ -3002,6 +3782,26 @@
         {
           "id": "1.17",
           "title": "Surapprentissage",
+          "glance": {
+            "phrase": "Surapprendre, c'est réciter le train sans savoir prédire du nouveau.",
+            "image": "L'élève qui connaît les corrigés par cœur et rate l'examen.",
+            "key": "train 0,01 · validation 0,8 → écart suspect",
+            "trap": "Fêter une loss de train minuscule sans regarder la validation.",
+            "steps": [
+              {
+                "title": "Comparer",
+                "text": "train et validation"
+              },
+              {
+                "title": "Repérer",
+                "text": "l'écart qui se creuse"
+              },
+              {
+                "title": "Corriger",
+                "text": "données, régularisation, arrêt"
+              }
+            ]
+          },
           "tag": "Évaluation",
           "minutes": 30,
           "why": "Une loss d'entraînement minuscule peut accompagner un modèle inutile sur des données nouvelles. Il faut reconnaître ce décalage avant de célébrer une courbe.",
@@ -3094,6 +3894,26 @@
         {
           "id": "2.1",
           "title": "Texte et Unicode",
+          "glance": {
+            "phrase": "Unicode donne un numéro à chaque caractère, avant tout découpage en tokens.",
+            "image": "Un immense catalogue où chaque caractère a son numéro de page.",
+            "key": "ord(\"A\") = 65 · ord(\"é\") = 233",
+            "trap": "Un numéro Unicode n'est pas encore un token du modèle.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le texte caractère par caractère"
+              },
+              {
+                "title": "Numéroter",
+                "text": "ord(caractère)"
+              },
+              {
+                "title": "Retrouver",
+                "text": "chr(numéro)"
+              }
+            ]
+          },
           "tag": "Données",
           "minutes": 25,
           "why": "Un modèle ne voit pas des lettres. Il voit des nombres produits à partir d'un texte déjà codé. Unicode est cette couche, avant tout tokenizer.",
@@ -3170,6 +3990,26 @@
         {
           "id": "2.2",
           "title": "Construire un corpus",
+          "glance": {
+            "phrase": "Le corpus est la seule matière où le modèle peut trouver des régularités.",
+            "image": "Une bibliothèque : le modèle ne sait que ce qu'elle contient.",
+            "key": "read_text(encoding=\"utf-8\")",
+            "trap": "Oublier l'encodage : les accents se cassent selon la machine.",
+            "steps": [
+              {
+                "title": "Rassembler",
+                "text": "des textes"
+              },
+              {
+                "title": "Charger",
+                "text": "en UTF-8"
+              },
+              {
+                "title": "Compter",
+                "text": "caractères et mots"
+              }
+            ]
+          },
           "tag": "Données",
           "minutes": 25,
           "why": "Le corpus est la seule matière dans laquelle le modèle peut trouver des régularités. Un corpus minuscule et propre apprend moins de choses, mais il permet de vérifier que le code est juste.",
@@ -3244,6 +4084,26 @@
         {
           "id": "2.3",
           "title": "Caractères et octets",
+          "glance": {
+            "phrase": "Un fichier est fait d'octets ; UTF-8 code un caractère sur 1 à 4 octets.",
+            "image": "Des colis de tailles variées : « a » tient dans 1 carton, « 🤖 » dans 4.",
+            "key": "\"é\" = 1 caractère = 2 octets",
+            "trap": "len(texte) compte des caractères, pas des octets.",
+            "steps": [
+              {
+                "title": "Prendre",
+                "text": "un caractère"
+              },
+              {
+                "title": "Encoder",
+                "text": ".encode(\"utf-8\")"
+              },
+              {
+                "title": "Compter",
+                "text": "les octets obtenus"
+              }
+            ]
+          },
           "tag": "Encodage",
           "minutes": 30,
           "why": "Les fichiers sont des octets. Les chaînes Python sont des caractères. Un tokenizer « byte-level » travaille entre les deux. Il faut voir la différence sur un exemple.",
@@ -3325,6 +4185,26 @@
         {
           "id": "2.4",
           "title": "Vocabulaire",
+          "glance": {
+            "phrase": "Le vocabulaire est la liste fermée des unités connues, chacune avec un numéro fixe.",
+            "image": "Un alphabet de casiers numérotés : sans casier, pas de place.",
+            "key": "sorted(set(texte))",
+            "trap": "Changer l'ordre du vocabulaire après l'entraînement change le sens des numéros.",
+            "steps": [
+              {
+                "title": "Collecter",
+                "text": "les caractères uniques"
+              },
+              {
+                "title": "Trier",
+                "text": "dans un ordre stable"
+              },
+              {
+                "title": "Numéroter",
+                "text": "0, 1, 2…"
+              }
+            ]
+          },
           "tag": "Tokenizer",
           "minutes": 25,
           "why": "Le modèle ne peut attribuer un vecteur qu'à une unité connue. Le vocabulaire est la liste fermée de ces unités, chacune avec un identifiant entier.",
@@ -3399,6 +4279,26 @@
         {
           "id": "2.5",
           "title": "Tokenizer caractère",
+          "glance": {
+            "phrase": "Le tokenizer traduit le texte en numéros et les numéros en texte, sans rien perdre.",
+            "image": "Un dictionnaire à deux sens : caractère → numéro et numéro → caractère.",
+            "key": "\"abba\" → [0, 1, 1, 0] → \"abba\"",
+            "trap": "Un aller-retour qui ne rend pas le texte d'origine est un bug.",
+            "steps": [
+              {
+                "title": "Construire",
+                "text": "stoi et itos"
+              },
+              {
+                "title": "Encoder",
+                "text": "texte → ids"
+              },
+              {
+                "title": "Décoder",
+                "text": "ids → texte identique"
+              }
+            ]
+          },
           "tag": "Tokenizer",
           "minutes": 40,
           "why": "C'est la première frontière réelle entre le texte et le calcul. Un aller-retour encode puis decode qui ne rend pas le texte de départ est un bug, pas une « créativité ».",
@@ -3475,6 +4375,26 @@
         {
           "id": "2.6",
           "title": "BPE, l'intuition",
+          "glance": {
+            "phrase": "BPE fusionne les paires fréquentes pour raccourcir les séquences.",
+            "image": "Des aimants : les lettres souvent voisines finissent collées.",
+            "key": "banana : « an » apparaît 2 fois",
+            "trap": "BPE ne découpe pas en mots : il recolle des morceaux fréquents.",
+            "steps": [
+              {
+                "title": "Lister",
+                "text": "les paires voisines"
+              },
+              {
+                "title": "Compter",
+                "text": "la plus fréquente"
+              },
+              {
+                "title": "Fusionner",
+                "text": "en un nouveau token"
+              }
+            ]
+          },
           "tag": "Tokenizer",
           "minutes": 30,
           "why": "Le caractère seul produit de longues séquences. Le mot entier explose le vocabulaire et bute sur les mots rares. BPE construit un milieu : il fusionne les paires fréquentes.",
@@ -3549,6 +4469,26 @@
         {
           "id": "2.7",
           "title": "Construire un mini-BPE",
+          "glance": {
+            "phrase": "Chaque fusion crée un nouveau token ; décoder défait les fusions à l'envers.",
+            "image": "Une poupée russe : chaque token contient les deux qu'il a fusionnés.",
+            "key": "nouvel id = entier suivant",
+            "trap": "Décoder dans le mauvais ordre : le texte rendu est faux.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "les paires"
+              },
+              {
+                "title": "Fusionner",
+                "text": "la gagnante, nouvel id"
+              },
+              {
+                "title": "Répéter",
+                "text": "num_merges fois"
+              }
+            ]
+          },
           "tag": "Tokenizer",
           "minutes": 40,
           "why": "Quelques fusions écrites par toi montrent le mécanisme que les tokenizers de production répètent des dizaines de milliers de fois, avec la même logique.",
@@ -3630,6 +4570,26 @@
         {
           "id": "2.8",
           "title": "Identifiants de tokens",
+          "glance": {
+            "phrase": "Un identifiant est un numéro de casier, pas une quantité.",
+            "image": "Des numéros de vestiaire : le 7 n'est pas « plus » que le 1.",
+            "key": "{\"a\": 0, \"b\": 1}",
+            "trap": "Additionner ou comparer des ids n'a aucun sens linguistique.",
+            "steps": [
+              {
+                "title": "Encoder",
+                "text": "en entiers"
+              },
+              {
+                "title": "Ranger",
+                "text": "dans un tableau"
+              },
+              {
+                "title": "Transmettre",
+                "text": "au modèle, sans calcul"
+              }
+            ]
+          },
           "tag": "Tokenizer",
           "minutes": 25,
           "why": "À partir d'ici, le modèle ne reçoit plus que des entiers. Confondre l'entier 2 et le caractère « 2 » est un bug classique au moment de brancher le réseau.",
@@ -3704,6 +4664,26 @@
         {
           "id": "2.9",
           "title": "Embeddings",
+          "glance": {
+            "phrase": "Un embedding remplace chaque numéro par un vecteur appris.",
+            "image": "Une étagère : une ligne par token, on va chercher la bonne ligne.",
+            "key": "ids (2, 5) → vecteurs (2, 5, D)",
+            "trap": "Ce n'est pas un calcul : c'est une lecture de ligne dans la table.",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "une table V × D"
+              },
+              {
+                "title": "Lire",
+                "text": "la ligne de chaque id"
+              },
+              {
+                "title": "Apprendre",
+                "text": "les valeurs de la table"
+              }
+            ]
+          },
           "tag": "Représentation",
           "minutes": 35,
           "why": "Un entier n'a pas de géométrie. L'embedding lui associe un vecteur appris, pour que deux tokens puissent se ressembler autrement que par leur numéro.",
@@ -3778,6 +4758,26 @@
         {
           "id": "2.10",
           "title": "Position",
+          "glance": {
+            "phrase": "On ajoute un vecteur de position pour que l'ordre des mots compte.",
+            "image": "Des numéros de siège : mêmes passagers, places différentes.",
+            "key": "vecteur = token[t] + position[t]",
+            "trap": "Au-delà de block_size, il n'existe pas de vecteur de position appris.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le vecteur du token"
+              },
+              {
+                "title": "Ajouter",
+                "text": "celui de sa position"
+              },
+              {
+                "title": "Obtenir",
+                "text": "un vecteur ordonné"
+              }
+            ]
+          },
           "tag": "Séquence",
           "minutes": 30,
           "why": "Une table d'embeddings ne sait pas si un token est le premier ou le dixième. Deux phrases aux mêmes mots dans un ordre différent auraient la même somme de vecteurs. Il faut une information de position.",
@@ -3852,6 +4852,26 @@
         {
           "id": "2.11",
           "title": "Batches et séquences",
+          "glance": {
+            "phrase": "On entraîne par lots de fenêtres : B séquences de T tokens.",
+            "image": "Une plaque de biscuits : B rangées de T biscuits.",
+            "key": "x = ids[i:i+T] · y = ids[i+1:i+T+1]",
+            "trap": "x = y crée une tâche de recopie : la cible est décalée d'un cran.",
+            "steps": [
+              {
+                "title": "Couper",
+                "text": "une fenêtre de T tokens"
+              },
+              {
+                "title": "Décaler",
+                "text": "la cible d'un cran"
+              },
+              {
+                "title": "Empiler",
+                "text": "B fenêtres"
+              }
+            ]
+          },
           "tag": "Données",
           "minutes": 30,
           "why": "On n'entraîne pas un token isolé, ni toute une vie d'un coup. On groupe des fenêtres de longueur fixe. Lire leur forme évite les bugs les plus coûteux du projet.",
@@ -3946,6 +4966,26 @@
         {
           "id": "3.1",
           "title": "Prédire le token suivant",
+          "glance": {
+            "phrase": "Un modèle de langage devine le token suivant à partir du passé, encore et encore.",
+            "image": "Un texte à trous : on cache le mot d'après et on devine.",
+            "key": "contexte → scores → token suivant",
+            "trap": "La cible est un entier : l'identifiant du vrai token suivant.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le passé"
+              },
+              {
+                "title": "Scorer",
+                "text": "chaque token possible"
+              },
+              {
+                "title": "Comparer",
+                "text": "au vrai suivant"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 30,
           "why": "Tout le modèle de langage du parcours tient dans une tâche : étant donné le passé, donner une distribution sur le token d'après. Le reste est une façon plus riche de lire ce passé.",
@@ -4022,6 +5062,26 @@
         {
           "id": "3.2",
           "title": "Le bigramme",
+          "glance": {
+            "phrase": "Le bigramme ne regarde que le token courant pour deviner le suivant.",
+            "image": "Un tableau de comptes : après « le », combien de fois chaque mot ?",
+            "key": "P(b | a) = compte(a, b) / somme de la ligne a",
+            "trap": "Il ignore tout ce qui est avant le dernier token.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "chaque paire (a, b)"
+              },
+              {
+                "title": "Lisser",
+                "text": "+ alpha partout"
+              },
+              {
+                "title": "Normaliser",
+                "text": "chaque ligne à 100 %"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 40,
           "why": "Le bigramme est la baseline. Il est faible, mais il est juste : on peut le calculer, le tester, et tout modèle plus cher devra le battre pour justifier son coût.",
@@ -4096,6 +5156,26 @@
         {
           "id": "3.3",
           "title": "Contexte",
+          "glance": {
+            "phrase": "Le contexte est la quantité de passé que le modèle accepte de regarder.",
+            "image": "Une fenêtre de lecture : plus elle est large, plus on voit loin.",
+            "key": "T = longueur maximale du contexte",
+            "trap": "Allonger T coûte cher : l'attention grandit comme T².",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "une longueur T"
+              },
+              {
+                "title": "Lire",
+                "text": "les T derniers tokens"
+              },
+              {
+                "title": "Prédire",
+                "text": "à chaque position"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 30,
           "why": "Le bigramme échoue dès que le bon token dépend de plus loin que le voisin. Le contexte est la quantité de passé qu'on accepte de regarder. On le borne ici.",
@@ -4172,6 +5252,26 @@
         {
           "id": "3.4",
           "title": "Logits",
+          "glance": {
+            "phrase": "Les logits sont des scores bruts, un par token, avant toute probabilité.",
+            "image": "Des notes de jury avant de les convertir en pourcentages.",
+            "key": "logits : (batch, temps, vocabulaire)",
+            "trap": "Un logit négatif ne veut pas dire « impossible ».",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "un score par token"
+              },
+              {
+                "title": "Lire",
+                "text": "la case [b, t, v]"
+              },
+              {
+                "title": "Convertir",
+                "text": "plus tard, par softmax"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 25,
           "why": "La sortie brute du modèle n'est pas une probabilité. Ce sont des logits : des scores libres, positifs ou négatifs. Les traiter comme des probabilités fausse la génération et la loss.",
@@ -4246,6 +5346,26 @@
         {
           "id": "3.5",
           "title": "Softmax",
+          "glance": {
+            "phrase": "Softmax transforme des scores en probabilités positives qui font 100 %.",
+            "image": "Un gâteau partagé selon les scores : le plus grand reçoit la plus grosse part.",
+            "key": "exp(z) / somme(exp(z))",
+            "trap": "Ajouter la même constante à tous les scores ne change rien.",
+            "steps": [
+              {
+                "title": "Soustraire",
+                "text": "le maximum, pour la stabilité"
+              },
+              {
+                "title": "Exponentier",
+                "text": "tout devient positif"
+              },
+              {
+                "title": "Diviser",
+                "text": "par la somme"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 30,
           "why": "Softmax est le pont entre les scores et une distribution. Sans lui, on ne peut ni échantillonner ni définir la cross-entropy proprement. On l'écrit dans cette étape.",
@@ -4322,6 +5442,26 @@
         {
           "id": "3.6",
           "title": "Cross-entropy",
+          "glance": {
+            "phrase": "La cross-entropy coûte d'autant plus que le bon token reçoit peu de probabilité.",
+            "image": "Une amende proportionnelle à la surprise du modèle.",
+            "key": "loss = −log(p du bon token)",
+            "trap": "Calcule depuis les logits : un log de probabilité arrondie peut valoir l'infini.",
+            "steps": [
+              {
+                "title": "Softmax",
+                "text": "des logits"
+              },
+              {
+                "title": "Prendre",
+                "text": "p du bon token"
+              },
+              {
+                "title": "Coûter",
+                "text": "−log(p)"
+              }
+            ]
+          },
           "tag": "Langage",
           "minutes": 35,
           "why": "C'est la loss du langage. Elle dit : tu as mis telle probabilité sur le bon token, je te coûte moins le logarithme de cette probabilité. On la détaille ici.",
@@ -4409,6 +5549,26 @@
         {
           "id": "3.7",
           "title": "Température et top-k",
+          "glance": {
+            "phrase": "Température et top-k changent la façon de tirer le token, pas ce que sait le modèle.",
+            "image": "Un bouton prudence/audace sur le tirage au sort.",
+            "key": "logits / T : T < 1 pique, T > 1 aplatit",
+            "trap": "Température 0 = argmax ; on ne divise jamais par zéro.",
+            "steps": [
+              {
+                "title": "Filtrer",
+                "text": "garder les k meilleurs"
+              },
+              {
+                "title": "Diviser",
+                "text": "par la température"
+              },
+              {
+                "title": "Tirer",
+                "text": "selon softmax"
+              }
+            ]
+          },
           "tag": "Génération",
           "minutes": 30,
           "why": "Générer, c'est tirer un token dans la distribution. Température et top-k ne rendent pas le modèle plus savant : ils changent la forme du tirage.",
@@ -4485,6 +5645,26 @@
         {
           "id": "3.8",
           "title": "Entraîner le modèle de langage",
+          "glance": {
+            "phrase": "On entraîne le modèle de langage avec la même boucle, sur des fenêtres de tokens.",
+            "image": "Le même entraînement sportif, sur un nouveau terrain.",
+            "key": "fenêtre → logits → cross-entropy → backward → pas",
+            "trap": "Le bigramme compte ; le réseau, lui, apprend par gradient.",
+            "steps": [
+              {
+                "title": "Montrer",
+                "text": "une fenêtre"
+              },
+              {
+                "title": "Punir",
+                "text": "le score du mauvais token"
+              },
+              {
+                "title": "Corriger",
+                "text": "les poids, puis recommencer"
+              }
+            ]
+          },
           "tag": "Entraînement",
           "minutes": 35,
           "why": "La boucle du niveau 1 s'applique enfin à des tokens. Le forward change, la loss change, l'ordre des opérations non. On reprend cet ordre sur des tokens.",
@@ -4559,6 +5739,26 @@
         {
           "id": "3.9",
           "title": "Génération autoregressive",
+          "glance": {
+            "phrase": "Générer, c'est prédire un token, le recoller au contexte, et recommencer.",
+            "image": "Écrire une phrase mot après mot, en relisant à chaque fois.",
+            "key": "ids.append(suivant)",
+            "trap": "Au-delà de block_size, on ne garde que la fin du contexte.",
+            "steps": [
+              {
+                "title": "Prédire",
+                "text": "la dernière position"
+              },
+              {
+                "title": "Tirer",
+                "text": "un token"
+              },
+              {
+                "title": "Recoller",
+                "text": "puis recommencer"
+              }
+            ]
+          },
           "tag": "Génération",
           "minutes": 35,
           "why": "Une fois le modèle entraîné, produire du texte c'est répéter : prédire, choisir un token, le coller au contexte, recommencer. On écrit cette boucle de génération.",
@@ -4635,6 +5835,26 @@
         {
           "id": "3.10",
           "title": "Perplexité",
+          "glance": {
+            "phrase": "La perplexité dit entre combien de tokens le modèle hésite, en moyenne.",
+            "image": "Un dé à N faces : plus N est petit, plus le modèle est sûr.",
+            "key": "perplexité = exp(loss)",
+            "trap": "Comparer à un chiffre d'article : compare plutôt au bigramme et au hasard.",
+            "steps": [
+              {
+                "title": "Moyenner",
+                "text": "la loss"
+              },
+              {
+                "title": "Exponentier",
+                "text": "exp(loss)"
+              },
+              {
+                "title": "Comparer",
+                "text": "à V, le hasard"
+              }
+            ]
+          },
           "tag": "Évaluation",
           "minutes": 30,
           "why": "La loss moyenne est juste mais peu lisible. La perplexité la réécrit comme un effectif : à quel vocabulaire uniforme le modèle équivaut-il. On la calcule dans cette étape.",
@@ -4709,6 +5929,26 @@
         {
           "id": "3.11",
           "title": "Sauvegarder et recharger",
+          "glance": {
+            "phrase": "Un checkpoint garde ensemble les poids, la configuration et le tokenizer.",
+            "image": "Une recette et son réglage du four, rangés dans la même boîte.",
+            "key": "config + poids + vocabulaire",
+            "trap": "Recharger les poids avec un autre vocabulaire : les numéros ne veulent plus rien dire.",
+            "steps": [
+              {
+                "title": "Sauver",
+                "text": "poids + config + tokenizer"
+              },
+              {
+                "title": "Recharger",
+                "text": "le tout ensemble"
+              },
+              {
+                "title": "Vérifier",
+                "text": "mêmes logits qu'avant"
+              }
+            ]
+          },
           "tag": "Entraînement",
           "minutes": 25,
           "why": "Un entraînement qui n'est pas rechargeable n'est pas une expérience. Il faut pouvoir retrouver les poids et le vocabulaire qui vont ensemble.",
@@ -4803,6 +6043,26 @@
         {
           "id": "4.1",
           "title": "La limite du contexte naïf",
+          "glance": {
+            "phrase": "Moyenner tout le passé ou ne garder que le voisin rate les liens précis.",
+            "image": "Lire une phrase : certains mots anciens comptent plus que d'autres.",
+            "key": "moyenne = bruit · voisin = myope",
+            "trap": "Tout pondérer pareil noie le mot utile dans le reste.",
+            "steps": [
+              {
+                "title": "Moyenner",
+                "text": "mélange tout, même le bruit"
+              },
+              {
+                "title": "Bigramme",
+                "text": "jette tout sauf le voisin"
+              },
+              {
+                "title": "Attention",
+                "text": "pondère selon le contenu"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 30,
           "why": "Moyenner tout le passé, ou ne garder que le dernier token, rate des liens précis : un mot au début peut être celui qui compte. L'attention existe pour choisir où regarder.",
@@ -4877,6 +6137,26 @@
         {
           "id": "4.2",
           "title": "Requête, clé et valeur",
+          "glance": {
+            "phrase": "La requête cherche, la clé s'annonce, la valeur est ce qu'on emporte.",
+            "image": "Bibliothèque : ta question, le titre au dos du livre, le chapitre photocopié.",
+            "key": "Q = X·Wq · K = X·Wk · V = X·Wv",
+            "trap": "On compare la requête aux CLÉS, jamais directement aux valeurs.",
+            "steps": [
+              {
+                "title": "Projeter",
+                "text": "X en Q, K et V"
+              },
+              {
+                "title": "Comparer",
+                "text": "Q avec chaque K"
+              },
+              {
+                "title": "Emporter",
+                "text": "les V des meilleures clés"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 30,
           "why": "Trois rôles évitent de comparer un vecteur à lui-même sans intention. La requête cherche, la clé s'annonce, la valeur est ce qu'on emporte si la comparaison réussit.",
@@ -4953,6 +6233,26 @@
         {
           "id": "4.3",
           "title": "Produit scalaire des scores",
+          "glance": {
+            "phrase": "Le score entre deux positions est le produit scalaire de la requête et de la clé.",
+            "image": "Deux flèches : alignées = grand score, perpendiculaires = zéro.",
+            "key": "Q (T, D) @ Kᵀ (D, T) → scores (T, T)",
+            "trap": "Un score peut être négatif : ce n'est pas encore une probabilité.",
+            "steps": [
+              {
+                "title": "Prendre",
+                "text": "la requête i"
+              },
+              {
+                "title": "Multiplier",
+                "text": "par la clé j"
+              },
+              {
+                "title": "Ranger",
+                "text": "dans la case (i, j)"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 25,
           "why": "Le score entre deux positions est un produit scalaire. C'est le même calcul qu'au niveau 0, appliqué à une requête et à une clé. On le réutilise comme score.",
@@ -5029,6 +6329,26 @@
         {
           "id": "4.4",
           "title": "Self-attention",
+          "glance": {
+            "phrase": "Chaque mot choisit les mots de la même phrase qui l'aident à deviner la suite.",
+            "image": "Un projecteur : chaque mot éclaire les mots utiles.",
+            "key": "softmax(Q·Kᵀ / √d) · V",
+            "trap": "Chaque ligne de poids doit faire exactement 100 %.",
+            "steps": [
+              {
+                "title": "Comparer",
+                "text": "Q · K donne un score"
+              },
+              {
+                "title": "Normaliser",
+                "text": "softmax : la ligne fait 100 %"
+              },
+              {
+                "title": "Mélanger",
+                "text": "somme pondérée des V"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 35,
           "why": "Self-attention veut dire : les requêtes, les clés et les valeurs viennent de la même séquence. Chaque position relit les autres positions du même texte.",
@@ -5105,6 +6425,26 @@
         {
           "id": "4.5",
           "title": "Masque causal",
+          "glance": {
+            "phrase": "Le masque causal interdit à chaque position de lire le futur.",
+            "image": "Écrire une phrase sans voir les mots pas encore écrits.",
+            "key": "scores du futur → −1e9 → poids 0",
+            "trap": "Sans masque, le modèle triche : il lit le token qu'il doit prédire.",
+            "steps": [
+              {
+                "title": "Dessiner",
+                "text": "un triangle de positions permises"
+              },
+              {
+                "title": "Bloquer",
+                "text": "le futur à −1e9"
+              },
+              {
+                "title": "Softmax",
+                "text": "le futur tombe à 0"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 30,
           "why": "Sans masque, la position 2 peut lire le token 5, celui qu'elle est censée prédire. Le masque ferme le futur. C'est la condition d'une génération honnête.",
@@ -5181,6 +6521,26 @@
         {
           "id": "4.6",
           "title": "Attention à l'échelle",
+          "glance": {
+            "phrase": "On divise les scores par √d pour que softmax ne devienne pas un argmax.",
+            "image": "Baisser le volume avant d'enregistrer, pour ne pas saturer.",
+            "key": "scores / √d_tête",
+            "trap": "Oublier √d : même forme, mêmes axes, mais des poids faux.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "Q · K"
+              },
+              {
+                "title": "Réduire",
+                "text": "diviser par √d"
+              },
+              {
+                "title": "Softmax",
+                "text": "des poids moins piqués"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 25,
           "why": "Sans diviser par la racine de la dimension, les produits scalaires grandissent avec D et softmax devient un argmax accidentel. L'échelle rend l'entraînement stable.",
@@ -5269,6 +6629,26 @@
         {
           "id": "4.7",
           "title": "Multi-têtes",
+          "glance": {
+            "phrase": "Plusieurs têtes regardent la phrase de plusieurs façons en même temps.",
+            "image": "Plusieurs lecteurs, chacun avec son surligneur de couleur.",
+            "key": "d_tête = d_model / n_têtes = 16 / 4 = 4",
+            "trap": "Un mauvais reshape garde la forme mais mélange les valeurs.",
+            "steps": [
+              {
+                "title": "Découper",
+                "text": "D en H têtes"
+              },
+              {
+                "title": "Attendre",
+                "text": "chaque tête calcule seule"
+              },
+              {
+                "title": "Recoller",
+                "text": "concaténer puis × Wo"
+              }
+            ]
+          },
           "tag": "Attention",
           "minutes": 30,
           "why": "Une seule comparaison mélange tous les critères. Plusieurs têtes laissent coexister plusieurs façons de regarder la même phrase : accord, proximité, nom cité plus haut.",
@@ -5345,6 +6725,26 @@
         {
           "id": "4.8",
           "title": "Connexions résiduelles",
+          "glance": {
+            "phrase": "Le résidu ajoute la correction du bloc à son entrée, qui passe tout droit.",
+            "image": "Une autoroute avec une bretelle : le trafic principal continue.",
+            "key": "sortie = x + f(x)",
+            "trap": "Sans résidu, un réseau profond perd son entrée et son gradient.",
+            "steps": [
+              {
+                "title": "Garder",
+                "text": "l'entrée x"
+              },
+              {
+                "title": "Calculer",
+                "text": "la correction f(x)"
+              },
+              {
+                "title": "Additionner",
+                "text": "x + f(x)"
+              }
+            ]
+          },
           "tag": "Bloc",
           "minutes": 25,
           "why": "Ajouter le résultat d'un sous-bloc à son entrée laisse passer le signal même si le sous-bloc est mal initialisé. Sans résidu, un réseau profond perd facilement son entrée.",
@@ -5421,6 +6821,26 @@
         {
           "id": "4.9",
           "title": "Normalisation",
+          "glance": {
+            "phrase": "La normalisation remet chaque vecteur à une échelle connue, couche après couche.",
+            "image": "Régler chaque micro au même volume avant le mixage.",
+            "key": "(x − moyenne) / écart-type × γ + β",
+            "trap": "LayerNorm normalise chaque token seul, pas tout le batch.",
+            "steps": [
+              {
+                "title": "Centrer",
+                "text": "retirer la moyenne"
+              },
+              {
+                "title": "Réduire",
+                "text": "diviser par l'écart-type"
+              },
+              {
+                "title": "Réétirer",
+                "text": "× gain + biais"
+              }
+            ]
+          },
           "tag": "Bloc",
           "minutes": 30,
           "why": "Les activations qui grossissent ou s'effondrent rendent le pas d'apprentissage intenable. Normaliser remet l'échelle du vecteur sous contrôle, couche après couche.",
@@ -5497,6 +6917,26 @@
         {
           "id": "4.10",
           "title": "Le réseau feed-forward",
+          "glance": {
+            "phrase": "Le FFN transforme chaque position séparément, avec les mêmes poids partout.",
+            "image": "Un atelier où chaque mot entre seul et ressort transformé.",
+            "key": "gelu(x @ W1) @ W2, largeur 4D",
+            "trap": "Le FFN ne mélange pas les positions : c'est le rôle de l'attention.",
+            "steps": [
+              {
+                "title": "Élargir",
+                "text": "D → 4D"
+              },
+              {
+                "title": "Plier",
+                "text": "GELU"
+              },
+              {
+                "title": "Resserrer",
+                "text": "4D → D"
+              }
+            ]
+          },
           "tag": "Bloc",
           "minutes": 30,
           "why": "L'attention mélange les positions. Elle ne transforme pas beaucoup, à elle seule, le contenu d'une position. Le FFN est la transformation position par position, la même pour toutes.",
@@ -5573,6 +7013,26 @@
         {
           "id": "4.11",
           "title": "Un bloc Transformer",
+          "glance": {
+            "phrase": "Un bloc : normaliser, relire avec l'attention, ajouter, transformer, ajouter.",
+            "image": "Un tour complet : relire le contexte, puis retravailler chaque mot.",
+            "key": "h = x + Attn(Norm(x)) · y = h + FFN(Norm(h))",
+            "trap": "Le résidu ajoute l'entrée NON normalisée.",
+            "steps": [
+              {
+                "title": "Relire",
+                "text": "x + Attention(Norm(x))"
+              },
+              {
+                "title": "Transformer",
+                "text": "h + FFN(Norm(h))"
+              },
+              {
+                "title": "Garder",
+                "text": "la même forme en sortie"
+              }
+            ]
+          },
           "tag": "Bloc",
           "minutes": 35,
           "why": "Le bloc est l'unité qu'on empile. Le nommer correctement — attention résiduelle, puis FFN résiduel, avec pre-norm — évite les architectures « presque » justes.",
@@ -5649,6 +7109,26 @@
         {
           "id": "4.12",
           "title": "Empiler les blocs",
+          "glance": {
+            "phrase": "Empiler des blocs permet de construire des liens à partir de liens déjà trouvés.",
+            "image": "Relire un texte plusieurs fois, en comprenant mieux à chaque passage.",
+            "key": "coût ∝ n_layers",
+            "trap": "Les blocs ont la même forme mais pas les mêmes poids.",
+            "steps": [
+              {
+                "title": "Bloc 1",
+                "text": "liens simples"
+              },
+              {
+                "title": "Bloc 2",
+                "text": "liens de liens"
+              },
+              {
+                "title": "Bloc n",
+                "text": "même forme, autres poids"
+              }
+            ]
+          },
           "tag": "Modèle",
           "minutes": 25,
           "why": "Un bloc extrait peu. Plusieurs blocs composent des relectures. La profondeur est un hyperparamètre, pas une preuve de qualité. On empile sans confondre profondeur et qualité.",
@@ -5725,6 +7205,26 @@
         {
           "id": "4.13",
           "title": "Modèle decoder-only",
+          "glance": {
+            "phrase": "Un decoder-only lit le passé et écrit la suite, sans encodeur séparé.",
+            "image": "Un écrivain qui n'a que les pages déjà écrites.",
+            "key": "ids → embeddings → n blocs → norme → logits",
+            "trap": "Le masque est causal partout : aucun bloc ne voit le futur.",
+            "steps": [
+              {
+                "title": "Encoder",
+                "text": "ids + positions"
+              },
+              {
+                "title": "Traverser",
+                "text": "n blocs causaux"
+              },
+              {
+                "title": "Projeter",
+                "text": "vers V logits"
+              }
+            ]
+          },
           "tag": "Modèle",
           "minutes": 35,
           "why": "Le modèle qu'on construit est un décodeur seul : il lit le passé et prédit la suite. Il n'a pas un encodeur séparé qui aurait vu toute la phrase source.",
@@ -5801,6 +7301,26 @@
         {
           "id": "4.14",
           "title": "Entraîner et générer",
+          "glance": {
+            "phrase": "On entraîne le GPT complet, puis on le fait écrire un token à la fois.",
+            "image": "Apprendre à écrire, puis rédiger mot après mot.",
+            "key": "train → checkpoint → recharger → générer",
+            "trap": "Le rechargement doit redonner exactement les mêmes logits.",
+            "steps": [
+              {
+                "title": "Entraîner",
+                "text": "tous les blocs ensemble"
+              },
+              {
+                "title": "Sauver",
+                "text": "le meilleur sur validation"
+              },
+              {
+                "title": "Générer",
+                "text": "un token à la fois"
+              }
+            ]
+          },
           "tag": "Modèle",
           "minutes": 40,
           "why": "Le dessin du Transformer ne vaut que s'il se comporte : causalité, cache cohérent avec le forward complet, génération qui allonge la séquence d'un token.",
@@ -5901,6 +7421,26 @@
         {
           "id": "5.1",
           "title": "Limites des positions absolues",
+          "glance": {
+            "phrase": "Une table de positions apprises s'arrête à block_size : au-delà, pas de vecteur.",
+            "image": "32 chaises numérotées : la 33e n'existe pas.",
+            "key": "position < block_size, sinon ValueError",
+            "trap": "Relire la dernière ligne en silence cacherait le problème.",
+            "steps": [
+              {
+                "title": "Apprendre",
+                "text": "une ligne par place"
+              },
+              {
+                "title": "Dépasser",
+                "text": "place 33 inconnue"
+              },
+              {
+                "title": "Refuser",
+                "text": "plutôt que deviner"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 25,
           "why": "Une table de positions apprises s'arrête à block_size. Demander une place de plus n'a pas de vecteur. C'est la première limite que les modèles récents contournent.",
@@ -5975,6 +7515,26 @@
         {
           "id": "5.2",
           "title": "RoPE",
+          "glance": {
+            "phrase": "RoPE fait tourner Q et K selon la position : le score dépend de leur écart.",
+            "image": "Deux aiguilles d'horloge : seul l'angle entre elles compte.",
+            "key": "angle = θᵢ × position",
+            "trap": "Tourner ne change pas la longueur, et V n'est jamais tourné.",
+            "steps": [
+              {
+                "title": "Grouper",
+                "text": "les dimensions par paires"
+              },
+              {
+                "title": "Tourner",
+                "text": "selon la position"
+              },
+              {
+                "title": "Comparer",
+                "text": "Q · K dépend de l'écart"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 40,
           "why": "RoPE encode la position en faisant tourner les requêtes et les clés. Le produit scalaire devient sensible à l'écart entre deux positions, sans table d'addition.",
@@ -6056,6 +7616,26 @@
         {
           "id": "5.3",
           "title": "RMSNorm",
+          "glance": {
+            "phrase": "RMSNorm remet l'échelle sans recentrer, avec moins d'opérations.",
+            "image": "Régler le volume sans toucher à la balance gauche-droite.",
+            "key": "x / √(moyenne(x²) + ε) × gain",
+            "trap": "Pas de biais β : RMSNorm et LayerNorm ne donnent pas les mêmes valeurs.",
+            "steps": [
+              {
+                "title": "Mesurer",
+                "text": "l'énergie : RMS"
+              },
+              {
+                "title": "Diviser",
+                "text": "x par la RMS"
+              },
+              {
+                "title": "Réétirer",
+                "text": "× gain"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 30,
           "why": "LayerNorm centre et réduit. RMSNorm ne fait que remettre l'échelle, avec moins d'opérations. Les modèles récents l'utilisent souvent à la place.",
@@ -6137,6 +7717,26 @@
         {
           "id": "5.4",
           "title": "GELU et SwiGLU",
+          "glance": {
+            "phrase": "SwiGLU ajoute une porte au FFN : une branche décide ce qui passe.",
+            "image": "Un robinet sur le tuyau : le débit dépend de la porte.",
+            "key": "(silu(x·Wg) × x·Wu) · Wd",
+            "trap": "Trois matrices au lieu de deux : à largeur égale, c'est plus cher.",
+            "steps": [
+              {
+                "title": "Porte",
+                "text": "silu(x · Wg)"
+              },
+              {
+                "title": "Signal",
+                "text": "x · Wu"
+              },
+              {
+                "title": "Combiner",
+                "text": "porte × signal, puis · Wd"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 35,
           "why": "Le FFN GELU à deux matrices est la version 2017. SwiGLU ajoute une porte et se retrouve dans beaucoup de modèles récents. Il faut voir le calcul, pas seulement le nom.",
@@ -6211,6 +7811,26 @@
         {
           "id": "5.5",
           "title": "MHA, MQA et GQA",
+          "glance": {
+            "phrase": "GQA garde beaucoup de têtes de requête mais partage moins de têtes K/V.",
+            "image": "Plusieurs élèves posent leurs questions sur quelques fiches communes.",
+            "key": "4 têtes Q · 2 têtes K/V → chaque K/V sert 2 Q",
+            "trap": "n_heads doit être un multiple de n_kv_heads.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "moins de têtes K/V"
+              },
+              {
+                "title": "Répéter",
+                "text": "chaque K/V pour ses requêtes"
+              },
+              {
+                "title": "Alléger",
+                "text": "le cache de génération"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 35,
           "why": "Le cache des clés et des valeurs pèse autant que le nombre de têtes. GQA garde plusieurs têtes de requête mais moins de têtes KV, pour alléger la génération.",
@@ -6285,6 +7905,26 @@
         {
           "id": "5.6",
           "title": "Cache KV",
+          "glance": {
+            "phrase": "Le cache KV garde les clés et valeurs passées pour ne pas les recalculer.",
+            "image": "Garder ses annotations des pages déjà lues.",
+            "key": "logits avec cache = logits sans cache",
+            "trap": "Les positions des nouveaux tokens commencent après le passé, pas à zéro.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "K et V du nouveau token"
+              },
+              {
+                "title": "Ajouter",
+                "text": "au cache"
+              },
+              {
+                "title": "Lire",
+                "text": "tout le passé d'un coup"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 35,
           "why": "Regénérer toute la phrase à chaque nouveau token refait les mêmes clés. Le cache les garde. Il est juste seulement s'il donne le même logit que le forward complet.",
@@ -6359,6 +7999,26 @@
         {
           "id": "5.7",
           "title": "Weight tying",
+          "glance": {
+            "phrase": "La même table sert à lire les tokens et à prédire le suivant.",
+            "image": "Un seul dictionnaire pour lire et pour écrire.",
+            "key": "logits = h @ tokᵀ · économie V × D",
+            "trap": "Le gradient de la table cumule deux chemins : lecture et prédiction.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "tok[id] en entrée"
+              },
+              {
+                "title": "Réutiliser",
+                "text": "tokᵀ en sortie"
+              },
+              {
+                "title": "Économiser",
+                "text": "V × D paramètres"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 25,
           "why": "La table d'embedding et la tête de sortie font des travaux miroirs : passer d'un identifiant à un vecteur, et d'un vecteur à des scores d'identifiants. Partager leurs poids économise V fois D paramètres.",
@@ -6433,6 +8093,26 @@
         {
           "id": "5.8",
           "title": "Initialisation",
+          "glance": {
+            "phrase": "L'initialisation fixe l'échelle des poids avant le premier pas.",
+            "image": "Accorder les instruments avant le concert.",
+            "key": "poids ~ N(0 ; 0,02) · gains 1 · biais 0",
+            "trap": "Même config, même graine : mêmes logits. Sinon, ce n'est pas reproductible.",
+            "steps": [
+              {
+                "title": "Tirer",
+                "text": "des poids petits"
+              },
+              {
+                "title": "Fixer",
+                "text": "gains à 1, biais à 0"
+              },
+              {
+                "title": "Vérifier",
+                "text": "même graine, mêmes logits"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 30,
           "why": "Les mêmes équations, mal initialisées, divergent ou n'apprennent pas. L'initialisation fixe l'échelle des poids au départ, avant le premier pas.",
@@ -6507,6 +8187,26 @@
         {
           "id": "5.9",
           "title": "Contexte long",
+          "glance": {
+            "phrase": "Doubler le contexte multiplie par quatre le coût de l'attention.",
+            "image": "Une salle où chacun salue tout le monde : 2 fois plus de gens, 4 fois plus de saluts.",
+            "key": "coût attention ∝ T²",
+            "trap": "Une position apprise sur 512 tokens n'est pas bonne d'office à 8 000.",
+            "steps": [
+              {
+                "title": "Allonger",
+                "text": "T → 2T"
+              },
+              {
+                "title": "Compter",
+                "text": "(2T)² = 4 T²"
+              },
+              {
+                "title": "Mesurer",
+                "text": "qualité au-delà de l'appris"
+              }
+            ]
+          },
           "tag": "Moderne",
           "minutes": 30,
           "why": "Allonger la fenêtre ne se décrète pas. L'attention coûte le carré de la longueur, et une position entraînée sur 512 tokens n'est pas automatiquement bonne à 8000.",
@@ -6581,6 +8281,26 @@
         {
           "id": "5.10",
           "title": "Entraîner une variante moderne et la comparer",
+          "glance": {
+            "phrase": "On mesure une variante contre la baseline, une seule pièce changée, sur plusieurs graines.",
+            "image": "Tester un pneu : même vélo, même parcours, seul le pneu change.",
+            "key": "écart variante − baseline vs écart entre graines",
+            "trap": "Une seule graine favorable ne prouve rien.",
+            "steps": [
+              {
+                "title": "Fixer",
+                "text": "données, pas, graines"
+              },
+              {
+                "title": "Changer",
+                "text": "une seule option"
+              },
+              {
+                "title": "Comparer",
+                "text": "les écarts appariés"
+              }
+            ]
+          },
           "tag": "Expérience",
           "minutes": 45,
           "why": "Lire qu'une pièce moderne « marche mieux » ne suffit pas. Le laboratoire sait maintenant entraîner RoPE, RMSNorm, SwiGLU, GQA et le partage de poids : tu peux mesurer toi-même ce qu'une variante change, à budget égal, au lieu de recopier une affirmation.",
@@ -6674,6 +8394,26 @@
         {
           "id": "6.1",
           "title": "Coût des paramètres",
+          "glance": {
+            "phrase": "Un nombre de paramètres devient des octets, et l'optimiseur en ajoute beaucoup.",
+            "image": "Une valise : les vêtements, plus la trousse d'Adam deux fois plus lourde.",
+            "key": "fp16 + Adam : 2 + 8 octets par paramètre",
+            "trap": "Oublier les états d'Adam : l'entraînement pèse bien plus que l'inférence.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "les paramètres"
+              },
+              {
+                "title": "Convertir",
+                "text": "× octets par nombre"
+              },
+              {
+                "title": "Ajouter",
+                "text": "les états de l'optimiseur"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "« Un million de paramètres » ne dit pas si ça tient en mémoire. Il faut convertir le compte en octets, et ne pas oublier l'optimiseur. On convertit le compte dans cette étape.",
@@ -6748,6 +8488,26 @@
         {
           "id": "6.2",
           "title": "RAM et VRAM",
+          "glance": {
+            "phrase": "La VRAM est le plan de travail du GPU : poids, états, activations et cache s'y serrent.",
+            "image": "Un établi trop petit : peu importe la taille de l'entrepôt.",
+            "key": "out of memory = RAM ou VRAM, pas disque",
+            "trap": "Agrandir le batch ou la fenêtre gonfle les activations.",
+            "steps": [
+              {
+                "title": "Charger",
+                "text": "poids et optimiseur"
+              },
+              {
+                "title": "Calculer",
+                "text": "les activations du lot"
+              },
+              {
+                "title": "Générer",
+                "text": "+ le cache KV"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Le disque peut contenir les poids alors que la carte graphique ne peut pas les charger. L'erreur « out of memory » vise la mémoire de travail, pas le SSD.",
@@ -6822,6 +8582,26 @@
         {
           "id": "6.3",
           "title": "FLOPs",
+          "glance": {
+            "phrase": "Les FLOPs comptent les opérations ; l'attention longue est dominée par T².",
+            "image": "Compter les gestes d'une chaîne de montage plutôt que les ouvriers.",
+            "key": "n_layers × (8·T·D² + 4·T²·D)",
+            "trap": "Le nombre de paramètres ne dit pas le temps de calcul.",
+            "steps": [
+              {
+                "title": "Projections",
+                "text": "8·T·D²"
+              },
+              {
+                "title": "Scores et mélange",
+                "text": "4·T²·D"
+              },
+              {
+                "title": "Multiplier",
+                "text": "par le nombre de couches"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 35,
           "why": "Le temps ne se devine pas au nombre de paramètres. Une attention longue est dominée par T², un FFN large par T × D × d_ff. Les FLOPs rendent cette différence chiffrée.",
@@ -6903,6 +8683,26 @@
         {
           "id": "6.4",
           "title": "Profiler",
+          "glance": {
+            "phrase": "Le profiler mesure où le temps passe vraiment, au-delà des formules.",
+            "image": "Un chronomètre posé à côté de la théorie.",
+            "key": "échauffer, mesurer plusieurs fois, garder la médiane",
+            "trap": "Une seule mesure est une anecdote, même avec trois décimales.",
+            "steps": [
+              {
+                "title": "Échauffer",
+                "text": "quelques appels à vide"
+              },
+              {
+                "title": "Mesurer",
+                "text": "plusieurs fois"
+              },
+              {
+                "title": "Résumer",
+                "text": "la médiane"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Une formule dit le volume théorique. Un profiler dit où le temps passe vraiment. Les deux se corrigent l'un l'autre. On les fait dialoguer ici.",
@@ -6977,6 +8777,26 @@
         {
           "id": "6.5",
           "title": "Batch",
+          "glance": {
+            "phrase": "Un plus gros batch calme le gradient mais gonfle la mémoire des activations.",
+            "image": "Goûter 32 cuillères d'un coup : avis plus sûr, mais il faut 32 cuillères.",
+            "key": "batch × 2 → activations × 2, paramètres × 1",
+            "trap": "Le batch ne change pas le nombre de paramètres.",
+            "steps": [
+              {
+                "title": "Grouper",
+                "text": "B exemples"
+              },
+              {
+                "title": "Moyenner",
+                "text": "un gradient plus calme"
+              },
+              {
+                "title": "Payer",
+                "text": "des activations × B"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Augmenter le batch stabilise le gradient et occupe mieux le matériel, mais il grossit les activations et peut forcer à baisser la fenêtre. On mesure ce compromis.",
@@ -7051,6 +8871,26 @@
         {
           "id": "6.6",
           "title": "Précision mixte",
+          "glance": {
+            "phrase": "Calculer en 16 bits allège et accélère, mais certains calculs restent en 32 bits.",
+            "image": "Une règle moins graduée : plus légère, moins précise.",
+            "key": "fp16 : plage étroite · bf16 : plage de fp32",
+            "trap": "En fp16, un logit un peu grand devient infini.",
+            "steps": [
+              {
+                "title": "Stocker",
+                "text": "en 16 bits"
+              },
+              {
+                "title": "Protéger",
+                "text": "softmax et normes en 32 bits"
+              },
+              {
+                "title": "Vérifier",
+                "text": "pas d'infini ni de NaN"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 30,
           "why": "Calculer en 16 bits accélère et allège, mais tous les nombres ne supportent pas d'y vivre. La précision mixte garde certains calculs en 32 bits.",
@@ -7125,6 +8965,26 @@
         {
           "id": "6.7",
           "title": "Accumulation de gradient",
+          "glance": {
+            "phrase": "Accumuler les gradients de petits lots simule un grand lot sans sa mémoire.",
+            "image": "Quatre petites pesées additionnées pour un seul grand total.",
+            "key": "loss / nombre de micro-lots, puis un seul pas",
+            "trap": "Des micro-lots de tailles différentes se pondèrent par leurs cibles.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "plusieurs petits lots"
+              },
+              {
+                "title": "Additionner",
+                "text": "leurs gradients"
+              },
+              {
+                "title": "Avancer",
+                "text": "un seul pas"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "On peut simuler un gros batch en additionnant les gradients de plusieurs petits pas, puis en mettant à jour une seule fois. La mémoire ressemble au petit batch, le gradient au gros.",
@@ -7210,6 +9070,26 @@
         {
           "id": "6.8",
           "title": "Checkpointing des activations",
+          "glance": {
+            "phrase": "On jette des activations au forward et on les recalcule au backward.",
+            "image": "Effacer son brouillon et le refaire quand on en a besoin.",
+            "key": "moins de mémoire, plus de calcul",
+            "trap": "Le temps augmente : c'est un échange, pas un gain gratuit.",
+            "steps": [
+              {
+                "title": "Garder",
+                "text": "les entrées des blocs"
+              },
+              {
+                "title": "Jeter",
+                "text": "les intermédiaires"
+              },
+              {
+                "title": "Recalculer",
+                "text": "au moment du backward"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Garder toutes les activations pour le backward coûte cher. En jeter certaines et les recalculer au retour échange de la mémoire contre du temps.",
@@ -7284,6 +9164,26 @@
         {
           "id": "6.9",
           "title": "Quantification",
+          "glance": {
+            "phrase": "Quantifier stocke les poids en 8 ou 4 bits pour faire tourner le modèle sur moins.",
+            "image": "Arrondir les mesures d'une recette au gramme près.",
+            "key": "int8 = 1 octet · int4 = 0,5 octet",
+            "trap": "La perte de qualité se mesure : elle n'est jamais nulle d'office.",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "une échelle"
+              },
+              {
+                "title": "Arrondir",
+                "text": "chaque poids"
+              },
+              {
+                "title": "Mesurer",
+                "text": "la qualité obtenue"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 30,
           "why": "Après l'entraînement, on peut stocker les poids en 8 ou 4 bits. La mémoire d'inférence baisse beaucoup. La qualité baisse un peu, et parfois beaucoup si on quantifie n'importe comment.",
@@ -7358,6 +9258,26 @@
         {
           "id": "6.10",
           "title": "Distillation",
+          "glance": {
+            "phrase": "Un petit modèle apprend à imiter les hésitations d'un grand modèle.",
+            "image": "Un élève qui copie le raisonnement du professeur, pas seulement sa réponse.",
+            "key": "cible = distribution du professeur",
+            "trap": "L'élève est plus petit : rien ne garantit qu'il garde la qualité.",
+            "steps": [
+              {
+                "title": "Interroger",
+                "text": "le professeur"
+              },
+              {
+                "title": "Imiter",
+                "text": "sa distribution"
+              },
+              {
+                "title": "Comparer",
+                "text": "taille et qualité"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Un grand modèle peut servir de professeur à un petit. Le petit n'apprend plus seulement le token cible : il apprend la distribution du grand. On y gagne de la vitesse si la qualité suit.",
@@ -7432,6 +9352,26 @@
         {
           "id": "6.11",
           "title": "CPU et GPU",
+          "glance": {
+            "phrase": "Le GPU excelle sur les gros calculs réguliers, pas sur les petites décisions Python.",
+            "image": "Une salle de calculateurs : inutile de la réunir pour trois nombres.",
+            "key": "grosses matrices → GPU · boucle Python → CPU",
+            "trap": "Envoyer un scalaire au GPU à chaque pas peut coûter plus que le calcul.",
+            "steps": [
+              {
+                "title": "Grouper",
+                "text": "de gros tableaux"
+              },
+              {
+                "title": "Calculer",
+                "text": "sur le GPU"
+              },
+              {
+                "title": "Décider",
+                "text": "côté CPU"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 25,
           "why": "Le GPU accélère les gros produits de matrices. Il n'accélère pas un Python qui décide token après token avec de minuscules tenseurs. Il faut savoir lequel est occupé.",
@@ -7506,6 +9446,26 @@
         {
           "id": "6.12",
           "title": "Inférence locale et tableau",
+          "glance": {
+            "phrase": "Un tableau qualité, temps, mémoire compare des réglages en n'en changeant qu'un.",
+            "image": "Un banc d'essai : une ligne par réglage, une colonne par mesure.",
+            "key": "qualité · temps · RAM",
+            "trap": "Comparer des qualités mesurées avec des métriques différentes.",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "des réglages"
+              },
+              {
+                "title": "Mesurer",
+                "text": "qualité, temps, RAM"
+              },
+              {
+                "title": "Trier",
+                "text": "et conclure prudemment"
+              }
+            ]
+          },
           "tag": "Mesure",
           "minutes": 35,
           "why": "Le projet du niveau est un tableau : qualité, temps, mémoire, pour plusieurs réglages. Sans ce tableau, « plus moderne » n'est qu'un adjectif.",
@@ -7598,6 +9558,26 @@
         {
           "id": "7.1",
           "title": "Qu'est-ce qu'un expert",
+          "glance": {
+            "phrase": "Un expert est un FFN parmi plusieurs, chacun avec ses propres poids.",
+            "image": "Plusieurs ateliers au lieu d'un seul.",
+            "key": "expert = w1, b1, ReLU, w2, b2",
+            "trap": "Personne n'assigne un sujet à un expert : leur rôle émerge de l'entraînement.",
+            "steps": [
+              {
+                "title": "Créer",
+                "text": "plusieurs FFN"
+              },
+              {
+                "title": "Envoyer",
+                "text": "un vecteur à un expert"
+              },
+              {
+                "title": "Transformer",
+                "text": "avec ses poids à lui"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 25,
           "why": "Dans ce parcours, un expert n'est pas une personne ni un modèle entier. C'est un FFN parmi d'autres, interchangeable, que le routeur peut choisir.",
@@ -7679,6 +9659,26 @@
         {
           "id": "7.2",
           "title": "Dense et sparse",
+          "glance": {
+            "phrase": "Un modèle sparse stocke beaucoup d'experts mais n'en fait travailler que quelques-uns.",
+            "image": "Une bibliothèque où l'on ne lit que deux livres par question.",
+            "key": "mémoire = tous les experts · calcul = les actifs",
+            "trap": "Les experts inactifs occupent quand même la mémoire.",
+            "steps": [
+              {
+                "title": "Stocker",
+                "text": "E experts"
+              },
+              {
+                "title": "Activer",
+                "text": "k par token"
+              },
+              {
+                "title": "Économiser",
+                "text": "du calcul, pas de la mémoire"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 25,
           "why": "Un modèle dense utilise tous ses poids à chaque token. Un modèle sparse n'en active qu'une partie. Le nombre de paramètres et le coût par token se découplent.",
@@ -7753,6 +9753,26 @@
         {
           "id": "7.3",
           "title": "Le routeur",
+          "glance": {
+            "phrase": "Le routeur donne à chaque expert une probabilité, selon le vecteur du token.",
+            "image": "Un aiguilleur qui lit chaque colis et choisit le bon quai.",
+            "key": "softmax(x @ routeur)",
+            "trap": "Le routeur apprend : ce n'est pas une règle écrite à la main.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "le vecteur du token"
+              },
+              {
+                "title": "Scorer",
+                "text": "chaque expert"
+              },
+              {
+                "title": "Normaliser",
+                "text": "par softmax"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 30,
           "why": "Quelqu'un doit choisir l'expert. Le routeur est une petite couche linéaire, suivie d'un softmax, qui donne une probabilité à chaque expert. On l'écrit dans cette étape.",
@@ -7827,6 +9847,26 @@
         {
           "id": "7.4",
           "title": "Top-k",
+          "glance": {
+            "phrase": "Top-k garde les k meilleurs experts et renormalise leurs poids entre eux.",
+            "image": "Consulter les deux meilleurs avis, pas les vingt.",
+            "key": "softmax sur les k meilleurs seulement",
+            "trap": "Sans renormaliser, une partie de la masse reste sur les experts ignorés.",
+            "steps": [
+              {
+                "title": "Trier",
+                "text": "les scores"
+              },
+              {
+                "title": "Garder",
+                "text": "les k premiers"
+              },
+              {
+                "title": "Pondérer",
+                "text": "et additionner leurs sorties"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 30,
           "why": "On ne mélange pas tous les experts : ce serait redevenir dense. Top-k garde les k meilleurs scores et renormalise seulement sur eux. On code ce choix top-k.",
@@ -7901,6 +9941,26 @@
         {
           "id": "7.5",
           "title": "Capacité",
+          "glance": {
+            "phrase": "La capacité limite le nombre de tokens qu'un expert accepte.",
+            "image": "Un atelier de quatre places : le cinquième client est renvoyé.",
+            "key": "capacité = ⌈facteur × T / E⌉",
+            "trap": "Les tokens refusés (dropped) doivent être comptés, pas ignorés.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "la capacité"
+              },
+              {
+                "title": "Remplir",
+                "text": "dans l'ordre"
+              },
+              {
+                "title": "Compter",
+                "text": "les tokens refusés"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 30,
           "why": "Si tous les tokens choisissent le même expert, cet expert doit les traiter tous et le gain sparse disparaît. La capacité limite le nombre de tokens par expert.",
@@ -7975,6 +10035,26 @@
         {
           "id": "7.6",
           "title": "Équilibrage de charge",
+          "glance": {
+            "phrase": "On mesure l'équilibre : qui reçoit vraiment les tokens, et qui était voulu.",
+            "image": "Compter les clients réellement entrés dans chaque atelier.",
+            "key": "f = choix réels · P = probabilités moyennes",
+            "trap": "f et P peuvent diverger quand la capacité refuse du monde.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "f : tokens par expert"
+              },
+              {
+                "title": "Moyenner",
+                "text": "P : probabilités du routeur"
+              },
+              {
+                "title": "Comparer",
+                "text": "les deux"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 25,
           "why": "Un routeur qui envoie tout au même expert gaspille les autres. L'équilibrage se mesure avant de se corriger. Sinon on ne sait pas ce que la loss répare.",
@@ -8049,6 +10129,26 @@
         {
           "id": "7.7",
           "title": "Perte auxiliaire",
+          "glance": {
+            "phrase": "Une perte auxiliaire pousse le routeur à répartir les tokens.",
+            "image": "Une prime pour les ateliers qui partagent le travail.",
+            "key": "aux = E × Σ fᵢ·Pᵢ, minimum 1",
+            "trap": "Elle vaut 1 au mieux, pas 0.",
+            "steps": [
+              {
+                "title": "Mesurer",
+                "text": "f et P"
+              },
+              {
+                "title": "Calculer",
+                "text": "E × Σ f·P"
+              },
+              {
+                "title": "Ajouter",
+                "text": "à la loss de langage"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 30,
           "why": "Mesurer l'effondrement ne le corrige pas. Une loss auxiliaire, ajoutée à la loss de langage, pousse le routeur à utiliser les experts. On l'ajoute comme terme séparé.",
@@ -8123,6 +10223,26 @@
         {
           "id": "7.8",
           "title": "Parallélisme des experts",
+          "glance": {
+            "phrase": "Placer les experts sur plusieurs machines n'aide que si le routage se répartit.",
+            "image": "Deux ateliers dans deux pièces : utile si les clients se partagent.",
+            "key": "gain = répartition − coût des transferts",
+            "trap": "Si tout le monde va au même expert, les autres machines attendent.",
+            "steps": [
+              {
+                "title": "Répartir",
+                "text": "un expert par machine"
+              },
+              {
+                "title": "Envoyer",
+                "text": "chaque token à son expert"
+              },
+              {
+                "title": "Rapatrier",
+                "text": "le résultat"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 25,
           "why": "Les experts peuvent vivre sur des machines différentes. Ce gain n'existe que si le routage n'oblige pas chacun à attendre le même expert. On le dit sans le simuler sur plusieurs machines.",
@@ -8197,6 +10317,26 @@
         {
           "id": "7.9",
           "title": "Mémoire et calcul",
+          "glance": {
+            "phrase": "Un MoE ajoute surtout des paramètres stockés ; il doit le justifier par la qualité.",
+            "image": "Louer plus d'ateliers n'a de sens que si le travail s'améliore.",
+            "key": "MoE 4 experts top-1 : mémoire ×4, calcul ≈ ×1",
+            "trap": "Si la perplexité ne baisse pas, tu as seulement alourdi le modèle.",
+            "steps": [
+              {
+                "title": "Remplacer",
+                "text": "le FFN par un MoE"
+              },
+              {
+                "title": "Mesurer",
+                "text": "perplexité et dropped"
+              },
+              {
+                "title": "Écrire",
+                "text": "la ligne du tableau"
+              }
+            ]
+          },
           "tag": "MoE",
           "minutes": 30,
           "why": "Le projet du niveau est de remplacer le FFN par un MoE et de dire, en une ligne de tableau, ce qu'on a gagné et ce qu'on a payé. On écrit cette ligne de tableau.",
@@ -8289,6 +10429,26 @@
         {
           "id": "8.1",
           "title": "La récurrence",
+          "glance": {
+            "phrase": "Une récurrence résume le passé dans un état, mis à jour à chaque token.",
+            "image": "Marcher avec un carnet d'une seule page qu'on corrige à chaque pas.",
+            "key": "h = oubli × h + entrée",
+            "trap": "L'état a une taille fixe : il ne relit pas toute la séquence.",
+            "steps": [
+              {
+                "title": "Partir",
+                "text": "d'un état nul"
+              },
+              {
+                "title": "Oublier",
+                "text": "un peu du passé"
+              },
+              {
+                "title": "Ajouter",
+                "text": "le token courant"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 25,
           "why": "L'attention relie chaque position à toutes les précédentes. Une récurrence fait autre chose : elle résume le passé dans un état, puis le met à jour avec le token courant. C'est le geste du niveau 8, et le coût en temps redevient linéaire.",
@@ -8363,6 +10523,26 @@
         {
           "id": "8.2",
           "title": "L'état caché",
+          "glance": {
+            "phrase": "L'état caché est une mémoire interne ; la sortie est ce qu'on en montre.",
+            "image": "Un tiroir : on n'en sort qu'une partie à chaque fois.",
+            "key": "h = exp(δ·a)·h + δ·b·x · y = c·h",
+            "trap": "a doit être négatif pour que le passé s'efface au lieu d'exploser.",
+            "steps": [
+              {
+                "title": "Oublier",
+                "text": "× exp(δ·a)"
+              },
+              {
+                "title": "Écrire",
+                "text": "+ δ·b·x"
+              },
+              {
+                "title": "Lire",
+                "text": "y = c·h"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 25,
           "why": "L'état n'est pas la sortie. C'est une mémoire interne. Confondre les deux empêche de lire à la fois un RNN, un SSM et le cache KV, qui sont trois mémoires différentes.",
@@ -8437,6 +10617,26 @@
         {
           "id": "8.3",
           "title": "Intuition d'un modèle d'état",
+          "glance": {
+            "phrase": "Un modèle d'état décrit un système qui évolue et une mesure qu'on lit.",
+            "image": "Un réservoir : l'eau entre, une partie fuit, on lit le niveau.",
+            "key": "continu h' = A·h + B·x → discret avec un pas δ",
+            "trap": "Le labo code la version discrète, pas la dérivation continue.",
+            "steps": [
+              {
+                "title": "Entrer",
+                "text": "x arrive"
+              },
+              {
+                "title": "Évoluer",
+                "text": "l'état change"
+              },
+              {
+                "title": "Observer",
+                "text": "on lit y"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 30,
           "why": "Un state space model décrit un système par un état qui évolue et une observation qu'on lit. C'est le vocabulaire des articles Mamba, et il est plus vieux que les transformers : il vient du signal.",
@@ -8511,6 +10711,26 @@
         {
           "id": "8.4",
           "title": "Convolution ou récurrence",
+          "glance": {
+            "phrase": "Si les coefficients sont fixes, la boucle est équivalente à une convolution.",
+            "image": "Un trou toujours de même taille : on prévoit ce qui restera de chaque goutte.",
+            "key": "noyau = 1, a, a², a³…",
+            "trap": "Dès que les coefficients dépendent de l'entrée, l'équivalence disparaît.",
+            "steps": [
+              {
+                "title": "Fixer",
+                "text": "a constant"
+              },
+              {
+                "title": "Développer",
+                "text": "x₃ + a·x₂ + a²·x₁"
+              },
+              {
+                "title": "Convoluer",
+                "text": "avec le noyau"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 30,
           "why": "Un système linéaire dont les coefficients ne dépendent pas de l'entrée peut s'écrire de deux façons : une boucle, ou un produit par un noyau fixe. Cette équivalence explique pourquoi les anciens SSM s'entraînaient comme une convolution, et pourquoi la sélectivité la casse.",
@@ -8585,6 +10805,26 @@
         {
           "id": "8.5",
           "title": "Le scan parallèle",
+          "glance": {
+            "phrase": "Le scan parallèle regroupe les pas affines pour ne pas attendre le pas d'avant.",
+            "image": "Composer des recettes « × a puis + b » deux par deux, en parallèle.",
+            "key": "(a₁,b₁) puis (a₂,b₂) = (a₂·a₁, a₂·b₁ + b₂)",
+            "trap": "L'ordre compte : la composition est associative, pas commutative.",
+            "steps": [
+              {
+                "title": "Écrire",
+                "text": "chaque pas comme (a, b)"
+              },
+              {
+                "title": "Composer",
+                "text": "par paires, en parallèle"
+              },
+              {
+                "title": "Retrouver",
+                "text": "le résultat de la boucle"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 35,
           "why": "Une boucle Python sur T est correcte et lente. Le scan parallèle calcule la même récurrence en associant les pas, pour qu'un matériel parallèle ne soit pas condamné à attendre le temps t-1.",
@@ -8659,6 +10899,26 @@
         {
           "id": "8.6",
           "title": "La sélectivité",
+          "glance": {
+            "phrase": "La sélectivité rend l'oubli, l'écriture et la lecture dépendants du contenu.",
+            "image": "Noter un mot rare dans le carnet, laisser passer un « le ».",
+            "key": "b, c, δ calculés à partir de chaque token",
+            "trap": "Avec la sélectivité, plus de convolution à noyau fixe.",
+            "steps": [
+              {
+                "title": "Projeter",
+                "text": "le token en b, c, δ"
+              },
+              {
+                "title": "Choisir",
+                "text": "combien écrire et oublier"
+              },
+              {
+                "title": "Scanner",
+                "text": "avec ces valeurs"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 30,
           "why": "Un réservoir aux trous fixes traite une virgule comme un nombre. La sélectivité rend l'oubli, l'écriture et la lecture dépendants du contenu : le modèle peut garder un nom et laisser passer un mot outil.",
@@ -8733,6 +10993,26 @@
         {
           "id": "8.7",
           "title": "Mamba, version réduite",
+          "glance": {
+            "phrase": "Le labo garde l'idée de Mamba : un scan sélectif à la place de l'attention.",
+            "image": "Une maquette de pont : elle montre où passe la charge, pas le pont entier.",
+            "key": "scan sélectif + portes + résidu",
+            "trap": "Ce n'est pas un bloc Mamba complet : pas de convolution courte ni de noyau CUDA.",
+            "steps": [
+              {
+                "title": "Projeter",
+                "text": "l'entrée"
+              },
+              {
+                "title": "Scanner",
+                "text": "de façon sélective"
+              },
+              {
+                "title": "Ajouter",
+                "text": "au résidu"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 35,
           "why": "Mamba est le nom d'une architecture, pas d'une ligne de code. Le fil rouge en garde l'idée — un scan sélectif à la place de l'attention — et laisse de côté le reste, pour ne pas prétendre reproduire un article.",
@@ -8814,6 +11094,26 @@
         {
           "id": "8.8",
           "title": "Attention contre SSM",
+          "glance": {
+            "phrase": "L'attention relit le passé exact ; le SSM le résume à moindre coût.",
+            "image": "Un index précis contre un résumé oral.",
+            "key": "attention ∝ T² · scan ∝ T",
+            "trap": "Un résumé échoue quand un détail précis comptait.",
+            "steps": [
+              {
+                "title": "Attention",
+                "text": "relit chaque position"
+              },
+              {
+                "title": "SSM",
+                "text": "compresse dans un état"
+              },
+              {
+                "title": "Choisir",
+                "text": "selon la tâche"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 30,
           "why": "Choisir un dos, c'est choisir ce que le modèle peut rappeler. L'attention relit le passé exact dans la fenêtre. Le SSM le comprime. Aucun des deux ne gagne sur tous les textes.",
@@ -8888,6 +11188,26 @@
         {
           "id": "8.9",
           "title": "Un dos hybride",
+          "glance": {
+            "phrase": "Un dos hybride alterne couches d'attention et couches de scan.",
+            "image": "Un index et un résumé, au lieu de parier sur un seul carnet.",
+            "key": "pair → attention · impair → SSM",
+            "trap": "Même forme de sortie ne veut pas dire mêmes valeurs.",
+            "steps": [
+              {
+                "title": "Couche paire",
+                "text": "attention"
+              },
+              {
+                "title": "Couche impaire",
+                "text": "scan"
+              },
+              {
+                "title": "Vérifier",
+                "text": "forme et causalité"
+              }
+            ]
+          },
           "tag": "SSM",
           "minutes": 30,
           "why": "Rien n'oblige à choisir un seul mélangeur. Un dos hybride alterne attention et scan. Le fil rouge le fait pour que l'architecture du niveau 12 soit un paramètre, pas un autre programme.",
@@ -8980,6 +11300,26 @@
         {
           "id": "9.1",
           "title": "Les modalités",
+          "glance": {
+            "phrase": "Une modalité est une façon de mesurer le monde : texte, image, son, vidéo.",
+            "image": "Plusieurs capteurs qui doivent finir dans la même langue de vecteurs.",
+            "key": "toute modalité → suite de vecteurs de largeur D",
+            "trap": "Le labo ne gère que l'image en entrée : le reste est décrit, pas codé.",
+            "steps": [
+              {
+                "title": "Mesurer",
+                "text": "pixels, sons, mots"
+              },
+              {
+                "title": "Découper",
+                "text": "en morceaux"
+              },
+              {
+                "title": "Projeter",
+                "text": "vers des vecteurs D"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 25,
           "why": "Jusqu'ici le modèle ne mange que des identifiants de texte. Une modalité est une autre façon de mesurer le monde : image, son, vidéo. Le niveau 9 n'ajoute pas une magie, il ajoute une conversion vers des vecteurs de la même largeur.",
@@ -9054,6 +11394,26 @@
         {
           "id": "9.2",
           "title": "Pixels et patches",
+          "glance": {
+            "phrase": "On découpe une image en patches : chaque carré devient un token visuel.",
+            "image": "Quadriller une photo en timbres, puis aligner les timbres.",
+            "key": "image H × W, patch p → (H/p)·(W/p) patches",
+            "trap": "Le premier patch est le carré en haut à gauche, pas la première ligne.",
+            "steps": [
+              {
+                "title": "Quadriller",
+                "text": "en carrés p × p"
+              },
+              {
+                "title": "Aplatir",
+                "text": "chaque carré en ligne"
+              },
+              {
+                "title": "Aligner",
+                "text": "en séquence"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 30,
           "why": "Un pixel seul est pauvre, et une image entière est trop grosse pour un token. Le geste utile est le patch : un carré de pixels aplati, traité comme un token visuel.",
@@ -9135,6 +11495,26 @@
         {
           "id": "9.3",
           "title": "Un encodeur visuel, en idée",
+          "glance": {
+            "phrase": "Un encodeur visuel traduit chaque patch en vecteur de largeur D.",
+            "image": "Un dictionnaire pixels → langue du modèle.",
+            "key": "patches (N, P) @ poids (P, D) + biais",
+            "trap": "Ici c'est une seule couche linéaire, pas un Transformer visuel complet.",
+            "steps": [
+              {
+                "title": "Prendre",
+                "text": "un patch aplati"
+              },
+              {
+                "title": "Multiplier",
+                "text": "par W (P, D)"
+              },
+              {
+                "title": "Obtenir",
+                "text": "un vecteur D"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 30,
           "why": "Découper ne suffit pas. Un encodeur visuel transforme les patches en vecteurs de largeur D, puis peut les mélanger entre eux. Le dépôt ne code que la projection linéaire, et le dit.",
@@ -9209,6 +11589,26 @@
         {
           "id": "9.4",
           "title": "Spectrogramme et audio",
+          "glance": {
+            "phrase": "Un spectrogramme montre, tranche par tranche, l'énergie de chaque fréquence.",
+            "image": "Une partition : le temps vers la droite, les graves en bas, les aigus en haut.",
+            "key": "son → tranches courtes → énergie par fréquence",
+            "trap": "Le dépôt n'a pas de fonction spectrogramme : l'idée est décrite, pas codée.",
+            "steps": [
+              {
+                "title": "Découper",
+                "text": "le son en tranches"
+              },
+              {
+                "title": "Mesurer",
+                "text": "les fréquences"
+              },
+              {
+                "title": "Ranger",
+                "text": "en tableau temps × fréquence"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 25,
           "why": "Un son brut est une longue suite d'échantillons. Les modèles le résument souvent en spectrogramme : pour de courtes fenêtres, l'énergie par fréquence. Cette leçon fixe le vocabulaire, sans prétendre coder l'audio.",
@@ -9283,6 +11683,26 @@
         {
           "id": "9.5",
           "title": "Encodeur audio, en idée",
+          "glance": {
+            "phrase": "Un encodeur audio projette des cadres de son vers D, comme pour l'image.",
+            "image": "Un alphabet de sons, comme le BPE est un alphabet de bouts de mots.",
+            "key": "cadres audio → vecteurs D",
+            "trap": "Aucun module audio n'est testé ici : ne cite aucun score.",
+            "steps": [
+              {
+                "title": "Couper",
+                "text": "en cadres"
+              },
+              {
+                "title": "Encoder",
+                "text": "chaque cadre"
+              },
+              {
+                "title": "Projeter",
+                "text": "vers D"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 25,
           "why": "Comme pour l'image, un encodeur audio projette des cadres vers D. Les articles parlent de tokenizer audio ou d'encodeur de parole. Ici tu apprends à lire ces mots sans confondre avec le code du dépôt.",
@@ -9357,6 +11777,26 @@
         {
           "id": "9.6",
           "title": "La vidéo, espace et temps",
+          "glance": {
+            "phrase": "Une vidéo se découpe dans l'espace et dans le temps : les tokens explosent.",
+            "image": "Une pile de photos découpées en timbres, ou en petits cubes.",
+            "key": "20 images × 16 patches = 320 tokens",
+            "trap": "Le coût de l'attention grandit comme le carré de ce nombre.",
+            "steps": [
+              {
+                "title": "Découper",
+                "text": "chaque image en patches"
+              },
+              {
+                "title": "Empiler",
+                "text": "les images dans le temps"
+              },
+              {
+                "title": "Compter",
+                "text": "les tokens et le coût"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 25,
           "why": "Une vidéo est une pile d'images. On peut la découper dans l'espace comme une photo, et dans le temps comme un son. Le coût explose si tu traites chaque pixel de chaque image comme un token.",
@@ -9431,6 +11871,26 @@
         {
           "id": "9.7",
           "title": "Projeter vers un espace commun",
+          "glance": {
+            "phrase": "Pour mélanger deux modalités, leurs vecteurs doivent avoir la même largeur et un sens comparable.",
+            "image": "Deux langues traduites vers une troisième, avec un dictionnaire chacune.",
+            "key": "même D pour texte et patches",
+            "trap": "Même largeur ne veut pas dire même sens : il faut un entraînement commun.",
+            "steps": [
+              {
+                "title": "Projeter",
+                "text": "le texte vers D"
+              },
+              {
+                "title": "Projeter",
+                "text": "l'image vers D"
+              },
+              {
+                "title": "Aligner",
+                "text": "par entraînement"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 30,
           "why": "Deux modalités ne se parlent que si leurs vecteurs ont la même largeur et un sens comparable. La projection commune est ce contrat. Sans elle, concaténer un patch et un token est une erreur de forme, ou pire une erreur de sens.",
@@ -9505,6 +11965,26 @@
         {
           "id": "9.8",
           "title": "Fusionner les modalités",
+          "glance": {
+            "phrase": "On fusionne les modalités en les concaténant ou par attention croisée.",
+            "image": "Une seule file d'attente, ou une question posée à un voisin.",
+            "key": "concaténation causale : l'ordre décide qui voit qui",
+            "trap": "Image puis texte : le texte lit l'image, l'image ne lit pas le texte.",
+            "steps": [
+              {
+                "title": "Placer",
+                "text": "image puis texte"
+              },
+              {
+                "title": "Masquer",
+                "text": "le futur"
+              },
+              {
+                "title": "Lire",
+                "text": "le texte voit l'image"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 30,
           "why": "Une fois les vecteurs dans le même D, encore faut-il décider comment ils se mélangent : concaténation, attention croisée, ou addition. Le choix change ce que le modèle peut ignorer.",
@@ -9579,6 +12059,26 @@
         {
           "id": "9.9",
           "title": "Des sorties multimodales",
+          "glance": {
+            "phrase": "Sortir une image ou un son demande un décodeur et une loss sur cette modalité.",
+            "image": "Lire une légende contre peindre la photo à partir de la légende.",
+            "key": "entrée image ≠ sortie image",
+            "trap": "Le labo va des pixels vers D, jamais de D vers les pixels.",
+            "steps": [
+              {
+                "title": "Encoder",
+                "text": "vers D"
+              },
+              {
+                "title": "Décoder",
+                "text": "D → pixels"
+              },
+              {
+                "title": "Mesurer",
+                "text": "une loss image"
+              }
+            ]
+          },
           "tag": "Multimodal",
           "minutes": 25,
           "why": "Entrer une image pour prédire du texte est une tâche. Sortir une image, ou du son, en est une autre : il faut un décodeur, et une loss sur cette modalité. Le dépôt n'a ni l'un ni l'autre.",
@@ -9671,6 +12171,26 @@
         {
           "id": "10.1",
           "title": "Contexte et mémoire",
+          "glance": {
+            "phrase": "La fenêtre est la page ouverte ; une mémoire externe est une étagère consultée au besoin.",
+            "image": "Le bureau et la bibliothèque : on n'apporte que les bons livres.",
+            "key": "fenêtre ∝ T² · mémoire : k extraits choisis",
+            "trap": "La mémoire externe n'aide que par les extraits réellement injectés.",
+            "steps": [
+              {
+                "title": "Ranger",
+                "text": "les documents dehors"
+              },
+              {
+                "title": "Chercher",
+                "text": "les k plus utiles"
+              },
+              {
+                "title": "Coller",
+                "text": "dans le contexte"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 25,
           "why": "La fenêtre du modèle est une mémoire chère : chaque token y occupe une place et, avec l'attention, un coût quadratique. Une mémoire externe est un placard qu'on n'ouvre que si la question le demande.",
@@ -9745,6 +12265,26 @@
         {
           "id": "10.2",
           "title": "Des vecteurs pour chercher",
+          "glance": {
+            "phrase": "Pour chercher, on transforme question et documents en vecteurs comparables.",
+            "image": "Deux flèches de mots : même direction = mêmes proportions de mots.",
+            "key": "sac de mots normalisé · cosinus",
+            "trap": "Un texte sans mot commun donne un vecteur nul, jamais une division par zéro.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "les mots"
+              },
+              {
+                "title": "Normaliser",
+                "text": "longueur 1"
+              },
+              {
+                "title": "Comparer",
+                "text": "par produit scalaire"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "Chercher un document demande une représentation comparable à la question. Le laboratoire utilise un sac de mots normalisé, pas un embedding entraîné, pour que le score soit un produit scalaire lisible.",
@@ -9819,6 +12359,26 @@
         {
           "id": "10.3",
           "title": "Retrieval",
+          "glance": {
+            "phrase": "Le retrieval note chaque document et garde les k meilleurs, de façon reproductible.",
+            "image": "Trier des fiches : à égalité, la première rangée gagne.",
+            "key": "top-k par cosinus · égalité → plus petit indice",
+            "trap": "À score nul, aucun document n'est vraiment pertinent.",
+            "steps": [
+              {
+                "title": "Noter",
+                "text": "chaque document"
+              },
+              {
+                "title": "Trier",
+                "text": "du meilleur au moins bon"
+              },
+              {
+                "title": "Garder",
+                "text": "les k premiers"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "Le retrieval classe des documents et n'en garde que k. Le détail qui compte est le départage : à score égal, l'indice le plus petit gagne, pour que le résultat ne dépende pas d'un ordre instable.",
@@ -9900,6 +12460,26 @@
         {
           "id": "10.4",
           "title": "Une mémoire externe",
+          "glance": {
+            "phrase": "On injecte des extraits numérotés et visibles, qu'on peut citer et éteindre.",
+            "image": "Une réponse avec ses sources en note de bas de page.",
+            "key": "« Question : … » + « Extraits : [i] … »",
+            "trap": "Sans afficher les extraits, on ne peut pas vérifier d'où vient la réponse.",
+            "steps": [
+              {
+                "title": "Chercher",
+                "text": "les extraits"
+              },
+              {
+                "title": "Numéroter",
+                "text": "avec l'index d'origine"
+              },
+              {
+                "title": "Assembler",
+                "text": "question + extraits"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "La mémoire devient utile quand on peut la montrer, la citer, et l'éteindre. build_context fabrique un texte qui sépare la question des extraits numérotés, pour que tu voies ce qui a été injecté.",
@@ -9974,6 +12554,26 @@
         {
           "id": "10.5",
           "title": "Une récurrence de raisonnement",
+          "glance": {
+            "phrase": "Raisonner en plusieurs passes : brouillon, relecture, correction.",
+            "image": "Relire sa copie avant de la rendre.",
+            "key": "sortie précédente → nouvelle entrée",
+            "trap": "Ce n'est pas le scan interne du SSM : c'est une boucle de passes.",
+            "steps": [
+              {
+                "title": "Répondre",
+                "text": "un brouillon"
+              },
+              {
+                "title": "Réinjecter",
+                "text": "le brouillon"
+              },
+              {
+                "title": "Corriger",
+                "text": "une nouvelle passe"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "Certains problèmes se résolvent en plusieurs passes : écrire un brouillon, le relire, corriger. C'est une récurrence sur des pensées, pas sur les tokens du texte source. Le dépôt ne la code pas ; il donne le vocabulaire pour ne pas la confondre avec le scan.",
@@ -10048,6 +12648,26 @@
         {
           "id": "10.6",
           "title": "La profondeur adaptative",
+          "glance": {
+            "phrase": "La profondeur adaptative s'arrête tôt quand la réponse est facile.",
+            "image": "On ne relit pas dix fois une addition, mais une preuve, oui.",
+            "key": "confiance par couche + seuil",
+            "trap": "Le dos du labo exécute toujours toutes ses couches.",
+            "steps": [
+              {
+                "title": "Calculer",
+                "text": "couche par couche"
+              },
+              {
+                "title": "Mesurer",
+                "text": "la confiance"
+              },
+              {
+                "title": "S'arrêter",
+                "text": "au-dessus du seuil"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 25,
           "why": "Toutes les questions ne méritent pas le même nombre de couches. La profondeur adaptative s'arrête tôt quand la réponse est facile, et continue quand elle ne l'est pas. C'est un levier de coût, à ne pas confondre avec un résultat déjà mesuré.",
@@ -10122,6 +12742,26 @@
         {
           "id": "10.7",
           "title": "Outils et agents",
+          "glance": {
+            "phrase": "Un outil est une fonction extérieure ; un agent décide quand l'appeler.",
+            "image": "Prêter une montre à qui on demande l'heure.",
+            "key": "agent = boucle + outils + trace des appels",
+            "trap": "retrieve est un outil ; la boucle d'agent n'est pas écrite ici.",
+            "steps": [
+              {
+                "title": "Décider",
+                "text": "outil ou réponse"
+              },
+              {
+                "title": "Appeler",
+                "text": "l'outil"
+              },
+              {
+                "title": "Tracer",
+                "text": "chaque appel"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "Un outil est une fonction que le modèle n'exécute pas dans ses poids : une calculatrice, une recherche, un test. Un agent est une boucle qui décide d'appeler ces fonctions. Sans trace des appels, tu ne peux pas juger la réponse.",
@@ -10196,6 +12836,26 @@
         {
           "id": "10.8",
           "title": "Évaluer le raisonnement",
+          "glance": {
+            "phrase": "Une bonne réponse ne prouve pas un raisonnement : on compare avec et sans extraits.",
+            "image": "Retirer la béquille pour voir si l'on tient debout.",
+            "key": "avec extraits vs sans extraits",
+            "trap": "Une seule bonne réponse peut venir de la chance ou de la mémoire.",
+            "steps": [
+              {
+                "title": "Poser",
+                "text": "avec extraits"
+              },
+              {
+                "title": "Reposer",
+                "text": "sans extraits"
+              },
+              {
+                "title": "Comparer",
+                "text": "les résultats"
+              }
+            ]
+          },
           "tag": "Mémoire",
           "minutes": 30,
           "why": "Une réponse juste ne prouve pas un raisonnement. Elle peut être copiée du contexte, mémorisée dans les poids, ou tombée juste par chance. Évaluer, c'est séparer ces cas.",
@@ -10288,6 +12948,26 @@
         {
           "id": "11.1",
           "title": "Lire un papier",
+          "glance": {
+            "phrase": "Un article est une hypothèse avec des mesures et des limites, pas une vérité.",
+            "image": "Une recette : ingrédients que tu as, ceux qui manquent, plat promis.",
+            "key": "question · baseline · données · budget · limites",
+            "trap": "Le titre n'est pas une preuve.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "la question et la baseline"
+              },
+              {
+                "title": "Noter",
+                "text": "données et budget"
+              },
+              {
+                "title": "Séparer",
+                "text": "reproduit / non reproduit"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "Un article n'est pas une vérité à recopier. C'est une hypothèse, un montage, des mesures, et des limites. Ce niveau t'apprend à en extraire une expérience que tu pourrais refaire, puis à dire ce que tu n'as pas refait.",
@@ -10362,6 +13042,26 @@
         {
           "id": "11.2",
           "title": "Reproduire une expérience",
+          "glance": {
+            "phrase": "Reproduire, c'est fixer données, découpage, métrique et baseline pour un nombre recalculable.",
+            "image": "Cacher la fin de la phrase, apprendre sur le début, mesurer sur la fin.",
+            "key": "apprendre sur la tête, mesurer sur la queue",
+            "trap": "Apprendre sur la partie mesurée truque le résultat.",
+            "steps": [
+              {
+                "title": "Couper",
+                "text": "tête / queue"
+              },
+              {
+                "title": "Apprendre",
+                "text": "sur la tête"
+              },
+              {
+                "title": "Mesurer",
+                "text": "sur la queue"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 35,
           "why": "Reproduire, ce n'est pas relancer un script trouvé. C'est fixer les données, le découpage, la métrique et la baseline, puis obtenir un nombre que quelqu'un d'autre peut recalculer.",
@@ -10436,6 +13136,26 @@
         {
           "id": "11.3",
           "title": "Concepts plutôt que tokens",
+          "glance": {
+            "phrase": "Prédire des concepts plutôt que des tokens : moins d'étapes, un nouveau problème.",
+            "image": "Deviner la prochaine idée, puis l'écrire lettre par lettre.",
+            "key": "pas économisés vs coût du décodeur",
+            "trap": "Le dépôt ne l'implémente pas : aucun résultat à annoncer.",
+            "steps": [
+              {
+                "title": "Prédire",
+                "text": "une idée"
+              },
+              {
+                "title": "Décoder",
+                "text": "vers des caractères"
+              },
+              {
+                "title": "Comparer",
+                "text": "au même budget"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "Une idée récente consiste à prédire des unités plus larges que le token : une phrase, un « concept ». Elle promet des suites plus courtes. Elle déplace la difficulté dans la définition du concept et dans le décodeur qui revient aux mots.",
@@ -10510,6 +13230,26 @@
         {
           "id": "11.4",
           "title": "Un temps de calcul interne",
+          "glance": {
+            "phrase": "Un temps de calcul interne fait plusieurs pas avant d'émettre un token.",
+            "image": "Tourner la réponse dans sa tête avant de parler.",
+            "key": "plusieurs mises à jour latentes par token",
+            "trap": "Le scan du labo avance d'un pas par token : ce n'est pas un temps interne.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "un token"
+              },
+              {
+                "title": "Penser",
+                "text": "plusieurs pas internes"
+              },
+              {
+                "title": "Émettre",
+                "text": "un token"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "Une autre idée donne au modèle un temps interne : plusieurs mises à jour d'un état latent avant d'émettre un token. On l'appelle parfois calcul temporel, ou pensée continue. Elle ressemble à la profondeur adaptative, avec un horloge qui n'est pas celle des tokens.",
@@ -10584,6 +13324,26 @@
         {
           "id": "11.5",
           "title": "Raisonner dans un espace continu",
+          "glance": {
+            "phrase": "Raisonner dans des vecteurs, sans écrire chaque étape en mots.",
+            "image": "Compter sur ses doigts sans prononcer les nombres.",
+            "key": "juger par l'exactitude, pas par l'interprétation",
+            "trap": "Lire une « pensée » dans un vecteur est un récit, pas une mesure.",
+            "steps": [
+              {
+                "title": "Baseline",
+                "text": "étapes écrites en tokens"
+              },
+              {
+                "title": "Variante",
+                "text": "mise à jour d'un vecteur"
+              },
+              {
+                "title": "Mesurer",
+                "text": "l'exactitude"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "Le raisonnement latent propose de calculer dans des vecteurs, sans passer par des mots à chaque étape. C'est proche du temps interne, mais l'objet manipulé n'est pas un token. Le gain n'existe ici que comme hypothèse.",
@@ -10658,6 +13418,26 @@
         {
           "id": "11.6",
           "title": "Alternatives à l'attention",
+          "glance": {
+            "phrase": "L'attention n'est pas obligatoire : le scan du niveau 8 en est une alternative.",
+            "image": "Deux moteurs sur le même banc d'essai.",
+            "key": "même forme · causalité · qualité à mesurer",
+            "trap": "Même forme ne veut pas dire même qualité de langage.",
+            "steps": [
+              {
+                "title": "Brancher",
+                "text": "attention ou scan"
+              },
+              {
+                "title": "Vérifier",
+                "text": "forme et causalité"
+              },
+              {
+                "title": "Mesurer",
+                "text": "la perplexité à part"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "L'attention n'est pas une loi. Le niveau 8 a déjà une alternative dans le dépôt : le scan. D'autres articles en proposent encore. Tu compares celles que tu peux exécuter, et tu cites les autres comme lectures.",
@@ -10732,6 +13512,26 @@
         {
           "id": "11.7",
           "title": "Multimodal natif",
+          "glance": {
+            "phrase": "Un modèle multimodal natif entraîne ensemble texte et image dès les premières couches.",
+            "image": "Écrire le livre dans deux langues, au lieu de coller un traducteur.",
+            "key": "paires image-légende + perte commune",
+            "trap": "Projeter des patches change une forme, pas un sens appris.",
+            "steps": [
+              {
+                "title": "Collecter",
+                "text": "des paires"
+              },
+              {
+                "title": "Entraîner",
+                "text": "les deux côtés ensemble"
+              },
+              {
+                "title": "Mesurer",
+                "text": "l'alignement"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 25,
           "why": "Un modèle multimodal natif mélange les modalités dès les premières couches, au lieu de coller un encodeur d'image devant un modèle de texte. L'idée est claire. Le dépôt n'a que le premier geste : les patches.",
@@ -10806,6 +13606,26 @@
         {
           "id": "11.8",
           "title": "Ce qui n'a pas été reproduit",
+          "glance": {
+            "phrase": "Dire précisément ce qui n'a pas été reproduit fait partie du travail.",
+            "image": "La maquette en vitrine, avec l'étiquette « ce n'est pas le pont ».",
+            "key": "reproduit · non reproduit · pourquoi",
+            "trap": "Taire une limite rend tout le reste moins crédible.",
+            "steps": [
+              {
+                "title": "Lister",
+                "text": "ce qui est mesuré"
+              },
+              {
+                "title": "Lister",
+                "text": "ce qui ne l'est pas"
+              },
+              {
+                "title": "Expliquer",
+                "text": "chaque limite"
+              }
+            ]
+          },
           "tag": "Recherche",
           "minutes": 30,
           "why": "La dernière étape du niveau est une liste négative, et c'est une livraison. Un portfolio crédible dit ce qu'il n'a pas fait, avec autant de précision que ce qu'il a mesuré.",
@@ -10898,6 +13718,26 @@
         {
           "id": "12.1",
           "title": "Formuler une hypothèse",
+          "glance": {
+            "phrase": "Une hypothèse utile est une phrase qu'un nombre précis peut contredire.",
+            "image": "Un pari avec la règle écrite à l'avance : quel résultat te donne tort.",
+            "key": "changement précis + mesure + seuil d'échec",
+            "trap": "« Mon modèle est meilleur » n'est pas vérifiable.",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "un seul changement"
+              },
+              {
+                "title": "Prédire",
+                "text": "un effet mesurable"
+              },
+              {
+                "title": "Écrire",
+                "text": "ce qui te donnerait tort"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Une architecture personnelle commence par une phrase falsifiable. « Mon modèle est meilleur » ne l'est pas. « Remplacer une couche d'attention sur deux par un scan baisse le coût et garde la causalité » l'est, parce que le dépôt peut le mesurer.",
@@ -10972,6 +13812,26 @@
         {
           "id": "12.2",
           "title": "La baseline",
+          "glance": {
+            "phrase": "Une variante n'a de sens que comparée à une baseline qui fait la même tâche.",
+            "image": "Chronométrer un trajet contre le bus, pas contre rester chez soi.",
+            "key": "bigramme → uniforme · transformer → variante",
+            "trap": "Comparer à une baseline plus faible que nécessaire flatte la variante.",
+            "steps": [
+              {
+                "title": "Fixer",
+                "text": "la tâche"
+              },
+              {
+                "title": "Mesurer",
+                "text": "la baseline"
+              },
+              {
+                "title": "Comparer",
+                "text": "la variante au même banc"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Sans baseline, une variante n'a pas de sens. La baseline du langage, depuis le niveau 3, est le bigramme, et derrière lui la loi uniforme. La baseline du dos est le kind transformer, pas une absence de modèle.",
@@ -11046,6 +13906,26 @@
         {
           "id": "12.3",
           "title": "L'ablation",
+          "glance": {
+            "phrase": "Une ablation change une seule pièce à la fois.",
+            "image": "Changer un ingrédient, goûter, remettre l'ancien.",
+            "key": "run_ablation : une config par expérience",
+            "trap": "Changer dos, graine et taille ensemble : on ne sait plus ce qui a compté.",
+            "steps": [
+              {
+                "title": "Copier",
+                "text": "la configuration"
+              },
+              {
+                "title": "Changer",
+                "text": "un seul facteur"
+              },
+              {
+                "title": "Mesurer",
+                "text": "et comparer"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Une ablation retire ou remplace une seule pièce. Si tu changes le dos, la graine et la taille en même temps, tu ne sais plus laquelle a fait bouger le nombre.",
@@ -11120,6 +14000,26 @@
         {
           "id": "12.4",
           "title": "Les métriques",
+          "glance": {
+            "phrase": "Chaque métrique a une unité ; on ne mélange pas les unités.",
+            "image": "Des centimètres et des degrés ne se moyennent pas.",
+            "key": "perplexité · forme · causalité · octets · FLOPs",
+            "trap": "Trier un tableau n'est pas mesurer : les colonnes doivent venir d'un banc.",
+            "steps": [
+              {
+                "title": "Nommer",
+                "text": "la métrique"
+              },
+              {
+                "title": "Donner",
+                "text": "son unité"
+              },
+              {
+                "title": "Mesurer",
+                "text": "sur le même banc"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Une métrique sans unité est un slogan. Le dépôt en a quelques-unes, précises : perplexité, forme, causalité, octets, FLOPs, score de retrieval. Les mélanger dans une note unique les détruit.",
@@ -11194,6 +14094,26 @@
         {
           "id": "12.5",
           "title": "Un banc d'essai",
+          "glance": {
+            "phrase": "Un banc d'essai garde les mêmes entrées et métriques pour tous les systèmes.",
+            "image": "La même piste, les mêmes chronos, plusieurs coureurs.",
+            "key": "entrées fixes + métriques fixes",
+            "trap": "Changer le banc pour un seul système annule la comparaison.",
+            "steps": [
+              {
+                "title": "Figer",
+                "text": "les entrées"
+              },
+              {
+                "title": "Figer",
+                "text": "les métriques"
+              },
+              {
+                "title": "Rejouer",
+                "text": "pour chaque système"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Un benchmark est un banc fixe : mêmes entrées, mêmes métriques, plusieurs systèmes. Changer le banc en même temps que le système annule la comparaison. Le tien doit tenir sur une machine modeste, puisque c'est le sujet du niveau 6.",
@@ -11268,6 +14188,26 @@
         {
           "id": "12.6",
           "title": "Qualité, latence, mémoire, énergie",
+          "glance": {
+            "phrase": "Qualité, latence, mémoire, énergie : un gain sur une colonne peut coûter ailleurs.",
+            "image": "Une voiture rapide qui vide son réservoir en dix minutes.",
+            "key": "parameter_bytes · attention_flops · qualité",
+            "trap": "Une estimation de FLOPs n'est pas une durée, et l'énergie n'est pas mesurée ici.",
+            "steps": [
+              {
+                "title": "Estimer",
+                "text": "octets et FLOPs"
+              },
+              {
+                "title": "Mesurer",
+                "text": "la qualité"
+              },
+              {
+                "title": "Afficher",
+                "text": "toutes les colonnes"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 35,
           "why": "Un modèle qui gagne sur une colonne peut perdre sur les autres. Le niveau 6 a préparé le tableau. Ici tu l'utilises pour l'architecture, et tu n'inventes pas une colonne énergie que tu ne mesures pas.",
@@ -11342,6 +14282,26 @@
         {
           "id": "12.7",
           "title": "La modularité",
+          "glance": {
+            "phrase": "Une pièce modulaire se remplace sans changer ce qu'attend le reste du modèle.",
+            "image": "Une pièce standard : on la change sans refaire la voiture.",
+            "key": "kind change, (B, T, D) reste",
+            "trap": "Même forme ne veut pas dire mêmes poids ni mêmes sorties.",
+            "steps": [
+              {
+                "title": "Garder",
+                "text": "l'interface"
+              },
+              {
+                "title": "Changer",
+                "text": "le mélangeur"
+              },
+              {
+                "title": "Vérifier",
+                "text": "forme et causalité"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 25,
           "why": "Tu ne peux ablater une pièce que si elle se décroche. Le Backbone est modulaire au sens étroit : un argument kind change le mélangeur sans changer la forme attendue par l'appelant.",
@@ -11416,6 +14376,26 @@
         {
           "id": "12.8",
           "title": "L'architecture candidate",
+          "glance": {
+            "phrase": "La candidate est une maquette honnête : ses pièces, ses essais, ses limites.",
+            "image": "Une maquette rendue avec sa fiche technique.",
+            "key": "projet obligatoire : ton GPT standard entraîné",
+            "trap": "Présenter la maquette comme un produit fini.",
+            "steps": [
+              {
+                "title": "Assembler",
+                "text": "le GPT standard"
+              },
+              {
+                "title": "Entraîner",
+                "text": "depuis zéro"
+              },
+              {
+                "title": "Varier",
+                "text": "un seul réglage documenté"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 35,
           "why": "La candidate du parcours est volontairement petite : un dos dont on choisit le mélangeur, justifié par des tests de forme et de causalité, et par un coût d'attention qui n'existe que sur les couches attn. C'est une architecture, pas un produit.",
@@ -11490,6 +14470,26 @@
         {
           "id": "12.9",
           "title": "Entraîner ce que tu sais entraîner",
+          "glance": {
+            "phrase": "On n'entraîne que ce qu'on sait vraiment entraîner, et on le dit.",
+            "image": "Savoir faire une crêpe n'est pas tenir un restaurant.",
+            "key": "GPT et variantes : entraînés · dos hybride : forward",
+            "trap": "Annoncer un dos hybride entraîné alors qu'il n'a jamais reçu de gradient.",
+            "steps": [
+              {
+                "title": "Surapprendre",
+                "text": "un minuscule lot"
+              },
+              {
+                "title": "Séparer",
+                "text": "train, validation, test"
+              },
+              {
+                "title": "Entraîner",
+                "text": "et recharger"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Le mot entraînement couvre des choses très différentes dans ce dépôt : une régression, un classifieur convexe, un comptage de bigrammes. Il ne couvre pas un apprentissage complet du dos hybrid. Tu entraînes ce qui a un test de baisse de loss, et tu le dis.",
@@ -11564,6 +14564,26 @@
         {
           "id": "12.10",
           "title": "Analyser un échec",
+          "glance": {
+            "phrase": "Un échec mesuré est un résultat : on en cherche la cause.",
+            "image": "Un gâteau plat : vérifier la levure avant de changer de four.",
+            "key": "fuite du futur = bug, pas créativité",
+            "trap": "Cacher un test rouge abîme plus le projet qu'un modèle moyen.",
+            "steps": [
+              {
+                "title": "Constater",
+                "text": "le test ou la métrique"
+              },
+              {
+                "title": "Isoler",
+                "text": "la cause"
+              },
+              {
+                "title": "Documenter",
+                "text": "bug ou hypothèse fausse"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "Un test rouge, ou une métrique pire que la baseline, est un résultat. Le cacher casse le portfolio plus sûrement qu'un modèle moyen. Analyser, c'est relier l'échec à une cause que tu peux nommer.",
@@ -11638,6 +14658,26 @@
         {
           "id": "12.11",
           "title": "Itérer une fois",
+          "glance": {
+            "phrase": "Itérer, c'est changer un seul facteur après avoir lu une mesure.",
+            "image": "Changer la levure, pas toute la recette.",
+            "key": "nouvelle config + nouvelle mesure, même banc",
+            "trap": "Empiler des idées sans relire les mesures.",
+            "steps": [
+              {
+                "title": "Lire",
+                "text": "la ligne du tableau"
+              },
+              {
+                "title": "Changer",
+                "text": "un facteur"
+              },
+              {
+                "title": "Remesurer",
+                "text": "sur le même banc"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 25,
           "why": "Itérer, c'est changer un facteur après avoir lu une ligne, pas empiler des idées. Une itération tient dans une nouvelle configuration et une nouvelle mesure sur le même banc.",
@@ -11712,6 +14752,26 @@
         {
           "id": "12.12",
           "title": "Documenter la candidate",
+          "glance": {
+            "phrase": "Documenter la candidate pour qu'un autre puisse tout vérifier.",
+            "image": "Une fiche posée sur la maquette : à quoi elle sert, comment la refaire.",
+            "key": "hypothèse · baseline · tests · coûts · limites",
+            "trap": "Oublier les limites non mesurées dans le compte rendu.",
+            "steps": [
+              {
+                "title": "Rassembler",
+                "text": "code, données, contrôles"
+              },
+              {
+                "title": "Écrire",
+                "text": "hypothèse et mesures"
+              },
+              {
+                "title": "Faire relire",
+                "text": "avec PROJET_FINAL.md"
+              }
+            ]
+          },
           "tag": "Architecture",
           "minutes": 30,
           "why": "La dernière étape du parcours est un texte que quelqu'un d'autre peut vérifier. Il dit l'hypothèse, la baseline, les tests verts, les colonnes, et les limites. Il ne dit pas qu'un article a été reproduit.",
@@ -11811,6 +14871,26 @@
         {
           "id": "13.1",
           "title": "Fusionner les paires",
+          "glance": {
+            "phrase": "BPE colle la paire la plus fréquente en un nouveau token, encore et encore.",
+            "image": "Coller « l » et « e » parce qu'on les voit toujours ensemble.",
+            "key": "fréquence max · égalité → plus petite paire",
+            "trap": "À égalité, on ne tire pas au hasard : on suit l'ordre des morceaux.",
+            "steps": [
+              {
+                "title": "Compter",
+                "text": "les paires"
+              },
+              {
+                "title": "Coller",
+                "text": "la plus fréquente"
+              },
+              {
+                "title": "Recommencer",
+                "text": "jusqu'au nombre de fusions"
+              }
+            ]
+          },
           "tag": "BPE",
           "minutes": 35,
           "why": "Le tokenizer caractère donne un identifiant par lettre. C'est clair, et c'est trop long : un mot courant devient une suite de pas. Le BPE recolle les paires fréquentes pour que le modèle voie des morceaux de mots, sans ouvrir une bibliothèque.",
@@ -11885,6 +14965,26 @@
         {
           "id": "13.2",
           "title": "Garder le vocabulaire",
+          "glance": {
+            "phrase": "Le vocabulaire et ses fusions voyagent avec le modèle, sans être recalculés.",
+            "image": "Le carnet des collages, rangé avec les poids.",
+            "key": "save / load : vocab + merges",
+            "trap": "Un caractère jamais vu lève KeyError au lieu d'inventer un identifiant.",
+            "steps": [
+              {
+                "title": "Sauver",
+                "text": "vocab et fusions"
+              },
+              {
+                "title": "Recharger",
+                "text": "sans réapprendre"
+              },
+              {
+                "title": "Encoder",
+                "text": "dans l'ordre enregistré"
+              }
+            ]
+          },
           "tag": "BPE",
           "minutes": 25,
           "why": "Un vocabulaire qui change entre l'entraînement et l'échantillonnage produit des identifiants faux. Il faut écrire les fusions, les relire, et refuser un caractère jamais vu.",
@@ -11959,6 +15059,26 @@
         {
           "id": "13.3",
           "title": "Choisir le texte",
+          "glance": {
+            "phrase": "On choisit des textes dont on connaît la source, la licence et les limites.",
+            "image": "Une recette : une goutte d'abord, puis un livre, puis plus si la machine suit.",
+            "key": "fiche : source · licence · langue · taille",
+            "trap": "Réserver des documents entiers, pas des phrases, pour mesurer le transfert.",
+            "steps": [
+              {
+                "title": "Choisir",
+                "text": "dans le catalogue"
+              },
+              {
+                "title": "Préparer",
+                "text": "train, val, attribution"
+              },
+              {
+                "title": "Réserver",
+                "text": "des documents entiers"
+              }
+            ]
+          },
           "tag": "Données",
           "minutes": 30,
           "why": "Le modèle n'apprend que le texte qu'on lui donne. Un catalogue vérifié évite de mélanger un jouet, un livre du domaine public et un dump qu'on n'a pas le droit de redistribuer.",
@@ -12035,6 +15155,26 @@
         {
           "id": "13.4",
           "title": "Le playground",
+          "glance": {
+            "phrase": "Le playground rejoue le modèle dans le navigateur, token par token.",
+            "image": "Le modèle pose ses jetons sur la table, un par un.",
+            "key": "mêmes logits en Python et en JavaScript",
+            "trap": "Les poids servis sont arrondis en float32 : on compare au même point de départ.",
+            "steps": [
+              {
+                "title": "Écrire",
+                "text": "un début de texte"
+              },
+              {
+                "title": "Régler",
+                "text": "température et top-k"
+              },
+              {
+                "title": "Observer",
+                "text": "le token et l'attention"
+              }
+            ]
+          },
           "tag": "Playground",
           "minutes": 30,
           "why": "Lire une courbe dans un JSON ne montre pas le prochain token. Le playground rejoue le forward dans le navigateur, avec la température, le top-k et les poids d'attention du dernier pas.",
@@ -12109,6 +15249,26 @@
         {
           "id": "13.5",
           "title": "Des questions et des réponses",
+          "glance": {
+            "phrase": "Pour apprendre à répondre, il faut des paires question-réponse de provenance connue.",
+            "image": "Des fiches de révision : la question au recto, la réponse au verso.",
+            "key": "« Question : … » puis « Réponse : … »",
+            "trap": "Chaque jeu d'instructions a sa licence et ses réserves.",
+            "steps": [
+              {
+                "title": "Écrire",
+                "text": "la question"
+              },
+              {
+                "title": "Associer",
+                "text": "la réponse"
+              },
+              {
+                "title": "Vérifier",
+                "text": "la licence"
+              }
+            ]
+          },
           "tag": "Ajustement",
           "minutes": 25,
           "why": "Continuer un roman n'apprend pas à répondre. Il faut des paires question réponse, courtes, dont on connaît la provenance, avant d'ouvrir un grand jeu d'instructions.",
@@ -12183,6 +15343,26 @@
         {
           "id": "13.6",
           "title": "Masquer la question",
+          "glance": {
+            "phrase": "On masque la question dans la loss : seule la réponse est notée.",
+            "image": "L'énoncé reste au tableau ; seule la copie de l'élève est corrigée.",
+            "key": "masque : prompt 0 · réponse 1",
+            "trap": "Noter toute la ligne récompense la récitation de la question.",
+            "steps": [
+              {
+                "title": "Encoder",
+                "text": "question et réponse"
+              },
+              {
+                "title": "Masquer",
+                "text": "la question"
+              },
+              {
+                "title": "Noter",
+                "text": "seulement la réponse"
+              }
+            ]
+          },
           "tag": "Ajustement",
           "minutes": 35,
           "why": "Si la perte compte toute la ligne, le modèle est récompensé pour réciter la question. On veut qu'il apprenne la réponse, tout en voyant la question.",
@@ -12257,6 +15437,26 @@
         {
           "id": "13.7",
           "title": "Ajuster sans tout bouger",
+          "glance": {
+            "phrase": "LoRA ajoute une petite correction au lieu de réécrire toutes les matrices.",
+            "image": "Ajouter un tiroir sans déplacer le meuble.",
+            "key": "W + échelle × A·B, B = 0 au départ",
+            "trap": "Comme B vaut 0, rien ne change avant le premier pas : c'est voulu.",
+            "steps": [
+              {
+                "title": "Geler",
+                "text": "les poids d'origine"
+              },
+              {
+                "title": "Ajouter",
+                "text": "A et B de petit rang"
+              },
+              {
+                "title": "Entraîner",
+                "text": "seulement A et B"
+              }
+            ]
+          },
           "tag": "LoRA",
           "minutes": 35,
           "why": "Réécrire toutes les matrices sur un petit jeu d'instructions écrase vite le texte déjà appris. LoRA ajoute une correction de petit rang, et on compare les deux sur le même exemple.",
@@ -12338,6 +15538,26 @@
         {
           "id": "13.8",
           "title": "Continuer le dialogue",
+          "glance": {
+            "phrase": "On lit ce que le modèle ajusté génère, et on dit ce qu'il ne sait pas faire.",
+            "image": "Poser une question du cours et écouter la réponse.",
+            "key": "invite · graine · température · longueur · arrêt",
+            "trap": "Une loss qui baisse ne fait pas un assistant général.",
+            "steps": [
+              {
+                "title": "Recharger",
+                "text": "le checkpoint"
+              },
+              {
+                "title": "Générer",
+                "text": "avec des réglages explicites"
+              },
+              {
+                "title": "Relire",
+                "text": "et noter les limites"
+              }
+            ]
+          },
           "tag": "Dialogue",
           "minutes": 25,
           "why": "Une perte qui descend ne fait pas un assistant. Il faut lire la suite générée, dire ce qu'elle recolle du jeu d'instructions, et ce qu'elle ne sait pas faire.",

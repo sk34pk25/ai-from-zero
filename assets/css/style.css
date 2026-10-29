@@ -1,49 +1,89 @@
-/* AI From Zero — cahier d'atelier. Thème posé avant la peinture par le script du head. */
+/* AI From Zero — « Cahier lumineux » : fond clair, bleu vif, surligneur jaune.
+   Le thème est posé avant la peinture par le script du head ; « Cahier nuit » est la variante sombre. */
 
-:root {
-  color-scheme: dark;
-  --bg: #14120f;
-  --bg-elev: #1d1a16;
-  --bg-elev-2: #26221c;
-  --ink: #f6f1e8;
-  --muted: #d2c7b8;
-  --faint: #b7ab9c;
-  --line: #3a342c;
-  --line-strong: #5c5146;
-  --accent: #f0a36a;
-  --accent-ink: #2a160c;
-  --good: #8ee0c3;
-  --good-ink: #083328;
-  --danger: #ffb4b0;
-  --danger-ink: #4a1214;
-  --focus: #f0a36a;
-  --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-  --header: 4.25rem;
-  --sidebar: 18.5rem;
-  --serif: "Liberation Serif", "Iowan Old Style", Palatino, Georgia, serif;
-  --sans: Inter, "Segoe UI", "Liberation Sans", "Helvetica Neue", sans-serif;
-  --mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, "Liberation Mono", monospace;
-  --radius: 14px;
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/Inter-Regular.woff") format("woff");
 }
 
-:root[data-theme="light"] {
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/Inter-SemiBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../fonts/InterDisplay-ExtraBold.woff") format("woff");
+}
+
+:root {
   color-scheme: light;
-  --bg: #f4f0e7;
-  --bg-elev: #fffdf8;
-  --bg-elev-2: #f7f1e6;
-  --ink: #221e1a;
-  --muted: #534c43;
-  --faint: #645c52;
-  --line: #e4dacb;
-  --line-strong: #c9bba6;
-  --accent: #8d3b12;
-  --accent-ink: #fff8f3;
-  --good: #0f6b45;
-  --good-ink: #f3fff9;
-  --danger: #9f1239;
-  --danger-ink: #fff1f2;
-  --focus: #0f5e48;
-  --shadow: 0 18px 40px rgba(60, 42, 20, 0.08);
+  --bg: #f4f7fc;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #eef2f9;
+  --ink: #172033;
+  --muted: #4a5568;
+  --faint: #5a6478;
+  --line: #e2e8f2;
+  --line-strong: #c8d1e0;
+  --accent: #2558e8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8eeff;
+  --highlight: #ffd84d;
+  --highlight-soft: #fff3c4;
+  --highlight-ink: #6b4e00;
+  --good: #0e7a50;
+  --good-ink: #ffffff;
+  --good-soft: #e6f6ef;
+  --danger: #b42318;
+  --danger-ink: #ffffff;
+  --focus: #2558e8;
+  --code-bg: #172033;
+  --code-ink: #eef2fa;
+  --shadow: 0 8px 24px rgba(23, 32, 51, 0.07);
+  --header: 4.25rem;
+  --sidebar: 18.5rem;
+  --display: "Inter Display", Inter, "Segoe UI", system-ui, sans-serif;
+  --serif: var(--display);
+  --sans: Inter, "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, "Liberation Mono", monospace;
+  --radius: 20px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1626;
+  --bg-elev: #172036;
+  --bg-elev-2: #1e2942;
+  --ink: #eef2fa;
+  --muted: #b8c2d6;
+  --faint: #9aa6be;
+  --line: #2a3654;
+  --line-strong: #3b4a6e;
+  --accent: #7fa2ff;
+  --accent-ink: #0f1626;
+  --accent-soft: #1f2d52;
+  --highlight: #ffd84d;
+  --highlight-soft: #3a3214;
+  --highlight-ink: #ffe58a;
+  --good: #6ee7b7;
+  --good-ink: #0f1626;
+  --good-soft: #123528;
+  --danger: #fca5a5;
+  --danger-ink: #0f1626;
+  --focus: #7fa2ff;
+  --code-bg: #0a101d;
+  --code-ink: #eef2fa;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 *,
@@ -55,9 +95,7 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 40% at 10% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 50%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font: 1.0625rem/1.75 var(--sans);
   text-rendering: optimizeLegibility;
@@ -375,11 +413,13 @@ main {
   text-transform: uppercase;
 }
 
-h1, h2, h3 { font-family: var(--serif); font-weight: 650; letter-spacing: -0.03em; line-height: 1.12; }
+h1, h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.12; }
+
+h3 { font-family: var(--sans); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
 
 h1 { font-size: clamp(2.4rem, 4.8vw, 3.75rem); margin: 0 0 1.1rem; }
 
-h1 em { font-style: italic; color: var(--accent); }
+h1 em { font-style: normal; color: inherit; background: linear-gradient(transparent 58%, var(--highlight) 58%); padding: 0 0.08em; }
 
 h2 { font-size: clamp(1.5rem, 2vw, 2rem); margin: 0 0 0.5rem; }
 
@@ -408,6 +448,9 @@ h2 { font-size: clamp(1.5rem, 2vw, 2rem); margin: 0 0 0.5rem; }
 }
 
 .hero-levels span:first-child {
+  flex: none;
+  min-width: 2ch;
+  white-space: nowrap;
   font-family: var(--mono);
   color: var(--accent);
   font-size: 0.78rem;
@@ -579,8 +622,8 @@ pre {
   padding: 1rem 1.05rem;
   overflow: auto;
   border-radius: 12px;
-  background: #1a1714;
-  color: #f6efe2;
+  background: var(--code-bg);
+  color: var(--code-ink);
 }
 
 code { font-family: var(--mono); font-size: 0.92rem; }
@@ -1402,3 +1445,197 @@ th,td { padding:.6rem;text-align:left;border-bottom:1px solid var(--line);vertic
 .placement-result:focus { outline: none; }
 .local-panel .aid-actions { flex-wrap: wrap; }
 .lock-note .button { margin-top: 0.6rem; width: auto; }
+
+/* Leçon visuelle : schéma, pas à pas, trois cartes, puis le texte complet replié. */
+h1[tabindex="-1"]:focus,
+main[tabindex="-1"]:focus { outline: none; }
+
+.glance-phrase {
+  font-size: clamp(1.2rem, 1.6vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 44rem;
+  margin: 0 0 1.4rem;
+}
+
+.visual {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+
+.visual figcaption { color: var(--muted); font-size: 0.95rem; }
+
+.glance-label {
+  margin: 0 0 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.glance-strip { margin: 1.4rem 0 0; }
+
+.glance-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.6rem;
+  counter-reset: none;
+}
+
+.glance-step {
+  position: relative;
+  display: grid;
+  gap: 0.2rem;
+  align-content: start;
+  padding: 1rem 1.05rem 1.05rem;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  min-width: 0;
+}
+
+.glance-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -1.25rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-top: 3px solid var(--accent);
+  border-right: 3px solid var(--accent);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.glance-step-num {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.35rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--display);
+  font-weight: 800;
+}
+
+.glance-step strong { font-size: 1.05rem; }
+
+.glance-step span:last-child { color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+
+.glance-steps.is-large .glance-step { padding: 1.3rem 1.25rem; }
+
+.glance-steps.is-large .glance-step-num { width: 2.6rem; height: 2.6rem; font-size: 1.2rem; }
+
+.glance-steps.is-large .glance-step strong { font-size: 1.2rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .glance-step { animation: glance-in 0.45s ease-out both; animation-delay: calc(var(--i, 0) * 0.12s); }
+}
+
+@keyframes glance-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.glance-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.6rem 0;
+}
+
+.glance-card {
+  padding: 1.05rem 1.15rem;
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+
+.glance-card p { margin: 0; line-height: 1.5; }
+
+.glance-card.is-key code {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  background: transparent;
+  padding: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+
+.glance-card.is-trap { background: var(--highlight-soft); border-color: transparent; }
+
+.glance-card.is-trap .glance-label { color: var(--highlight-ink); }
+
+.lesson-deep {
+  margin: 1.6rem 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+}
+
+.lesson-deep > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.8rem;
+  min-height: 3.25rem;
+  padding: 0.9rem 1.15rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.lesson-deep > summary::-webkit-details-marker { display: none; }
+
+.lesson-deep > summary::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.lesson-deep[open] > summary::before { content: "−"; }
+
+.lesson-deep-title { font-weight: 600; }
+
+.lesson-deep-meta { color: var(--muted); font-size: 0.92rem; }
+
+.lesson-deep-body { display: grid; gap: 1rem; padding: 0 1.15rem 1.2rem; }
+
+.lesson-deep-body > p { margin: 0; color: var(--muted); }
+
+.lesson-deep-body .block,
+.lesson-deep-body .callout { margin: 0; box-shadow: none; }
+
+.lesson-deep-body h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+
+@media (max-width: 760px) {
+  .glance-steps, .glance-cards { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+  .glance-step:not(:last-child)::after {
+    top: auto;
+    bottom: -1.05rem;
+    right: auto;
+    left: 1.6rem;
+    transform: rotate(135deg);
+  }
+  .glance-cards { gap: 0.8rem; }
+}
+
+.lesson-main .glance-phrase { margin-bottom: 1.4rem; }
+.lesson-actions + * { margin-top: 1.6rem; }
+.code-head { flex-wrap: wrap; row-gap: 0.5rem; }
+.code-head h2 { white-space: nowrap; margin-right: auto; }

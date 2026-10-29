@@ -1,0 +1,65 @@
+{
+  "8.1": {
+    "phrase": "Une récurrence résume le passé dans un état, mis à jour à chaque token.",
+    "image": "Marcher avec un carnet d'une seule page qu'on corrige à chaque pas.",
+    "cle": "h = oubli × h + entrée",
+    "piege": "L'état a une taille fixe : il ne relit pas toute la séquence.",
+    "etapes": [["Partir", "d'un état nul"], ["Oublier", "un peu du passé"], ["Ajouter", "le token courant"]]
+  },
+  "8.2": {
+    "phrase": "L'état caché est une mémoire interne ; la sortie est ce qu'on en montre.",
+    "image": "Un tiroir : on n'en sort qu'une partie à chaque fois.",
+    "cle": "h = exp(δ·a)·h + δ·b·x · y = c·h",
+    "piege": "a doit être négatif pour que le passé s'efface au lieu d'exploser.",
+    "etapes": [["Oublier", "× exp(δ·a)"], ["Écrire", "+ δ·b·x"], ["Lire", "y = c·h"]]
+  },
+  "8.3": {
+    "phrase": "Un modèle d'état décrit un système qui évolue et une mesure qu'on lit.",
+    "image": "Un réservoir : l'eau entre, une partie fuit, on lit le niveau.",
+    "cle": "continu h' = A·h + B·x → discret avec un pas δ",
+    "piege": "Le labo code la version discrète, pas la dérivation continue.",
+    "etapes": [["Entrer", "x arrive"], ["Évoluer", "l'état change"], ["Observer", "on lit y"]]
+  },
+  "8.4": {
+    "phrase": "Si les coefficients sont fixes, la boucle est équivalente à une convolution.",
+    "image": "Un trou toujours de même taille : on prévoit ce qui restera de chaque goutte.",
+    "cle": "noyau = 1, a, a², a³…",
+    "piege": "Dès que les coefficients dépendent de l'entrée, l'équivalence disparaît.",
+    "etapes": [["Fixer", "a constant"], ["Développer", "x₃ + a·x₂ + a²·x₁"], ["Convoluer", "avec le noyau"]]
+  },
+  "8.5": {
+    "phrase": "Le scan parallèle regroupe les pas affines pour ne pas attendre le pas d'avant.",
+    "image": "Composer des recettes « × a puis + b » deux par deux, en parallèle.",
+    "cle": "(a₁,b₁) puis (a₂,b₂) = (a₂·a₁, a₂·b₁ + b₂)",
+    "piege": "L'ordre compte : la composition est associative, pas commutative.",
+    "etapes": [["Écrire", "chaque pas comme (a, b)"], ["Composer", "par paires, en parallèle"], ["Retrouver", "le résultat de la boucle"]]
+  },
+  "8.6": {
+    "phrase": "La sélectivité rend l'oubli, l'écriture et la lecture dépendants du contenu.",
+    "image": "Noter un mot rare dans le carnet, laisser passer un « le ».",
+    "cle": "b, c, δ calculés à partir de chaque token",
+    "piege": "Avec la sélectivité, plus de convolution à noyau fixe.",
+    "etapes": [["Projeter", "le token en b, c, δ"], ["Choisir", "combien écrire et oublier"], ["Scanner", "avec ces valeurs"]]
+  },
+  "8.7": {
+    "phrase": "Le labo garde l'idée de Mamba : un scan sélectif à la place de l'attention.",
+    "image": "Une maquette de pont : elle montre où passe la charge, pas le pont entier.",
+    "cle": "scan sélectif + portes + résidu",
+    "piege": "Ce n'est pas un bloc Mamba complet : pas de convolution courte ni de noyau CUDA.",
+    "etapes": [["Projeter", "l'entrée"], ["Scanner", "de façon sélective"], ["Ajouter", "au résidu"]]
+  },
+  "8.8": {
+    "phrase": "L'attention relit le passé exact ; le SSM le résume à moindre coût.",
+    "image": "Un index précis contre un résumé oral.",
+    "cle": "attention ∝ T² · scan ∝ T",
+    "piege": "Un résumé échoue quand un détail précis comptait.",
+    "etapes": [["Attention", "relit chaque position"], ["SSM", "compresse dans un état"], ["Choisir", "selon la tâche"]]
+  },
+  "8.9": {
+    "phrase": "Un dos hybride alterne couches d'attention et couches de scan.",
+    "image": "Un index et un résumé, au lieu de parier sur un seul carnet.",
+    "cle": "pair → attention · impair → SSM",
+    "piege": "Même forme de sortie ne veut pas dire mêmes valeurs.",
+    "etapes": [["Couche paire", "attention"], ["Couche impaire", "scan"], ["Vérifier", "forme et causalité"]]
+  }
+}

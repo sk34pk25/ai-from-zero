@@ -1,0 +1,86 @@
+{
+  "12.1": {
+    "phrase": "Une hypothèse utile est une phrase qu'un nombre précis peut contredire.",
+    "image": "Un pari avec la règle écrite à l'avance : quel résultat te donne tort.",
+    "cle": "changement précis + mesure + seuil d'échec",
+    "piege": "« Mon modèle est meilleur » n'est pas vérifiable.",
+    "etapes": [["Choisir", "un seul changement"], ["Prédire", "un effet mesurable"], ["Écrire", "ce qui te donnerait tort"]]
+  },
+  "12.2": {
+    "phrase": "Une variante n'a de sens que comparée à une baseline qui fait la même tâche.",
+    "image": "Chronométrer un trajet contre le bus, pas contre rester chez soi.",
+    "cle": "bigramme → uniforme · transformer → variante",
+    "piege": "Comparer à une baseline plus faible que nécessaire flatte la variante.",
+    "etapes": [["Fixer", "la tâche"], ["Mesurer", "la baseline"], ["Comparer", "la variante au même banc"]]
+  },
+  "12.3": {
+    "phrase": "Une ablation change une seule pièce à la fois.",
+    "image": "Changer un ingrédient, goûter, remettre l'ancien.",
+    "cle": "run_ablation : une config par expérience",
+    "piege": "Changer dos, graine et taille ensemble : on ne sait plus ce qui a compté.",
+    "etapes": [["Copier", "la configuration"], ["Changer", "un seul facteur"], ["Mesurer", "et comparer"]]
+  },
+  "12.4": {
+    "phrase": "Chaque métrique a une unité ; on ne mélange pas les unités.",
+    "image": "Des centimètres et des degrés ne se moyennent pas.",
+    "cle": "perplexité · forme · causalité · octets · FLOPs",
+    "piege": "Trier un tableau n'est pas mesurer : les colonnes doivent venir d'un banc.",
+    "etapes": [["Nommer", "la métrique"], ["Donner", "son unité"], ["Mesurer", "sur le même banc"]]
+  },
+  "12.5": {
+    "phrase": "Un banc d'essai garde les mêmes entrées et métriques pour tous les systèmes.",
+    "image": "La même piste, les mêmes chronos, plusieurs coureurs.",
+    "cle": "entrées fixes + métriques fixes",
+    "piege": "Changer le banc pour un seul système annule la comparaison.",
+    "etapes": [["Figer", "les entrées"], ["Figer", "les métriques"], ["Rejouer", "pour chaque système"]]
+  },
+  "12.6": {
+    "phrase": "Qualité, latence, mémoire, énergie : un gain sur une colonne peut coûter ailleurs.",
+    "image": "Une voiture rapide qui vide son réservoir en dix minutes.",
+    "cle": "parameter_bytes · attention_flops · qualité",
+    "piege": "Une estimation de FLOPs n'est pas une durée, et l'énergie n'est pas mesurée ici.",
+    "etapes": [["Estimer", "octets et FLOPs"], ["Mesurer", "la qualité"], ["Afficher", "toutes les colonnes"]]
+  },
+  "12.7": {
+    "phrase": "Une pièce modulaire se remplace sans changer ce qu'attend le reste du modèle.",
+    "image": "Une pièce standard : on la change sans refaire la voiture.",
+    "cle": "kind change, (B, T, D) reste",
+    "piege": "Même forme ne veut pas dire mêmes poids ni mêmes sorties.",
+    "etapes": [["Garder", "l'interface"], ["Changer", "le mélangeur"], ["Vérifier", "forme et causalité"]]
+  },
+  "12.8": {
+    "phrase": "La candidate est une maquette honnête : ses pièces, ses essais, ses limites.",
+    "image": "Une maquette rendue avec sa fiche technique.",
+    "cle": "projet obligatoire : ton GPT standard entraîné",
+    "piege": "Présenter la maquette comme un produit fini.",
+    "etapes": [["Assembler", "le GPT standard"], ["Entraîner", "depuis zéro"], ["Varier", "un seul réglage documenté"]]
+  },
+  "12.9": {
+    "phrase": "On n'entraîne que ce qu'on sait vraiment entraîner, et on le dit.",
+    "image": "Savoir faire une crêpe n'est pas tenir un restaurant.",
+    "cle": "GPT et variantes : entraînés · dos hybride : forward",
+    "piege": "Annoncer un dos hybride entraîné alors qu'il n'a jamais reçu de gradient.",
+    "etapes": [["Surapprendre", "un minuscule lot"], ["Séparer", "train, validation, test"], ["Entraîner", "et recharger"]]
+  },
+  "12.10": {
+    "phrase": "Un échec mesuré est un résultat : on en cherche la cause.",
+    "image": "Un gâteau plat : vérifier la levure avant de changer de four.",
+    "cle": "fuite du futur = bug, pas créativité",
+    "piege": "Cacher un test rouge abîme plus le projet qu'un modèle moyen.",
+    "etapes": [["Constater", "le test ou la métrique"], ["Isoler", "la cause"], ["Documenter", "bug ou hypothèse fausse"]]
+  },
+  "12.11": {
+    "phrase": "Itérer, c'est changer un seul facteur après avoir lu une mesure.",
+    "image": "Changer la levure, pas toute la recette.",
+    "cle": "nouvelle config + nouvelle mesure, même banc",
+    "piege": "Empiler des idées sans relire les mesures.",
+    "etapes": [["Lire", "la ligne du tableau"], ["Changer", "un facteur"], ["Remesurer", "sur le même banc"]]
+  },
+  "12.12": {
+    "phrase": "Documenter la candidate pour qu'un autre puisse tout vérifier.",
+    "image": "Une fiche posée sur la maquette : à quoi elle sert, comment la refaire.",
+    "cle": "hypothèse · baseline · tests · coûts · limites",
+    "piege": "Oublier les limites non mesurées dans le compte rendu.",
+    "etapes": [["Rassembler", "code, données, contrôles"], ["Écrire", "hypothèse et mesures"], ["Faire relire", "avec PROJET_FINAL.md"]]
+  }
+}

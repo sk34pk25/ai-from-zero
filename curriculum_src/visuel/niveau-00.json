@@ -1,0 +1,163 @@
+{
+  "0.1": {
+    "phrase": "Le stockage garde les fichiers, la RAM tient le travail en cours, le CPU calcule.",
+    "image": "Un atelier : étagères = stockage, plan de travail = RAM, artisan = CPU.",
+    "cle": "1 paramètre float32 = 4 octets",
+    "piege": "« Plus de mémoire » : c'est souvent la RAM qui manque, pas le disque.",
+    "etapes": [["Lire", "le code et les données sur le disque"], ["Charger", "les copier en RAM ou en VRAM"], ["Calculer", "le CPU ou le GPU travaille"]]
+  },
+  "0.2": {
+    "phrase": "Un chemin dit où trouver un fichier, à partir du dossier où tu te trouves.",
+    "image": "Le disque est un arbre : dossiers = branches, fichiers = feuilles.",
+    "cle": "notes/machine.txt part du dossier courant",
+    "piege": "Python cherche depuis le dossier de lancement, pas depuis l'éditeur.",
+    "etapes": [["Situer", "le dossier courant"], ["Descendre", "dossier/sous-dossier/fichier"], ["Ouvrir", "le fichier trouvé"]]
+  },
+  "0.3": {
+    "phrase": "Le terminal est une porte texte : tu tapes une commande, le système répond.",
+    "image": "Un GPS en ligne de commande : où suis-je, qu'y a-t-il ici, où aller.",
+    "cle": "pwd · ls · cd",
+    "piege": "ls montre le contenu, il ne te déplace pas : c'est cd qui bouge.",
+    "etapes": [["pwd", "où suis-je ?"], ["ls", "qu'y a-t-il ici ?"], ["cd", "j'entre dans un dossier"]]
+  },
+  "0.4": {
+    "phrase": "L'interpréteur Python lit ton fichier .py et exécute ses instructions.",
+    "image": "Un lecteur de recettes : le .py est la recette, Python la cuisine.",
+    "cle": "python3 --version",
+    "piege": "Après l'installation, ouvre un NOUVEAU terminal, sinon Python reste introuvable.",
+    "etapes": [["Installer", "Python 3.12 depuis python.org"], ["Vérifier", "python3 --version"], ["Tester", "python3 -c \"print(2 + 2)\""]]
+  },
+  "0.5": {
+    "phrase": "Programmer, c'est écrire, exécuter, observer, puis corriger une seule chose.",
+    "image": "Une recette suivie à la lettre : la machine ne devine jamais.",
+    "cle": "print(\"Bonjour\") affiche puis passe à la ligne",
+    "piege": "Les guillemets entourent le texte : sans eux, Python cherche un nom.",
+    "etapes": [["Écrire", "une instruction"], ["Exécuter", "python3 fichier.py"], ["Observer", "comparer à l'attendu"]]
+  },
+  "0.6": {
+    "phrase": "Une variable est une étiquette posée sur une valeur d'un certain type.",
+    "image": "Des étiquettes collées sur des boîtes : texte, entier, décimal.",
+    "cle": "str · int · float",
+    "piege": "\"4\" est un texte, 4 un nombre : \"4\" + \"4\" donne \"44\".",
+    "etapes": [["Nommer", "couches = 4"], ["Typer", "int, float ou str"], ["Vérifier", "type(couches)"]]
+  },
+  "0.7": {
+    "phrase": "Une condition choisit quel bloc exécuter selon qu'une affirmation est vraie.",
+    "image": "Un aiguillage de train : une seule voie est prise.",
+    "cle": "if · elif · else, indentés de 4 espaces",
+    "piege": "1.0 < 1.0 est faux : « strictement inférieur » exclut l'égalité.",
+    "etapes": [["Tester", "loss < 1.0 ?"], ["Choisir", "le premier bloc vrai"], ["Exécuter", "seulement ce bloc"]]
+  },
+  "0.8": {
+    "phrase": "Une boucle répète le même bloc pour chaque élément ou chaque tour.",
+    "image": "Une piste d'athlétisme : même parcours, tour après tour.",
+    "cle": "range(4) → 0, 1, 2, 3",
+    "piege": "range(4) s'arrête AVANT 4 : quatre tours, de 0 à 3.",
+    "etapes": [["Démarrer", "step = 0"], ["Répéter", "le corps de la boucle"], ["S'arrêter", "avant la borne"]]
+  },
+  "0.9": {
+    "phrase": "Une fonction reçoit des entrées, fait un travail et RENVOIE un résultat.",
+    "image": "Une petite machine nommée : on y glisse x, il en sort x × x.",
+    "cle": "def carre(x): return x * x",
+    "piege": "Sans return, la fonction renvoie None, même si elle a affiché quelque chose.",
+    "etapes": [["Définir", "def nom(entrée):"], ["Calculer", "le corps de la fonction"], ["Renvoyer", "return résultat"]]
+  },
+  "0.10": {
+    "phrase": "Une liste range des éléments dans l'ordre, un dictionnaire les range par clé.",
+    "image": "Une liste = une file d'attente numérotée ; un dictionnaire = un carnet d'adresses.",
+    "cle": "tokens[0] · config[\"dim\"]",
+    "piege": "Le premier élément est tokens[0], pas tokens[1].",
+    "etapes": [["Créer", "[...] ou {clé: valeur}"], ["Lire", "par index ou par clé"], ["Modifier", "append ou nouvelle clé"]]
+  },
+  "0.11": {
+    "phrase": "Un module est un fichier .py dont un autre fichier peut importer les noms.",
+    "image": "Une boîte à outils étiquetée : on prend seulement l'outil dont on a besoin.",
+    "cle": "from model.mathutil import softmax",
+    "piege": "Lance depuis la racine du projet, sinon Python ne trouve pas le dossier model.",
+    "etapes": [["Écrire", "outils.py avec une fonction"], ["Importer", "from outils import f"], ["Utiliser", "f(...) dans un autre fichier"]]
+  },
+  "0.12": {
+    "phrase": "Une erreur se lit de bas en haut : type, message, puis ligne fautive.",
+    "image": "Un récit d'enquête : la dernière ligne nomme le suspect.",
+    "cle": "IndexError · NameError · KeyError",
+    "piege": "Changer dix lignes à la fois : tu ne sais plus laquelle a réparé.",
+    "etapes": [["Lire", "la dernière ligne"], ["Supposer", "une seule cause"], ["Tester", "une modification, puis relancer"]]
+  },
+  "0.13": {
+    "phrase": "Un commit enregistre un état cohérent du projet, avec un message clair.",
+    "image": "Un album photo du projet : chaque photo a une légende.",
+    "cle": "git status → git add → git commit",
+    "piege": "« wip » n'est pas un message : dis ce que le changement fait.",
+    "etapes": [["Voir", "git status"], ["Préparer", "git add fichier"], ["Enregistrer", "git commit -m \"...\""]]
+  },
+  "0.14": {
+    "phrase": "Un environnement virtuel donne au projet ses propres versions de paquets.",
+    "image": "Une valise par voyage : les affaires d'un projet ne se mélangent pas aux autres.",
+    "cle": "python3 -m venv .venv",
+    "piege": "Oublier d'activer le venv : les paquets s'installent ailleurs.",
+    "etapes": [["Créer", "python3 -m venv .venv"], ["Activer", "source .venv/bin/activate"], ["Installer", "pip install -r requirements.txt"]]
+  },
+  "0.15": {
+    "phrase": "NumPy calcule sur un tableau entier d'un coup, selon sa forme.",
+    "image": "Une grille de cases : la forme dit combien de lignes et de colonnes.",
+    "cle": "x.shape → (2, 3)",
+    "piege": "reshape garde l'ordre des valeurs ; transpose échange les axes.",
+    "etapes": [["Créer", "np.array ou np.arange"], ["Lire la forme", "x.shape"], ["Calculer", "toute la grille à la fois"]]
+  },
+  "0.16": {
+    "phrase": "Carré, exponentielle et logarithme reviendront dans chaque loss du parcours.",
+    "image": "Trois outils : le carré efface le signe, exp rend positif, log mesure le petit.",
+    "cle": "log(exp(x)) = x",
+    "piege": "exp ne donne pas une probabilité : il faut encore diviser par la somme.",
+    "etapes": [["Carré", "(-2)² = 4"], ["Exponentielle", "exp(0) = 1"], ["Logarithme", "log(exp(2)) = 2"]]
+  },
+  "0.17": {
+    "phrase": "Un vecteur est une liste de nombres ; le produit scalaire mesure leur accord.",
+    "image": "Deux flèches : plus elles pointent dans le même sens, plus le score est grand.",
+    "cle": "[1,2,3] · [4,5,6] = 4 + 10 + 18 = 32",
+    "piege": "Les deux vecteurs doivent avoir la même taille pour le produit scalaire.",
+    "etapes": [["Aligner", "composante par composante"], ["Multiplier", "1×4, 2×5, 3×6"], ["Additionner", "4 + 10 + 18 = 32"]]
+  },
+  "0.18": {
+    "phrase": "Une matrice transforme un vecteur : chaque ligne donne une sortie.",
+    "image": "Une table de recettes : chaque ligne mélange les ingrédients à sa façon.",
+    "cle": "(2, 3) @ (3, 4) → (2, 4)",
+    "piege": "Les dimensions intérieures doivent coïncider : (2,3) @ (2,3) est impossible.",
+    "etapes": [["Vérifier", "dimensions intérieures égales"], ["Combiner", "ligne × colonne"], ["Obtenir", "la forme extérieure"]]
+  },
+  "0.19": {
+    "phrase": "Une distribution répartit 100 % de certitude entre plusieurs issues.",
+    "image": "Un gâteau partagé : des parts positives qui font exactement un gâteau.",
+    "cle": "p ≥ 0 et somme(p) = 1",
+    "piege": "Un logit n'est pas une probabilité : il peut être négatif ou dépasser 1.",
+    "etapes": [["Vérifier", "aucune valeur négative"], ["Additionner", "toutes les parts"], ["Comparer", "la somme vaut-elle 1 ?"]]
+  },
+  "0.20": {
+    "phrase": "La dérivée dit si la sortie monte ou descend quand on pousse un peu l'entrée.",
+    "image": "La pente d'une colline sous tes pieds.",
+    "cle": "(f(x+ε) − f(x−ε)) / 2ε",
+    "piege": "Pente positive = la loss monte : pour descendre, on va dans l'autre sens.",
+    "etapes": [["Pousser", "x + ε et x − ε"], ["Mesurer", "l'écart des sorties"], ["Diviser", "par 2ε pour la pente"]]
+  },
+  "0.21": {
+    "phrase": "Une classe est un moule ; chaque objet créé garde ses propres valeurs.",
+    "image": "Un moule à gaufres : chaque gaufre a sa garniture.",
+    "cle": "self = l'objet sur lequel la méthode travaille",
+    "piege": "b = a ne copie rien : a et b désignent le même objet.",
+    "etapes": [["Définir", "class Compteur:"], ["Construire", "a = Compteur(5)"], ["Appeler", "a.ajouter(2)"]]
+  },
+  "0.22": {
+    "phrase": "Un test compare le résultat de ton code à une valeur calculée à la main.",
+    "image": "La balance de cuisine : on pèse au lieu de deviner.",
+    "cle": "assert moyenne([2, 4, 9]) == 5",
+    "piege": "Ne change jamais l'attendu pour faire passer un test : relis le code.",
+    "etapes": [["Calculer", "l'attendu à la main"], ["Écrire", "assert résultat == attendu"], ["Lancer", "python -m pytest"]]
+  },
+  "0.23": {
+    "phrase": "Tu assembles seul fichier, boucle, fonction, classe et tests dans un vrai petit outil.",
+    "image": "Un carnet de bord de vélo : chaque ligne est une sortie.",
+    "cle": "lire → Carnet → rapport JSON",
+    "piege": "Écrire tout le code d'un coup : teste chaque brique avant la suivante.",
+    "etapes": [["Lire", "le texte en nombres"], ["Calculer", "total, moyenne, record"], ["Rapporter", "un JSON stable"]]
+  }
+}

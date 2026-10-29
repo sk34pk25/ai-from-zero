@@ -1,0 +1,58 @@
+{
+  "11.1": {
+    "phrase": "Un article est une hypothèse avec des mesures et des limites, pas une vérité.",
+    "image": "Une recette : ingrédients que tu as, ceux qui manquent, plat promis.",
+    "cle": "question · baseline · données · budget · limites",
+    "piege": "Le titre n'est pas une preuve.",
+    "etapes": [["Lire", "la question et la baseline"], ["Noter", "données et budget"], ["Séparer", "reproduit / non reproduit"]]
+  },
+  "11.2": {
+    "phrase": "Reproduire, c'est fixer données, découpage, métrique et baseline pour un nombre recalculable.",
+    "image": "Cacher la fin de la phrase, apprendre sur le début, mesurer sur la fin.",
+    "cle": "apprendre sur la tête, mesurer sur la queue",
+    "piege": "Apprendre sur la partie mesurée truque le résultat.",
+    "etapes": [["Couper", "tête / queue"], ["Apprendre", "sur la tête"], ["Mesurer", "sur la queue"]]
+  },
+  "11.3": {
+    "phrase": "Prédire des concepts plutôt que des tokens : moins d'étapes, un nouveau problème.",
+    "image": "Deviner la prochaine idée, puis l'écrire lettre par lettre.",
+    "cle": "pas économisés vs coût du décodeur",
+    "piege": "Le dépôt ne l'implémente pas : aucun résultat à annoncer.",
+    "etapes": [["Prédire", "une idée"], ["Décoder", "vers des caractères"], ["Comparer", "au même budget"]]
+  },
+  "11.4": {
+    "phrase": "Un temps de calcul interne fait plusieurs pas avant d'émettre un token.",
+    "image": "Tourner la réponse dans sa tête avant de parler.",
+    "cle": "plusieurs mises à jour latentes par token",
+    "piege": "Le scan du labo avance d'un pas par token : ce n'est pas un temps interne.",
+    "etapes": [["Lire", "un token"], ["Penser", "plusieurs pas internes"], ["Émettre", "un token"]]
+  },
+  "11.5": {
+    "phrase": "Raisonner dans des vecteurs, sans écrire chaque étape en mots.",
+    "image": "Compter sur ses doigts sans prononcer les nombres.",
+    "cle": "juger par l'exactitude, pas par l'interprétation",
+    "piege": "Lire une « pensée » dans un vecteur est un récit, pas une mesure.",
+    "etapes": [["Baseline", "étapes écrites en tokens"], ["Variante", "mise à jour d'un vecteur"], ["Mesurer", "l'exactitude"]]
+  },
+  "11.6": {
+    "phrase": "L'attention n'est pas obligatoire : le scan du niveau 8 en est une alternative.",
+    "image": "Deux moteurs sur le même banc d'essai.",
+    "cle": "même forme · causalité · qualité à mesurer",
+    "piege": "Même forme ne veut pas dire même qualité de langage.",
+    "etapes": [["Brancher", "attention ou scan"], ["Vérifier", "forme et causalité"], ["Mesurer", "la perplexité à part"]]
+  },
+  "11.7": {
+    "phrase": "Un modèle multimodal natif entraîne ensemble texte et image dès les premières couches.",
+    "image": "Écrire le livre dans deux langues, au lieu de coller un traducteur.",
+    "cle": "paires image-légende + perte commune",
+    "piege": "Projeter des patches change une forme, pas un sens appris.",
+    "etapes": [["Collecter", "des paires"], ["Entraîner", "les deux côtés ensemble"], ["Mesurer", "l'alignement"]]
+  },
+  "11.8": {
+    "phrase": "Dire précisément ce qui n'a pas été reproduit fait partie du travail.",
+    "image": "La maquette en vitrine, avec l'étiquette « ce n'est pas le pont ».",
+    "cle": "reproduit · non reproduit · pourquoi",
+    "piege": "Taire une limite rend tout le reste moins crédible.",
+    "etapes": [["Lister", "ce qui est mesuré"], ["Lister", "ce qui ne l'est pas"], ["Expliquer", "chaque limite"]]
+  }
+}

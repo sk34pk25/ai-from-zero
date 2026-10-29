@@ -1,0 +1,72 @@
+{
+  "5.1": {
+    "phrase": "Une table de positions apprises s'arrête à block_size : au-delà, pas de vecteur.",
+    "image": "32 chaises numérotées : la 33e n'existe pas.",
+    "cle": "position < block_size, sinon ValueError",
+    "piege": "Relire la dernière ligne en silence cacherait le problème.",
+    "etapes": [["Apprendre", "une ligne par place"], ["Dépasser", "place 33 inconnue"], ["Refuser", "plutôt que deviner"]]
+  },
+  "5.2": {
+    "phrase": "RoPE fait tourner Q et K selon la position : le score dépend de leur écart.",
+    "image": "Deux aiguilles d'horloge : seul l'angle entre elles compte.",
+    "cle": "angle = θᵢ × position",
+    "piege": "Tourner ne change pas la longueur, et V n'est jamais tourné.",
+    "etapes": [["Grouper", "les dimensions par paires"], ["Tourner", "selon la position"], ["Comparer", "Q · K dépend de l'écart"]]
+  },
+  "5.3": {
+    "phrase": "RMSNorm remet l'échelle sans recentrer, avec moins d'opérations.",
+    "image": "Régler le volume sans toucher à la balance gauche-droite.",
+    "cle": "x / √(moyenne(x²) + ε) × gain",
+    "piege": "Pas de biais β : RMSNorm et LayerNorm ne donnent pas les mêmes valeurs.",
+    "etapes": [["Mesurer", "l'énergie : RMS"], ["Diviser", "x par la RMS"], ["Réétirer", "× gain"]]
+  },
+  "5.4": {
+    "phrase": "SwiGLU ajoute une porte au FFN : une branche décide ce qui passe.",
+    "image": "Un robinet sur le tuyau : le débit dépend de la porte.",
+    "cle": "(silu(x·Wg) × x·Wu) · Wd",
+    "piege": "Trois matrices au lieu de deux : à largeur égale, c'est plus cher.",
+    "etapes": [["Porte", "silu(x · Wg)"], ["Signal", "x · Wu"], ["Combiner", "porte × signal, puis · Wd"]]
+  },
+  "5.5": {
+    "phrase": "GQA garde beaucoup de têtes de requête mais partage moins de têtes K/V.",
+    "image": "Plusieurs élèves posent leurs questions sur quelques fiches communes.",
+    "cle": "4 têtes Q · 2 têtes K/V → chaque K/V sert 2 Q",
+    "piege": "n_heads doit être un multiple de n_kv_heads.",
+    "etapes": [["Calculer", "moins de têtes K/V"], ["Répéter", "chaque K/V pour ses requêtes"], ["Alléger", "le cache de génération"]]
+  },
+  "5.6": {
+    "phrase": "Le cache KV garde les clés et valeurs passées pour ne pas les recalculer.",
+    "image": "Garder ses annotations des pages déjà lues.",
+    "cle": "logits avec cache = logits sans cache",
+    "piege": "Les positions des nouveaux tokens commencent après le passé, pas à zéro.",
+    "etapes": [["Calculer", "K et V du nouveau token"], ["Ajouter", "au cache"], ["Lire", "tout le passé d'un coup"]]
+  },
+  "5.7": {
+    "phrase": "La même table sert à lire les tokens et à prédire le suivant.",
+    "image": "Un seul dictionnaire pour lire et pour écrire.",
+    "cle": "logits = h @ tokᵀ · économie V × D",
+    "piege": "Le gradient de la table cumule deux chemins : lecture et prédiction.",
+    "etapes": [["Lire", "tok[id] en entrée"], ["Réutiliser", "tokᵀ en sortie"], ["Économiser", "V × D paramètres"]]
+  },
+  "5.8": {
+    "phrase": "L'initialisation fixe l'échelle des poids avant le premier pas.",
+    "image": "Accorder les instruments avant le concert.",
+    "cle": "poids ~ N(0 ; 0,02) · gains 1 · biais 0",
+    "piege": "Même config, même graine : mêmes logits. Sinon, ce n'est pas reproductible.",
+    "etapes": [["Tirer", "des poids petits"], ["Fixer", "gains à 1, biais à 0"], ["Vérifier", "même graine, mêmes logits"]]
+  },
+  "5.9": {
+    "phrase": "Doubler le contexte multiplie par quatre le coût de l'attention.",
+    "image": "Une salle où chacun salue tout le monde : 2 fois plus de gens, 4 fois plus de saluts.",
+    "cle": "coût attention ∝ T²",
+    "piege": "Une position apprise sur 512 tokens n'est pas bonne d'office à 8 000.",
+    "etapes": [["Allonger", "T → 2T"], ["Compter", "(2T)² = 4 T²"], ["Mesurer", "qualité au-delà de l'appris"]]
+  },
+  "5.10": {
+    "phrase": "On mesure une variante contre la baseline, une seule pièce changée, sur plusieurs graines.",
+    "image": "Tester un pneu : même vélo, même parcours, seul le pneu change.",
+    "cle": "écart variante − baseline vs écart entre graines",
+    "piege": "Une seule graine favorable ne prouve rien.",
+    "etapes": [["Fixer", "données, pas, graines"], ["Changer", "une seule option"], ["Comparer", "les écarts appariés"]]
+  }
+}

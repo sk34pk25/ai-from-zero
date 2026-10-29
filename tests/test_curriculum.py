@@ -38,3 +38,19 @@ def test_every_step_is_real_and_answers_move():
         assert step["build"]
         assert step["exercise"]
         assert step["why"]
+
+
+def test_every_step_has_a_short_visual_summary():
+    data = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+    steps = [step for level in data["levels"] for step in level["steps"]]
+    for step in steps:
+        glance = step["glance"]
+        assert 0 < len(glance["phrase"]) <= 120, step["id"]
+        assert 0 < len(glance["image"]) <= 95, step["id"]
+        assert 0 < len(glance["key"]) <= 60, step["id"]
+        assert 0 < len(glance["trap"]) <= 100, step["id"]
+        assert len(glance["steps"]) == 3, step["id"]
+        for item in glance["steps"]:
+            assert 0 < len(item["title"]) <= 20 and 0 < len(item["text"]) <= 42, step["id"]
+    phrases = [step["glance"]["phrase"] for step in steps]
+    assert len(set(phrases)) == len(phrases), "chaque leçon a sa propre phrase clé"

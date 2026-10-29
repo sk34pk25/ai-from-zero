@@ -572,6 +572,43 @@ def learning_aids(
     }
 
 
+GLANCE_LIMITS = {"phrase": 120, "image": 95, "cle": 60, "piege": 100}
+
+
+def load_glances() -> dict[str, dict]:
+    """Version visuelle de chaque leçon : une phrase, une image, l'essentiel, le piège, trois étapes."""
+    glances: dict[str, dict] = {}
+    for path in sorted((SRC / "visuel").glob("niveau-*.json")):
+        for key, value in json.loads(path.read_text(encoding="utf-8")).items():
+            if key in glances:
+                raise SystemExit(f"Résumé visuel en double : {key}")
+            glances[key] = value
+    return glances
+
+
+def glance_for(lesson_id: str, glances: dict[str, dict]) -> dict:
+    raw = glances.get(lesson_id)
+    if raw is None:
+        raise SystemExit(f"Résumé visuel absent : {lesson_id}")
+    for field, limit in GLANCE_LIMITS.items():
+        text = str(raw.get(field, "")).strip()
+        if not text or len(text) > limit:
+            raise SystemExit(f"{lesson_id} : {field} vide ou plus long que {limit} caractères")
+    steps = raw.get("etapes")
+    if not isinstance(steps, list) or len(steps) != 3:
+        raise SystemExit(f"{lesson_id} : trois étapes visuelles requises")
+    for title, text in steps:
+        if not title.strip() or not text.strip() or len(title) > 20 or len(text) > 42:
+            raise SystemExit(f"{lesson_id} : étape visuelle trop longue ou vide")
+    return {
+        "phrase": raw["phrase"].strip(),
+        "image": raw["image"].strip(),
+        "key": raw["cle"].strip(),
+        "trap": raw["piege"].strip(),
+        "steps": [{"title": t.strip(), "text": x.strip()} for t, x in steps],
+    }
+
+
 def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     required = [
         "id",
@@ -641,6 +678,7 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     return {
         "id": fields["id"].strip(),
         "title": fields["title"].strip(),
+        "glance": glance_for(fields["id"].strip(), load_glances()),
         "tag": fields["tag"].strip(),
         "minutes": int(fields["minutes"]),
         "why": fields["why"].strip(),

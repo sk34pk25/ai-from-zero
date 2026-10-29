@@ -122,7 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
           return null;
         }
       })(),
-      false,
+      // Sans choix enregistré, on suit le réglage clair/sombre du système, comme le script du head.
+      typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-color-scheme: light)").matches,
     ),
     false,
   );
@@ -455,7 +457,7 @@ function applyTheme(theme, store) {
   document.documentElement.style.colorScheme = theme;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta)
-    meta.setAttribute("content", theme === "light" ? "#f4f0e7" : "#14120f");
+    meta.setAttribute("content", theme === "light" ? "#f4f7fc" : "#0f1626");
   if (store) { try { safeStorage()?.setItem(THEME_KEY, theme); } catch { /* thème pour cette page */ } }
   if (els.theme) {
     const toLight = theme === "dark";
@@ -1224,47 +1226,68 @@ function paintLesson(id) {
   });
 }
 
+const STEP_FIGURES = new Set(["flow", "stack", "compare", "bars", "machine"]);
+
+/** Trois gestes numérotés, reliés par des flèches : le schéma de l'étape quand elle n'a pas de figure dédiée. */
+function stepsDiagram(steps, { large = false } = {}) {
+  const list = h("ol", { class: large ? "glance-steps is-large" : "glance-steps" });
+  steps.forEach((step, index) => {
+    list.append(
+      h("li", { class: "glance-step", style: `--i: ${index}` }, [
+        h("span", { class: "glance-step-num", "aria-hidden": "true", text: String(index + 1) }),
+        h("strong", { text: step.title }),
+        h("span", { text: step.text }),
+      ]),
+    );
+  });
+  return list;
+}
+
+function glanceCards(glance) {
+  return h("div", { class: "glance-cards" }, [
+    h("section", { class: "glance-card", "aria-labelledby": "glance-image" }, [
+      h("h2", { id: "glance-image", class: "glance-label", text: "En image" }),
+      h("p", { text: glance.image }),
+    ]),
+    h("section", { class: "glance-card is-key", "aria-labelledby": "glance-key" }, [
+      h("h2", { id: "glance-key", class: "glance-label", text: "L'essentiel" }),
+      h("p", {}, h("code", { text: glance.key })),
+    ]),
+    h("section", { class: "glance-card is-trap", "aria-labelledby": "glance-trap" }, [
+      h("h2", { id: "glance-trap", class: "glance-label", text: "Piège" }),
+      h("p", { text: glance.trap }),
+    ]),
+  ]);
+}
+
+function readingMinutes(lesson) {
+  const words = [lesson.why, lesson.build, lesson.review, ...lesson.sections.map((s) => s.text || ""), ...(lesson.takeaways || []), ...(lesson.pitfalls || [])]
+    .join(" ")
+    .split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 function lessonBody(lesson, grade, done, around) {
+  const glance = lesson.glance;
+  const stepFigure = STEP_FIGURES.has(lesson.visual || "flow");
   const nodes = [
-    h("p", { class: "lead", text: lesson.why }),
-    h("figure", { class: "visual", "data-visual": lesson.visual || "flow" }, [
-      h("figcaption", { text: lesson.visualCaption || "" }),
+    h("p", { class: "lead glance-phrase", text: glance.phrase }),
+    h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
+      h("figcaption", { text: stepFigure ? "L'étape en trois gestes." : lesson.visualCaption || "" }),
       h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
   ];
-  for (const section of lesson.sections) {
-    if (section.kind === "code") nodes.push(codeBlock(section));
-    else if (section.kind === "reference") nodes.push(h("section", { class: "block block-reference" }, [
-      h("h2", { text: section.heading }),
-      h("a", { href: section.href, target: "_blank", rel: "noopener", text: section.title }),
-      ...paragraphs(section.text),
-    ]));
-    else {
-      nodes.push(
-        h("section", { class: `block block-${section.kind}` }, [
-          h("h2", { text: section.heading }),
-          ...paragraphs(section.text),
-        ]),
-      );
-    }
-  }
+  if (!stepFigure)
+    nodes.push(
+      h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
+        h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
+        stepsDiagram(glance.steps),
+      ]),
+    );
+  nodes.push(glanceCards(glance));
+  for (const section of lesson.sections) if (section.kind === "code") nodes.push(codeBlock(section));
   nodes.push(
-    h("section", { class: "callout callout-takeaway" }, [
-      h("h2", { text: "À retenir" }),
-      h(
-        "ul",
-        {},
-        (lesson.takeaways || []).map((item) => h("li", { text: item })),
-      ),
-    ]),
-    h("section", { class: "callout callout-pitfall" }, [
-      h("h2", { text: "Pièges fréquents" }),
-      h(
-        "ul",
-        {},
-        (lesson.pitfalls || []).map((item) => h("li", { text: item })),
-      ),
-    ]),
+    quizBlock(lesson, grade),
     h("section", { class: "callout callout-exercise" }, [
       h("h2", { text: "Exercice" }),
       ...paragraphs(lesson.exercise),
@@ -1299,34 +1322,7 @@ function lessonBody(lesson, grade, done, around) {
         paragraphs(lesson.solution || ""),
       ),
     ]),
-    h("section", { class: "callout callout-build" }, [
-      h("h2", { text: "Fil rouge" }),
-      ...paragraphs(lesson.build),
-      h("p", {}, [
-        "Fichier : ",
-        h("code", { text: lesson.codeFile || "model/" }),
-        lesson.codeSymbol ? ` · ${lesson.codeSymbol}` : "",
-        ".",
-      ]),
-      h("p", {}, [
-        h("a", {
-          href: "#/construire",
-          text: "Ouvrir la piste « construire mon LLM ».",
-        }),
-      ]),
-      ...(lesson.tpIds || []).map((id) =>
-        h(
-          "p",
-          {},
-          h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` }),
-        ),
-      ),
-    ]),
-    h("section", { class: "callout callout-review" }, [
-      h("h2", { text: "À retrouver plus tard" }),
-      h("p", { text: lesson.review || "" }),
-    ]),
-    quizBlock(lesson, grade),
+    lessonDeep(lesson),
     h("div", { class: "lesson-actions" }, [
       around.prev
         ? h(
@@ -1365,6 +1361,64 @@ function lessonBody(lesson, grade, done, around) {
     ]),
   );
   return nodes;
+}
+
+/** Le texte complet de l'étape, replié : il reste là pour qui veut creuser, sans encombrer la page. */
+function lessonDeep(lesson) {
+  const body = [h("p", { text: lesson.why })];
+  for (const section of lesson.sections) {
+    if (section.kind === "code") continue;
+    if (section.kind === "reference")
+      body.push(
+        h("section", { class: "block block-reference" }, [
+          h("h3", { text: section.heading }),
+          h("a", { href: section.href, target: "_blank", rel: "noopener", text: section.title }),
+          ...paragraphs(section.text),
+        ]),
+      );
+    else
+      body.push(
+        h("section", { class: `block block-${section.kind}` }, [
+          h("h3", { text: section.heading }),
+          ...paragraphs(section.text),
+        ]),
+      );
+  }
+  body.push(
+    h("section", { class: "callout callout-takeaway" }, [
+      h("h3", { text: "À retenir" }),
+      h("ul", {}, (lesson.takeaways || []).map((item) => h("li", { text: item }))),
+    ]),
+    h("section", { class: "callout callout-pitfall" }, [
+      h("h3", { text: "Pièges fréquents" }),
+      h("ul", {}, (lesson.pitfalls || []).map((item) => h("li", { text: item }))),
+    ]),
+    h("section", { class: "callout callout-build" }, [
+      h("h3", { text: "Fil rouge" }),
+      ...paragraphs(lesson.build),
+      h("p", {}, [
+        "Fichier : ",
+        h("code", { text: lesson.codeFile || "model/" }),
+        lesson.codeSymbol ? ` · ${lesson.codeSymbol}` : "",
+        ".",
+      ]),
+      h("p", {}, [h("a", { href: "#/construire", text: "Ouvrir la piste « construire mon LLM »." })]),
+      ...(lesson.tpIds || []).map((id) =>
+        h("p", {}, h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` })),
+      ),
+    ]),
+    h("section", { class: "callout callout-review" }, [
+      h("h3", { text: "À retrouver plus tard" }),
+      h("p", { text: lesson.review || "" }),
+    ]),
+  );
+  return h("details", { class: "lesson-deep" }, [
+    h("summary", {}, [
+      h("span", { class: "lesson-deep-title", text: "Pour aller plus loin" }),
+      h("span", { class: "lesson-deep-meta", text: `explication complète · environ ${readingMinutes(lesson)} min de lecture` }),
+    ]),
+    h("div", { class: "lesson-deep-body" }, body),
+  ]);
 }
 
 function paragraphs(text) {

@@ -139,6 +139,8 @@ test("le curriculum commité a 161 leçons et des réponses réparties", () => {
     assert.ok(step.solution.length > 40);
     assert.ok(step.codeFile.startsWith("model/"));
     assert.ok(step.review.includes(step.title));
+    assert.equal(step.glance.steps.length, 3);
+    assert.ok(step.glance.phrase.length <= 120 && step.glance.key.length <= 60);
   }
   assert.deepEqual(counts, [41, 40, 40, 40]);
   assert.equal(data.track.length, 20);

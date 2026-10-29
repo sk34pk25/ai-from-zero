@@ -1,5 +1,5 @@
 {
-  "version": "926fadb8bcf9",
+  "version": "4d2189befd55",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -7,6 +7,9 @@
     "manifest.webmanifest",
     "assets/icon-192.png",
     "assets/icon-512.png",
+    "assets/fonts/Inter-Regular.woff",
+    "assets/fonts/Inter-SemiBold.woff",
+    "assets/fonts/InterDisplay-ExtraBold.woff",
     "data/curriculum.json",
     "assets/config.js",
     "assets/css/style.css",

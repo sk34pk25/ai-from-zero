@@ -1,0 +1,65 @@
+{
+  "7.1": {
+    "phrase": "Un expert est un FFN parmi plusieurs, chacun avec ses propres poids.",
+    "image": "Plusieurs ateliers au lieu d'un seul.",
+    "cle": "expert = w1, b1, ReLU, w2, b2",
+    "piege": "Personne n'assigne un sujet à un expert : leur rôle émerge de l'entraînement.",
+    "etapes": [["Créer", "plusieurs FFN"], ["Envoyer", "un vecteur à un expert"], ["Transformer", "avec ses poids à lui"]]
+  },
+  "7.2": {
+    "phrase": "Un modèle sparse stocke beaucoup d'experts mais n'en fait travailler que quelques-uns.",
+    "image": "Une bibliothèque où l'on ne lit que deux livres par question.",
+    "cle": "mémoire = tous les experts · calcul = les actifs",
+    "piege": "Les experts inactifs occupent quand même la mémoire.",
+    "etapes": [["Stocker", "E experts"], ["Activer", "k par token"], ["Économiser", "du calcul, pas de la mémoire"]]
+  },
+  "7.3": {
+    "phrase": "Le routeur donne à chaque expert une probabilité, selon le vecteur du token.",
+    "image": "Un aiguilleur qui lit chaque colis et choisit le bon quai.",
+    "cle": "softmax(x @ routeur)",
+    "piege": "Le routeur apprend : ce n'est pas une règle écrite à la main.",
+    "etapes": [["Lire", "le vecteur du token"], ["Scorer", "chaque expert"], ["Normaliser", "par softmax"]]
+  },
+  "7.4": {
+    "phrase": "Top-k garde les k meilleurs experts et renormalise leurs poids entre eux.",
+    "image": "Consulter les deux meilleurs avis, pas les vingt.",
+    "cle": "softmax sur les k meilleurs seulement",
+    "piege": "Sans renormaliser, une partie de la masse reste sur les experts ignorés.",
+    "etapes": [["Trier", "les scores"], ["Garder", "les k premiers"], ["Pondérer", "et additionner leurs sorties"]]
+  },
+  "7.5": {
+    "phrase": "La capacité limite le nombre de tokens qu'un expert accepte.",
+    "image": "Un atelier de quatre places : le cinquième client est renvoyé.",
+    "cle": "capacité = ⌈facteur × T / E⌉",
+    "piege": "Les tokens refusés (dropped) doivent être comptés, pas ignorés.",
+    "etapes": [["Calculer", "la capacité"], ["Remplir", "dans l'ordre"], ["Compter", "les tokens refusés"]]
+  },
+  "7.6": {
+    "phrase": "On mesure l'équilibre : qui reçoit vraiment les tokens, et qui était voulu.",
+    "image": "Compter les clients réellement entrés dans chaque atelier.",
+    "cle": "f = choix réels · P = probabilités moyennes",
+    "piege": "f et P peuvent diverger quand la capacité refuse du monde.",
+    "etapes": [["Compter", "f : tokens par expert"], ["Moyenner", "P : probabilités du routeur"], ["Comparer", "les deux"]]
+  },
+  "7.7": {
+    "phrase": "Une perte auxiliaire pousse le routeur à répartir les tokens.",
+    "image": "Une prime pour les ateliers qui partagent le travail.",
+    "cle": "aux = E × Σ fᵢ·Pᵢ, minimum 1",
+    "piege": "Elle vaut 1 au mieux, pas 0.",
+    "etapes": [["Mesurer", "f et P"], ["Calculer", "E × Σ f·P"], ["Ajouter", "à la loss de langage"]]
+  },
+  "7.8": {
+    "phrase": "Placer les experts sur plusieurs machines n'aide que si le routage se répartit.",
+    "image": "Deux ateliers dans deux pièces : utile si les clients se partagent.",
+    "cle": "gain = répartition − coût des transferts",
+    "piege": "Si tout le monde va au même expert, les autres machines attendent.",
+    "etapes": [["Répartir", "un expert par machine"], ["Envoyer", "chaque token à son expert"], ["Rapatrier", "le résultat"]]
+  },
+  "7.9": {
+    "phrase": "Un MoE ajoute surtout des paramètres stockés ; il doit le justifier par la qualité.",
+    "image": "Louer plus d'ateliers n'a de sens que si le travail s'améliore.",
+    "cle": "MoE 4 experts top-1 : mémoire ×4, calcul ≈ ×1",
+    "piege": "Si la perplexité ne baisse pas, tu as seulement alourdi le modèle.",
+    "etapes": [["Remplacer", "le FFN par un MoE"], ["Mesurer", "perplexité et dropped"], ["Écrire", "la ligne du tableau"]]
+  }
+}

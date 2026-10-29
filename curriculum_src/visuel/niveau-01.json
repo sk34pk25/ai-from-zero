@@ -1,0 +1,121 @@
+{
+  "1.1": {
+    "phrase": "Apprendre, c'est ajuster des nombres jusqu'à ce que l'erreur mesurée diminue.",
+    "image": "Une bascule à pommes dont le seuil glisse jusqu'à trier juste.",
+    "cle": "y = w·x + b : w et b peuvent bouger",
+    "piege": "Des règles écrites à la main n'apprennent rien, même si elles marchent.",
+    "etapes": [["Prédire", "avec les paramètres actuels"], ["Mesurer", "l'erreur par une loss"], ["Ajuster", "w et b, puis recommencer"]]
+  },
+  "1.2": {
+    "phrase": "Les features sont les indices, le label est la réponse à retrouver.",
+    "image": "Une fiche d'enquête : indices en haut, coupable en bas.",
+    "cle": "X[i] → y[i], dans le même ordre",
+    "piege": "Mélanger y sans mélanger X : le modèle apprend un mensonge.",
+    "etapes": [["Choisir", "les features X"], ["Associer", "le label y de chaque ligne"], ["Garder", "l'ordre identique"]]
+  },
+  "1.3": {
+    "phrase": "On s'entraîne sur train, on choisit sur validation, on mesure une seule fois sur test.",
+    "image": "Exercices, examen blanc, puis vrai examen ouvert une seule fois.",
+    "cle": "train 80 % · validation 10 % · test 10 %",
+    "piege": "Regarder le test pour décider : il ne mesure plus rien de nouveau.",
+    "etapes": [["Apprendre", "sur train"], ["Choisir", "les réglages sur validation"], ["Mesurer", "une fois sur test"]]
+  },
+  "1.4": {
+    "phrase": "L'algorithme règle les paramètres ; toi, tu règles les hyperparamètres.",
+    "image": "Deux tableaux de boutons : celui de la machine et le tien.",
+    "cle": "w, b = paramètres · learning rate = hyperparamètre",
+    "piege": "Le learning rate n'apprend pas : il fixe la taille des pas.",
+    "etapes": [["Fixer", "lr, nombre de pas, largeur"], ["Entraîner", "les poids bougent seuls"], ["Comparer", "puis changer un réglage"]]
+  },
+  "1.5": {
+    "phrase": "Un neurone multiplie chaque entrée par son poids, additionne et ajoute un biais.",
+    "image": "Une table de mixage : un bouton de volume par entrée.",
+    "cle": "z = 2×0,5 + 3×(−0,2) + 0,1 = 0,5",
+    "piege": "Sans biais, la frontière de décision passe forcément par zéro.",
+    "etapes": [["Pondérer", "chaque entrée × son poids"], ["Additionner", "toutes les contributions"], ["Décaler", "+ le biais b"]]
+  },
+  "1.6": {
+    "phrase": "L'activation plie le calcul : sans elle, empiler des couches ne sert à rien.",
+    "image": "Une feuille qu'on plie : deux inclinaisons ne font jamais un pli.",
+    "cle": "ReLU(x) = max(0, x)",
+    "piege": "ReLU(−3) vaut 0, pas −3 : les négatifs sont coupés.",
+    "etapes": [["Calculer", "z, la somme pondérée"], ["Plier", "appliquer ReLU"], ["Transmettre", "à la couche suivante"]]
+  },
+  "1.7": {
+    "phrase": "Un réseau enchaîne couche, activation, couche : chacune change la représentation.",
+    "image": "Une chaîne de traduction : chaque étape réécrit le message.",
+    "cle": "relu(x @ W1 + b1) @ W2 + b2",
+    "piege": "Retirer ReLU : les deux couches redeviennent une seule couche linéaire.",
+    "etapes": [["Mélanger", "x @ W1 + b1"], ["Plier", "ReLU"], ["Sortir", "@ W2 + b2"]]
+  },
+  "1.8": {
+    "phrase": "Le forward fait passer l'entrée à travers le modèle jusqu'à une prédiction.",
+    "image": "Lire le calcul à voix haute, de l'entrée vers la sortie.",
+    "cle": "GPT : (batch, temps) → (batch, temps, vocabulaire)",
+    "piege": "Une forme juste ne prouve pas un calcul juste, mais une forme fausse prouve un bug.",
+    "etapes": [["Entrer", "les données"], ["Traverser", "les couches"], ["Sortir", "la prédiction"]]
+  },
+  "1.9": {
+    "phrase": "La loss résume l'erreur en un seul nombre à faire baisser.",
+    "image": "Une note sur 20 à l'envers : plus elle est basse, mieux c'est.",
+    "cle": "(5 − 7)² = 4",
+    "piege": "Une loss qui baisse sur train peut monter sur validation.",
+    "etapes": [["Comparer", "prédiction et cible"], ["Mettre au carré", "l'écart"], ["Moyenner", "sur les exemples"]]
+  },
+  "1.10": {
+    "phrase": "Le gradient indique, pour chaque paramètre, de quel côté la loss monte.",
+    "image": "Une flèche par bouton : « tourne par là et ça empire ».",
+    "cle": "w ← w − lr × gradient",
+    "piege": "On va CONTRE le gradient : il montre la montée, pas la descente.",
+    "etapes": [["Mesurer", "la pente pour chaque poids"], ["Inverser", "aller dans l'autre sens"], ["Doser", "multiplier par lr"]]
+  },
+  "1.11": {
+    "phrase": "Pour une fonction composée, on multiplie les dérivées de chaque maillon.",
+    "image": "Robinet → seau → fuite : effet total = produit des effets.",
+    "cle": "dy/dx = dy/du × du/dx = 12 × 2 = 24",
+    "piege": "Oublier un maillon de la chaîne : la pente obtenue est inventée.",
+    "etapes": [["Découper", "x → u → y"], ["Dériver", "chaque maillon seul"], ["Multiplier", "les dérivées"]]
+  },
+  "1.12": {
+    "phrase": "La rétropropagation calcule tous les gradients en une seule passe arrière.",
+    "image": "Remonter la rivière : chaque barrage dit qui l'a fait déborder.",
+    "cle": "w·w + w en w = 3 → gradient 2w + 1 = 7",
+    "piege": "Un poids utilisé deux fois reçoit la SOMME de ses deux contributions.",
+    "etapes": [["Forward", "garder les intermédiaires"], ["Partir", "de la loss, gradient 1"], ["Remonter", "opération par opération"]]
+  },
+  "1.13": {
+    "phrase": "La descente de gradient fait un petit pas contre la pente, encore et encore.",
+    "image": "Descendre dans le brouillard en tâtant le sol à chaque pas.",
+    "cle": "écart × (1 − 2·lr) à chaque pas",
+    "piege": "Un pas trop grand fait osciller ou diverger au lieu de descendre.",
+    "etapes": [["Mesurer", "la pente"], ["Avancer", "w − lr × pente"], ["Recommencer", "jusqu'au creux"]]
+  },
+  "1.14": {
+    "phrase": "Un optimiseur transforme les gradients en pas, en gardant la mémoire des précédents.",
+    "image": "Une bille qui prend de l'élan quand la pente reste la même.",
+    "cle": "Adam : moyennes m (gradient) et v (carré)",
+    "piege": "Oublier la correction de démarrage : les premiers pas sont faussés.",
+    "etapes": [["Lisser", "m = moyenne des gradients"], ["Mettre à l'échelle", "par √v"], ["Avancer", "lr × m̂ / √v̂"]]
+  },
+  "1.15": {
+    "phrase": "Un tenseur se souvient de ses opérations pour calculer ses gradients tout seul.",
+    "image": "Un carnet de bord : chaque calcul est noté pour être relu à l'envers.",
+    "cle": "requires_grad = « je veux les dérivées »",
+    "piege": "Un même poids lu deux fois cumule ses gradients : c'est voulu.",
+    "etapes": [["Créer", "un Tensor suivi"], ["Calculer", "le graphe se construit"], ["backward()", "les gradients apparaissent"]]
+  },
+  "1.16": {
+    "phrase": "Chaque tour d'entraînement : prédire, mesurer, effacer, remonter, avancer.",
+    "image": "Une routine sportive dont l'ordre des gestes ne change jamais.",
+    "cle": "forward → loss → zero_grad → backward → step",
+    "piege": "Oublier la remise à zéro : les gradients s'additionnent d'un tour à l'autre.",
+    "etapes": [["Prédire et mesurer", "forward puis loss"], ["Remonter", "zéro, puis backward"], ["Avancer", "optimiseur.step()"]]
+  },
+  "1.17": {
+    "phrase": "Surapprendre, c'est réciter le train sans savoir prédire du nouveau.",
+    "image": "L'élève qui connaît les corrigés par cœur et rate l'examen.",
+    "cle": "train 0,01 · validation 0,8 → écart suspect",
+    "piege": "Fêter une loss de train minuscule sans regarder la validation.",
+    "etapes": [["Comparer", "train et validation"], ["Repérer", "l'écart qui se creuse"], ["Corriger", "données, régularisation, arrêt"]]
+  }
+}

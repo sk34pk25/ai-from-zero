@@ -1,0 +1,79 @@
+{
+  "3.1": {
+    "phrase": "Un modèle de langage devine le token suivant à partir du passé, encore et encore.",
+    "image": "Un texte à trous : on cache le mot d'après et on devine.",
+    "cle": "contexte → scores → token suivant",
+    "piege": "La cible est un entier : l'identifiant du vrai token suivant.",
+    "etapes": [["Lire", "le passé"], ["Scorer", "chaque token possible"], ["Comparer", "au vrai suivant"]]
+  },
+  "3.2": {
+    "phrase": "Le bigramme ne regarde que le token courant pour deviner le suivant.",
+    "image": "Un tableau de comptes : après « le », combien de fois chaque mot ?",
+    "cle": "P(b | a) = compte(a, b) / somme de la ligne a",
+    "piege": "Il ignore tout ce qui est avant le dernier token.",
+    "etapes": [["Compter", "chaque paire (a, b)"], ["Lisser", "+ alpha partout"], ["Normaliser", "chaque ligne à 100 %"]]
+  },
+  "3.3": {
+    "phrase": "Le contexte est la quantité de passé que le modèle accepte de regarder.",
+    "image": "Une fenêtre de lecture : plus elle est large, plus on voit loin.",
+    "cle": "T = longueur maximale du contexte",
+    "piege": "Allonger T coûte cher : l'attention grandit comme T².",
+    "etapes": [["Choisir", "une longueur T"], ["Lire", "les T derniers tokens"], ["Prédire", "à chaque position"]]
+  },
+  "3.4": {
+    "phrase": "Les logits sont des scores bruts, un par token, avant toute probabilité.",
+    "image": "Des notes de jury avant de les convertir en pourcentages.",
+    "cle": "logits : (batch, temps, vocabulaire)",
+    "piege": "Un logit négatif ne veut pas dire « impossible ».",
+    "etapes": [["Calculer", "un score par token"], ["Lire", "la case [b, t, v]"], ["Convertir", "plus tard, par softmax"]]
+  },
+  "3.5": {
+    "phrase": "Softmax transforme des scores en probabilités positives qui font 100 %.",
+    "image": "Un gâteau partagé selon les scores : le plus grand reçoit la plus grosse part.",
+    "cle": "exp(z) / somme(exp(z))",
+    "piege": "Ajouter la même constante à tous les scores ne change rien.",
+    "etapes": [["Soustraire", "le maximum, pour la stabilité"], ["Exponentier", "tout devient positif"], ["Diviser", "par la somme"]]
+  },
+  "3.6": {
+    "phrase": "La cross-entropy coûte d'autant plus que le bon token reçoit peu de probabilité.",
+    "image": "Une amende proportionnelle à la surprise du modèle.",
+    "cle": "loss = −log(p du bon token)",
+    "piege": "Calcule depuis les logits : un log de probabilité arrondie peut valoir l'infini.",
+    "etapes": [["Softmax", "des logits"], ["Prendre", "p du bon token"], ["Coûter", "−log(p)"]]
+  },
+  "3.7": {
+    "phrase": "Température et top-k changent la façon de tirer le token, pas ce que sait le modèle.",
+    "image": "Un bouton prudence/audace sur le tirage au sort.",
+    "cle": "logits / T : T < 1 pique, T > 1 aplatit",
+    "piege": "Température 0 = argmax ; on ne divise jamais par zéro.",
+    "etapes": [["Filtrer", "garder les k meilleurs"], ["Diviser", "par la température"], ["Tirer", "selon softmax"]]
+  },
+  "3.8": {
+    "phrase": "On entraîne le modèle de langage avec la même boucle, sur des fenêtres de tokens.",
+    "image": "Le même entraînement sportif, sur un nouveau terrain.",
+    "cle": "fenêtre → logits → cross-entropy → backward → pas",
+    "piege": "Le bigramme compte ; le réseau, lui, apprend par gradient.",
+    "etapes": [["Montrer", "une fenêtre"], ["Punir", "le score du mauvais token"], ["Corriger", "les poids, puis recommencer"]]
+  },
+  "3.9": {
+    "phrase": "Générer, c'est prédire un token, le recoller au contexte, et recommencer.",
+    "image": "Écrire une phrase mot après mot, en relisant à chaque fois.",
+    "cle": "ids.append(suivant)",
+    "piege": "Au-delà de block_size, on ne garde que la fin du contexte.",
+    "etapes": [["Prédire", "la dernière position"], ["Tirer", "un token"], ["Recoller", "puis recommencer"]]
+  },
+  "3.10": {
+    "phrase": "La perplexité dit entre combien de tokens le modèle hésite, en moyenne.",
+    "image": "Un dé à N faces : plus N est petit, plus le modèle est sûr.",
+    "cle": "perplexité = exp(loss)",
+    "piege": "Comparer à un chiffre d'article : compare plutôt au bigramme et au hasard.",
+    "etapes": [["Moyenner", "la loss"], ["Exponentier", "exp(loss)"], ["Comparer", "à V, le hasard"]]
+  },
+  "3.11": {
+    "phrase": "Un checkpoint garde ensemble les poids, la configuration et le tokenizer.",
+    "image": "Une recette et son réglage du four, rangés dans la même boîte.",
+    "cle": "config + poids + vocabulaire",
+    "piege": "Recharger les poids avec un autre vocabulaire : les numéros ne veulent plus rien dire.",
+    "etapes": [["Sauver", "poids + config + tokenizer"], ["Recharger", "le tout ensemble"], ["Vérifier", "mêmes logits qu'avant"]]
+  }
+}
