@@ -152,6 +152,7 @@
     "atelier/PANNES.md",
     "atelier/PROJET_FINAL.md",
     "atelier/README.md",
+    "atelier/RELECTURE.md",
     "atelier/artifacts.py",
     "atelier/benchmark.py",
     "atelier/benchmark/manifest.json",
@@ -181,7 +182,8 @@
     "atelier/FONDATIONS.md",
     "atelier/PANNES.md",
     "atelier/BANC_FR.md",
-    "atelier/EXTENSIONS.md"
+    "atelier/EXTENSIONS.md",
+    "atelier/RELECTURE.md"
   ],
   "diagnostics": [
     {

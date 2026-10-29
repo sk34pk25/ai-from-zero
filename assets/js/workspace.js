@@ -215,7 +215,8 @@ export function validateBackup(raw) {
       key.startsWith("lesson/") &&
       (!value ||
         (value.note != null && typeof value.note !== "string") ||
-        (value.attempts != null && !Array.isArray(value.attempts)))
+        (value.attempts != null && !Array.isArray(value.attempts)) ||
+        (value.exerciseCode != null && typeof value.exerciseCode !== "string"))
     )
       throw new Error("Carnet invalide");
     if (key.startsWith("ide/") && typeof value?.content !== "string")

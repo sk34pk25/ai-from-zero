@@ -16,12 +16,13 @@ export async function paintExperiments(main) {
       "data/atelier_reference_run.json",
     ],
     ["Banc français · documents réservés", "data/benchmark_fr_run.json"],
+    ["Banc littéraire · baseline et RoPE", "data/benchmark_modern_run.json"],
   ]) {
     try {
       const r = await fetch(new URL(path, document.baseURI));
       if (r.ok) {
         const value = await r.json();
-        if (value.format === "afz-benchmark-v1") reports.push(...normalizeReports(value, name));
+        if (["afz-benchmark-v1", "afz-modern-benchmark-v1"].includes(value.format)) reports.push(...normalizeReports(value, name));
         else reports.push({ name, ...value });
       }
     } catch {

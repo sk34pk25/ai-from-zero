@@ -26,6 +26,12 @@ Contrôle : `--jusqua 2`. Dessine le décalage et explique pourquoi x=y créerai
 
 Écris `softmax` sur le dernier axe. Soustrais le maximum de chaque ligne, exponentie puis divise par la somme de cette ligne. Préserve les axes avec keepdims. Écris `entropie(z,y)` sur des logits (N,V) et cibles (N,) : moyenne de log(sum(exp(z_stable))) moins le score stable de la cible. Ne prends pas le log de probabilités déjà arrondies.
 
+**Exemple chiffré, à refaire à la main.** Logits z = [1, 2, 3], cible 2.
+1. On soustrait le maximum 3 : [-2, -1, 0]. Les probabilités ne changent pas, mais exp ne déborde plus.
+2. exp donne [0,1353 ; 0,3679 ; 1] ; leur somme vaut 1,5032.
+3. softmax = [0,0900 ; 0,2447 ; 0,6652] ; la somme fait bien 1.
+4. Entropie croisée = log(somme des exp) − score décalé de la cible = log(1,5032) − 0 = 0,4076, c'est-à-dire −log(0,6652).
+
 Contrôle : `--jusqua 3`. Deux logits 1000 donnent [.5,.5], l'uniforme sur V=5 donne log(5). Explique pourquoi une loss est en nats et n'est comparable entre tokenizers qu'après passage à une unité commune, comme les nats par caractère.
 
 ## TP 4 — Différences finies (0.20, 1.10, 1.11)
@@ -48,6 +54,11 @@ Contrôle : `--jusqua 5`. Pour w*w+w en w=3, attends 7. Pour u=x*x puis u+u en x
 
 Lis ensuite `moteur.py` : matmul propage dX=dY@Wᵀ et dW=Xᵀ@dY, en réduisant le broadcasting ; embedding utilise np.add.at pour les tokens répétés ; LayerNorm réduit les statistiques du dernier axe et calcule son backward analytique. Relie leurs variables à une différence finie sur une seule coordonnée. Le moteur complet est fourni comme ensemble de primitives ; son code est lisible et testé, pas une brique LLM préfabriquée.
 
+**Exemple pas à pas.** g a la forme (2, 4, 3) et ne contient que des 1 ; le paramètre a la forme (1, 3).
+1. g a un axe de plus que le paramètre : on somme l'axe 0, il reste (4, 3) rempli de 2.
+2. La première dimension du paramètre vaut 1 mais celle de g vaut 4 : on somme cet axe en le gardant, on obtient (1, 3) rempli de 8.
+3. Chaque coefficient du paramètre a été réutilisé 2 × 4 = 8 fois par le broadcasting : il reçoit donc 8 contributions.
+
 Contrôle : `--jusqua 6`. Explique où le gradient de deux lectures du même token s'additionne.
 
 ## API des tableaux utilisée dans les TP suivants
@@ -58,11 +69,20 @@ Contrôle : `--jusqua 6`. Explique où le gradient de deux lectures du même tok
 
 Écris `attention(q,k,v)` avec q,k,v de forme (B,H,T,Dh). Scores = QKᵀ/sqrt(Dh), de forme (B,H,T,T). Transpose les deux derniers axes de K. Ajoute une matrice triangulaire supérieure à -1e9, zéro ailleurs, AVANT softmax. La sortie vaut softmax(scores)@V et retrouve (B,H,T,Dh). Le masque est constant : il ne reçoit pas de gradient.
 
+**Exemple chiffré.** Une tête, T = 2, Dh = 1, avec q = [1, 1], k = [0, 2], v = [10, 20].
+- Position 0 : elle ne voit que k₀, son poids vaut 1, la sortie vaut v₀ = 10.
+- Position 1 : scores = [1×0, 1×2] / √1 = [0, 2] ; softmax ≈ [0,119 ; 0,881] ; sortie ≈ 0,119×10 + 0,881×20 = 18,81.
+- Le masque ajouté vaut [[0, −1e9], [0, 0]] : seule la case « position 0 regarde la position 1 » est bloquée.
+
 Contrôle : `--jusqua 7`. La position zéro doit rendre V à la position zéro. Modifier la dernière valeur ne doit pas changer les sorties précédentes. Le correcteur compare aussi dL/dQ à une différence finie : réussir une shape seule ne suffit pas.
 
 ## TP 8 — Multi-têtes (4.7)
 
 Écris `multi_tetes(x,p,prefix,heads)`. x=(B,T,D) ; les poids p[prefix+'wq'], wk, wv, wo sont (D,D). Projette Q,K,V, reshape en (B,T,H,D/H), permute en (B,H,T,D/H), appelle TON attention, puis fais l'inverse des permutations et projette par Wo. D doit être divisible par H.
+
+**Suivre les formes.** B = 1, T = 3, D = 4, H = 2 donc D/H = 2 :
+x (1, 3, 4) → @Wq → (1, 3, 4) → reshape (1, 3, 2, 2) → permute (0, 2, 1, 3) → (1, 2, 3, 2) → attention → (1, 2, 3, 2) → permute (0, 2, 1, 3) → (1, 3, 2, 2) → reshape (1, 3, 4) → @Wo → (1, 3, 4).
+Écris cette chaîne dans un commentaire au-dessus de ton code avant de le taper.
 
 Contrôle : `--jusqua 8`. Un mauvais reshape peut conserver la shape tout en mélangeant les valeurs ; vérifie une petite grille numérotée à la main. Les gradients doivent traverser les projections.
 
@@ -76,17 +96,31 @@ Contrôle : `--jusqua 9`. Si Wo et W2 valent zéro, le bloc doit être exactemen
 
 Écris `logits(ids,p,config)` et `perte(z,y)`. IDs=(B,T). Additionne embedding tok et embedding pos (indices de 0 à T-1). Exécute les couches i avec le préfixe f'{i}.'. Applique LayerNorm finale, puis la tête (D,V) : la sortie est (B,T,V). Refuse T supérieur à config['block']. perte aplatit logits et cibles pour cross_entropy. La boucle lui donne des cibles déjà décalées ; ne décale pas une seconde fois.
 
+**Suivre les formes.** B = 2, T = 5, D = 16, V = 30 : embedding des tokens (2, 5, 16) + embedding des positions (5, 16), qui se répète sur le batch → (2, 5, 16) → couches → LayerNorm → @tête (16, 30) → logits (2, 5, 30). Pour la loss : logits aplatis (10, 30) et cibles aplaties (10,).
+
 Contrôle : `--jusqua 10`. Vérifie toutes les positions du passé après modification du futur. Le correcteur exige des gradients non nuls dans embeddings, attention, FFN et tête, et une coordonnée d'attention conforme à la différence finie.
 
 ## TP 11 — AdamW (1.14, 1.16)
 
 Écris `adamw(params,state,lr,weight_decay)`. params contient des Tensor. Incrémente un compteur t une seule fois par pas. Pour chaque paramètre, m=.9m+.1g et v=.95v+.05g² ; corrige les biais m/(1-.9**t), v/(1-.95**t), retire lr*m_hat/(sqrt(v_hat)+1e-8). Applique séparément la décroissance aux tableaux de rang au moins deux ; le laboratoire laisse les gains et biais sans décroissance.
 
+**Un pas d'AdamW à la main.** Un coefficient de matrice w = 2, gradient g = 0,5, lr = 0,01, weight_decay = 0,1, premier pas (t = 1).
+1. m = 0,1 × 0,5 = 0,05 et v = 0,05 × 0,25 = 0,0125.
+2. Corrections : m̂ = 0,05 / (1 − 0,9) = 0,5 et v̂ = 0,0125 / (1 − 0,95) = 0,25.
+3. Décroissance : w devient 2 × (1 − 0,01 × 0,1) = 1,998.
+4. Mise à jour : m̂ / (√v̂ + 1e-8) ≈ 0,5 / 0,5 = 1, donc w devient 1,998 − 0,01 = 1,988.
+Remarque : au premier pas, le déplacement vaut environ lr quelle que soit la taille du gradient. C'est pour cela que le compteur t compte.
+
 Contrôle : `--jusqua 11`. Un test sur deux pas empêche d'oublier le compteur. La boucle remet les gradients à zéro et recrée le forward avant chaque backward. Les checkpoints de l'atelier conservent les poids pour l'inférence ; ils ne promettent pas une reprise exacte AdamW. Pour ce mécanisme supplémentaire, lis les tests de reprise du laboratoire principal.
 
 ## TP 12 — Génération et premier entraînement (3.7, 3.9, 3.11, 4.14)
 
 Écris `prochain(z,rng,temperature,top_k)`. À température zéro, argmax sans division. Sinon, limite aux k plus grands logits, divise par température puis tire avec le générateur fourni. Le lanceur conserve uniquement les block derniers IDs à chaque pas, puis décode. Une graine identique doit reproduire le tirage.
+
+**Exemple chiffré de température.** Logits [2, 1, 0] avec top_k = 2 : on garde [2, 1].
+- Température 0,5 : [4, 2] → probabilités ≈ [0,881 ; 0,119]. Le premier token domine.
+- Température 2 : [1 ; 0,5] → probabilités ≈ [0,622 ; 0,378]. Le tirage devient plus varié.
+- Température 0 : on prend directement l'indice 0, sans diviser par zéro.
 
 ```bash
 python verifier.py --rapport controles.json

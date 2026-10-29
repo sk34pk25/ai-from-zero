@@ -32,6 +32,7 @@ def payload():
             "atelier/PANNES.md",
             "atelier/BANC_FR.md",
             "atelier/EXTENSIONS.md",
+            "atelier/RELECTURE.md",
         ],
         "diagnostics": json.loads(
             (ROOT / "curriculum_src/diagnostics.json").read_text(encoding="utf-8")

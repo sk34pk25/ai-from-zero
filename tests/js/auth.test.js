@@ -50,3 +50,10 @@ test("une session stockée ou un retour Auth ouvre le client", () => {
     true,
   );
 });
+
+
+test("un stockage refusé ne démarre pas une session anonyme", () => {
+  const blocked={get length(){throw new Error("refus");}};
+  assert.equal(shouldOpenAuthClient(config,"https://exemple.test/",blocked),false);
+  assert.equal(shouldOpenAuthClient(config,"https://exemple.test/?code=code",blocked),true);
+});

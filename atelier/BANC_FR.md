@@ -36,3 +36,25 @@ python -m model.eval_questions --checkpoint runs/sft/modele.npz --questions atel
 Les anciens poids sans historique des groupes restent marqués « indépendance non vérifiable ». L’évaluateur ne transforme pas ces anciens poids en assistant fiable. Les cas réservés sont publics pour l’apprentissage ; leur simple publication ne garantit pas leur absence d’un autre corpus. N’entraîne pas sur ces cas si tu veux les conserver comme test.
 
 Pour préparer les trois fichiers d’instructions en gardant les familles : `python -m model.eval_questions --questions atelier/benchmark/questions.json --prepare-to runs/questions`. Dans un plan SFT, utilise ensuite train.json comme instructions, validation.json comme validation et test.json comme test. Le fichier source questions.json contient tous les splits : ne l’utilise pas directement comme jeu d’entraînement.
+
+
+## Un second banc : sept livres et des auteurs principaux réservés
+
+Depuis la racine du dépôt complet (le lanceur n'est pas dans le ZIP autonome de l'atelier) :
+
+~~~bash
+OPENBLAS_NUM_THREADS=1 python -m model.benchmark_modern --out runs/litterature-rope
+python scripts/package_modern_benchmark.py --run runs/litterature-rope --out runs/litterature-rope.zip
+~~~
+
+Sous PowerShell, fixer d'abord $env:OPENBLAS_NUM_THREADS="1", puis lancer les commandes Python. Aucun téléchargement : data/benchmark_literature_protocol.json fige les positions et empreintes des extraits du corpus existant, décrit dans model/data/SOURCES.md. Les textes gardent leurs conditions ; ils ne deviennent pas MIT par leur présence à côté du code.
+
+Le protocole précède le calcul : 21 extraits de 6 000 caractères, sept livres et cinq auteurs principaux ; 12 train (Voltaire, Verne), 3 validation (Flaubert), 6 test (Hugo, Dumas). Aucun livre ni auteur principal ne traverse les splits. Le paratexte peut provenir d'autres contributeurs : ces groupes ne prouvent pas une absence de toute contribution commune. Les romans historiques d'une seule plateforme éditoriale ne représentent pas tous les usages du français.
+
+Positions absolues contre RoPE : une modification conceptuelle, largeur 16, une couche, deux têtes, bloc 32, batch 4, 600 pas, graines 0/1/2. Les matrices communes de chaque paire partent des mêmes poids neufs et reçoivent les mêmes lots. Les poids finaux au budget fixé sont comparés ; le choix se fait sur la moyenne de validation documentaire avant le test de cette seule position. Le tokenizer caractère vient seulement de train. Les caractères inconnus sont remplacés et comptés. Chaque cible est évaluée une fois dans son document, y compris le dernier morceau court.
+
+Le rapport data/benchmark_modern_run.json conserve les six runs, les générations fixées, paramètres, coûts, empreintes et différences appariées. Validation moyenne : baseline 2,4747, RoPE 2,3112. Différence RoPE−baseline : −0,1635 nat/caractère ; écart-type des trois différences 0,0141. RoPE retenu obtient au test 2,3841 ± 0,0094, contre 2,5335 pour le bigramme et 4,6151 pour l'uniforme. Les comparaisons portent sur les mêmes 35 996 cibles ; 42 caractères sont remplacés. Baseline : 6 912 paramètres ; RoPE : 6 400. Pas et tokens sont égaux, pas les paramètres ni les FLOPs.
+
+Ce résultat ne valide ni un chat ni une supériorité générale de RoPE. Trois graines donnent une dispersion descriptive. Les anciens poids du playground ont vu certains livres ; ils ne servent pas ici, où tout part de zéro. Ne choisir aucun nouveau réglage sur ce test public après consultation de ses résultats. Une nouvelle question demande un autre protocole et, si nécessaire, d'autres documents réservés.
+
+L'archive contient sources exactes, données existantes, rapports, poids et SHA256SUMS. L'empaquetage refuse une source ou un checkpoint changé depuis le run. Le workflow manuel de publication propose litterature pour ce banc, atelier pour le premier ; les nouveaux poids restent hors de l'historique Git.

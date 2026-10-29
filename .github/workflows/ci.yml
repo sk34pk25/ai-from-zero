@@ -8,9 +8,9 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -20,7 +20,7 @@ jobs:
       - name: pytest
         run: python -m pytest
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -46,9 +46,9 @@ jobs:
       - name: Lighthouse pages lourdes
         run: CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
         env:
-          LIGHTHOUSE_ROUTES: '["/#/playground","/#/ide","/#/atelier"]'
+          LIGHTHOUSE_ROUTES: '["/#/playground","/#/ide","/#/atelier","/#/positionnement"]'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: rapports
@@ -65,22 +65,22 @@ jobs:
       matrix:
         browser: [firefox, webkit]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js
+      - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js tests/e2e/local.spec.js tests/e2e/reliability.spec.js
         env:
           PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
 
   torch-parity:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt

@@ -1,5 +1,7 @@
 import { getRecord, setRecord } from "./workspace.js";
 import { onLeave } from "./lifecycle.js";
+import { isOwner } from "./auth.js";
+import { browserStorage, localToken, readLocalDraft, writeLocalDraft } from "./local-records.js";
 /** Figures, exercice et pas à pas ajoutés après le rendu de la leçon. */
 
 import { h } from "./dom.js";
@@ -70,18 +72,29 @@ function exercisePanel(exercise, owner) {
     class: "ide-fallback",
     "aria-label": "Code de l'exercice",
   });
-  area.value =
-    getRecord(`lesson/${exercise.lessonId}`, {}).exerciseCode ||
-    exercise.starter;
+  const token = localToken(browserStorage());
+  const ownerWorkspace = isOwner();
+  area.value = (ownerWorkspace
+    ? getRecord(`lesson/${exercise.lessonId}`, {}).exerciseCode
+    : readLocalDraft(browserStorage(), exercise.lessonId)) ?? exercise.starter;
+  let lastSaved = area.value;
   const save = () => {
-    if (owner)
-      setRecord(`lesson/${exercise.lessonId}`, {
-        ...getRecord(`lesson/${exercise.lessonId}`, {}),
-        exerciseCode: area.value,
-      });
+    if (ownerWorkspace && isOwner()) setRecord(`lesson/${exercise.lessonId}`, {
+      ...getRecord(`lesson/${exercise.lessonId}`, {}), exerciseCode: area.value,
+    });
+    else if (!ownerWorkspace && owner && area.value !== lastSaved) {
+      if (writeLocalDraft(browserStorage(), exercise.lessonId, area.value, token)) lastSaved = area.value;
+      else status.textContent = "Brouillon non enregistré : le suivi a été effacé, le stockage est refusé ou le code dépasse 100 000 caractères. Copie ton code avant de fermer.";
+    }
   };
   area.addEventListener("change", save);
-  onLeave(save);
+  let timer;
+  area.addEventListener("input", () => {
+    clearTimeout(timer);
+    if (!ownerWorkspace && owner) timer = setTimeout(save, 250);
+  });
+  window.addEventListener("beforeunload", save);
+  onLeave(() => { clearTimeout(timer); save(); window.removeEventListener("beforeunload", save); });
   const run = h(
     "button",
     {
@@ -95,7 +108,7 @@ function exercisePanel(exercise, owner) {
         const result = await request({ type: "run", code, files: [] });
         window.dispatchEvent(
           new CustomEvent("afz-exercise", {
-            detail: { id: exercise.lessonId, ok: result.type !== "error" },
+            detail: { id: exercise.lessonId, ok: result.type !== "error", scope: ownerWorkspace ? "owner" : "local", localToken: token },
           }),
         );
         status.textContent =

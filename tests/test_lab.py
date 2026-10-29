@@ -381,12 +381,16 @@ def test_committed_french_gpt_run():
     assert (ROOT / "model" / "data" / "francais.txt").read_text(encoding="utf-8").startswith("le chat ")
 
 
-def test_gpt_training_refuses_a_modern_variant():
-    from model.gpt_train import bind_parameters
+def test_gpt_training_refuses_an_unknown_variant():
+    from dataclasses import replace
 
-    rope = TinyGPT(GPTConfig(vocab_size=8, d_model=8, n_heads=2, n_layers=1, block_size=4, pos="rope", seed=0))
+    from model.gpt_train import assert_trainable
+
+    config = GPTConfig(vocab_size=8, d_model=8, n_heads=2, n_layers=1, block_size=4)
+    assert_trainable(replace(config, pos="rope", ffn="swiglu", tie_weights=True))
+    object.__setattr__(config, "pos", "alibi")
     with pytest.raises(ValueError):
-        bind_parameters(rope)
+        assert_trainable(config)
 
 
 def test_tiny_lm_trains_with_real_backward():

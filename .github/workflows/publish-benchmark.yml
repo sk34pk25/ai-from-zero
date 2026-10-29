@@ -2,6 +2,12 @@ name: Publier un benchmark et ses checkpoints
 
 on:
   workflow_dispatch:
+    inputs:
+      benchmark:
+        type: choice
+        description: Protocole fixé à exécuter
+        default: litterature
+        options: [litterature, atelier]
 
 permissions:
   contents: write
@@ -11,20 +17,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OPENBLAS_NUM_THREADS: "1"
+      BENCHMARK: ${{ inputs.benchmark }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
       - name: Réaliser les contrôles puis le protocole fixé
         run: |
           python atelier/verifier.py --module correction
-          python atelier/benchmark.py --module correction --out runs/publication --steps 240 --widths 16,24 --seeds 0,1,2
+          if [ "$BENCHMARK" = "litterature" ]; then
+            python -m model.benchmark_modern --out runs/publication
+          else
+            python atelier/benchmark.py --module correction --out runs/publication --steps 240 --widths 16,24 --seeds 0,1,2
+          fi
       - name: Archiver hors de l'historique Git
-        run: python scripts/package_benchmark.py --run runs/publication --out runs/benchmark-fr.zip
+        run: |
+          if [ "$BENCHMARK" = "litterature" ]; then
+            python scripts/package_modern_benchmark.py --run runs/publication --out runs/benchmark-fr.zip
+          else
+            python scripts/package_benchmark.py --run runs/publication --out runs/benchmark-fr.zip
+          fi
       - name: Publier les poids, sources, données et empreintes en Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "atelier-${GITHUB_RUN_ID}" runs/benchmark-fr.zip --target "$GITHUB_SHA" --title "Banc français — ${GITHUB_SHA:0:7}" --notes-file atelier/BANC_FR.md
+          gh release create "benchmark-${GITHUB_RUN_ID}" runs/benchmark-fr.zip --target "$GITHUB_SHA" --title "Banc français — ${GITHUB_SHA:0:7}" --notes-file atelier/BANC_FR.md

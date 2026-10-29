@@ -47,3 +47,18 @@ export const ICONS = {
   moon: "M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z",
   close: "M6 6l12 12M18 6 6 18",
 };
+
+/** Fil d'Ariane : le dernier élément est la page courante, sans lien. */
+export function crumb(items) {
+  const nav = h("nav", { class: "breadcrumb", "aria-label": "Fil d'Ariane" });
+  const list = h("ol");
+  items.forEach((item, index) => {
+    const li = h("li");
+    if (item.href && index < items.length - 1)
+      li.append(h("a", { href: item.href, text: item.label }));
+    else li.append(h("span", { text: item.label }));
+    list.append(li);
+  });
+  nav.append(list);
+  return nav;
+}

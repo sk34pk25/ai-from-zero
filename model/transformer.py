@@ -3,8 +3,8 @@
 Les variantes modernes (RoPE, RMSNorm, SwiGLU, GQA, weight tying) sont des options
 du même module : c'est le fil rouge des niveaux 4 et 5.
 
-L'entraînement du decoder standard (positions absolues, LayerNorm, GELU,
-attention multi-têtes) passe par model.gpt_train et l'autograd NumPy.
+Toutes ces options s'entraînent : model.gpt_train reconstruit le même forward
+avec l'autograd NumPy (RoPE, GQA, SwiGLU et poids partagés compris).
 """
 
 from __future__ import annotations

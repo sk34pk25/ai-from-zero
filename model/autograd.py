@@ -47,20 +47,27 @@ class Tensor:
         if not self.requires_grad:
             raise ValueError("ce tenseur ne suit pas le gradient")
         self.grad = np.ones_like(self.data)
+        for node in reversed(self._topological_order()):
+            node._backward()
+
+    def _topological_order(self) -> list[Tensor]:
+        """Parents avant enfants, sans récursion : un graphe profond ne bute pas sur la pile Python."""
         order: list[Tensor] = []
         seen: set[int] = set()
-
-        def visit(node: Tensor) -> None:
+        stack: list[tuple[Tensor, bool]] = [(self, False)]
+        while stack:
+            node, parents_done = stack.pop()
+            if parents_done:
+                order.append(node)
+                continue
             if id(node) in seen:
-                return
+                continue
             seen.add(id(node))
-            for parent in node._prev:
-                visit(parent)
-            order.append(node)
-
-        visit(self)
-        for node in reversed(order):
-            node._backward()
+            stack.append((node, True))
+            for parent in reversed(node._prev):
+                if id(parent) not in seen:
+                    stack.append((parent, False))
+        return order
 
     def _binary(self, other: Tensor, out: np.ndarray, backward) -> Tensor:
         result = Tensor(out, requires_grad=self.requires_grad or other.requires_grad)
@@ -178,6 +185,22 @@ class Tensor:
             d_inner = scale * (1.0 + 3.0 * 0.044715 * values**2)
             local = 0.5 * (1.0 + tanh_inner) + 0.5 * values * sech2 * d_inner
             self.grad += result.grad * local
+
+        result = Tensor(out, requires_grad=self.requires_grad)
+        result._prev = (self,) if self.requires_grad else ()
+        result._backward = backward
+        return result
+
+    def silu(self) -> Tensor:
+        """SiLU (swish) : x · σ(x), la même que model.mathutil.silu."""
+        values = self.data
+        sigmoid = 1.0 / (1.0 + np.exp(-values))
+        out = values * sigmoid
+
+        def backward() -> None:
+            if self.requires_grad:
+                # d/dx [x σ(x)] = σ(x) + x σ(x)(1 − σ(x))
+                self.grad += result.grad * sigmoid * (1.0 + values * (1.0 - sigmoid))
 
         result = Tensor(out, requires_grad=self.requires_grad)
         result._prev = (self,) if self.requires_grad else ()
@@ -337,6 +360,56 @@ def causal_attention(hidden: Tensor, wq: Tensor, wk: Tensor, wv: Tensor) -> Tens
     mask = np.triu(np.ones((time, time), dtype=np.float64), k=1) * -1e9
     weights = (scores + mask).softmax(axis=-1)
     return weights.matmul(value)
+
+
+def _rotate_pairs(states: np.ndarray, cos: np.ndarray, sin: np.ndarray) -> np.ndarray:
+    even = states[..., 0::2]
+    odd = states[..., 1::2]
+    rotated = np.empty_like(states)
+    rotated[..., 0::2] = even * cos - odd * sin
+    rotated[..., 1::2] = even * sin + odd * cos
+    return rotated
+
+
+def rope(states: Tensor, cos: np.ndarray, sin: np.ndarray) -> Tensor:
+    """RoPE sur (B, H, T, D), comme model.attention.apply_rope.
+
+    Chaque paire de dimensions tourne d'un angle fixe. Une rotation est
+    orthogonale : le gradient revient par la rotation inverse (angle opposé).
+    """
+    cos_b = np.asarray(cos)[None, None, :, :]
+    sin_b = np.asarray(sin)[None, None, :, :]
+    out = _rotate_pairs(states.data, cos_b, sin_b)
+
+    def backward() -> None:
+        if states.requires_grad:
+            states.grad += _rotate_pairs(result.grad, cos_b, -sin_b)
+
+    result = Tensor(out, requires_grad=states.requires_grad)
+    result._prev = (states,) if states.requires_grad else ()
+    result._backward = backward
+    return result
+
+
+def repeat_kv(states: Tensor, repeats: int) -> Tensor:
+    """Attention groupée : chaque tête K/V sert `repeats` têtes de requête.
+
+    Le gradient d'une tête partagée est la somme des gradients des copies.
+    """
+    if repeats == 1:
+        return states
+    batch, kv_heads, time, dim = states.data.shape
+    out = np.repeat(states.data, repeats, axis=1)
+
+    def backward() -> None:
+        if states.requires_grad:
+            grouped = result.grad.reshape(batch, kv_heads, repeats, time, dim)
+            states.grad += grouped.sum(axis=2)
+
+    result = Tensor(out, requires_grad=states.requires_grad)
+    result._prev = (states,) if states.requires_grad else ()
+    result._backward = backward
+    return result
 
 
 def _transpose_backward(source: Tensor) -> Tensor:

@@ -11,7 +11,7 @@ Périmètre autorisé : uniquement ai-from-zero, accès propriétaire conservé.
 
 ## Vérifications et limites
 
-- Les corrigés Python des 63 exercices sont exécutés en CI. Les 157 corrections textuelles sont rédigées pour les exercices ; elles ne constituent pas une certification pédagogique externe.
+- Les corrigés Python des 66 exercices sont exécutés en CI. Les 161 corrections textuelles sont rédigées pour les exercices ; elles ne constituent pas une certification pédagogique externe.
 - Les tests de reprise exacte comparent tous les poids après sauvegarde/rechargement. Les anciens checkpoints et rapports publiés sont conservés.
 - Le backend versionné est déployé : vérifications propriétaire, autre utilisateur et absence de droits anonymes réalisées par transactions annulées.
 - La matrice CI vérifie Chromium, Firefox et WebKit. Un véritable iPhone/iPad ou appareil Android n'est pas accessible à cet environnement ; cette vérification physique reste manuelle.
@@ -27,6 +27,17 @@ Périmètre autorisé : uniquement ai-from-zero, accès propriétaire conservé.
 - [x] Exercices réalignés, nouveaux cas numériques et quatre critères propres à chaque niveau.
 - [x] Séparation documentaire, dédoublonnage exact, couverture et provenance.
 - [x] Plans SFT avec validation réservée ; test final explicite ; diagnostics de rejet/troncature.
-- [x] Vérification automatique des 152 exemples et du projet téléchargé hors dépôt.
+- [x] Vérification automatique des 161 exemples et du projet téléchargé hors dépôt.
 
 Les contrôles vérifient l’outillage et des propriétés. La réussite d’un élève, son autonomie et la qualité d’un modèle sur de nouvelles tâches demandent encore une réalisation et une relecture de son projet.
+
+## Audit du 29 octobre 2026
+
+- [x] Niveau 0 : classes et objets (0.21), assert et pytest (0.22), mini-projet de synthèse (0.23), avec exercices exécutables.
+- [x] Test de positionnement à douze questions ; les étapes liées aux erreurs ne sont jamais marquées.
+- [x] Mode apprenant local, sur demande explicite : progression, quiz et exercices dans le navigateur, export/import au format de Mon espace, effacement.
+- [x] RoPE, SwiGLU, GQA/MQA et poids partagés entraînables ; gradients vérifiés par différences finies et contre PyTorch ; leçon 5.10 de comparaison sur plusieurs graines.
+- [x] Backward itératif, sans limite de profondeur.
+- [x] Content-Security-Policy générée avec les empreintes des scripts inline ; actions CI à jour.
+- [x] Exemples chiffrés dans les TP 3, 6, 7, 8, 10, 11 et 12 de l'atelier, et dans les leçons 1.13 et 3.6.
+- [ ] Observation humaine : faire suivre les niveaux 0 à 2 à un débutant, noter où il bloque (docs/DEVICE_CHECKLIST.md pour les appareils).

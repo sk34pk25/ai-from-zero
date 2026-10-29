@@ -752,12 +752,12 @@ def build_data() -> dict:
             key=lambda step: [int(part) for part in step["id"].split(".")],
         )
         expected = {
-            "0": 20,
+            "0": 23,
             "1": 17,
             "2": 11,
             "3": 11,
             "4": 14,
-            "5": 9,
+            "5": 10,
             "6": 12,
             "7": 9,
             "8": 9,

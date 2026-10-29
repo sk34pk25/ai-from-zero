@@ -1,3 +1,4 @@
+import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
 import {
   openWorkspace,
@@ -7,6 +8,16 @@ import {
   subscribe,
   workspaceReady,
 } from "./workspace.js";
+import {
+  enableLocalLearner,
+  forgetLocalLearner,
+  localLearnerEnabled,
+  LOCAL_REVIEW_KEY,
+  localOptInButton,
+  localPanel,
+  readLocalProgress,
+  writeLocalProgress,
+} from "./learner.js";
 import { leavePage, onLeave } from "./lifecycle.js";
 import {
   recordAttempt,
@@ -19,7 +30,7 @@ import {
   levelCheckpoint,
 } from "./study.js";
 import { indexCurriculum, levelProgress, neighbors, applyLearningPath, preferredLearningPath } from "./curriculum.js";
-import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
+import { appendChildren, crumb, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
 import {
   isOwner,
@@ -48,7 +59,7 @@ import {
   writeJson,
 } from "./storage.js";
 import { modifierLabel } from "./text.js";
-import { mountChatRun, mountTrainingRun, mountVisual } from "./visuals.js";
+import { mountVisual } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
 
@@ -63,6 +74,9 @@ const state = {
   gptRun: null,
   finetuneRun: null,
   owner: false,
+  local: false,
+  localSnapshot: null,
+  localToken: null,
   quizzes: {},
   exercises: {},
   pageTicket: 0,
@@ -73,6 +87,28 @@ const state = {
 };
 
 const els = {};
+
+/** Le propriétaire synchronise ; un visiteur qui l'a demandé garde sa progression dans ce navigateur. */
+function tracking() {
+  return state.owner || state.local;
+}
+
+function safeStorage() {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function editingFieldActive() {
+  return document.activeElement?.matches("textarea, input, [contenteditable=true]");
+}
+
+function refreshLocalMode() {
+  const storage = safeStorage();
+  state.local = !state.owner && Boolean(storage) && localLearnerEnabled(storage);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
@@ -167,6 +203,14 @@ function bindChrome() {
     setMenu(false);
     render({ scroll: "top" });
   });
+  window.addEventListener("storage", (event) => {
+    if (state.owner || !state.index || !localChangeKey(event.key)) return;
+    const wasLocal = state.local;
+    refreshLocalMode(); applyStoredProgress();
+    const editing = editingFieldActive();
+    if (wasLocal !== state.local || (!editing && !event.key?.includes("/draft/"))) render({ scroll: "keep" });
+    else paintChrome();
+  });
   window.addEventListener("resize", syncSidebar);
   syncSidebar();
 }
@@ -183,6 +227,7 @@ async function boot() {
     onAuth(() => {
       const wasOwner = state.owner;
       state.owner = isOwner();
+      refreshLocalMode();
       if (!state.owner) remotePullStarted = false;
       applyStoredProgress();
       updateAccountLink();
@@ -199,6 +244,7 @@ async function boot() {
     });
     await restoreSession();
     state.owner = isOwner();
+    refreshLocalMode();
     applyStoredProgress();
     state.booting = false;
     render({ scroll: "top" });
@@ -246,6 +292,16 @@ async function loadFinetuneRun() {
 }
 
 function applyStoredProgress() {
+  if (!state.owner && state.local && state.index) {
+    const stored = normalizeProgress(readLocalProgress(safeStorage()) || emptyProgress());
+    state.localSnapshot = normalizeProgress(stored);
+    state.localToken = localToken(safeStorage());
+    const known = new Set(state.index.orderedIds);
+    state.done = new Set(stored.done.filter((id) => known.has(id)));
+    state.quizzes = stored.quizzes || {};
+    state.exercises = stored.exercises || {};
+    return;
+  }
   if (!state.owner || !state.index) {
     state.done = new Set();
     state.quizzes = {};
@@ -255,7 +311,7 @@ function applyStoredProgress() {
   const stored = normalizeProgress(
     getRecord(
       "progress",
-      readJson(localStorage, PROGRESS_KEY, emptyProgress()),
+      readJson(safeStorage(), PROGRESS_KEY, emptyProgress()),
     ),
   );
   const known = new Set(state.index.orderedIds);
@@ -265,9 +321,24 @@ function applyStoredProgress() {
 }
 
 function persistDone() {
+  if (!state.owner && state.local) {
+    const ordered = state.index.numericIds.filter((id) => state.done.has(id));
+    if (
+      !writeLocalProgress(safeStorage(), {
+        v: 1,
+        done: ordered,
+        quizzes: state.quizzes,
+        exercises: state.exercises,
+      }, state.localSnapshot, state.localToken)
+    )
+      toast("Le navigateur refuse l'enregistrement local.");
+    refreshLocalMode();
+    applyStoredProgress();
+    return;
+  }
   if (!state.owner) return;
   const ordered = state.index.numericIds.filter((id) => state.done.has(id));
-  writeJson(localStorage, PROGRESS_KEY, {
+  writeJson(safeStorage(), PROGRESS_KEY, {
     v: 1,
     done: ordered,
     quizzes: state.quizzes,
@@ -285,7 +356,7 @@ let remotePullStarted = false;
 
 function rememberProgressLocal() {
   const ordered = state.index.numericIds.filter((id) => state.done.has(id));
-  writeJson(localStorage, PROGRESS_KEY, {
+  writeJson(safeStorage(), PROGRESS_KEY, {
     v: 1,
     done: ordered,
     quizzes: state.quizzes,
@@ -316,7 +387,7 @@ async function pullRemote() {
       if (workspaceReady()) persistDone();
     } else applyStoredProgress();
     rememberProgressLocal();
-    if (!["connexion", "password", "recovery"].includes(state.route.name))
+    if (!["connexion", "password", "recovery"].includes(state.route.name) && !editingFieldActive())
       render({ scroll: "keep" });
     else paintChrome();
   } catch {
@@ -333,34 +404,46 @@ subscribe(() => {
     applyStoredProgress();
     rememberProgressLocal();
     if (
-      !["connexion", "password", "recovery", "study"].includes(state.route.name)
+      !["connexion", "password", "recovery", "study"].includes(state.route.name) &&
+      !editingFieldActive()
     )
       render({ scroll: "keep" });
     else paintChrome();
   }
 });
 window.addEventListener("afz-exercise", ({ detail }) => {
-  if (!state.owner) return;
+  if (!tracking()) return;
+  if (detail.scope === "local" && (state.owner || detail.localToken !== state.localToken)) return;
+  if (detail.scope === "owner" && !state.owner) return;
   state.exercises[detail.id] = { ok: detail.ok };
   recordAttempt(detail.id, "exercise", detail.ok);
   persistDone();
 });
 
+function reviewKey() {
+  return state.owner ? REVIEW_KEY : LOCAL_REVIEW_KEY;
+}
+
 function readReview() {
-  const stored = readJson(localStorage, REVIEW_KEY, {});
+  if (!state.owner) return readLocalReview(safeStorage());
+  const stored = readJson(safeStorage(), reviewKey(), {});
   if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
   return stored;
 }
 
 function writeReviewStamp(id, present) {
-  if (!state.owner) return;
+  if (!tracking()) return;
+  if (!state.owner) {
+    writeLocalReview(safeStorage(), id, present, state.localToken);
+    return;
+  }
   const map = readReview();
   if (present) {
     if (!map[id]) map[id] = Date.now();
   } else {
     delete map[id];
   }
-  writeJson(localStorage, REVIEW_KEY, map);
+  writeJson(safeStorage(), reviewKey(), map);
 }
 
 function currentTheme() {
@@ -373,7 +456,7 @@ function applyTheme(theme, store) {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta)
     meta.setAttribute("content", theme === "light" ? "#f4f0e7" : "#14120f");
-  if (store) localStorage.setItem(THEME_KEY, theme);
+  if (store) { try { safeStorage()?.setItem(THEME_KEY, theme); } catch { /* thème pour cette page */ } }
   if (els.theme) {
     const toLight = theme === "dark";
     const label = toLight
@@ -583,6 +666,7 @@ function render({ scroll }) {
   const route = routeFromHref(location.href);
   const routeKey = JSON.stringify(route);
   const routeChanged = routeKey !== state.lastRouteKey;
+  const firstPaint = state.lastRouteKey === "";
   if (routeChanged) {
     state.quizChoice = null;
     state.hintCount = 0;
@@ -600,11 +684,11 @@ function render({ scroll }) {
   els.main.dataset.paint = String(ticket);
   paintChrome();
   paintMain(route, ticket);
-  if (scroll === "top") window.scrollTo(0, 0);
+  if (scroll === "top") { if (!firstPaint) window.scrollTo(0, 0); }
   else window.scrollTo(0, y);
   if (scroll === "top") {
     const heading = els.main.querySelector("h1");
-    if (heading && routeChanged) {
+    if (heading && routeChanged && !firstPaint) {
       if (!heading.hasAttribute("tabindex"))
         heading.setAttribute("tabindex", "-1");
       heading.focus({ preventScroll: true });
@@ -696,6 +780,24 @@ function paintMain(route, ticket) {
     );
   else if (route.name === "study") paintStudy(els.main, state.index);
   else if (route.name === "glossary") paintGlossary(els.main, state.index);
+  else if (route.name === "placement")
+    paintAsync(ticket, () => import("./placement.js"), (mod) =>
+      mod.paintPlacement(els.main, {
+        index: state.index,
+        canTrack: tracking,
+        onMarkKnown: markKnown,
+        enableTracking: () => {
+          const storage = safeStorage();
+          if (!storage || !enableLocalLearner(storage)) {
+            toast("Ce navigateur refuse le stockage local.");
+            return false;
+          }
+          refreshLocalMode();
+          applyStoredProgress();
+          return true;
+        },
+      }),
+    );
   else if (route.name === "home") paintHome();
   else if (route.name === "level") paintLevel(route.id);
   else if (route.name === "lesson") {
@@ -703,11 +805,31 @@ function paintMain(route, ticket) {
     import("./lesson-tools.js")
       .then((mod) => {
         if (ticket !== state.pageTicket) return;
-        return mod.attachLessonTools(els.main, route.id, state.owner);
+        return mod.attachLessonTools(els.main, route.id, tracking());
       })
       .catch(() => {});
-  } else if (route.name === "model") paintModel();
-  else if (route.name === "track") paintTrack();
+  } else if (route.name === "model")
+    paintAsync(ticket, () => import("./page-model.js"), (mod) => mod.paintModel(els.main, {
+      architecture: state.index.architecture,
+      done: state.done,
+      selectedPart: state.selectedPart,
+      onSelect: (id) => {
+        state.selectedPart = id;
+        render({ scroll: "keep" });
+      },
+    }));
+  else if (route.name === "track")
+    paintAsync(ticket, () => import("./page-track.js"), (mod) => mod.paintTrack(els.main, {
+      track: state.index.track,
+      done: state.done,
+      reports: { gptRun: state.gptRun, finetuneRun: state.finetuneRun },
+      loadReports: () =>
+        ensureTrainingReports().then(() => ({
+          gptRun: state.gptRun,
+          finetuneRun: state.finetuneRun,
+        })),
+      isCurrent: () => ticket === state.pageTicket,
+    }));
   else if (route.name === "atelier")
     paintAsync(
       ticket,
@@ -817,6 +939,7 @@ function pageTitle(route) {
   if (route.name === "recovery") return `Nouveau mot de passe · ${base}`;
   if (route.name === "about") return `À propos · ${base}`;
   if (route.name === "donnees") return `Données · ${base}`;
+  if (route.name === "placement") return `Positionnement · ${base}`;
   return `${base} — le parcours pour construire la tienne`;
 }
 
@@ -914,6 +1037,18 @@ function paintHome() {
     ]),
     h("div", { class: "stat-grid" }, cards),
     resumePanel(state.index),
+    localPanel({
+      owner: state.owner,
+      local: state.local,
+      done: state.done,
+      quizzes: state.quizzes,
+      exercises: state.exercises,
+      orderedIds: state.index.orderedIds,
+      numericIds: state.index.numericIds,
+      enable: enableLocalTracking,
+      importProgress: importLocalProgress,
+      erase: onReset,
+    }),
     reviewBlock(),
     roadmap,
   );
@@ -1148,13 +1283,13 @@ function lessonBody(lesson, grade, done, around) {
           {
             type: "button",
             "data-solution-button": "true",
-            disabled: !state.owner,
+            disabled: !tracking(),
             onClick: () => {
-              if (!state.owner) return;
+              if (!tracking()) return;
               toggleSolution();
             },
           },
-          state.owner ? "Voir une correction" : "Réservé au propriétaire",
+          tracking() ? "Voir une correction" : "Réservé au propriétaire",
         ),
       ]),
       h("ol", { id: "hint-list", "aria-live": "polite" }),
@@ -1300,9 +1435,9 @@ function quizBlock(lesson, grade) {
         class: classes.join(" "),
         "data-choice": String(index),
         "aria-pressed": selected ? "true" : "false",
-        disabled: !state.owner,
+        disabled: !tracking(),
         onClick: () => {
-          if (!state.owner) return;
+          if (!tracking()) return;
           state.quizChoice = index;
           recordAttempt(lesson.id, "quiz", index === lesson.quiz.answer);
           state.quizzes[lesson.id] = {
@@ -1310,15 +1445,16 @@ function quizBlock(lesson, grade) {
             choice: index,
           };
           persistDone();
-          upsertRow(
-            "quiz_results",
-            {
-              lesson_id: lesson.id,
-              choice: index,
-              correct: index === lesson.quiz.answer,
-            },
-            "lesson_id",
-          ).catch(() => toast("L'enregistrement distant a été refusé."));
+          if (state.owner)
+            upsertRow(
+              "quiz_results",
+              {
+                lesson_id: lesson.id,
+                choice: index,
+                correct: index === lesson.quiz.answer,
+              },
+              "lesson_id",
+            ).catch(() => toast("L'enregistrement distant a été refusé."));
           render({ scroll: "keep" });
         },
       },
@@ -1332,16 +1468,18 @@ function quizBlock(lesson, grade) {
   });
   return h("section", { class: "quiz", "aria-labelledby": "quiz-title" }, [
     h("h2", { id: "quiz-title", text: "Quiz" }),
-    state.owner
+    tracking()
       ? null
-      : h("p", {
-          class: "lock-note",
-          text: "Réservé au propriétaire. Les réponses et la progression ne sont pas enregistrées pour un visiteur.",
-        }),
+      : h("div", { class: "lock-note" }, [
+          h("p", {
+            text: "Réservé au propriétaire, ou à toi si tu actives le suivi sur cet appareil. Rien n'est enregistré sans ton accord, et rien n'est envoyé.",
+          }),
+          localOptInButton(enableLocalTracking),
+        ]),
     h("p", { id: "quiz-question", text: quiz.question }),
     h("div", { role: "group", "aria-labelledby": "quiz-question" }, options),
     feedback,
-    state.owner && grade.correct ? correctionMark() : null,
+    tracking() && grade.correct ? correctionMark() : null,
   ]);
 }
 
@@ -1379,7 +1517,7 @@ function feedbackText(lesson, grade) {
 }
 
 function toggleLesson(id) {
-  if (!state.owner) {
+  if (!tracking()) {
     toast("Réservé au propriétaire.");
     return;
   }
@@ -1397,69 +1535,6 @@ function toggleLesson(id) {
       : "Étape retirée de la progression.",
   );
   render({ scroll: "keep" });
-}
-
-function paintModel() {
-  const parts = state.index.architecture;
-  const selected =
-    parts.find((part) => part.id === state.selectedPart) ?? parts[0];
-  const list = h("div", { class: "pipeline", role: "list" });
-  for (const part of parts) {
-    const unlocked = state.done.has(part.step);
-    const pressed = selected?.id === part.id;
-    const button = h(
-      "button",
-      {
-        type: "button",
-        class: `component${unlocked ? " is-on" : ""}${pressed ? " is-selected" : ""}`,
-        "aria-pressed": pressed ? "true" : "false",
-        onClick: () => {
-          state.selectedPart = part.id;
-          render({ scroll: "keep" });
-        },
-      },
-      [
-        h("span", {
-          class: "eyebrow",
-          text: unlocked ? "Acquis" : "Verrouillé",
-        }),
-        h("strong", { text: part.name }),
-        h("span", { text: `Étape ${part.step}` }),
-      ],
-    );
-    list.append(h("div", { role: "listitem" }, [button]));
-  }
-  const detail = h(
-    "section",
-    { class: "component-info", "aria-live": "polite" },
-    [
-      h("p", { class: "eyebrow", text: "Inspecteur" }),
-      h("h2", { text: selected ? selected.name : "Composant" }),
-      h("p", { text: selected ? selected.summary : "" }),
-      selected
-        ? h("p", {}, [
-            "Introduit à l'étape ",
-            h("a", { href: `#/lecon/${selected.step}`, text: selected.step }),
-            state.done.has(selected.step)
-              ? ". Cette brique est débloquée."
-              : ". Termine cette étape pour la débloquer.",
-          ])
-        : null,
-      h("p", {
-        text: "Le code de référence est dans le dossier model/ du dépôt, couvert par pytest.",
-      }),
-    ],
-  );
-  els.main.replaceChildren(
-    crumb([{ href: "#/", label: "Accueil" }, { label: "Mon modèle" }]),
-    h("p", { class: "eyebrow", text: "Fil rouge" }),
-    h("h1", { text: "Architecture évolutive" }),
-    h("p", {
-      class: "lead",
-      text: "Les briques se débloquent quand l'étape qui les introduit est terminée. Le code correspondant est dans le dossier model/.",
-    }),
-    h("div", { class: "model-shell" }, [list, detail]),
-  );
 }
 
 function revealHint(lesson) {
@@ -1515,7 +1590,7 @@ function restoreLessonAids(article, lesson) {
 }
 
 function reviewBlock() {
-  if (!state.owner || state.done.size === 0) return null;
+  if (!tracking() || state.done.size === 0) return null;
   const stamps = readReview();
   const queue = reviewQueue(state.index.orderedIds, {
     done: [...state.done],
@@ -1554,127 +1629,6 @@ function reviewBlock() {
   );
 }
 
-function paintTrack() {
-  const stages = state.index.track ?? [];
-  const doneCount = stages.filter((stage) => state.done.has(stage.step)).length;
-  const list = h("ol", { class: "track-list" });
-  stages.forEach((stage, index) => {
-    const done = state.done.has(stage.step);
-    const item = h("li", { class: done ? "track-step is-done" : "track-step" });
-    appendChildren(item, [
-      h("p", {
-        class: "eyebrow",
-        text: done ? `Étape ${index + 1} · cochée` : `Étape ${index + 1}`,
-      }),
-      h("h2", { text: stage.title }),
-      h("p", { text: stage.summary }),
-      h("p", {}, [
-        "Fichier ",
-        h("code", { text: stage.file }),
-        " · leçon ",
-        h("a", { href: `#/lecon/${stage.step}`, text: stage.step }),
-        ".",
-      ]),
-    ]);
-    list.append(item);
-  });
-  const sample = [
-    "python3 -m model.gpt_train --steps 400",
-    'python3 -m model.gpt_sample --prompt "le chat "',
-  ].join("\n");
-  const pre = h("pre");
-  pre.append(h("code", { text: sample }));
-  const runHost = h("div", { class: "visual-host", "data-run-host": "true" });
-  const chatHost = h("div", { class: "visual-host", "data-chat-host": "true" });
-  const reportsReady = Boolean(state.gptRun && state.finetuneRun);
-  if (!reportsReady) {
-    runHost.append(
-      h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }),
-    );
-    chatHost.append(
-      h("p", { class: "visual-readout", text: "Chargement du compte-rendu…" }),
-    );
-  }
-  els.main.replaceChildren(
-    crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
-    h("p", { class: "eyebrow", text: "Fil rouge" }),
-    h("h1", { text: "Construire ton LLM" }),
-    h("section", { class: "callout" }, [
-      h("h2", { text: "Construire avec tes fonctions" }),
-      h("p", {
-        text: "Tronc commun : niveaux 0, 1, 2, 3, 4 puis 13. Les cases de cette piste indiquent les leçons cochées ; la preuve de maîtrise est le projet final entraîné sur tes données, avec validation, baselines et rechargement.",
-      }),
-      h("a", {
-        class: "button button-primary",
-        href: "#/atelier",
-        text: "Ouvrir les 12 TP et le projet final",
-      }),
-    ]),
-    h("p", {
-      class: "lead",
-      text: `${stages.length} étapes, d'un dossier vide jusqu'à un petit GPT entraîné par rétropropagation. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste.`,
-    }),
-    h(
-      "section",
-      { class: "callout callout-build", "aria-labelledby": "run-title" },
-      [
-        h("h2", { id: "run-title", text: "Entraînement réel" }),
-        h("p", {
-          text:
-            state.gptRun?.label ||
-            "Un entraînement CPU déjà fait dans ce dépôt. Les nombres et les phrases viennent de ce run, pas d'un dessin.",
-        }),
-        runHost,
-      ],
-    ),
-    h(
-      "section",
-      { class: "callout callout-build", "aria-labelledby": "chat-title" },
-      [
-        h("h2", { id: "chat-title", text: "Dialogue ajusté" }),
-        h("p", {
-          text:
-            state.finetuneRun?.label ||
-            "L'ajustement question-réponse est dans data/finetune_run.json.",
-        }),
-        chatHost,
-      ],
-    ),
-    h("p", {
-      class: "track-progress",
-      text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.`,
-    }),
-    list,
-    h("section", { class: "callout callout-build" }, [
-      h("h2", { text: "Lancer l'entraînement" }),
-      h("p", {
-        text: "Depuis la racine du dépôt. gpt_train.py entraîne TinyGPT avec l'autograd NumPy et AdamW. --dataset lit un jeu préparé, --plan enchaîne les étapes. gpt_sample.py tire une suite.",
-      }),
-      h("p", {}, [
-        h("a", { href: "#/donnees", text: "Ouvrir le catalogue des jeux." }),
-      ]),
-      pre,
-    ]),
-    h("section", { class: "callout" }, [
-      h("h2", { text: "Ce que cette piste n'entraîne pas" }),
-      h("p", {
-        text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet.",
-      }),
-    ]),
-  );
-  if (reportsReady) {
-    mountTrainingRun(runHost, state.gptRun);
-    mountChatRun(chatHost, state.finetuneRun);
-    return;
-  }
-  const ticket = state.pageTicket;
-  ensureTrainingReports().then(() => {
-    if (ticket !== state.pageTicket) return;
-    mountTrainingRun(runHost, state.gptRun);
-    mountChatRun(chatHost, state.finetuneRun);
-  });
-}
-
 function paintNotFound(path) {
   els.main.replaceChildren(
     h("p", { class: "eyebrow", text: "Introuvable" }),
@@ -1691,41 +1645,55 @@ function paintNotFound(path) {
   );
 }
 
-function crumb(items) {
-  const nav = h("nav", { class: "breadcrumb", "aria-label": "Fil d'Ariane" });
-  const list = h("ol");
-  items.forEach((item, index) => {
-    const li = h("li");
-    if (item.href && index < items.length - 1)
-      li.append(h("a", { href: item.href, text: item.label }));
-    else li.append(h("span", { text: item.label }));
-    list.append(li);
-  });
-  nav.append(list);
-  return nav;
+function enableLocalTracking() {
+  const storage = safeStorage();
+  if (!storage || !enableLocalLearner(storage)) {
+    toast("Ce navigateur refuse le stockage local.");
+    return false;
+  }
+  refreshLocalMode();
+  applyStoredProgress();
+  toast("Suivi activé : ta progression reste dans ce navigateur.");
+  render({ scroll: "keep" });
+  return true;
+}
+
+function importLocalProgress(progress, drafts = {}) {
+  if (!progress || !writeLocalProgress(safeStorage(), progress, readLocalProgress(safeStorage()), state.localToken)) {
+    toast("Sauvegarde non reconnue.");
+    return;
+  }
+  applyStoredProgress();
+  for (const [id, code] of Object.entries(drafts)) writeLocalDraft(safeStorage(), id, code, state.localToken);
+  toast(`Progression importée : ${stepsLabel(progress.done.length).toLowerCase()}.`);
+  render({ scroll: "keep" });
 }
 
 function onPlacement() {
-  if (!state.owner) {
-    toast("Réservé au propriétaire.");
-    return;
-  }
-  const level = state.index?.levels.find((entry) => entry.id === 0);
-  if (!level) return;
-  const ok = window.confirm(
-    "Marquer les 20 étapes du niveau 0 (fondations numériques) comme déjà connues sur cet appareil ?",
-  );
-  if (!ok) return;
-  for (const step of level.steps) {
-    state.done.add(step.id);
-    writeReviewStamp(step.id, true);
+  location.hash = "#/positionnement";
+}
+
+function markKnown(ids) {
+  if (!tracking()) return;
+  for (const id of ids) {
+    state.done.add(id);
+    writeReviewStamp(id, true);
   }
   persistDone();
-  toast("Fondations marquées comme connues.");
+  toast(`${stepsLabel(ids.length)} d'après le positionnement.`);
   render({ scroll: "keep" });
 }
 
 function onReset() {
+  if (!state.owner && state.local) {
+    if (!window.confirm("Effacer la progression gardée dans ce navigateur ? Exporte-la d'abord si tu veux la garder.")) return;
+    forgetLocalLearner(safeStorage());
+    refreshLocalMode();
+    applyStoredProgress();
+    toast("Progression locale effacée.");
+    render({ scroll: "keep" });
+    return;
+  }
   if (!state.owner) {
     toast("Réservé au propriétaire.");
     return;

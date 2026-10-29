@@ -77,6 +77,27 @@
     "check": "assert abs(derivee(lambda x:x*x,4)-8)<1e-6; assert abs(derivee(lambda x:3*x+1,-2)-3)<1e-6\n"
   },
   {
+    "lessonId": "0.21",
+    "prompt": "Écris la classe Point(x, y) et sa méthode distance_origine. Point(3, 4) doit être à 5.0 de l'origine.",
+    "starter": "class Point:\n    def __init__(self, x, y):\n        pass  # range x et y dans self\n\n    def distance_origine(self):\n        return 0.0  # racine de x² + y²\n\np = Point(3, 4)\nprint(p.distance_origine())\n",
+    "solution": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n    def distance_origine(self):\n        return (self.x ** 2 + self.y ** 2) ** 0.5\n\np = Point(3, 4)\nprint(p.distance_origine())\n",
+    "check": "assert Point(3, 4).distance_origine() == 5.0; a = Point(1, 1); b = Point(1, 1); assert a is not b and a.x == b.x and a.y == b.y; assert Point(0, -2).distance_origine() == 2.0\n"
+  },
+  {
+    "lessonId": "0.22",
+    "prompt": "Écris maximum(valeurs) sans utiliser max. Une liste vide doit lever ValueError ; [-5, -1] doit donner -1.",
+    "starter": "def maximum(valeurs):\n    meilleur = 0  # attention : est-ce un bon départ ?\n    for v in valeurs:\n        if v > meilleur:\n            meilleur = v\n    return meilleur\n\nprint(maximum([3, 9, 2]))\n",
+    "solution": "def maximum(valeurs):\n    if len(valeurs) == 0:\n        raise ValueError(\"liste vide\")\n    meilleur = valeurs[0]\n    for v in valeurs[1:]:\n        if v > meilleur:\n            meilleur = v\n    return meilleur\n\nprint(maximum([3, 9, 2]))\n",
+    "check": "assert maximum([3, 9, 2]) == 9; assert maximum([-5, -1]) == -1; assert maximum([4]) == 4\ntry:\n    maximum([])\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('une liste vide doit lever ValueError')\n"
+  },
+  {
+    "lessonId": "0.23",
+    "prompt": "Complète la méthode au_dessus(seuil) du Carnet : les distances strictement supérieures au seuil, sans modifier le carnet.",
+    "starter": "class Carnet:\n    def __init__(self, distances):\n        self.distances = list(distances)\n\n    def moyenne(self):\n        if not self.distances:\n            raise ValueError(\"carnet vide\")\n        return sum(self.distances) / len(self.distances)\n\n    def au_dessus(self, seuil):\n        return []  # à compléter\n\nprint(Carnet([12, 7.5, 20]).au_dessus(10))\n",
+    "solution": "class Carnet:\n    def __init__(self, distances):\n        self.distances = list(distances)\n\n    def moyenne(self):\n        if not self.distances:\n            raise ValueError(\"carnet vide\")\n        return sum(self.distances) / len(self.distances)\n\n    def au_dessus(self, seuil):\n        return [d for d in self.distances if d > seuil]\n\nprint(Carnet([12, 7.5, 20]).au_dessus(10))\n",
+    "check": "c = Carnet([12, 7.5, 20, 10]); assert c.au_dessus(10) == [12, 20]; assert c.distances == [12, 7.5, 20, 10]; assert Carnet([]).au_dessus(0) == []\ntry:\n    Carnet([]).moyenne()\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('un carnet vide doit lever ValueError')\n"
+  },
+  {
     "lessonId": "1.4",
     "prompt": "Écris le neurone affine sans activation.",
     "starter": "def prediction(x,w,b):\n    # À compléter\n    pass\n",

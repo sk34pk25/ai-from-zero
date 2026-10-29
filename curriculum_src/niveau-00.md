@@ -15,7 +15,7 @@ Imagine un atelier. Le plan de travail est la RAM : tout ce qui est en cours y e
 @VOCAB
 CPU : processeur général. RAM : mémoire vive, rapide et volatile. Stockage : SSD ou disque, persistant et plus lent. VRAM : mémoire du GPU. Programme : instructions chargées en mémoire puis exécutées.
 @EXPLAIN
-Au lancement d'un entraînement, le système lit le code et les données depuis le stockage, les copie en RAM ou en VRAM, puis le CPU ou le GPU calcule. Un modèle peut donc refuser de démarrer alors que le disque est presque vide : c'est la mémoire de travail qui est trop petite. L'inverse existe aussi. Un gros corpus occupe le stockage même si personne ne l'a chargé. Retenir trois ordres de grandeur suffit pour l'instant : un octet, un million d'octets (environ un mégaoctet) et un milliard (environ un gigaoctet). Un paramètre en float32 pèse 4 octets.
+Au lancement d'un entraînement, le système lit le code et les données depuis le stockage, les copie en RAM ou en VRAM, puis le CPU ou le GPU calcule. Un modèle peut donc refuser de démarrer alors que le disque est presque vide : c'est la mémoire de travail qui est trop petite. L'inverse existe aussi. Un gros corpus occupe le stockage même si personne ne l'a chargé. Retenir trois ordres de grandeur suffit pour l'instant : un octet, un million d'octets (un mégaoctet, Mo) et un milliard (un gigaoctet, Go). Les systèmes comptent souvent en puissances de 2 : un Mio vaut 1024 × 1024 = 1 048 576 octets, un Gio vaut 1024 Mio. L'écart est d'environ 7 % pour les Gio : 16 Gio de RAM font environ 17,2 Go. Le code ci-dessous compte en Mio et Gio, comme le gestionnaire de tâches. Un paramètre en float32 pèse 4 octets.
 @LANG python
 @CODE
 :::

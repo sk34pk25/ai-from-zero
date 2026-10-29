@@ -1,0 +1,103 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { installOwner } from "./session.js";
+import { PLACEMENT } from "../../assets/js/placement.js";
+const lessons=JSON.parse(readFileSync(new URL("../../data/curriculum.json",import.meta.url))).levels.flatMap(l=>l.steps);
+const progress=page=>page.evaluate(async()=> (await import("/assets/js/local-records.js")).readLocalProgress(localStorage));
+async function complete(page,id) {
+  await page.locator('[data-choice="'+lessons.find(s=>s.id===id).quiz.answer+'"]').click();
+  await page.getByRole("button",{name:"Marquer comme terminée"}).click();
+}
+test("le cours reste lisible avec un stockage inaccessible ; la navigation garde le focus",async({page})=>{
+  const errors=[];page.on("pageerror",e=>errors.push(e.message));
+  await page.addInitScript(()=>Object.defineProperty(window,"localStorage",{get(){throw new DOMException("Bloqué","SecurityError");}}));
+  await page.goto("/");
+  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.locator("h1")).not.toHaveText("Parcours indisponible");
+  await page.getByRole("button",{name:/thème/i}).click();
+  await page.goto("/#/lecon/4.5");
+  await expect(page.locator("[data-lesson-id='4.5']")).toBeVisible();
+  await page.getByRole("link",{name:"Étape suivante",exact:true}).click();
+  await expect(page.locator("h1")).toBeFocused();
+  expect(errors).toEqual([]);
+});
+test("les onglets conservent leurs changements ; l'effacement invalide un ancien résultat",async({page,context})=>{
+  await page.goto("/");
+  await page.getByRole("button",{name:"Suivre ma progression sur cet appareil"}).click();
+  const old=await page.evaluate(()=>localStorage.getItem("afz-local-learner"));
+  const other=await context.newPage();
+  await page.goto("/#/lecon/1.6");await other.goto("/#/lecon/1.3");
+  await complete(page,"1.6");await complete(other,"1.3");
+  await expect.poll(async()=> (await progress(other)).done).toEqual(expect.arrayContaining(["1.6","1.3"]));
+  await page.goto("/#/lecon/1.6");
+  await page.getByRole("button",{name:"Retirer des étapes terminées"}).click();
+  await other.goto("/#/lecon/1.3");
+  await other.getByRole("button",{name:"Retirer des étapes terminées"}).click();
+  expect((await progress(other)).done).toEqual([]);
+  await page.goto("/");
+  page.once("dialog",d=>d.accept());
+  await page.locator(".local-panel").getByRole("button",{name:"Effacer",exact:true}).click();
+  await expect(other.getByRole("button",{name:"Suivre ma progression sur cet appareil"})).toBeVisible();
+  await other.reload();
+  await other.getByRole("button",{name:"Suivre ma progression sur cet appareil"}).click();
+  await other.evaluate(token=>window.dispatchEvent(new CustomEvent("afz-exercise",{detail:{id:"0.23",ok:true,scope:"local",localToken:token}})),old);
+  expect((await progress(other)).exercises["0.23"]).toBeUndefined();
+});
+test("le positionnement mobile invalide un ancien score et un programme modifié",async({page})=>{
+  // Les calculs et erreurs volontaires du programme sont vérifiés par pytest.
+  await page.route("**/assets/js/pyworker.js*",r=>r.fulfill({contentType:"text/javascript",body:'self.onmessage=()=>self.postMessage({type:"done"});'}));
+  await page.setViewportSize({width:360,height:780});
+  await page.goto("/#/positionnement");
+  for(const q of PLACEMENT)await page.locator('input[name="placement-'+q.id+'"][value="'+q.answer+'"]').check();
+  await page.getByRole("button",{name:"Voir mon résultat"}).click();
+  const axe=await new AxeBuilder({page}).analyze();
+  expect(axe.violations,JSON.stringify(axe.violations)).toEqual([]);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  await page.getByRole("button",{name:"Vérifier mon programme"}).click();
+  const save=page.getByRole("button",{name:/Garder ce résultat/});
+  await expect(save).toBeEnabled();
+  await page.getByRole("textbox",{name:"Code de l’épreuve pratique"}).fill("autre programme");
+  await expect(save).toBeDisabled();
+  const q=PLACEMENT[0];
+  await page.locator('input[name="placement-'+q.id+'"][value="'+((q.answer+1)%4)+'"]').check();
+  await expect(page.locator(".placement-result")).toBeHidden();
+  await expect(save).toHaveCount(0);
+});
+test("les brouillons locaux survivent au rechargement, à l'export et à l'import",async({page})=>{
+  await page.goto("/");
+  await page.getByRole("button",{name:"Suivre ma progression sur cet appareil"}).click();
+  await page.goto("/#/lecon/0.23");
+  const area=page.getByRole("textbox",{name:"Code de l'exercice"});
+  await area.fill("# mon brouillon personnel\n");
+  await page.reload();
+  await expect(area).toHaveValue("# mon brouillon personnel\n");
+  await page.goto("/");
+  const [d]=await Promise.all([page.waitForEvent("download"),page.getByRole("button",{name:"Exporter",exact:true}).click()]);
+  const backup=JSON.parse(readFileSync(await d.path(),"utf8"));
+  expect(backup.records["lesson/0.23"].exerciseCode).toBe("# mon brouillon personnel\n");
+  page.once("dialog",dialog=>dialog.accept());
+  await page.locator(".local-panel").getByRole("button",{name:"Effacer",exact:true}).click();
+  await page.getByRole("button",{name:"Suivre ma progression sur cet appareil"}).click();
+  await page.locator(".local-panel input[type=file]").setInputFiles({name:"progression.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(backup))});
+  await expect(page.locator("#toast")).toContainText("Progression importée");
+  await page.goto("/#/lecon/0.23");
+  await expect(area).toHaveValue("# mon brouillon personnel\n");
+});
+test("une session propriétaire ne reçoit pas automatiquement le brouillon visiteur",async({page})=>{
+  const writes=await installOwner(page);
+  await page.goto("/");
+  await page.getByRole("button",{name:"Suivre ma progression sur cet appareil"}).click();
+  await page.goto("/#/lecon/0.23");
+  const code=page.getByRole("textbox",{name:"Code de l'exercice"});
+  await code.fill("# BROUILLON_LOCAL_SANS_TRANSFERT");
+  await page.evaluate(async()=>{
+    const map=JSON.parse(document.querySelector("#afz-importmap").textContent);
+    const auth=await import(map.scopes["./assets/js/"]["./assets/js/auth.js"]);
+    await auth.signIn("apprenant@example.com","secret-secret");
+  });
+  await expect(code).not.toHaveValue("# BROUILLON_LOCAL_SANS_TRANSFERT");
+  await page.goto("/#/espace");
+  await expect(page.getByRole("button",{name:"Exporter mes données",exact:true})).toBeVisible();
+  expect(writes.some(r=>(r.postData()||"").includes("BROUILLON_LOCAL_SANS_TRANSFERT"))).toBe(false);
+});

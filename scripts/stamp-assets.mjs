@@ -92,6 +92,44 @@ export function importMap(version) {
   return { scopes: { "./assets/js/": scope } };
 }
 
+/** Empreintes des scripts inline (thème, version, import map), pour la CSP. */
+export function inlineScriptHashes(html) {
+  const hashes = [];
+  const pattern = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
+  let match = pattern.exec(html);
+  while (match) {
+    const digest = createHash("sha256").update(match[1], "utf8").digest("base64");
+    hashes.push(`'sha256-${digest}'`);
+    match = pattern.exec(html);
+  }
+  return hashes;
+}
+
+/** Politique de sécurité du contenu. Les workers chargent Pyodide sous leur propre politique. */
+export function contentSecurityPolicy(html) {
+  return [
+    "default-src 'self'",
+    `script-src 'self' ${inlineScriptHashes(html).join(" ")}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self'",
+    // Tout projet Supabase (le dépôt, une copie, ou le faux serveur des tests e2e), et rien d'autre.
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+    "worker-src 'self'",
+    "manifest-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+}
+
+export function applyCsp(html) {
+  return html.replace(
+    /(<meta http-equiv="Content-Security-Policy" content=")[^"]*(">)/,
+    `$1${contentSecurityPolicy(html)}$2`,
+  );
+}
+
 function currentVersion() {
   const source = readFileSync(join(root, "assets", "js", "version.js"), "utf8");
   const match = source.match(/ASSET_VERSION = "([^"]+)"/);
@@ -109,6 +147,7 @@ function stamp() {
     /<script type="importmap" id="afz-importmap">[\s\S]*?<\/script>/,
     `<script type="importmap" id="afz-importmap">\n${json}\n</script>`,
   );
+  html = applyCsp(html);
   writeFileSync(
     join(root, "assets", "js", "version.js"),
     `/** Version des assets statiques. Réécrite par scripts/stamp-assets.mjs. */\nexport const ASSET_VERSION = "${next}";\n`,
@@ -132,6 +171,7 @@ function stamp() {
     "assets/vendor/editor.js",
     "assets/vendor/supabase.js",
     "data/exercises.json",
+    "data/placement_practice.json",
     "data/debug.json",
     "data/datasets.json",
     "data/gpt_run.json",
@@ -139,6 +179,8 @@ function stamp() {
     "data/atelier.json",
     "data/atelier_reference_run.json",
     "data/benchmark_fr_run.json",
+    "data/benchmark_modern_run.json",
+    "data/benchmark_literature_protocol.json",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
     "model/manifest.json",
     ...readdirSync(join(root, "model"))

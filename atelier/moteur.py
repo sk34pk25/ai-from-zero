@@ -47,20 +47,27 @@ class Tensor:
         if not self.requires_grad:
             raise ValueError("ce tenseur ne suit pas le gradient")
         self.grad = np.ones_like(self.data)
+        for node in reversed(self._topological_order()):
+            node._backward()
+
+    def _topological_order(self) -> list[Tensor]:
+        """Parents avant enfants, sans récursion : un graphe profond ne bute pas sur la pile Python."""
         order: list[Tensor] = []
         seen: set[int] = set()
-
-        def visit(node: Tensor) -> None:
+        stack: list[tuple[Tensor, bool]] = [(self, False)]
+        while stack:
+            node, parents_done = stack.pop()
+            if parents_done:
+                order.append(node)
+                continue
             if id(node) in seen:
-                return
+                continue
             seen.add(id(node))
-            for parent in node._prev:
-                visit(parent)
-            order.append(node)
-
-        visit(self)
-        for node in reversed(order):
-            node._backward()
+            stack.append((node, True))
+            for parent in reversed(node._prev):
+                if id(parent) not in seen:
+                    stack.append((parent, False))
+        return order
 
     def _binary(self, other: Tensor, out: np.ndarray, backward) -> Tensor:
         result = Tensor(out, requires_grad=self.requires_grad or other.requires_grad)

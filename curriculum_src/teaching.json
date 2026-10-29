@@ -645,6 +645,22 @@
     "13.8": {
       "file": "model/finetune.py",
       "symbol": "evaluate_instructions"
+    },
+    "0.21": {
+      "file": "model/autograd.py",
+      "symbol": "Tensor"
+    },
+    "0.22": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.23": {
+      "file": "model/stats.py",
+      "symbol": "build_report"
+    },
+    "5.10": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
     }
   },
   "assessments": {

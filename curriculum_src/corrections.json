@@ -1568,5 +1568,49 @@
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Une bonne réponse déjà vue n'est pas un test de reformulation."
     ]
+  },
+  "0.21": {
+    "hints": [
+      "La racine carrée s'obtient avec math.sqrt ou ** 0.5.",
+      "Écris les valeurs intermédiaires avant de conclure. Pour Point(3, 4) : x² + y² = 9 + 16 = 25, et la racine de 25 vaut 5.0."
+    ],
+    "solution": "class Point: def __init__(self, x, y): self.x = x; self.y = y. Puis def distance_origine(self): return (self.x ** 2 + self.y ** 2) ** 0.5. Point(3, 4).distance_origine() vaut 5.0. p = Point(1, 1) et q = Point(1, 1) ont les mêmes valeurs mais p is q vaut False : ce sont deux objets construits séparément. r = p donne r is p à True.",
+    "pitfalls": [
+      "Oublier self dans la définition de la méthode : Python passe l'objet en premier argument, la méthode doit le recevoir.",
+      "Écrire x = x dans __init__ au lieu de self.x = x : la valeur reste locale et l'objet n'a pas d'attribut x."
+    ]
+  },
+  "0.22": {
+    "hints": [
+      "Parcours la liste en gardant le plus grand élément vu jusqu'ici.",
+      "Écris les valeurs attendues avant le code. Pour [3, 9, 2] : 3, puis 9 > 3 donc 9, puis 2 < 9, résultat 9. Pour [-5, -1] le résultat est -1, pas 0."
+    ],
+    "solution": "def maximum(valeurs): si la liste est vide, raise ValueError ; sinon meilleur = valeurs[0] puis, pour chaque v, si v > meilleur alors meilleur = v ; return meilleur. Tests : assert maximum([3, 9, 2]) == 9, assert maximum([-5, -1]) == -1, et un bloc try/except ValueError pour la liste vide. Démarrer meilleur à 0 serait faux : maximum([-5, -1]) rendrait 0.",
+    "pitfalls": [
+      "Initialiser le maximum à 0 : le test sur [-5, -1] le révèle, c'est pour cela qu'on teste des nombres négatifs.",
+      "Corriger la valeur attendue d'un test pour qu'il passe au lieu de corriger la fonction."
+    ]
+  },
+  "0.23": {
+    "hints": [
+      "Une compréhension de liste avec une condition suffit : [d for d in self.distances if d > seuil].",
+      "Écris l'attendu avant le code. Pour [12, 7.5, 20] et le seuil 10 : 12 > 10 oui, 7.5 non, 20 oui, donc [12, 20]. Un carnet vide doit lever ValueError dans moyenne."
+    ],
+    "solution": "def au_dessus(self, seuil): return [d for d in self.distances if d > seuil]. Test : assert Carnet([12, 7.5, 20]).au_dessus(10) == [12, 20]. Pour le carnet vide : try: Carnet([]).moyenne() puis except ValueError: pass, et raise AssertionError si aucune exception n'est levée. Strictement supérieur exclut une distance égale au seuil.",
+    "pitfalls": [
+      "Utiliser >= alors que la consigne dit strictement supérieur : ajoute un test avec une distance égale au seuil.",
+      "Modifier self.distances dans au_dessus : la méthode doit renvoyer une nouvelle liste sans abîmer le carnet."
+    ]
+  },
+  "5.10": {
+    "hints": [
+      "Garde le dictionnaire commun identique : seule la clé de variante change.",
+      "Écris un tableau avant de conclure : une ligne par graine, une colonne par configuration. Calcule l'écart entre les graines d'une même configuration, puis l'écart entre configurations."
+    ],
+    "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans rien changer d'autre. Note val_loss_end et parameter_count. Si l'écart moyen entre configurations dépasse nettement l'écart entre graines, écris que la variante a amélioré la validation dans ce réglage précis (corpus, taille, nombre de pas). Sinon, écris qu'aucune différence n'est mesurable ici. Dans les deux cas, précise que rien n'est démontré pour un modèle plus grand ou un autre corpus.",
+    "pitfalls": [
+      "Comparer une variante entraînée 120 pas à une baseline entraînée 60 pas : on mesure alors le budget, pas la pièce.",
+      "Changer deux options à la fois : l'effet observé ne peut plus être attribué à l'une ou à l'autre."
+    ]
   }
 }

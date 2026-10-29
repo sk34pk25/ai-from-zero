@@ -115,6 +115,7 @@ export async function paintAtelier(main, index) {
     "Huit pannes à diagnostiquer",
     "Banc français et questions réservées",
     "BPE octets, PyTorch et utilisation locale",
+    "Relire avec un débutant et sur de vrais appareils",
   ];
   spec.documents.forEach((path, i) =>
     selector.append(h("option", { value: path, text: names[i] })),

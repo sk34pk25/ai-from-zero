@@ -6,6 +6,8 @@ export default defineConfig({
   workers: 1,
   timeout: 120_000,
   expect: { timeout: 10_000 },
+  // En CI, chaque échec devient une annotation lisible dans la PR, en plus du rapport HTML.
+  reporter: process.env.CI ? [["github"], ["list"], ["html", { open: "never" }]] : [["list"]],
   use: {
     serviceWorkers: "block",
     browserName: process.env.PLAYWRIGHT_BROWSER || "chromium",

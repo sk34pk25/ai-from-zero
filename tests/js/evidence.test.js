@@ -11,8 +11,8 @@ test("le parcours actif règle la reprise et les voisins sans perdre des leçons
   const done = index.lessons.filter(({ level }) => level.id <= 4).map(({ lesson }) => lesson.id);
   assert.equal(completionStats(index.orderedIds, done).nextId, "13.1");
   assert.equal(neighbors(index.orderedIds, "4.14").next, "13.1");
-  assert.equal(index.orderedIds.length, 157);
-  assert.equal(index.coreIds.length, 81);
+  assert.equal(index.orderedIds.length, 161);
+  assert.equal(index.coreIds.length, 84);
   applyLearningPath(index, "all");
   assert.equal(neighbors(index.orderedIds, "4.14").next, "5.1");
   assert.equal(completionStats(index.orderedIds, done).count, done.length);
@@ -37,4 +37,13 @@ test("les rapports distinguent train, validation et test et refusent les valeurs
   const rows = normalizeReports(x, "banc");
   assert.equal(rows[0].test_final.test_loss, 2.7);
   assert.equal(rows[1].test_final, undefined);
+});
+
+
+test("le banc moderne ne montre le test que pour la position retenue", () => {
+ const report={format:"afz-modern-benchmark-v1",selected_position:"rope",runs:[{position:"absolute",seed:0,val_loss_end:2.5},{position:"rope",seed:0,val_loss_end:2.3}],test_final:[{seed:0,position:"rope",loss:2.4}]};
+ const rows=normalizeReports(report,"banc");
+ assert.equal(rows[0].test_loss,undefined); assert.equal(rows[1].test_loss,2.4);
+ assert.throws(()=>normalizeReports({...report,test_final:[{seed:0,loss:-1}]},"faux"));
+ assert.throws(()=>normalizeReports({...report,runs:[report.runs[0],report.runs[0]]},"doublon"));
 });

@@ -136,12 +136,39 @@ test("stockage indisponible : les cours restent lisibles", async ({ page }) => {
   await expect(page.locator("h1")).toHaveText("Fonctions");
 });
 
+test("la synchronisation initiale conserve la note active et son focus", async ({ page }) => {
+  const sharedLearning = new Map([["progress", {
+    key: "progress", revision: 1,
+    payload: { v: 1, done: [], quizzes: {}, exercises: {} },
+  }]]);
+  await installOwner(page, { sharedLearning });
+  let release;
+  const initialSync = new Promise(resolve => { release = resolve; });
+  await page.route("https://example.supabase.co/rest/v1/learning_records**", async route => {
+    await initialSync;
+    await route.fallback();
+  });
+  await signInAs(page);
+  await page.goto("/#/lecon/0.9");
+  const note = page.getByLabel("Mes notes pour cette leçon");
+  await note.fill("Note commencée pendant le chargement");
+  const activeNote = await note.elementHandle();
+  release();
+  await expect.poll(() => sharedLearning.get("lesson/0.9")?.payload.note)
+    .toBe("Note commencée pendant le chargement");
+  expect(await activeNote.evaluate(node => node.isConnected)).toBe(true);
+  await expect(note).toBeFocused();
+  await expect(note).toHaveValue("Note commencée pendant le chargement");
+});
+
 test("deux appareils voient les notes et détectent une modification concurrente", async ({
   browser,
 }) => {
   const sharedLearning = new Map();
-  const first = await browser.newContext({ baseURL: "http://127.0.0.1:4173" });
-  const second = await browser.newContext({ baseURL: "http://127.0.0.1:4173" });
+  const first = await browser.newContext({ baseURL: "http://127.0.0.1:4173", serviceWorkers: "block" });
+  const second = await browser.newContext({ baseURL: "http://127.0.0.1:4173", serviceWorkers: "block" });
+  let releasePc;
+  const resumePc = new Promise(resolve => { releasePc = resolve; });
   try {
     const pc = await first.newPage(),
       tablet = await second.newPage();
@@ -152,6 +179,13 @@ test("deux appareils voient les notes et détectent une modification concurrente
     await expect
       .poll(() => sharedLearning.get("lesson/0.9")?.payload.note)
       .toBe("Note du PC");
+    // Le PC garde volontairement la révision 1 pendant la saisie tablette.
+    // Sans ce contrôle, un rafraîchissement lié au scroll peut déjà lui
+    // apporter la révision 2 : ce ne serait alors plus un conflit.
+    await pc.route("https://example.supabase.co/rest/v1/learning_records**", async route => {
+      await resumePc;
+      await route.fallback();
+    });
     await installOwner(tablet, { sharedLearning });
     await signInAs(tablet);
     await tablet.goto("/#/lecon/0.9");
@@ -168,6 +202,7 @@ test("deux appareils voient les notes et détectent une modification concurrente
       .getByLabel("Mes notes pour cette leçon")
       .fill("Brouillon PC concurrent");
     await pc.goto("/#/espace");
+    releasePc();
     await expect(
       pc.getByRole("heading", { name: "Deux versions à départager" }).first(),
     ).toBeVisible();
@@ -175,6 +210,7 @@ test("deux appareils voient les notes et détectent une modification concurrente
       "Version tablette",
     );
   } finally {
+    releasePc();
     await first.close();
     await second.close();
   }

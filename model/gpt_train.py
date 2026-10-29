@@ -18,6 +18,7 @@ from pathlib import Path
 
 import numpy as np
 
+from model.attention import rope_cos_sin
 from model.autograd import Tensor, cross_entropy, embedding, layernorm
 from model.bpe import BPETokenizer
 from model.byte_bpe import ByteBPETokenizer
@@ -33,20 +34,19 @@ DEFAULT_REPORT = ROOT / "runs" / "gpt_run.json"
 
 
 def assert_trainable(config: GPTConfig) -> None:
-    if (
-        config.pos != "absolute"
-        or config.norm not in ("layer", "rms")
-        or config.ffn != "gelu"
-    ):
-        raise ValueError(
-            "l'entraînement couvre positions absolues, LayerNorm/RMSNorm et GELU"
-        )
-    if config.n_kv_heads not in (None, config.n_heads):
-        raise ValueError(
-            "l'entraînement couvre l'attention multi-têtes complète, pas le GQA"
-        )
-    if config.tie_weights:
-        raise ValueError("l'entraînement ne partage pas encore la tête et l'embedding")
+    """Toutes les variantes de GPTConfig ont un backward : on vérifie seulement la cohérence.
+
+    Positions absolues ou RoPE, LayerNorm ou RMSNorm, FFN GELU ou SwiGLU,
+    attention complète ou groupée (GQA), tête séparée ou partagée avec l'embedding.
+    """
+    if config.pos not in ("absolute", "rope"):
+        raise ValueError(f"positions inconnues : {config.pos}")
+    if config.norm not in ("layer", "rms"):
+        raise ValueError(f"normalisation inconnue : {config.norm}")
+    if config.ffn not in ("gelu", "swiglu"):
+        raise ValueError(f"FFN inconnu : {config.ffn}")
+    if config.n_heads % config.kv_heads != 0:
+        raise ValueError("n_heads doit être un multiple de n_kv_heads")
 
 
 def bind_parameters(model: TinyGPT) -> dict[str, Tensor]:
@@ -79,23 +79,35 @@ def _attention_block(
 ) -> Tensor:
     batch, time, _ = hidden.data.shape
     heads = config.n_heads
+    kv_heads = config.kv_heads
     head_dim = config.head_dim
     prefix = f"l{layer}"
-    query = (
-        hidden.matmul(params[f"{prefix}.wq"])
-        .reshape(batch, time, heads, head_dim)
-        .permute((0, 2, 1, 3))
-    )
-    key = (
-        hidden.matmul(params[f"{prefix}.wk"])
-        .reshape(batch, time, heads, head_dim)
-        .permute((0, 2, 1, 3))
-    )
-    value = (
-        hidden.matmul(params[f"{prefix}.wv"])
-        .reshape(batch, time, heads, head_dim)
-        .permute((0, 2, 1, 3))
-    )
+
+    def split(weight: str, count: int) -> Tensor:
+        return (
+            hidden.matmul(params[f"{prefix}.{weight}"])
+            .reshape(batch, time, count, head_dim)
+            .permute((0, 2, 1, 3))
+        )
+
+    query = split("wq", heads)
+    key = split("wk", kv_heads)
+    value = split("wv", kv_heads)
+    if config.pos == "rope":
+        try:
+            from model.autograd import rope
+        except ImportError as exc:
+            raise ValueError("Ton autograd.py ne fournit pas encore rope : ajoute cette primitive pour --pos rope, ou garde les positions absolues.") from exc
+        cos, sin = rope_cos_sin(np.arange(time), head_dim)
+        query = rope(query, cos, sin)
+        key = rope(key, cos, sin)
+    if kv_heads != heads:
+        try:
+            from model.autograd import repeat_kv
+        except ImportError as exc:
+            raise ValueError("Ton autograd.py ne fournit pas encore repeat_kv : ajoute cette primitive pour le GQA, ou garde toutes les têtes K/V.") from exc
+        key = repeat_kv(key, heads // kv_heads)
+        value = repeat_kv(value, heads // kv_heads)
     scores = query.matmul(key.permute((0, 1, 3, 2))) * (float(head_dim) ** -0.5)
     weights = _causal_fill(scores).softmax(axis=-1)
     context = (
@@ -104,8 +116,16 @@ def _attention_block(
     return context.matmul(params[f"{prefix}.wo"])
 
 
-def _mlp_block(hidden: Tensor, params: dict[str, Tensor], layer: int) -> Tensor:
+def _mlp_block(
+    hidden: Tensor, params: dict[str, Tensor], layer: int, config: GPTConfig | None = None
+) -> Tensor:
     prefix = f"l{layer}"
+    if config is not None and config.ffn == "swiglu":
+        if not hasattr(Tensor, "silu"):
+            raise ValueError("Ton Tensor ne fournit pas encore silu : ajoute cette méthode pour SwiGLU, ou garde GELU.")
+        gate = hidden.matmul(params[f"{prefix}.wg"]).silu()
+        up = hidden.matmul(params[f"{prefix}.wu"])
+        return (gate * up).matmul(params[f"{prefix}.wd"])
     return hidden.matmul(params[f"{prefix}.w1"]).gelu().matmul(params[f"{prefix}.w2"])
 
 
@@ -118,9 +138,9 @@ def logits_tensor(
     _, time = tokens.shape
     if time > config.block_size:
         raise ValueError("la séquence dépasse block_size")
-    hidden = embedding(params["tok"], tokens) + embedding(
-        params["pos"], np.arange(time)
-    )
+    hidden = embedding(params["tok"], tokens)
+    if config.pos == "absolute":
+        hidden = hidden + embedding(params["pos"], np.arange(time))
 
     def normaliser(hidden, prefix):
         if config.norm == "rms":
@@ -133,8 +153,11 @@ def logits_tensor(
         normed = normaliser(hidden, f"l{layer}.n1")
         hidden = hidden + _attention_block(normed, params, layer, config)
         normed = normaliser(hidden, f"l{layer}.n2")
-        hidden = hidden + _mlp_block(normed, params, layer)
+        hidden = hidden + _mlp_block(normed, params, layer, config)
     hidden = normaliser(hidden, "nf")
+    if config.tie_weights:
+        # La même table sert à lire les tokens et à les prédire : deux gradients s'y ajoutent.
+        return hidden.matmul(params["tok"].transpose())
     return hidden.matmul(params["head"])
 
 
@@ -484,6 +507,10 @@ def train_gpt(
     resume_state: bool = False,
     total_steps: int | None = None,
     norm: str = "layer",
+    ffn: str = "gelu",
+    pos: str = "absolute",
+    n_kv_heads: int | None = None,
+    tie_weights: bool = False,
 ) -> tuple[TinyGPT, CharTokenizer | BPETokenizer, GPTTrainResult]:
     if steps < 2:
         raise ValueError("au moins deux pas pour comparer le début et la fin")
@@ -523,9 +550,11 @@ def train_gpt(
         n_heads=n_heads,
         n_layers=n_layers,
         block_size=block,
-        ffn="gelu",
+        ffn=ffn,
         norm=norm,
-        pos="absolute",
+        pos=pos,
+        n_kv_heads=n_kv_heads,
+        tie_weights=tie_weights,
         seed=seed,
     )
     if initial_model is not None and asdict(initial_model.config) != asdict(config):
@@ -747,6 +776,19 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=3e-3)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--norm", choices=["layer", "rms"], default="layer")
+    parser.add_argument("--ffn", choices=["gelu", "swiglu"], default="gelu")
+    parser.add_argument("--pos", choices=["absolute", "rope"], default="absolute")
+    parser.add_argument(
+        "--kv-heads",
+        type=int,
+        default=None,
+        help="têtes K/V partagées (GQA) ; absent = attention complète",
+    )
+    parser.add_argument(
+        "--tie-weights",
+        action="store_true",
+        help="la tête de sortie réutilise la table d'embedding",
+    )
     parser.add_argument(
         "--test-final",
         action="store_true",
@@ -822,6 +864,10 @@ def main() -> None:
         resume_state=args.resume is not None,
         total_steps=args.total_steps,
         norm=args.norm,
+        ffn=args.ffn,
+        pos=args.pos,
+        n_kv_heads=args.kv_heads,
+        tie_weights=args.tie_weights,
         val_text=val_text,
         steps=args.steps,
         lr=args.lr,
@@ -906,6 +952,10 @@ def _run_plan(args) -> None:
                 val_text=val_text,
                 initial_model=model,
                 norm=item.get("norm", getattr(args, "norm", "layer")),
+                ffn=item.get("ffn", getattr(args, "ffn", "gelu")),
+                pos=item.get("pos", getattr(args, "pos", "absolute")),
+                n_kv_heads=item.get("kv_heads", getattr(args, "kv_heads", None)),
+                tie_weights=bool(item.get("tie_weights", getattr(args, "tie_weights", False))),
                 steps=int(item.get("steps", args.steps)),
                 lr=float(item.get("lr", args.lr)),
                 batch=int(item.get("batch", args.batch)),

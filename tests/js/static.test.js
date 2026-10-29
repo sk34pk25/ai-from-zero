@@ -4,7 +4,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 import { ASSET_VERSION } from "../../assets/js/version.js";
-import { assetHash, importMap } from "../../scripts/stamp-assets.mjs";
+import { assetHash, contentSecurityPolicy, importMap } from "../../scripts/stamp-assets.mjs";
 
 const root = new URL("../..", import.meta.url);
 
@@ -53,4 +53,19 @@ test("les anciens fichiers monolithiques ne sont plus servis", () => {
   assert.equal(existsSync(join(root.pathname, "assets/app.js")), false);
   assert.equal(existsSync(join(root.pathname, "assets/lessons.js")), false);
   assert.equal(existsSync(join(root.pathname, "assets/style.css")), false);
+});
+
+test("la CSP autorise exactement les scripts inline présents", () => {
+  const html = read("index.html");
+  const match = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/);
+  assert.ok(match, "balise CSP absente");
+  assert.ok(html.indexOf(match[0]) < html.indexOf("<script"), "la CSP doit précéder les scripts");
+  assert.equal(match[1], contentSecurityPolicy(html));
+  assert.doesNotMatch(match[1], /unsafe-eval|script-src[^;]*unsafe-inline/);
+  assert.match(match[1], /object-src 'none'/);
+});
+
+test("une seule couleur de thème est déclarée", () => {
+  const html = read("index.html");
+  assert.equal(html.match(/name="theme-color"/g).length, 1);
 });
