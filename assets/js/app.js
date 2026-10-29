@@ -251,10 +251,6 @@ async function boot() {
     applyStoredProgress();
     state.booting = false;
     render({ scroll: "top" });
-    // Les résumés visuels ne servent qu'aux leçons : chargés après le premier rendu.
-    const prefetch = () => ensureGlances().catch(() => {});
-    if (typeof requestIdleCallback === "function") requestIdleCallback(prefetch, { timeout: 2000 });
-    else setTimeout(prefetch, 300);
   } catch {
     state.booting = false;
     els.main.replaceChildren(
@@ -277,6 +273,17 @@ async function loadJsonReport(path) {
 }
 
 let glancesPromise = null;
+
+// Les résumés visuels ne servent qu'aux leçons : on les demande dès qu'un lien de leçon est survolé ou visé.
+for (const type of ["pointerover", "focusin", "touchstart"])
+  document.addEventListener(
+    type,
+    (event) => {
+      if (state.index && !state.glancesReady && event.target?.closest?.('a[href^="#/lecon/"]'))
+        ensureGlances().catch(() => {});
+    },
+    { passive: true },
+  );
 
 /** Ajoute à chaque leçon son résumé visuel (data/glance.json). Une erreur réseau permet de réessayer. */
 function ensureGlances() {
