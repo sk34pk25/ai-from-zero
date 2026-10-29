@@ -50,3 +50,16 @@ Le workflow manuel de publication archive données, sources et checkpoints avec 
 ## Ce qui demande encore une observation humaine
 
 Réaliser les essais de docs/DEVICE_CHECKLIST.md sur de vrais appareils. Faire suivre le parcours à un débutant et relire son code, son raisonnement et son projet final avec la grille /20. Aucun compteur ni succès de tests publics ne peut remplacer ces observations.
+
+## Version suivante (audit du 29 octobre 2026, après-midi)
+
+| Constat | Réalisation | Preuve |
+| --- | --- | --- |
+| Rampe Python trop courte, classes jamais enseignées | Étapes 0.21 (classes), 0.22 (assert, pytest), 0.23 (mini-projet), chacune avec exercice exécutable et corrigé. | Exemples et corrigés exécutés par pytest ; réponses des 157 quiz existants inchangées. |
+| Variantes modernes seulement en forward | RoPE, SwiGLU, GQA/MQA et poids partagés entraînables ; options CLI et plans. | Forward autograd = forward NumPy, chaque gradient = différence finie, et parité PyTorch en CI. |
+| Backward récursif | Parcours topologique itératif dans model/ et atelier/. | Graphe trois fois plus profond que la limite de récursion ; rapport de l'atelier identique au bit près. |
+| Rien n'est gardé pour un visiteur | Mode local sur demande explicite, export/import au format de Mon espace, effacement ciblé. | Tests unitaires du stockage ; e2e : aucune clé avant l'accord, aucune requête Supabase. |
+| « J'ai déjà les bases » marquait tout sans vérifier | Test de positionnement à douze questions ; les étapes liées aux erreurs restent à faire. | Tests unitaires du score ; e2e avec une erreur volontaire. |
+| Pas de CSP | Content-Security-Policy générée avec les empreintes des scripts inline. | Test : la politique publiée égale la politique recalculée. |
+
+Total : 161 étapes, 66 exercices exécutables, 161 exemples Python vérifiés. L'observation d'un vrai débutant reste à faire.
