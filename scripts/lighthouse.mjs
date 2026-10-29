@@ -81,7 +81,7 @@ const server = await startServer(4175);
 try {
   const chrome = await chromeLauncher.launch({
     chromePath: process.env.CHROME_PATH,
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"],
+    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
   });
   try {
     const routes=JSON.parse(process.env.LIGHTHOUSE_ROUTES||'["/"]');
