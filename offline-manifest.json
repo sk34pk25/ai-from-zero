@@ -1,5 +1,5 @@
 {
-  "version": "d358747602c5",
+  "version": "a7d6402d0a51",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -20,7 +20,6 @@
     "assets/js/evidence.js",
     "assets/js/gpt.js",
     "assets/js/inference-worker.js",
-    "assets/js/learner-panel.js",
     "assets/js/learner.js",
     "assets/js/lesson-tools.js",
     "assets/js/lifecycle.js",

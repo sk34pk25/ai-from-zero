@@ -12,10 +12,11 @@ import {
   forgetLocalLearner,
   localLearnerEnabled,
   LOCAL_REVIEW_KEY,
+  localOptInButton,
+  localPanel,
   readLocalProgress,
   writeLocalProgress,
 } from "./learner.js";
-import { localOptInButton, localPanel } from "./learner-panel.js";
 import { leavePage, onLeave } from "./lifecycle.js";
 import {
   recordAttempt,
