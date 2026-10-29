@@ -1,7 +1,8 @@
 /** Playground public : le forward JavaScript, sans écriture dans le stockage. */
 
+import { ASSET_VERSION } from "./version.js";
 import { h } from "./dom.js";
-import { decodeIds, encodePrompt, forward, loadModel, sampleIndex, softmax1, topIndices } from "./gpt.js";
+import { decodeIds, encodePrompt, loadModel, sampleIndex, softmax1, topIndices } from "./gpt.js";
 
 export async function paintPlayground(main) {
   const stamp = main.dataset.paint;
@@ -44,6 +45,8 @@ function paintReady(main, models) {
   const status = h("p", { class: "quiz-feedback", role: "status", text: "" });
   let mode = models.suite ? "suite" : "dialogue";
   let stop = false;
+  let inference = null;
+  let cancelStep = null;
   const sync = () => {
     readout.textContent = `Température ${temperature.value.replace(".", ",")}, top-k ${topk.value}.`;
   };
@@ -56,7 +59,7 @@ function paintReady(main, models) {
     disabled: !models.suite && !models.dialogue,
     onClick: () => run(),
   }, "Générer");
-  const halt = h("button", { type: "button", class: "button button-secondary", id: "play-stop", onClick: () => { stop = true; } }, "Arrêter");
+  const halt = h("button", { type: "button", class: "button button-secondary", id: "play-stop", onClick: () => { stop = true; inference?.terminate(); cancelStep?.(null); } }, "Arrêter");
   const switcher = h("div", { class: "filter-row" });
   if (models.suite) switcher.append(h("button", { type: "button", class: "button button-secondary", onClick: () => { mode = "suite"; prompt.value = "Le "; } }, "Suite de texte"));
   if (models.dialogue) switcher.append(h("button", { type: "button", class: "button button-secondary", onClick: () => { mode = "dialogue"; prompt.value = "Question : qu'est-ce qu'un token\nRéponse :"; } }, "Dialogue"));
@@ -64,37 +67,58 @@ function paintReady(main, models) {
   async function run() {
     const model = models[mode] || models.suite || models.dialogue;
     if (!model) return;
+    if (generate.disabled) return;
+    generate.disabled = true;
     stop = false;
-    tokens.replaceChildren();
-    bars.replaceChildren();
-    heat.replaceChildren();
-    output.textContent = "";
-    status.textContent = "Génération…";
-    let ids;
     try {
-      ids = encodePrompt(model.tokenizer, prompt.value);
-    } catch (error) {
-      status.textContent = String(error.message || error);
-      return;
+      tokens.replaceChildren();
+      bars.replaceChildren();
+      heat.replaceChildren();
+      output.textContent = "";
+      status.textContent = "Génération…";
+      let ids;
+      try {
+        ids = encodePrompt(model.tokenizer, prompt.value);
+        if (!ids.length) throw new Error("Écris une invite avant de générer du texte.");
+      } catch (error) {
+        status.textContent = String(error.message || error);
+        return;
+      }
+      inference = new Worker(new URL(`./inference-worker.js?v=${encodeURIComponent(ASSET_VERSION)}`, import.meta.url), { type: "module" });
+      const calculate = (ids, first) => new Promise((resolve, reject) => {
+        cancelStep = resolve;
+        inference.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
+        inference.onerror = () => reject(new Error("worker"));
+        inference.onmessageerror = () => reject(new Error("message"));
+        inference.postMessage(first ? { model, ids } : { ids });
+      });
+      const limit = Math.min(12, model.config.block_size - 1);
+      for (let step = 0; step < limit; step += 1) {
+        if (stop || !main.isConnected || !output.isConnected) break;
+        const windowIds = ids.slice(-model.config.block_size);
+        const result = await calculate(windowIds, step === 0);
+        if (!result || stop || !output.isConnected) break;
+        const logits = result.logits;
+        const temperatureValue = Number(temperature.value);
+        const k = Number(topk.value);
+        const next = sampleIndex(logits, temperatureValue, k, Math.random);
+        ids.push(next);
+        const chip = h("span", { class: "token-chip", text: decodeIds(model.tokenizer, [next]) || "·" });
+        tokens.append(chip);
+        paintBars(bars, model, logits);
+        paintHeat(heat, result.attention);
+        output.textContent = decodeIds(model.tokenizer, ids);
+        await new Promise((resolve) => window.setTimeout(resolve, 20));
+      }
+      status.textContent = stop ? "Génération arrêtée." : "Génération terminée. Aucune donnée n'est enregistrée.";
+    } catch {
+      status.textContent = "La génération a échoué. Essaie une invite plus courte.";
+    } finally {
+      inference?.terminate();
+      inference = null;
+      cancelStep = null;
+      generate.disabled = false;
     }
-    const limit = Math.min(12, model.config.block_size - 1);
-    for (let step = 0; step < limit; step += 1) {
-      if (stop) break;
-      const windowIds = ids.slice(-model.config.block_size);
-      const result = forward(model, windowIds);
-      const logits = result.logits[result.logits.length - 1];
-      const temperatureValue = Number(temperature.value);
-      const k = Number(topk.value);
-      const next = sampleIndex(logits, temperatureValue, k, Math.random);
-      ids.push(next);
-      const chip = h("span", { class: "token-chip", text: decodeIds(model.tokenizer, [next]) || "·" });
-      tokens.append(chip);
-      paintBars(bars, model, logits);
-      paintHeat(heat, result.attention);
-      output.textContent = decodeIds(model.tokenizer, ids);
-      await new Promise((resolve) => window.setTimeout(resolve, 20));
-    }
-    status.textContent = stop ? "Génération arrêtée." : "Génération terminée. Aucune donnée n'est enregistrée.";
   }
 
   const note = models.suite || models.dialogue

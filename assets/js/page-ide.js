@@ -88,6 +88,8 @@ function paintShell(main, ctx, paths, files) {
   const progress = h("progress", { id: "ide-progress", max: "8", value: "0", "aria-label": "Avancement de l'entraînement" });
   let view = null;
   let stopped = false;
+  let busy = false;
+  let editorPaint = 0;
 
   const editorHost = h("div", { id: "ide-editor", class: "ide-editor" });
   const tree = h("div", { id: "ide-tree", class: "ide-tree", role: "tree" });
@@ -103,8 +105,8 @@ function paintShell(main, ctx, paths, files) {
     files.set(current, readDoc());
   }
 
-  function showFile(path) {
-    remember();
+  function showFile(path, savePrevious = true) {
+    if (savePrevious) remember();
     current = path;
     const text = files.get(path) || "";
     tabs.replaceChildren(h("span", { class: "ide-tab", text: path }));
@@ -115,12 +117,17 @@ function paintShell(main, ctx, paths, files) {
       return;
     }
     mountEditor(text);
+    paintTree();
   }
 
   async function mountEditor(text) {
+    const paint = ++editorPaint;
+    view?.destroy();
+    view = null;
     editorHost.replaceChildren(h("p", { text: "Ouverture de l'éditeur…" }));
     try {
       const { EditorView, EditorState, basicSetup, python } = await import("../vendor/editor.js");
+      if (paint !== editorPaint || !editorHost.isConnected) return;
       editorHost.replaceChildren();
       view = new EditorView({
         state: EditorState.create({
@@ -130,6 +137,7 @@ function paintShell(main, ctx, paths, files) {
         parent: editorHost,
       });
     } catch {
+      if (paint !== editorPaint || !editorHost.isConnected) return;
       view = null;
       const area = h("textarea", { id: "ide-fallback", class: "ide-fallback" });
       area.value = text;
@@ -161,6 +169,7 @@ function paintShell(main, ctx, paths, files) {
 
   async function train() {
     if (!ctx.owner) return;
+    remember();
     stopped = false;
     lossValues.length = 0;
     chart.replaceChildren();
@@ -177,7 +186,7 @@ function paintShell(main, ctx, paths, files) {
       const event = await request({ type: "train-step" });
       if (event.type === "error") {
         output.textContent += `${event.text}\n`;
-        break;
+        return;
       }
       const payloadStep = event.payload || {};
       lossValues.push(Number(payloadStep.loss));
@@ -233,9 +242,19 @@ function paintShell(main, ctx, paths, files) {
     const blob = zipStore([...files.entries()].map(([name, data]) => ({ name, data })));
     const link = h("a", { href: URL.createObjectURL(blob), download: "ide-ai-from-zero.zip" });
     link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   }
 
-  const run = h("button", { type: "button", class: "button button-primary", id: "ide-run", disabled: !ctx.owner, onClick: () => runCode() }, "Exécuter");
+  async function compute(action) {
+    if (busy) return;
+    busy = true;
+    run.disabled = trainButton.disabled = true;
+    try { await action(); }
+    catch { output.textContent += "Le calcul a échoué. Réessaie après un arrêt.\n"; }
+    finally { busy = false; run.disabled = trainButton.disabled = !ctx.owner; }
+  }
+
+  const run = h("button", { type: "button", class: "button button-primary", id: "ide-run", disabled: !ctx.owner, onClick: () => compute(runCode) }, "Exécuter");
   const stop = h("button", {
     type: "button",
     class: "button button-secondary",
@@ -247,7 +266,7 @@ function paintShell(main, ctx, paths, files) {
       output.textContent += "Arrêt demandé.\n";
     },
   }, "Arrêter");
-  const trainButton = h("button", { type: "button", class: "button button-primary", id: "ide-train", disabled: !ctx.owner, onClick: () => train() }, "Entraîner");
+  const trainButton = h("button", { type: "button", class: "button button-primary", id: "ide-train", disabled: !ctx.owner, onClick: () => compute(train) }, "Entraîner");
   const trainStop = h("button", {
     type: "button",
     class: "button button-secondary",
@@ -266,11 +285,17 @@ function paintShell(main, ctx, paths, files) {
     disabled: !ctx.owner,
     onClick: async () => {
       if (!ctx.owner) return;
-      const file = await fetch(new URL(current, document.baseURI));
-      const text = file.ok ? await file.text() : "";
-      files.set(current, text);
-      showFile(current);
-      output.textContent = "Fichier rétabli depuis le dépôt.";
+      const path = current;
+      try {
+        const file = await fetch(new URL(path, document.baseURI));
+        if (!file.ok) throw new Error("fetch");
+        const text = await file.text();
+        files.set(path, text);
+        if (current === path) showFile(path, false);
+        output.textContent = "Fichier rétabli depuis le dépôt. Sauvegarde pour conserver cette version.";
+      } catch {
+        output.textContent = "Le fichier d'origine est indisponible. Ton code est conservé.";
+      }
     },
   }, "Rétablir");
   const zip = h("button", { type: "button", class: "button button-secondary", id: "ide-export", disabled: !ctx.owner, onClick: exportZip }, "Exporter le zip");
