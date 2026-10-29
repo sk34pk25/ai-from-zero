@@ -1,3 +1,4 @@
+import { ASSET_VERSION } from "./version.js";
 import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
 import {
@@ -131,6 +132,17 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   boot();
   registerOffline();
+});
+
+/** Les polices arrivent après le chargement : au premier passage la police système suffit, ensuite le cache sert Inter. */
+function loadThemeFonts() {
+  if (document.querySelector('link[data-theme-fonts]')) return;
+  const href = new URL(`assets/css/fonts.css?v=${ASSET_VERSION}`, document.baseURI).href;
+  document.head.append(h("link", { rel: "stylesheet", href, "data-theme-fonts": "true" }));
+}
+window.addEventListener("load", () => {
+  if (typeof requestIdleCallback === "function") requestIdleCallback(loadThemeFonts, { timeout: 3000 });
+  else setTimeout(loadThemeFonts, 200);
 });
 
 function cacheElements() {
