@@ -16,8 +16,6 @@ import {
   writeLocalProgress,
 } from "./learner.js";
 import { localOptInButton, localPanel } from "./learner-panel.js";
-import { paintModel } from "./page-model.js";
-import { paintTrack } from "./page-track.js";
 import { leavePage, onLeave } from "./lifecycle.js";
 import {
   recordAttempt,
@@ -782,7 +780,7 @@ function paintMain(route, ticket) {
       })
       .catch(() => {});
   } else if (route.name === "model")
-    paintModel(els.main, {
+    paintAsync(ticket, () => import("./page-model.js"), (mod) => mod.paintModel(els.main, {
       architecture: state.index.architecture,
       done: state.done,
       selectedPart: state.selectedPart,
@@ -790,9 +788,9 @@ function paintMain(route, ticket) {
         state.selectedPart = id;
         render({ scroll: "keep" });
       },
-    });
+    }));
   else if (route.name === "track")
-    paintTrack(els.main, {
+    paintAsync(ticket, () => import("./page-track.js"), (mod) => mod.paintTrack(els.main, {
       track: state.index.track,
       done: state.done,
       reports: { gptRun: state.gptRun, finetuneRun: state.finetuneRun },
@@ -802,7 +800,7 @@ function paintMain(route, ticket) {
           finetuneRun: state.finetuneRun,
         })),
       isCurrent: () => ticket === state.pageTicket,
-    });
+    }));
   else if (route.name === "atelier")
     paintAsync(
       ticket,

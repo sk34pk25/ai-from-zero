@@ -113,6 +113,10 @@ try {
     const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 95);
     if (failed.length || mobileFailed.length) {
       console.error("Scores sous 95 :", { desktop: failed, mobile: mobileFailed });
+      if (process.env.GITHUB_ACTIONS) {
+        const worst = [...weak, ...mobileWeak].slice(0, 4).map((audit) => `${audit.id} ${audit.display ?? audit.score}`).join(" ; ");
+        console.log(`::error title=Lighthouse ${route}::bureau ${JSON.stringify(scores)} mobile ${JSON.stringify(mobileScores)} — ${worst}`);
+      }
       process.exitCode = 1;
     }
     }
