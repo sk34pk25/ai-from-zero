@@ -1,4 +1,5 @@
-Inter (Regular, SemiBold) et Inter Display (ExtraBold), sous-ensemble latin au format WOFF.
+Inter (Regular, SemiBold) et Inter Display (ExtraBold), format WOFF2, réduits aux caractères utilisés par le site
+(pyftsubset --text-file, crénage conservé). Un caractère absent s'affiche dans la police de secours du système.
 Copyright 2016-2023 The Inter Project Authors (https://github.com/rsms/inter).
 Licence SIL Open Font License 1.1 : https://openfontlicense.org
 
