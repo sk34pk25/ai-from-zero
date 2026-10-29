@@ -316,11 +316,14 @@ Au début de l'entraînement, f peut être proche de zéro si les dernières mat
 @LANG python
 @CODE
 :::
+import numpy as np
 def avec_residu(x, correction):
     return x + correction
-
-x = [1.0, 2.0]
-print(avec_residu(x, [0.0, 0.0]))
+x = np.array([1.0, 2.0])
+y = avec_residu(x, np.array([0.0, 0.0]))
+np.testing.assert_array_equal(y, x)
+assert y.shape == x.shape
+print(y)
 :::
 @EXPERIMENT
 Passe une correction [0.1, -0.1]. La sortie doit être [1.1, 1.9]. Si tu oublies l'addition, tu perds x.
@@ -338,6 +341,11 @@ L'entrée, inchangée
 - Une distribution uniforme
 @EXPLANATION
 x + 0 = x. Le chemin direct laisse passer l'entrée quand la correction est nulle : c'est l'intérêt du résidu.
+@CODEFILE
+model/transformer.py
+@SYMBOL
+TinyGPT.forward
+
 @@@
 @ID 4.9
 @TITLE Normalisation
@@ -571,29 +579,35 @@ Entraîner, c'est la même boucle qu'au bigramme neuronal : logits, cross-entrop
 @VOCAB
 Cache KV : les clés et valeurs des tokens passés, réutilisées. Pas glouton : température 0, on prend l'argmax. Cohérence : le forward par morceaux égale le forward d'un coup.
 @EXPLAIN
-Le dépôt vérifie trois choses, qui valent mieux qu'un texte joli. Un changement du dernier token ne modifie pas les logits du passé. Un forward sur les trois premiers tokens, puis sur la suite avec le cache, retrouve les logits du forward complet. Une génération de trois pas depuis un seul token produit une séquence de longueur 4, dont le premier identifiant est conservé. L'entraînement complet à travers l'attention n'est pas réécrit en NumPy : le gradient de la loss et l'entraînement de la tête linéaire sont testés à part, et le forward est assez solide pour qu'un autograd, PyTorch par exemple, puisse s'appuyer dessus. On ne prétend pas avoir un optimiseur caché dans le forward.
+Le decoder standard est entièrement entraînable dans model/gpt_train.py : positions absolues, LayerNorm, attention multi-têtes, FFN GELU, résidus et tête de langage. logits_tensor reconstitue le forward avec des Tensor ; sequence_loss décale entrée et cible ; backward calcule tous les gradients et AdamW modifie les paramètres. Le test compare aussi le forward autograd au forward NumPy et vérifie un gradient d'attention par différence finie. En génération, les poids restent fixes et un token est ajouté au contexte. Le cache doit retrouver les logits du calcul complet, sans lire le futur. Lance le TP 12 : entraîne depuis une graine, mesure train et validation, recharge le checkpoint, puis compare le GPT au bigramme et à l'uniforme. Un résultat insuffisant doit être expliqué, pas caché. Les options modernes et le dos hybride ne sont pas entraînés par ce chemin.
 @LANG python
 @CODE
 :::
-import numpy as np
-from model.transformer import GPTConfig, TinyGPT, generate
-modele = TinyGPT(GPTConfig(vocab_size=12, d_model=16, n_heads=4, n_layers=2, block_size=8, seed=2))
-sortie = generate(modele, np.array([[1]]), 3, np.random.default_rng(0), temperature=0)
-print(sortie.shape, int(sortie[0, 0]))
+from model.gpt_train import train_gpt, sample_text
+texte = "le chat dort. le chien court.\n" * 40
+m, tok, r = train_gpt(texte, steps=40, batch=2, block=8,
+    d_model=8, n_heads=2, n_layers=1, sample=False, eval_windows=2)
+assert r.train_loss_end < r.train_loss_start
+print("train", r.train_loss_end, "validation", r.val_loss_end)
+print(sample_text(m, tok, "le ", 12, temperature=0, top_k=1, seed=0))
 :::
 @EXPERIMENT
 Lance le test test_transformer_shapes_cache_and_causality. Il doit passer. Lis le message si tu le modifies : la causalité est le premier invariant à ne pas casser.
 @EXERCISE
-Explique en trois lignes la différence entre un pas d'entraînement et un pas de génération. Un seul des deux modifie les poids.
+Dans ton atelier, termine decoder, loss et le pas AdamW. Lance verifier.py puis entrainer.py sur le corpus jouet. Joins les pertes train/validation, les baselines, une génération et le contrôle de rechargement. Indique ce que cette tâche simple ne prouve pas.
 @BUILD
-Le niveau 4 se ferme sur un mini-GPT sans nn.Transformer. Les tests de forme, de masque, de cache et de génération tiennent lieu de checkpoint. Le niveau 5 changera des pièces sans changer ce contrat.
+La sortie de ce niveau est un GPT standard réellement entraîné. atelier/GUIDE.md décrit le TP 12 et l'épreuve finale. Le fichier model/gpt_train.py est la référence ; garde tes propres poids et rapports dans runs/, pas dans les fichiers publiés.
 @QUESTION
-Le cache KV sert pendant la génération à…
+Quelles briques l'entraînement du GPT standard met-il à jour ?
 @CORRECT
-Réutiliser les clés et les valeurs des tokens déjà traités
+Embeddings, attention, FFN, normes et tête de sortie
 @WRONG
-- Modifier les poids plus vite
-- Supprimer le masque causal
-- Remplacer le tokenizer
+- Seulement la tête linéaire finale
+- Seulement le tokenizer
+- Seulement les valeurs du cache KV
 @EXPLANATION
-Le cache évite de recalculer le passé. Il ne doit pas changer le résultat : le test d'égalité avec le forward complet le garantit.
+Le graphe de logits_tensor traverse tous ces paramètres. Le backward et AdamW les mettent à jour. La génération seule, elle, ne change pas les poids.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+sequence_loss

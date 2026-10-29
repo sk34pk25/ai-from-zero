@@ -401,3 +401,113 @@ def split_instructions(
         [r for b in blocks[test_n : test_n + val_n] for r in b],
         [r for b in blocks[:test_n] for r in b],
     )
+
+
+def instruction_diagnostics(tokenizer, rows, block):
+    unknown = skipped = truncated = target_tokens = 0
+    for row in rows:
+        built = example_ids(tokenizer, row["question"], row["answer"])
+        if built is None:
+            unknown += 1
+            continue
+        ids, mask = built
+        packed = batch_from_ids(ids, mask, block)
+        if packed is None:
+            skipped += 1
+            continue
+        truncated += len(ids) > block + 1
+        target_tokens += int(packed[1].sum())
+    return {
+        "provided": len(rows),
+        "unknown_alphabet": unknown,
+        "without_answer_in_window": skipped,
+        "truncated": int(truncated),
+        "target_tokens": target_tokens,
+    }
+
+
+def _assert_separate_instructions(parts):
+    import re
+    from difflib import SequenceMatcher
+
+    def norm(text):
+        return re.sub(r"[^\w]+", " ", text.casefold()).strip()
+
+    named = list(parts.items())
+    for i, (left_name, left) in enumerate(named):
+        for right_name, right in named[i + 1 :]:
+            for a in left:
+                for b in right:
+                    if (
+                        norm(a["answer"]) == norm(b["answer"])
+                        or SequenceMatcher(
+                            None, norm(a["question"]), norm(b["question"])
+                        ).ratio()
+                        > 0.88
+                    ):
+                        raise ValueError(
+                            f"groupes d’instructions communs : {left_name}/{right_name}"
+                        )
+
+
+def finetune_phase(model, tokenizer, item, seed=0):
+    """Même protocole réservé pour les plans CLI et les comparaisons.
+
+    Le test est renvoyé sans être mesuré : --test-final le consulte après choix.
+    Un petit diagnostic sur train exige une intention explicite dans le plan.
+    """
+    rows = load_instructions(item["instructions"])
+    if item.get("validation"):
+        validation = load_instructions(item["validation"])
+        test = load_instructions(item["test"]) if item.get("test") else []
+        _assert_separate_instructions(
+            {"train": rows, "validation": validation, "test": test}
+        )
+        label = "fichiers séparés ; groupes lexicaux contrôlés"
+    elif item.get("diagnostic_train") is True:
+        validation, test = rows, []
+        label = (
+            "diagnostic sur train explicitement demandé ; généralisation non évaluée"
+        )
+    else:
+        if len(rows) < 10:
+            raise ValueError(
+                "SFT : fournir validation/test ou diagnostic_train=true pour ce petit jeu"
+            )
+        rows, validation, test = split_instructions(rows, seed)
+        label = "validation réservée par groupes lexicaux"
+    parts = {"train": rows, "validation": validation, "test": test}
+    diagnostics = {
+        name: instruction_diagnostics(tokenizer, part, model.config.block_size)
+        for name, part in parts.items()
+    }
+    before = evaluate_instructions(model, tokenizer, validation)
+    tuned = finetune(
+        model,
+        tokenizer,
+        rows,
+        steps=int(item.get("steps", 20)),
+        lr=float(item.get("lr", 1e-3)),
+        seed=seed,
+        lora_rank=item.get("lora_rank"),
+    )
+    after = evaluate_instructions(model, tokenizer, validation)
+    import hashlib, json
+
+    def digest(part):
+        return hashlib.sha256(
+            json.dumps(part, ensure_ascii=False, sort_keys=True).encode()
+        ).hexdigest()
+
+    report = {k: v for k, v in tuned.items() if k != "losses"}
+    report.update(
+        evaluation=label,
+        validation_loss_start=before["loss"],
+        validation_loss_end=after["loss"],
+        train_evaluation=evaluate_instructions(model, tokenizer, rows),
+        split={name: len(part) for name, part in parts.items()},
+        split_sha256={name: digest(part) for name, part in parts.items()},
+        diagnostics=diagnostics,
+        test_consulted=False,
+    )
+    return report, test

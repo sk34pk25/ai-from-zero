@@ -41,10 +41,10 @@
   },
   "0.5": {
     "hints": [
-      "print accepte plusieurs arguments de types différents.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. print(\"Ada\", \"construire un petit modèle\", 42) affiche les trois valeurs."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "print(\"Ada\", \"construire un petit modèle\", 42) affiche les trois valeurs. Remplace Ada par le prénom choisi. Les guillemets créent des chaînes ; 42 sans guillemets est un entier. print(\"42\") afficherait aussi 42, mais la valeur aurait le type str.",
+    "solution": "message = \"construire un petit modèle\" et nombre = 42. print(message, nombre) affiche les deux. Le type de nombre est int ; \"42\" serait une chaîne. Tu n'as pas encore besoin de définir une fonction.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : print accepte plusieurs arguments de types différents."
     ]
@@ -261,10 +261,10 @@
   },
   "1.7": {
     "hints": [
-      "Le biais de sortie s'ajoute après la dernière multiplication.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Pour une entrée de largeur D, une couche cachée H et une sortie O : x est (D,), x@W1 est (H,), h@W2 est (O,)."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "Pour une entrée de largeur D, une couche cachée H et une sortie O : x est (D,), x@W1 est (H,), h@W2 est (O,). En ajoutant b2 = 0,5, chaque sortie augmente de 0,5, sans changer sa shape. Reprends les matrices numériques de l'exemple pour vérifier.",
+    "solution": "Avec le batch de l'exemple, x a la forme (1,2), la couche cachée (1,2) et la sortie (1,1). La sortie initiale vaut 2 ; avec b2 = np.array([0.5]), elle vaut 2,5. L'axe batch est conservé dans chaque étape.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Le biais de sortie s'ajoute après la dernière multiplication."
     ]
@@ -341,10 +341,10 @@
   },
   "1.15": {
     "hints": [
-      "Distingue une nouvelle passe backward d'une remise à zéro.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Sur l'exemple du cours, un passage produit un gradient -4."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "Sur l'exemple du cours, un passage produit un gradient -4. Si tu reconstruis et rétropropages le même calcul sans zero_grad, les contributions s'accumulent et donnent -8. Avec ce petit autograd, réutiliser exactement le même graphe sans vider aussi ses gradients intermédiaires n'est pas une opération générale garantie : reconstruis le forward à chaque pas.",
+    "solution": "Le gradient du biais a la shape (3,) et vaut [2,2,2]. Chaque coordonnée a été ajoutée une fois par ligne et reçoit donc deux contributions. Le backward réduit l'axe diffusé du batch pour retrouver la shape du paramètre.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Distingue une nouvelle passe backward d'une remise à zéro."
     ]
@@ -721,10 +721,10 @@
   },
   "4.14": {
     "hints": [
-      "Demande si backward et l'optimiseur sont exécutés.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'entraînement voit des entrées et des cibles décalées, calcule une perte, rétropropage puis met à jour les poids."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "L'entraînement voit des entrées et des cibles décalées, calcule une perte, rétropropage puis met à jour les poids. La génération calcule les logits, choisit un token et l'ajoute au contexte. Elle garde les poids fixes et peut utiliser un cache KV.",
+    "solution": "Complète les fonctions de l'atelier, lance verifier.py, puis entrainer.py avec ton corpus. Vérifie que les paramètres changent, que les pertes train et validation sont calculées séparément et que les logits sont identiques après rechargement. Compare les baselines sur les mêmes cibles. Un petit corpus répété montre un apprentissage local, pas une maîtrise générale du français.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Demande si backward et l'optimiseur sont exécutés."
     ]
@@ -1441,20 +1441,20 @@
   },
   "12.8": {
     "hints": [
-      "Sépare construction, vérifications et qualité non mesurée.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple : « Candidate hybride : alternance attention et scan diagonal."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "Exemple : « Candidate hybride : alternance attention et scan diagonal. Les tests de shape (B,T,D) et de causalité passent. Aucun gain de perplexité après entraînement du dos hybride n'est mesuré. » Ajoute uniquement des chiffres que tu as réellement produits.",
+    "solution": "Exemple : GPT standard à une couche comme baseline, puis deux couches à largeur et nombre de tokens identiques. Choisis la loss sur validation comme mesure et conserve les deux rapports. Un dos hybride exécuté sans backward ne permet pas cette comparaison de qualité après entraînement.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Sépare construction, vérifications et qualité non mesurée."
     ]
   },
   "12.9": {
     "hints": [
-      "Nomme le type d'apprentissage de chaque composant.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Écris : « Le bigramme est estimé par comptage ; la tête linéaire est entraînée par descente ; le dos hybride est initialisé et exécuté sans apprentissage de ses poids."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "Écris : « Le bigramme est estimé par comptage ; la tête linéaire est entraînée par descente ; le dos hybride est initialisé et exécuté sans apprentissage de ses poids. » Un forward qui termine sans erreur ne justifie pas d'appeler ce dernier modèle entraîné.",
+    "solution": "La remise contient le code élève, les pertes, le checkpoint et une comparaison numérique avant/après chargement. Le minuscule lot sert à vérifier que le moteur peut apprendre ; les documents réservés servent à mesurer le transfert sans ajuster leurs poids. Le test final reste hors choix des hyperparamètres.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Nomme le type d'apprentissage de chaque composant."
     ]
@@ -1481,10 +1481,10 @@
   },
   "12.12": {
     "hints": [
-      "Associe chaque affirmation à une preuve ou retire-la.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Remplace « rapide » par une durée et sa machine, « léger » par une mémoire et ce qu'elle inclut, « meilleur » par une métrique et une baseline."
+      "Écris d'abord le contrat de forme ou le protocole attendu.",
+      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
     ],
-    "solution": "Remplace « rapide » par une durée et sa machine, « léger » par une mémoire et ce qu'elle inclut, « meilleur » par une métrique et une baseline. Pour une propriété non mesurée, écris « non évalué ». La fiche finale doit être vérifiable par quelqu'un qui n'a pas vu la conversation.",
+    "solution": "Le dossier final réunit le code de tes composants, les documents séparés, le tokenizer, la configuration, les courbes, les baselines et les logits après rechargement. Ajoute une variation contrôlée et explique les résultats, y compris négatifs. Un rapport automatique vérifie des propriétés ; la compréhension doit aussi être démontrée sans le corrigé.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Associe chaque affirmation à une preuve ou retire-la."
     ]

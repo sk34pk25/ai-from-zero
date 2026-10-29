@@ -496,7 +496,7 @@ Ajoute une troisième ligne de meilleure qualité mais de RAM énorme. Le tri la
 @EXERCISE
 Propose trois lignes honnêtes pour le fil rouge : bigramme, TinyGPT absolu, TinyGPT RoPE. Quelle unique colonne changer entre les deux TinyGPT pour que la comparaison parle de RoPE ?
 @BUILD
-quality_table ferme le niveau 6. Le composant « mesures » du site pointe ici. Les niveaux suivants, MoE et SSM, devront ajouter une ligne, pas remplacer le tableau.
+Le tableau compare qualité, temps et RAM réellement mesurés. L'atelier mesure le GPT standard contre le bigramme. RoPE reste un forward : sa vitesse peut être mesurée, sa qualité après entraînement reste non évaluée dans ce dépôt.
 @QUESTION
 Pour attribuer un gain à RoPE, il faut…
 @CORRECT
@@ -507,3 +507,7 @@ Ne changer que le mode de position entre les deux lignes comparées
 - Mesurer la qualité sur deux corpus différents
 @EXPLANATION
 Une comparaison utile isole un facteur. Le tri n'enlève pas cette obligation.
+@CODEFILE
+model/bench.py
+@SYMBOL
+quality_table

@@ -1,0 +1,169 @@
+{
+  "format": "afz-atelier-v1",
+  "coreLevels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    13
+  ],
+  "stages": [
+    {
+      "id": 1,
+      "title": "Tokenizer réversible",
+      "lessons": [
+        "2.1",
+        "2.3",
+        "2.5"
+      ],
+      "functions": "vocabulaire, encoder, decoder",
+      "contract": "Caractères triés, espaces et accents conservés ; inconnu signalé."
+    },
+    {
+      "id": 2,
+      "title": "Fenêtres et cibles",
+      "lessons": [
+        "2.11",
+        "3.1",
+        "3.3"
+      ],
+      "functions": "fenetres",
+      "contract": "Deux tableaux (N,T) ; le dernier élément prédit un token hors de son entrée."
+    },
+    {
+      "id": 3,
+      "title": "Probabilités et perte",
+      "lessons": [
+        "3.5",
+        "3.6"
+      ],
+      "functions": "softmax, entropie",
+      "contract": "Stabilité avec logits ±1000 ; uniforme : loss = log(V)."
+    },
+    {
+      "id": 4,
+      "title": "Pente numérique",
+      "lessons": [
+        "0.20",
+        "1.10",
+        "1.11"
+      ],
+      "functions": "derivee",
+      "contract": "Différence centrée ; chaîne et signe sur plusieurs fonctions."
+    },
+    {
+      "id": 5,
+      "title": "Ton moteur scalaire",
+      "lessons": [
+        "1.12",
+        "1.15"
+      ],
+      "functions": "Valeur",
+      "contract": "Parents, accumulation des chemins et ordre topologique inverse."
+    },
+    {
+      "id": 6,
+      "title": "Gradients sur tableaux",
+      "lessons": [
+        "0.15",
+        "1.15"
+      ],
+      "functions": "reduire_gradient",
+      "contract": "Retrouver la shape d’un biais diffusé ; lire aussi embedding et LayerNorm."
+    },
+    {
+      "id": 7,
+      "title": "Attention causale",
+      "lessons": [
+        "4.2",
+        "4.3",
+        "4.4",
+        "4.5",
+        "4.6"
+      ],
+      "functions": "attention",
+      "contract": "Masque avant softmax ; futur sans influence ; gradient vérifié numériquement."
+    },
+    {
+      "id": 8,
+      "title": "Plusieurs têtes",
+      "lessons": [
+        "4.7"
+      ],
+      "functions": "multi_tetes",
+      "contract": "Passage (B,T,D) ↔ (B,H,T,D/H) puis projection de sortie."
+    },
+    {
+      "id": 9,
+      "title": "Bloc pré-norme",
+      "lessons": [
+        "4.8",
+        "4.9",
+        "4.10",
+        "4.11"
+      ],
+      "functions": "bloc",
+      "contract": "Deux résidus ; FFN 4D ; corrections nulles = identité."
+    },
+    {
+      "id": 10,
+      "title": "Ton decoder",
+      "lessons": [
+        "4.12",
+        "4.13",
+        "4.14"
+      ],
+      "functions": "logits, perte",
+      "contract": "Embeddings, positions, blocs et logits (B,T,V) ; gradients dans toutes les briques."
+    },
+    {
+      "id": 11,
+      "title": "Pas AdamW",
+      "lessons": [
+        "1.14",
+        "1.16"
+      ],
+      "functions": "adamw",
+      "contract": "Moments, correction de biais, compteur et décroissance découplée."
+    },
+    {
+      "id": 12,
+      "title": "Générer et entraîner",
+      "lessons": [
+        "3.7",
+        "3.9",
+        "3.11",
+        "4.14",
+        "12.12",
+        "13.3"
+      ],
+      "functions": "prochain",
+      "contract": "Graine, top-k ; puis données réservées, baselines et checkpoint rechargé."
+    }
+  ],
+  "files": [
+    "atelier/GUIDE.md",
+    "atelier/INSTALLATION.md",
+    "atelier/LICENSE",
+    "atelier/PROJET_FINAL.md",
+    "atelier/README.md",
+    "atelier/commun.py",
+    "atelier/correction.py",
+    "atelier/demo/test.txt",
+    "atelier/demo/train.txt",
+    "atelier/demo/validation.txt",
+    "atelier/eleve.py",
+    "atelier/entrainer.py",
+    "atelier/evaluer.py",
+    "atelier/moteur.py",
+    "atelier/preparer.py",
+    "atelier/requirements.txt",
+    "atelier/verifier.py"
+  ],
+  "documents": [
+    "atelier/INSTALLATION.md",
+    "atelier/GUIDE.md",
+    "atelier/PROJET_FINAL.md"
+  ]
+}

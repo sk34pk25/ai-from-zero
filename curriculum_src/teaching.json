@@ -1,0 +1,926 @@
+{
+  "coreLevels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    13
+  ],
+  "afterCoreLevels": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "references": {
+    "0.1": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.2": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.3": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.4": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.5": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.6": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.7": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.8": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.9": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.10": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.11": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.12": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.13": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.14": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.15": {
+      "file": "model/stats.py",
+      "symbol": "summarize"
+    },
+    "0.16": {
+      "file": "model/mathutil.py",
+      "symbol": "softmax"
+    },
+    "0.17": {
+      "file": "model/attention.py",
+      "symbol": "scaled_dot_product_attention"
+    },
+    "0.18": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "0.19": {
+      "file": "model/mathutil.py",
+      "symbol": "softmax"
+    },
+    "0.20": {
+      "file": "model/mathutil.py",
+      "symbol": "numerical_derivative"
+    },
+    "1.1": {
+      "file": "model/mlp.py",
+      "symbol": "train_linear_regression"
+    },
+    "1.2": {
+      "file": "model/train.py",
+      "symbol": "train_linear_classifier"
+    },
+    "1.3": {
+      "file": "model/experiment.py",
+      "symbol": "split_sequence"
+    },
+    "1.4": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.parameter_count"
+    },
+    "1.5": {
+      "file": "model/mlp.py",
+      "symbol": "neuron"
+    },
+    "1.6": {
+      "file": "model/mlp.py",
+      "symbol": "relu"
+    },
+    "1.7": {
+      "file": "model/mlp.py",
+      "symbol": "mlp_forward"
+    },
+    "1.8": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "1.9": {
+      "file": "model/mathutil.py",
+      "symbol": "cross_entropy"
+    },
+    "1.10": {
+      "file": "model/mathutil.py",
+      "symbol": "cross_entropy_grad"
+    },
+    "1.11": {
+      "file": "model/autograd.py",
+      "symbol": "Tensor.__mul__"
+    },
+    "1.12": {
+      "file": "model/autograd.py",
+      "symbol": "Tensor.backward"
+    },
+    "1.13": {
+      "file": "model/mlp.py",
+      "symbol": "train_linear_regression"
+    },
+    "1.14": {
+      "file": "model/gpt_train.py",
+      "symbol": "AdamW.step"
+    },
+    "1.15": {
+      "file": "model/autograd.py",
+      "symbol": "_unbroadcast"
+    },
+    "1.16": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
+    },
+    "1.17": {
+      "file": "model/gpt_train.py",
+      "symbol": "corpus_loss"
+    },
+    "2.1": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.2": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.3": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.4": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.5": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.6": {
+      "file": "model/tokenizer.py",
+      "symbol": "MiniBPE"
+    },
+    "2.7": {
+      "file": "model/tokenizer.py",
+      "symbol": "MiniBPE.encode"
+    },
+    "2.8": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer.encode"
+    },
+    "2.9": {
+      "file": "model/autograd.py",
+      "symbol": "embedding"
+    },
+    "2.10": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "2.11": {
+      "file": "model/gpt_train.py",
+      "symbol": "sample_batch"
+    },
+    "3.1": {
+      "file": "model/bigram.py",
+      "symbol": "BigramModel.observe"
+    },
+    "3.2": {
+      "file": "model/bigram.py",
+      "symbol": "BigramModel.observe"
+    },
+    "3.3": {
+      "file": "model/gpt_train.py",
+      "symbol": "sample_batch"
+    },
+    "3.4": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "3.5": {
+      "file": "model/mathutil.py",
+      "symbol": "softmax"
+    },
+    "3.6": {
+      "file": "model/mathutil.py",
+      "symbol": "cross_entropy"
+    },
+    "3.7": {
+      "file": "model/transformer.py",
+      "symbol": "generate"
+    },
+    "3.8": {
+      "file": "model/tiny_lm.py",
+      "symbol": "train_tiny_lm"
+    },
+    "3.9": {
+      "file": "model/gpt_sample.py",
+      "symbol": "main"
+    },
+    "3.10": {
+      "file": "model/bigram.py",
+      "symbol": "BigramModel.perplexity"
+    },
+    "3.11": {
+      "file": "model/gpt_train.py",
+      "symbol": "save_checkpoint"
+    },
+    "4.1": {
+      "file": "model/attention.py",
+      "symbol": "scaled_dot_product_attention"
+    },
+    "4.2": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT._attention"
+    },
+    "4.3": {
+      "file": "model/attention.py",
+      "symbol": "scaled_dot_product_attention"
+    },
+    "4.4": {
+      "file": "model/attention.py",
+      "symbol": "scaled_dot_product_attention"
+    },
+    "4.5": {
+      "file": "model/attention.py",
+      "symbol": "causal_mask"
+    },
+    "4.6": {
+      "file": "model/attention.py",
+      "symbol": "scaled_dot_product_attention"
+    },
+    "4.7": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT._attention"
+    },
+    "4.8": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "4.9": {
+      "file": "model/autograd.py",
+      "symbol": "layernorm"
+    },
+    "4.10": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT._ffn"
+    },
+    "4.11": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "4.12": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "4.13": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "4.14": {
+      "file": "model/gpt_train.py",
+      "symbol": "sequence_loss"
+    },
+    "5.1": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "5.2": {
+      "file": "model/attention.py",
+      "symbol": "apply_rope"
+    },
+    "5.3": {
+      "file": "model/mathutil.py",
+      "symbol": "rmsnorm"
+    },
+    "5.4": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT._ffn"
+    },
+    "5.5": {
+      "file": "model/attention.py",
+      "symbol": "repeat_kv"
+    },
+    "5.6": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "5.7": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.forward"
+    },
+    "5.8": {
+      "file": "model/transformer.py",
+      "symbol": "TinyGPT.__init__"
+    },
+    "5.9": {
+      "file": "model/bench.py",
+      "symbol": "attention_flops"
+    },
+    "6.1": {
+      "file": "model/bench.py",
+      "symbol": "parameter_bytes"
+    },
+    "6.2": {
+      "file": "model/bench.py",
+      "symbol": "parameter_bytes"
+    },
+    "6.3": {
+      "file": "model/bench.py",
+      "symbol": "attention_flops"
+    },
+    "6.4": {
+      "file": "model/bench.py",
+      "symbol": "attention_flops"
+    },
+    "6.5": {
+      "file": "model/gpt_train.py",
+      "symbol": "sample_batch"
+    },
+    "6.6": {
+      "file": "model/bench.py",
+      "symbol": "parameter_bytes"
+    },
+    "6.7": {
+      "file": "model/autograd.py",
+      "symbol": "Tensor.zero_grad"
+    },
+    "6.8": {
+      "file": "model/autograd.py",
+      "symbol": "Tensor.backward"
+    },
+    "6.9": {
+      "file": "model/bench.py",
+      "symbol": "parameter_bytes"
+    },
+    "6.10": {
+      "file": "model/experiment.py",
+      "symbol": "run_ablation"
+    },
+    "6.11": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
+    },
+    "6.12": {
+      "file": "model/bench.py",
+      "symbol": "quality_table"
+    },
+    "7.1": {
+      "file": "model/moe.py",
+      "symbol": "expert_forward"
+    },
+    "7.2": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "7.3": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "7.4": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "7.5": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "7.6": {
+      "file": "model/moe.py",
+      "symbol": "load_balance_loss"
+    },
+    "7.7": {
+      "file": "model/moe.py",
+      "symbol": "load_balance_loss"
+    },
+    "7.8": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "7.9": {
+      "file": "model/moe.py",
+      "symbol": "moe_ffn"
+    },
+    "8.1": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "8.2": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "8.3": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "8.4": {
+      "file": "model/ssm.py",
+      "symbol": "sequential_affine"
+    },
+    "8.5": {
+      "file": "model/ssm.py",
+      "symbol": "parallel_affine"
+    },
+    "8.6": {
+      "file": "model/ssm.py",
+      "symbol": "selective_params"
+    },
+    "8.7": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone._ssm"
+    },
+    "8.8": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "8.9": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "9.1": {
+      "file": "model/multimodal.py",
+      "symbol": "patchify"
+    },
+    "9.2": {
+      "file": "model/multimodal.py",
+      "symbol": "patchify"
+    },
+    "9.3": {
+      "file": "model/multimodal.py",
+      "symbol": "project_patches"
+    },
+    "9.4": {
+      "file": "model/multimodal.py",
+      "symbol": "patchify"
+    },
+    "9.5": {
+      "file": "model/multimodal.py",
+      "symbol": "project_patches"
+    },
+    "9.6": {
+      "file": "model/multimodal.py",
+      "symbol": "patchify"
+    },
+    "9.7": {
+      "file": "model/multimodal.py",
+      "symbol": "project_patches"
+    },
+    "9.8": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "9.9": {
+      "file": "model/multimodal.py",
+      "symbol": "patchify"
+    },
+    "10.1": {
+      "file": "model/memory.py",
+      "symbol": "build_context"
+    },
+    "10.2": {
+      "file": "model/memory.py",
+      "symbol": "bow_vector"
+    },
+    "10.3": {
+      "file": "model/memory.py",
+      "symbol": "retrieve"
+    },
+    "10.4": {
+      "file": "model/memory.py",
+      "symbol": "build_context"
+    },
+    "10.5": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "10.6": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "10.7": {
+      "file": "model/memory.py",
+      "symbol": "retrieve"
+    },
+    "10.8": {
+      "file": "model/memory.py",
+      "symbol": "build_context"
+    },
+    "11.1": {
+      "file": "model/experiment.py",
+      "symbol": "run_ablation"
+    },
+    "11.2": {
+      "file": "model/experiment.py",
+      "symbol": "bigram_versus_uniform"
+    },
+    "11.3": {
+      "file": "model/tokenizer.py",
+      "symbol": "CharTokenizer"
+    },
+    "11.4": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "11.5": {
+      "file": "model/ssm.py",
+      "symbol": "selective_scan"
+    },
+    "11.6": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "11.7": {
+      "file": "model/multimodal.py",
+      "symbol": "project_patches"
+    },
+    "11.8": {
+      "file": "model/experiment.py",
+      "symbol": "run_ablation"
+    },
+    "12.1": {
+      "file": "model/experiment.py",
+      "symbol": "run_ablation"
+    },
+    "12.2": {
+      "file": "model/experiment.py",
+      "symbol": "bigram_versus_uniform"
+    },
+    "12.3": {
+      "file": "model/experiment.py",
+      "symbol": "run_ablation"
+    },
+    "12.4": {
+      "file": "model/bench.py",
+      "symbol": "quality_table"
+    },
+    "12.5": {
+      "file": "model/gpt_train.py",
+      "symbol": "corpus_loss"
+    },
+    "12.6": {
+      "file": "model/bench.py",
+      "symbol": "parameter_bytes"
+    },
+    "12.7": {
+      "file": "model/backbone.py",
+      "symbol": "Backbone.forward"
+    },
+    "12.8": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
+    },
+    "12.9": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
+    },
+    "12.10": {
+      "file": "model/bench.py",
+      "symbol": "quality_table"
+    },
+    "12.11": {
+      "file": "model/gpt_train.py",
+      "symbol": "train_gpt"
+    },
+    "12.12": {
+      "file": "model/gpt_train.py",
+      "symbol": "save_checkpoint"
+    },
+    "13.1": {
+      "file": "model/bpe.py",
+      "symbol": "BPETokenizer.train"
+    },
+    "13.2": {
+      "file": "model/bpe.py",
+      "symbol": "BPETokenizer.save"
+    },
+    "13.3": {
+      "file": "model/datasets.py",
+      "symbol": "prepared_splits"
+    },
+    "13.4": {
+      "file": "model/export_js.py",
+      "symbol": "export_browser"
+    },
+    "13.5": {
+      "file": "model/finetune.py",
+      "symbol": "format_pair"
+    },
+    "13.6": {
+      "file": "model/finetune.py",
+      "symbol": "example_ids"
+    },
+    "13.7": {
+      "file": "model/lora.py",
+      "symbol": "init_lora"
+    },
+    "13.8": {
+      "file": "model/finetune.py",
+      "symbol": "evaluate_instructions"
+    }
+  },
+  "assessments": {
+    "0": {
+      "criteria": [
+        "Créer le venv et importer NumPy avec le bon interpréteur.",
+        "Lire les sept mesures et retrouver leur moyenne à la main.",
+        "Expliquer (2,3)+(3,) et distinguer @ de *.",
+        "Estimer une dérivée centrée puis vérifier son signe."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "1": {
+      "criteria": [
+        "Calculer un forward et son gradient à la main.",
+        "Coder le graphe scalaire du TP 5, y compris un paramètre réutilisé.",
+        "Réduire un gradient de biais diffusé au TP 6.",
+        "Appliquer plusieurs pas AdamW et expliquer ses deux états."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "2": {
+      "criteria": [
+        "Encoder/décoder sans changer l’ordre des identifiants.",
+        "Montrer le cas d’un caractère absent et sa politique.",
+        "Construire des batches dont la cible est décalée de un.",
+        "Calculer (B,T,D) et le nombre de poids des embeddings."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "3": {
+      "criteria": [
+        "Estimer un bigramme sur train seulement.",
+        "Calculer une loss stable et retrouver log(V) pour l’uniforme.",
+        "Générer avec une graine et une température fixées.",
+        "Recharger des poids et vérifier les logits."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "4": {
+      "criteria": [
+        "Assembler attention causale, multi-têtes et deux résidus par bloc.",
+        "Comparer un gradient d’attention à une différence finie.",
+        "Entraîner le decoder standard avec les fonctions de l’atelier.",
+        "Rapporter validation, baselines et égalité après rechargement."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "5": {
+      "criteria": [
+        "Montrer la conservation de norme par RoPE.",
+        "Distinguer SiLU et sigmoïde par un contre-exemple numérique.",
+        "Comparer cache et forward complet sur les mêmes logits.",
+        "Dire quelles options restent sans backward ici."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "6": {
+      "criteria": [
+        "Distinguer poids, gradients, optimiseur, activations et cache.",
+        "Rapporter unités, échauffement et répétitions du chronométrage.",
+        "Comparer deux budgets de tokens identiques.",
+        "Séparer coût estimé et mémoire/énergie effectivement mesurées."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "7": {
+      "criteria": [
+        "Calculer les portes top-k et contrôler les formes.",
+        "Mesurer charge, capacité et tokens rejetés.",
+        "Expliquer le poids de la perte auxiliaire.",
+        "Documenter que ce MoE est testé en forward, sans entraînement global."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "8": {
+      "criteria": [
+        "Dérouler une récurrence à la main.",
+        "Composer deux transformations affines dans le bon ordre.",
+        "Comparer scan et boucle, puis vérifier la causalité.",
+        "Nommer les pièces manquantes d’un Mamba complet."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "9": {
+      "criteria": [
+        "Retrouver les pixels du premier patch.",
+        "Calculer N patches et leur largeur aplatie.",
+        "Distinguer projection de forme et alignement sémantique appris.",
+        "Préciser l’absence d’entraînement vision-langage et audio."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "10": {
+      "criteria": [
+        "Retrouver une source et conserver son identifiant.",
+        "Contrôler le cas sans mot partagé et sans document.",
+        "Comparer un protocole avec/sans retrieval.",
+        "Dire que le contexte lexical n’est pas un agent entraîné."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "11": {
+      "criteria": [
+        "Résumer question, données, baseline et budget d’un article.",
+        "Distinguer test logiciel et mesure expérimentale.",
+        "Utiliser une unité commune entre tokenizers.",
+        "Séparer résultats locaux et résultats seulement lus."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    },
+    "12": {
+      "criteria": [
+        "Livrer un projet personnel exécutable avec ses composants.",
+        "Mesurer un GPT entraîné, pas seulement un dos initialisé.",
+        "Comparer une variation à budget et données documentés.",
+        "Remettre le rapport final et expliquer ses limites sans le corrigé."
+      ],
+      "deliverable": "Rapport du GPT personnel et variation contrôlée.",
+      "guide": "atelier/PROJET_FINAL.md"
+    },
+    "13": {
+      "criteria": [
+        "Sauver et recharger le BPE sans écraser le tokenizer fourni.",
+        "Réserver des documents et contrôler doublons/couverture.",
+        "Mesurer SFT sur validation séparée et garder le test final.",
+        "Évaluer reformulations et arrêt, en déclarant la limite mono-tour."
+      ],
+      "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+      "guide": "atelier/GUIDE.md"
+    }
+  },
+  "stages": [
+    {
+      "id": 1,
+      "title": "Tokenizer réversible",
+      "lessons": [
+        "2.1",
+        "2.3",
+        "2.5"
+      ],
+      "functions": "vocabulaire, encoder, decoder",
+      "contract": "Caractères triés, espaces et accents conservés ; inconnu signalé."
+    },
+    {
+      "id": 2,
+      "title": "Fenêtres et cibles",
+      "lessons": [
+        "2.11",
+        "3.1",
+        "3.3"
+      ],
+      "functions": "fenetres",
+      "contract": "Deux tableaux (N,T) ; le dernier élément prédit un token hors de son entrée."
+    },
+    {
+      "id": 3,
+      "title": "Probabilités et perte",
+      "lessons": [
+        "3.5",
+        "3.6"
+      ],
+      "functions": "softmax, entropie",
+      "contract": "Stabilité avec logits ±1000 ; uniforme : loss = log(V)."
+    },
+    {
+      "id": 4,
+      "title": "Pente numérique",
+      "lessons": [
+        "0.20",
+        "1.10",
+        "1.11"
+      ],
+      "functions": "derivee",
+      "contract": "Différence centrée ; chaîne et signe sur plusieurs fonctions."
+    },
+    {
+      "id": 5,
+      "title": "Ton moteur scalaire",
+      "lessons": [
+        "1.12",
+        "1.15"
+      ],
+      "functions": "Valeur",
+      "contract": "Parents, accumulation des chemins et ordre topologique inverse."
+    },
+    {
+      "id": 6,
+      "title": "Gradients sur tableaux",
+      "lessons": [
+        "0.15",
+        "1.15"
+      ],
+      "functions": "reduire_gradient",
+      "contract": "Retrouver la shape d’un biais diffusé ; lire aussi embedding et LayerNorm."
+    },
+    {
+      "id": 7,
+      "title": "Attention causale",
+      "lessons": [
+        "4.2",
+        "4.3",
+        "4.4",
+        "4.5",
+        "4.6"
+      ],
+      "functions": "attention",
+      "contract": "Masque avant softmax ; futur sans influence ; gradient vérifié numériquement."
+    },
+    {
+      "id": 8,
+      "title": "Plusieurs têtes",
+      "lessons": [
+        "4.7"
+      ],
+      "functions": "multi_tetes",
+      "contract": "Passage (B,T,D) ↔ (B,H,T,D/H) puis projection de sortie."
+    },
+    {
+      "id": 9,
+      "title": "Bloc pré-norme",
+      "lessons": [
+        "4.8",
+        "4.9",
+        "4.10",
+        "4.11"
+      ],
+      "functions": "bloc",
+      "contract": "Deux résidus ; FFN 4D ; corrections nulles = identité."
+    },
+    {
+      "id": 10,
+      "title": "Ton decoder",
+      "lessons": [
+        "4.12",
+        "4.13",
+        "4.14"
+      ],
+      "functions": "logits, perte",
+      "contract": "Embeddings, positions, blocs et logits (B,T,V) ; gradients dans toutes les briques."
+    },
+    {
+      "id": 11,
+      "title": "Pas AdamW",
+      "lessons": [
+        "1.14",
+        "1.16"
+      ],
+      "functions": "adamw",
+      "contract": "Moments, correction de biais, compteur et décroissance découplée."
+    },
+    {
+      "id": 12,
+      "title": "Générer et entraîner",
+      "lessons": [
+        "3.7",
+        "3.9",
+        "3.11",
+        "4.14",
+        "12.12",
+        "13.3"
+      ],
+      "functions": "prochain",
+      "contract": "Graine, top-k ; puis données réservées, baselines et checkpoint rechargé."
+    }
+  ]
+}

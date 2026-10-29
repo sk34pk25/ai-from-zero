@@ -490,22 +490,23 @@ Le forward a déjà calculé u, z, la loss. Le backward repart de la loss et dem
 @VOCAB
 Backward : la passe arrière. Gradient local : la dérivée d'une opération. Accumulation : sommer les gradients si un paramètre sert à plusieurs endroits. Autograd : un programme qui fait ce backward tout seul.
 @EXPLAIN
-Pour loss = (w x + b - y)², on peut écrire dloss/dw = 2 (w x + b - y) x. C'est la chaîne : dérivée du carré, fois dérivée de la parenthèse, fois x. La backpropagation généralise cette ligne à chaque nœud. Elle a besoin des valeurs du forward, par exemple de la prédiction. C'est pourquoi on ne peut pas backward sans avoir fait le forward. Dans PyTorch, loss.backward() remplit p.grad. Dans le laboratoire NumPy, on écrit le gradient de la tête linéaire explicitement, et on le contrôle par différence finie. Les deux sont la même idée.
+Pour L = (w*x+b-y)², dL/dw = 2(w*x+b-y)*x. La backpropagation réutilise cette règle locale en parcourant le graphe du résultat vers les entrées. Si un même paramètre est utilisé deux fois, il reçoit la SOMME des contributions : pour y=w*w, il existe deux chemins vers w. Dans model/autograd.py, Tensor garde data, grad, ses parents et une fonction _backward. backward construit un ordre topologique puis visite cet ordre à l'envers. Une classe regroupe ici ces données et méthodes : Tensor(3.) crée un objet, w.data lit sa valeur, w.backward() appelle sa méthode. Dans le TP 5, tu écriras d'abord ce mécanisme sur des scalaires, avant de lire les opérations sur tableaux. Le forward doit être reconstruit à chaque lot ; remettre seulement les poids à zéro n'efface pas des gradients intermédiaires d'un ancien graphe.
 @LANG python
 @CODE
 :::
-w, x, b, y = 1.0, 3.0, 0.0, 7.0
-pred = w * x + b
-dloss_dpred = 2 * (pred - y)
-dloss_dw = dloss_dpred * x
-print(pred, dloss_dw)
+from model.autograd import Tensor
+w = Tensor(3.0)
+y = w * w + w
+y.backward()
+print(float(y.data), float(w.grad))
+assert float(w.grad) == 7.0
 :::
 @EXPERIMENT
-Change y pour qu'il soit égal à pred. Le gradient doit tomber à 0 : il n'y a plus de raison de bouger w pour cet exemple.
+Dessine les trois contributions de w dans w*w+w : w, w et 1. Vérifie que le résultat est 7 en w=3, puis change w=2 dans un nouveau graphe et prédis le gradient avant d'exécuter.
 @EXERCISE
 Dessine trois boîtes : x et w entrent dans « produit », le produit entre dans « carré de l'écart », la loss sort. Ajoute des flèches backward. Écris sous chaque flèche quelle quantité est multipliée.
 @BUILD
-train_linear_classifier applique le gradient analytique (softmax - one_hot) / N, puis W -= lr * X.T @ grad. Le test exige que la loss diminue nettement. C'est un backward court, lisible, et suffisant pour cette étape.
+Ouvre Tensor.backward et Tensor.__mul__ dans model/autograd.py. Complète ensuite le TP 5 : une valeur scalaire, des parents, des gradients qui s'ajoutent et un parcours inverse. La même règle entraîne les tableaux du GPT.
 @QUESTION
 Le backward calcule surtout…
 @CORRECT
@@ -516,6 +517,11 @@ Les gradients des paramètres à partir de la loss
 - La tokenization du texte
 @EXPLANATION
 La passe arrière ne crée pas de données. Elle attribue à chaque paramètre sa part de responsabilité dans la loss.
+@CODEFILE
+model/autograd.py
+@SYMBOL
+Tensor.backward
+
 @@@
 @ID 1.13
 @TITLE Descente de gradient
@@ -577,21 +583,26 @@ SGD regarde la pente du pas actuel. Un optimiseur à mémoire regarde aussi les 
 @VOCAB
 SGD : soustraire lr fois le gradient. Momentum : une moyenne des gradients passés. Adam : une moyenne du gradient et une moyenne de son carré, pour adapter le pas par paramètre. État d'optimiseur : ces moyennes, qui occupent de la mémoire.
 @EXPLAIN
-SGD s'écrit parameter -= learning_rate * gradient. Adam garde m ≈ moyenne du gradient et v ≈ moyenne du carré, puis divise l'un par la racine de l'autre. L'effet pratique : un paramètre au gradient agité reçoit des pas plus prudents. Adam n'enlève pas le besoin d'un learning rate, et il coûte de la mémoire : environ 8 octets de plus par paramètre pour m et v en float32. model/bench.py le compte dans parameter_bytes(..., optimizer="adam"). L'optimiseur ne choisit pas la loss, ni les données, ni l'architecture.
+SGD retire lr fois le gradient. Adam conserve deux moyennes exponentielles : m du gradient et v de son carré. Au pas t, corrige leur démarrage à zéro : m_hat=m/(1-beta1**t), v_hat=v/(1-beta2**t), puis retire lr*m_hat/(sqrt(v_hat)+eps). AdamW ajoute une décroissance des poids découplée du gradient ; le laboratoire l'applique aux matrices, pas aux gains et biais. Dans model/gpt_train.py, AdamW met réellement à jour tout le GPT standard. Deux états float32 représentent huit octets par paramètre ; notre NumPy float64 utilise davantage. L'atelier te fait coder le pas AdamW et comparer plusieurs pas à un calcul connu. Un optimiseur ne choisit ni les données ni la loss : il transforme les gradients en déplacements.
 @LANG python
 @CODE
 :::
-def sgd(parameter, gradient, learning_rate):
-    return parameter - learning_rate * gradient
-
-print(sgd(1.0, 0.5, 0.1))
+import numpy as np
+from model.autograd import Tensor
+from model.gpt_train import AdamW
+w = Tensor(np.array([1.0]))
+w.grad[:] = 0.5
+optim = AdamW({"w": w}, lr=0.1, weight_decay=0.0)
+optim.step(clip=0)
+assert np.allclose(w.data, [0.9])
+print(w.data)
 :::
 @EXPERIMENT
 Applique deux fois SGD avec le même gradient 0.5 et lr 0.1, en partant de 1. Compare à un pas unique de lr 0.2. Sur un gradient constant, deux petits pas et un grand pas ne tombent pas au même endroit si tu recalcules le gradient, mais ici il est fixé : calcule les deux résultats.
 @EXERCISE
 Explique en deux phrases pourquoi Adam peut prendre plus de RAM que SGD pour le même nombre de paramètres. Le chiffre du laboratoire est 8 octets supplémentaires par paramètre.
 @BUILD
-Les entraînements NumPy du dépôt utilisent SGD explicite, pour que le pas soit visible. Le tableau de coûts, lui, sait chiffrer Adam. Les deux choix sont assumés.
+Le TP 11 implémente moments, correction de biais et AdamW. model/gpt_train.py est la référence à comparer après ton essai. Les moments et le compteur font partie d'un checkpoint de reprise exacte.
 @QUESTION
 Un optimiseur décide comment…
 @CORRECT
@@ -602,6 +613,11 @@ Transformer les gradients en mises à jour de paramètres
 - Remplacer la fonction de loss
 @EXPLANATION
 L'optimiseur reçoit des gradients. La loss les a produits, le tokenizer n'a rien à voir avec ce choix.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+AdamW.step
+
 @@@
 @ID 1.15
 @TITLE Tenseurs et autograd
@@ -619,21 +635,24 @@ Un tenseur est un tableau qui peut se souvenir des opérations subies. Si tu le 
 @VOCAB
 Tenseur : tableau à N dimensions. requires_grad : demande le suivi des dérivées. .grad : le gradient accumulé. zero_grad : remet ces cases à zéro. Autograd : le moteur du backward automatique.
 @EXPLAIN
-L'exemple minimal est un scalaire. w = torch.tensor(1.0, requires_grad=True), loss = (w - 3) ** 2, loss.backward(), et w.grad vaut 2(w-3) = -4. C'est le même nombre qu'à la main. PyTorch accumule les gradients : si tu backward deux fois sans zero_grad, ils s'additionnent. Ce piège explique une loss qui « n'apprend plus » ou qui explose. Le dépôt n'impose pas PyTorch : model/train.py écrit le gradient de la tête linéaire en NumPy. Si tu installes PyTorch plus tard, tu dois retrouver le même -4.
+Un tenseur est un tableau dont on suit certaines dépendances. Le laboratoire construit son propre Tensor dans model/autograd.py ; aucune installation de PyTorch n'est nécessaire. requires_grad dit de suivre le gradient pour cette valeur. Le forward crée de nouveaux objets qui gardent leurs parents ; loss.backward() remplit les grad en sens inverse. L'addition utilise le broadcasting NumPy et son backward réduit les axes diffusés : un biais partagé par deux lignes reçoit la somme de leurs gradients. L'embedding doit aussi additionner deux lectures du même token avec np.add.at. PyTorch applique les mêmes principes à plus de dispositifs ; sa gestion de graphes ne doit pas être confondue avec ce moteur minimal. À chaque pas du laboratoire, zéro des gradients des paramètres, nouveau forward, backward puis optimisation.
 @LANG python
 @CODE
 :::
-# Équivalent NumPy du premier backward PyTorch.
-w = 1.0
-loss_grad_w = 2 * (w - 3)
-print(loss_grad_w)  # -4.0, comme w.grad après backward
+import numpy as np
+from model.autograd import Tensor
+x = Tensor(np.ones((2, 3)))
+biais = Tensor(np.zeros(3))
+(x + biais).sum().backward()
+assert np.array_equal(biais.grad, [2., 2., 2.])
+print(biais.grad)
 :::
 @EXPERIMENT
 Calcule 2*(w-3) pour w = 1 et w = 4. Les signes doivent être opposés. Si tu as PyTorch, compare à w.grad. Sinon, la valeur -4 suffit comme contrôle.
 @EXERCISE
-Explique pourquoi appeler backward deux fois sans remettre les gradients à zéro double w.grad sur ce problème. Écris la valeur qu'on lirait : -8.
+Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie les trois contributions, puis explique pourquoi on somme au lieu de garder (2,3).
 @BUILD
-Le fil rouge n'ajoute pas de dépendance torch. La référence reste le gradient testé dans model/mathutil.py. PyTorch, quand tu l'utiliseras, devra reproduire ces nombres, pas les contredire.
+Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 mesure une dérivée par différence finie et teste l'accumulation des lectures répétées.
 @QUESTION
 requires_grad=True indique surtout que…
 @CORRECT
@@ -644,6 +663,11 @@ On veut que les opérations sur ce tenseur puissent produire un gradient
 - Le tenseur est un label
 @EXPLANATION
 Ce drapeau active le suivi du graphe. Il ne choisit pas le matériel et ne sauvegarde rien tout seul.
+@CODEFILE
+model/autograd.py
+@SYMBOL
+_unbroadcast
+
 @@@
 @ID 1.16
 @TITLE Boucle d'entraînement
@@ -665,19 +689,24 @@ L'ordre minimal : prédiction = modèle(x) ; loss = coût(prédiction, y) ; grad
 @LANG python
 @CODE
 :::
-for step in range(3):
-    prediction = None  # forward
-    loss = None        # coût
-    gradients = None   # backward
-    parameter = None   # parameter -= lr * gradient
-print("ordre : forward, loss, backward, pas")
+import numpy as np
+from model.autograd import Tensor
+from model.gpt_train import AdamW
+w = Tensor(np.array([0.0]))
+optim = AdamW({"w": w}, lr=0.1, weight_decay=0.0)
+for _ in range(5):
+    w.zero_grad()
+    loss = ((w - 3) * (w - 3)).mean()
+    loss.backward()
+    optim.step()
+print(float(loss.data), w.data)
 :::
 @EXPERIMENT
 Dans un script à toi, appelle train_linear_regression sur y = 3x - 1 et affiche les cinq premières et les cinq dernières losses. Elles doivent descendre.
 @EXERCISE
 Écris les cinq opérations dans l'ordre, en français, sans code. Ajoute la phrase qui dit ce qui casse si on saute la remise à zéro des gradients.
 @BUILD
-La boucle de référence est train_linear_classifier dans model/train.py. Elle est volontairement plus courte qu'une boucle PyTorch, mais l'ordre est le même.
+Retrouve ces cinq gestes dans la boucle train_gpt : remise à zéro, forward, loss, backward, pas. Le TP 12 branchera tes logits et ta loss dans cette même boucle, avec une validation séparée.
 @QUESTION
 Pourquoi remettre les gradients à zéro avant chaque backward ?
 @CORRECT
@@ -688,6 +717,11 @@ Parce que les gradients s'accumulent sinon d'un pas sur l'autre
 - Pour changer le vocabulaire
 @EXPLANATION
 L'accumulation est utile seulement quand on la demande, par exemple pour simuler un plus gros batch. Par défaut, un pas doit voir uniquement son propre gradient.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+train_gpt
+
 @@@
 @ID 1.17
 @TITLE Surapprentissage

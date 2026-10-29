@@ -35,38 +35,183 @@ META = {
 }
 
 LEVELS = [
-    (0, "Fondations numériques", "Prendre en main la machine, Python, puis les quelques outils mathématiques qui reviendront dans chaque modèle.", "Un programme lit une colonne de nombres, calcule un résumé statistique et écrit un rapport. Dans le dépôt, c'est model/stats.py."),
-    (1, "Machine learning depuis zéro", "Comprendre ce que veut dire apprendre, puis écrire un petit réseau dont on voit passer le calcul et le gradient.", "Un prédicteur linéaire, puis un réseau à une couche cachée, entraînés par descente de gradient. Référence : model/mlp.py et model/train.py."),
-    (2, "Transformer le langage en nombres", "Passer du texte à des identifiants, puis à des vecteurs, sans cacher le tokenizer dans une bibliothèque.", "Un tokenizer caractère, un mini-BPE et un visualiseur. Référence : model/tokenizer.py."),
-    (3, "Premier modèle de langage", "Prédire le prochain token avec un bigramme, mesurer la perplexité, générer.", "Un modèle bigramme lissé, entraînable et capable d'échantillonner. Référence : model/bigram.py."),
-    (4, "Transformer construit à la main", "Assembler l'attention, le masque causal, les résidus et un bloc decoder-only sans module préfabriqué.", "Un mini-GPT NumPy dont on peut vérifier la causalité et le cache. Référence : model/attention.py et model/transformer.py."),
-    (5, "Transformer moderne", "Remplacer, une par une, les pièces de 2017 par celles qu'on retrouve dans les modèles récents.", "RoPE, RMSNorm, SwiGLU, GQA et weight tying sont des options du même TinyGPT."),
-    (6, "Efficacité et machines modestes", "Compter la mémoire, les FLOPs et le compromis qualité / vitesse / RAM avant de grossir le modèle.", "Des formules explicites et un tableau trié. Référence : model/bench.py."),
-    (7, "Mixture of Experts", "Garder le calcul d'un petit réseau tout en augmentant le nombre de paramètres utiles.", "Un FFN à experts, routeur top-k, capacité et perte d'équilibrage. Référence : model/moe.py."),
-    (8, "State space models et Mamba", "Une autre façon de lire une séquence : un état qui se met à jour, au lieu d'une attention quadratique.", "Une récurrence sélective, un scan associatif, et un dos interchangeable. Référence : model/ssm.py et model/backbone.py."),
-    (9, "Multimodal", "Faire entrer une deuxième modalité dans le même espace de vecteurs que le texte.", "Découpage d'une image en patches et projection linéaire. Référence : model/multimodal.py."),
-    (10, "Mémoire, retrieval et calcul adaptatif", "Dépasser la fenêtre de contexte par une mémoire qu'on peut éteindre et mesurer.", "Une recherche par similarité et un contexte construit à partir des extraits. Référence : model/memory.py."),
-    (11, "Frontière de la recherche", "Lire une idée récente, la réduire à une expérience, et dire ce qui n'a pas été reproduit.", "Un comparateur baseline / variante. Référence : model/experiment.py."),
-    (12, "Concevoir ton architecture", "Formuler une hypothèse, la mesurer contre une baseline, et documenter le compromis.", "Trois dos interchangeables — Transformer, SSM, hybride — avec la même forme de sortie."),
-    (13, "Tokenizer BPE, données et ajustement", "Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.", "Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py."),
+    (
+        0,
+        "Fondations numériques",
+        "Prendre en main la machine, Python, puis les quelques outils mathématiques qui reviendront dans chaque modèle.",
+        "Un programme lit une colonne de nombres, calcule un résumé statistique et écrit un rapport. Dans le dépôt, c'est model/stats.py.",
+    ),
+    (
+        1,
+        "Machine learning depuis zéro",
+        "Comprendre ce que veut dire apprendre, puis écrire un petit réseau dont on voit passer le calcul et le gradient.",
+        "Un prédicteur linéaire, puis un réseau à une couche cachée, entraînés par descente de gradient. Référence : model/mlp.py et model/train.py.",
+    ),
+    (
+        2,
+        "Transformer le langage en nombres",
+        "Passer du texte à des identifiants, puis à des vecteurs, sans cacher le tokenizer dans une bibliothèque.",
+        "Un tokenizer caractère, un mini-BPE et un visualiseur. Référence : model/tokenizer.py.",
+    ),
+    (
+        3,
+        "Premier modèle de langage",
+        "Prédire le prochain token avec un bigramme, mesurer la perplexité, générer.",
+        "Un modèle bigramme lissé, entraînable et capable d'échantillonner. Référence : model/bigram.py.",
+    ),
+    (
+        4,
+        "Transformer construit à la main",
+        "Assembler l'attention, le masque causal, les résidus et un bloc decoder-only sans module préfabriqué.",
+        "Un GPT NumPy entraîné de bout en bout, avec attention causale, sauvegarde et validation. Référence : model/gpt_train.py et atelier/.",
+    ),
+    (
+        5,
+        "Transformer moderne",
+        "Remplacer, une par une, les pièces de 2017 par celles qu'on retrouve dans les modèles récents.",
+        "RoPE, RMSNorm, SwiGLU, GQA et weight tying sont des options du même TinyGPT.",
+    ),
+    (
+        6,
+        "Efficacité et machines modestes",
+        "Compter la mémoire, les FLOPs et le compromis qualité / vitesse / RAM avant de grossir le modèle.",
+        "Des formules explicites et un tableau trié. Référence : model/bench.py.",
+    ),
+    (
+        7,
+        "Mixture of Experts",
+        "Garder le calcul d'un petit réseau tout en augmentant le nombre de paramètres utiles.",
+        "Un FFN à experts, routeur top-k, capacité et perte d'équilibrage. Référence : model/moe.py.",
+    ),
+    (
+        8,
+        "State space models et Mamba",
+        "Une autre façon de lire une séquence : un état qui se met à jour, au lieu d'une attention quadratique.",
+        "Une récurrence sélective, un scan associatif, et un dos interchangeable. Référence : model/ssm.py et model/backbone.py.",
+    ),
+    (
+        9,
+        "Multimodal",
+        "Faire entrer une deuxième modalité dans le même espace de vecteurs que le texte.",
+        "Découpage d'une image en patches et projection linéaire. Référence : model/multimodal.py.",
+    ),
+    (
+        10,
+        "Mémoire, retrieval et calcul adaptatif",
+        "Dépasser la fenêtre de contexte par une mémoire qu'on peut éteindre et mesurer.",
+        "Une recherche par similarité et un contexte construit à partir des extraits. Référence : model/memory.py.",
+    ),
+    (
+        11,
+        "Frontière de la recherche",
+        "Lire une idée récente, la réduire à une expérience, et dire ce qui n'a pas été reproduit.",
+        "Un comparateur baseline / variante. Référence : model/experiment.py.",
+    ),
+    (
+        12,
+        "Concevoir ton architecture",
+        "Formuler une hypothèse, la mesurer contre une baseline, et documenter le compromis.",
+        "Un GPT personnel entraîné, une variation contrôlée et un rapport ; le dos hybride reste une extension de forward.",
+    ),
+    (
+        13,
+        "Tokenizer BPE, données et ajustement",
+        "Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.",
+        "Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py.",
+    ),
 ]
 
 ARCHITECTURE = [
-    {"id": "machine", "name": "Machine", "step": "0.1", "summary": "CPU, RAM, stockage, puis GPU : savoir quel ressource sature quand un entraînement échoue."},
-    {"id": "stats", "name": "Statistiques", "step": "0.15", "summary": "Lire une série, calculer moyenne et écart-type, écrire un rapport reproductible."},
-    {"id": "reseau", "name": "Réseau", "step": "1.7", "summary": "Un neurone, une activation, une couche : la fonction paramétrée que l'on va entraîner."},
-    {"id": "tokenizer", "name": "Tokenizer", "step": "2.5", "summary": "La frontière entre une chaîne Unicode et les entiers que le modèle consomme."},
-    {"id": "bigramme", "name": "Bigramme", "step": "3.2", "summary": "La baseline de langage : la probabilité du token suivant ne dépend que du token courant."},
-    {"id": "attention", "name": "Attention", "step": "4.4", "summary": "Chaque position regarde les précédentes via requêtes, clés et valeurs."},
-    {"id": "transformer", "name": "Transformer", "step": "4.13", "summary": "Empilement de blocs decoder-only, avec résidus, normalisation et tête de sortie."},
-    {"id": "moderne", "name": "Blocs modernes", "step": "5.2", "summary": "RoPE, RMSNorm, SwiGLU, GQA, cache KV et poids partagés."},
-    {"id": "mesures", "name": "Mesures", "step": "6.3", "summary": "Octets par paramètre, FLOPs d'attention et tableau qualité / temps / RAM."},
-    {"id": "moe", "name": "Mixture of Experts", "step": "7.4", "summary": "Plusieurs FFN, un routeur top-k, une capacité et une perte d'équilibre."},
-    {"id": "ssm", "name": "SSM", "step": "8.7", "summary": "État récurrent sélectif, scan parallèle, alternative linéaire à l'attention."},
-    {"id": "patches", "name": "Patches", "step": "9.2", "summary": "Une image devient une séquence de patches projetés dans la dimension du modèle."},
-    {"id": "memoire", "name": "Mémoire externe", "step": "10.4", "summary": "Des documents retrouvés par similarité, injectés dans le contexte, et désactivables."},
-    {"id": "experiences", "name": "Expériences", "step": "11.2", "summary": "Une baseline et une variante, sur le même découpage, avec les mêmes métriques."},
-    {"id": "candidate", "name": "Architecture candidate", "step": "12.8", "summary": "Le dos se change sans changer la forme de la sortie : Transformer, SSM ou hybride."},
+    {
+        "id": "machine",
+        "name": "Machine",
+        "step": "0.1",
+        "summary": "CPU, RAM, stockage, puis GPU : savoir quel ressource sature quand un entraînement échoue.",
+    },
+    {
+        "id": "stats",
+        "name": "Statistiques",
+        "step": "0.15",
+        "summary": "Lire une série, calculer moyenne et écart-type, écrire un rapport reproductible.",
+    },
+    {
+        "id": "reseau",
+        "name": "Réseau",
+        "step": "1.7",
+        "summary": "Un neurone, une activation, une couche : la fonction paramétrée que l'on va entraîner.",
+    },
+    {
+        "id": "tokenizer",
+        "name": "Tokenizer",
+        "step": "2.5",
+        "summary": "La frontière entre une chaîne Unicode et les entiers que le modèle consomme.",
+    },
+    {
+        "id": "bigramme",
+        "name": "Bigramme",
+        "step": "3.2",
+        "summary": "La baseline de langage : la probabilité du token suivant ne dépend que du token courant.",
+    },
+    {
+        "id": "attention",
+        "name": "Attention",
+        "step": "4.4",
+        "summary": "Chaque position regarde les précédentes via requêtes, clés et valeurs.",
+    },
+    {
+        "id": "transformer",
+        "name": "Transformer",
+        "step": "4.13",
+        "summary": "Empilement de blocs decoder-only, avec résidus, normalisation et tête de sortie.",
+    },
+    {
+        "id": "moderne",
+        "name": "Blocs modernes",
+        "step": "5.2",
+        "summary": "RoPE, RMSNorm, SwiGLU, GQA, cache KV et poids partagés.",
+    },
+    {
+        "id": "mesures",
+        "name": "Mesures",
+        "step": "6.3",
+        "summary": "Octets par paramètre, FLOPs d'attention et tableau qualité / temps / RAM.",
+    },
+    {
+        "id": "moe",
+        "name": "Mixture of Experts",
+        "step": "7.4",
+        "summary": "Plusieurs FFN, un routeur top-k, une capacité et une perte d'équilibre.",
+    },
+    {
+        "id": "ssm",
+        "name": "SSM",
+        "step": "8.7",
+        "summary": "État récurrent sélectif, scan parallèle, alternative linéaire à l'attention.",
+    },
+    {
+        "id": "patches",
+        "name": "Patches",
+        "step": "9.2",
+        "summary": "Une image devient une séquence de patches projetés dans la dimension du modèle.",
+    },
+    {
+        "id": "memoire",
+        "name": "Mémoire externe",
+        "step": "10.4",
+        "summary": "Des documents retrouvés par similarité, injectés dans le contexte, et désactivables.",
+    },
+    {
+        "id": "experiences",
+        "name": "Expériences",
+        "step": "11.2",
+        "summary": "Une baseline et une variante, sur le même découpage, avec les mêmes métriques.",
+    },
+    {
+        "id": "candidate",
+        "name": "Architecture candidate",
+        "step": "12.8",
+        "summary": "Le dos se change sans changer la forme de la sortie : Transformer, SSM ou hybride.",
+    },
 ]
 
 
@@ -87,7 +232,11 @@ def parse_file(path: Path) -> list[dict[str, str]]:
             buf = []
 
         for line in block.splitlines():
-            if line.startswith("@") and line[1:].split(" ", 1)[0].isalpha() and line[1:].split(" ", 1)[0].isupper():
+            if (
+                line.startswith("@")
+                and line[1:].split(" ", 1)[0].isalpha()
+                and line[1:].split(" ", 1)[0].isupper()
+            ):
                 flush()
                 key, _, rest = line[1:].partition(" ")
                 current = key.lower()
@@ -132,7 +281,7 @@ VISUAL_CAPTION = {
     "tokenize": "Joue avec le texte : chaque caractère reçoit un identifiant stable, comme le tokenizer du laboratoire.",
     "softmax": "Des scores deviennent une distribution. La température étale ou concentre la masse.",
     "descent": "Le point descend la pente. Un pas trop grand dépasse le creux, un pas trop petit traîne.",
-    "loss": "Chaque pas d'entraînement doit faire descendre la perte. Si elle monte, le pas est trop grand ou le gradient est faux.",
+    "loss": "Observe la tendance sur plusieurs lots et la validation. Une hausse ponctuelle sur un nouveau lot est possible ; vérifie le gradient si la divergence persiste.",
     "attention": "Choisis une position. Elle ne regarde que son passé : le futur reste masqué.",
     "transformer": "Un bloc relit, ajoute le résidu, transforme, puis ajoute encore. La forme ne change pas.",
     "moe": "Chaque token n'entre que dans l'expert au score le plus haut. Les autres restent en mémoire.",
@@ -175,26 +324,146 @@ CODE_FILE = {
 }
 
 TRACK = [
-    {"id": "dossier", "title": "Un dossier vide", "step": "0.3", "file": "model/README.md", "summary": "Tu sais où tu es dans le terminal, et tu lances les commandes depuis la racine du dépôt."},
-    {"id": "nombres", "title": "Lire des nombres", "step": "0.15", "file": "model/stats.py", "summary": "Le premier programme utile lit une colonne et écrit un résumé. Rien n'est encore un modèle."},
-    {"id": "descente", "title": "Une perte qui descend", "step": "1.14", "file": "model/tiny_lm.py", "summary": "Une tête linéaire apprend par descente. Le gradient est calculé, pas deviné."},
-    {"id": "tokenizer", "title": "Du texte aux identifiants", "step": "2.5", "file": "model/tokenizer.py", "summary": "Le tokenizer caractère est la frontière. Sans lui, le modèle ne voit que des lettres brutes."},
-    {"id": "bigramme", "title": "La baseline", "step": "3.2", "file": "model/bigram.py", "summary": "Avant le réseau, le bigramme lissé donne la perplexité à battre."},
-    {"id": "autograd", "title": "La rétropropagation", "step": "1.12", "file": "model/autograd.py", "summary": "Chaque opération se souvient de son gradient. C'est le moteur de l'entraînement."},
-    {"id": "entrainement", "title": "Entraîner le petit modèle", "step": "3.8", "file": "model/tiny_lm.py", "summary": "train_tiny_lm lit un texte, descend la perte, puis propose une suite."},
-    {"id": "attention", "title": "L'attention entraînable", "step": "4.4", "file": "model/tiny_lm.py", "summary": "Avec attention=True, le même entraînement traverse le masque causal et le softmax."},
-    {"id": "echantillon", "title": "Échantillonner", "step": "3.9", "file": "model/tiny_lm.py", "summary": "Générer, c'est répéter : lire les scores du dernier pas, tirer un token, le recoller."},
-    {"id": "evaluer", "title": "Évaluer sans tricher", "step": "11.2", "file": "model/experiment.py", "summary": "La fin de la séquence reste cachée. La baseline uniforme vaut la taille du vocabulaire."},
-    {"id": "elargir", "title": "Élargir sans se raconter d'histoires", "step": "12.8", "file": "model/backbone.py", "summary": "Le dos interchangeable compare des formes. Il n'est pas, lui, entraîné de bout en bout."},
-    {"id": "tetes", "title": "L'attention multi-têtes", "step": "4.7", "file": "model/transformer.py", "summary": "Plusieurs têtes relisent le passé en parallèle. Dans TinyGPT, le gradient traverse chacune."},
-    {"id": "bloc", "title": "Le bloc decoder complet", "step": "4.11", "file": "model/transformer.py", "summary": "Norme, attention causale, résidu, norme, MLP GELU, résidu. Puis les embeddings, les blocs empilés et la tête."},
-    {"id": "gpt", "title": "Entraîner ton GPT", "step": "4.14", "file": "model/gpt_train.py", "summary": "AdamW, découpage train/val, perte, checkpoint. Le corpus français est model/data/francais.txt."},
-    {"id": "suite", "title": "Échantillonner ton GPT", "step": "3.9", "file": "model/gpt_sample.py", "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné."},
-    {"id": "bpe", "title": "Apprendre le BPE", "step": "13.1", "file": "model/bpe.py", "summary": "Les fusions sont déterministes. Le même texte et le même nombre de fusions redonnent le même vocabulaire."},
-    {"id": "catalogue", "title": "Choisir un jeu de données", "step": "13.3", "file": "model/datasets.py", "summary": "data/datasets.json est la liste vérifiée. prepare écrit un train et un val, avec la licence à côté."},
-    {"id": "playground", "title": "Lire le modèle dans le navigateur", "step": "13.4", "file": "model/export_js.py", "summary": "Les poids float32 et les logits de référence partent dans le playground. Le JavaScript refait le même forward."},
-    {"id": "masque", "title": "Ajuster avec un masque", "step": "13.6", "file": "model/finetune.py", "summary": "La perte ne compte que les tokens de la réponse. La question reste visible, elle n'est pas apprise comme une cible."},
-    {"id": "lora", "title": "Ajuster avec LoRA", "step": "13.7", "file": "model/lora.py", "summary": "Deux petits facteurs par matrice ciblée. On compare leur perte à un ajustement de tous les poids."},
+    {
+        "id": "dossier",
+        "title": "Un dossier vide",
+        "step": "0.3",
+        "file": "model/README.md",
+        "summary": "Tu sais où tu es dans le terminal, et tu lances les commandes depuis la racine du dépôt.",
+    },
+    {
+        "id": "nombres",
+        "title": "Lire des nombres",
+        "step": "0.15",
+        "file": "model/stats.py",
+        "summary": "Le premier programme utile lit une colonne et écrit un résumé. Rien n'est encore un modèle.",
+    },
+    {
+        "id": "autograd",
+        "title": "La rétropropagation",
+        "step": "1.12",
+        "file": "model/autograd.py",
+        "summary": "Chaque opération se souvient de son gradient. C'est le moteur de l'entraînement.",
+    },
+    {
+        "id": "descente",
+        "title": "Une perte qui descend",
+        "step": "1.14",
+        "file": "model/gpt_train.py",
+        "summary": "AdamW transforme les gradients en mises à jour ; tu codes ses moments et son compteur dans le TP 11.",
+    },
+    {
+        "id": "tokenizer",
+        "title": "Du texte aux identifiants",
+        "step": "2.5",
+        "file": "model/tokenizer.py",
+        "summary": "Le tokenizer caractère est la frontière. Sans lui, le modèle ne voit que des lettres brutes.",
+    },
+    {
+        "id": "bigramme",
+        "title": "La baseline",
+        "step": "3.2",
+        "file": "model/bigram.py",
+        "summary": "Avant le réseau, le bigramme lissé donne la perplexité à battre.",
+    },
+    {
+        "id": "entrainement",
+        "title": "Entraîner le petit modèle",
+        "step": "3.8",
+        "file": "model/tiny_lm.py",
+        "summary": "train_tiny_lm lit un texte, descend la perte, puis propose une suite.",
+    },
+    {
+        "id": "attention",
+        "title": "L'attention entraînable",
+        "step": "4.4",
+        "file": "model/tiny_lm.py",
+        "summary": "Avec attention=True, le même entraînement traverse le masque causal et le softmax.",
+    },
+    {
+        "id": "tetes",
+        "title": "L'attention multi-têtes",
+        "step": "4.7",
+        "file": "model/transformer.py",
+        "summary": "Plusieurs têtes relisent le passé en parallèle. Dans TinyGPT, le gradient traverse chacune.",
+    },
+    {
+        "id": "bloc",
+        "title": "Le bloc decoder complet",
+        "step": "4.11",
+        "file": "model/transformer.py",
+        "summary": "Norme, attention causale, résidu, norme, MLP GELU, résidu. Puis les embeddings, les blocs empilés et la tête.",
+    },
+    {
+        "id": "gpt",
+        "title": "Entraîner ton GPT",
+        "step": "4.14",
+        "file": "model/gpt_train.py",
+        "summary": "AdamW, découpage train/val, perte, checkpoint. Le corpus français est model/data/francais.txt.",
+    },
+    {
+        "id": "echantillon",
+        "title": "Échantillonner",
+        "step": "3.9",
+        "file": "model/tiny_lm.py",
+        "summary": "Générer, c'est répéter : lire les scores du dernier pas, tirer un token, le recoller.",
+    },
+    {
+        "id": "suite",
+        "title": "Échantillonner ton GPT",
+        "step": "3.9",
+        "file": "model/gpt_sample.py",
+        "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné.",
+    },
+    {
+        "id": "bpe",
+        "title": "Apprendre le BPE",
+        "step": "13.1",
+        "file": "model/bpe.py",
+        "summary": "Les fusions sont déterministes. Le même texte et le même nombre de fusions redonnent le même vocabulaire.",
+    },
+    {
+        "id": "catalogue",
+        "title": "Choisir un jeu de données",
+        "step": "13.3",
+        "file": "model/datasets.py",
+        "summary": "data/datasets.json est la liste vérifiée. prepare écrit un train et un val, avec la licence à côté.",
+    },
+    {
+        "id": "playground",
+        "title": "Lire le modèle dans le navigateur",
+        "step": "13.4",
+        "file": "model/export_js.py",
+        "summary": "Les poids float32 et les logits de référence partent dans le playground. Le JavaScript refait le même forward.",
+    },
+    {
+        "id": "masque",
+        "title": "Ajuster avec un masque",
+        "step": "13.6",
+        "file": "model/finetune.py",
+        "summary": "La perte ne compte que les tokens de la réponse. La question reste visible, elle n'est pas apprise comme une cible.",
+    },
+    {
+        "id": "lora",
+        "title": "Ajuster avec LoRA",
+        "step": "13.7",
+        "file": "model/lora.py",
+        "summary": "Deux petits facteurs par matrice ciblée. On compare leur perte à un ajustement de tous les poids.",
+    },
+    {
+        "id": "elargir",
+        "title": "Élargir sans se raconter d'histoires",
+        "step": "12.8",
+        "file": "model/backbone.py",
+        "summary": "Après ton GPT entraîné, le dos hybride reste une exploration de formes et de causalité sans entraînement de bout en bout.",
+    },
+    {
+        "id": "evaluer",
+        "title": "Évaluer sans tricher",
+        "step": "12.12",
+        "file": "atelier/PROJET_FINAL.md",
+        "summary": "Ton projet final documente les données réservées, les baselines, le rechargement et une variation contrôlée.",
+    },
 ]
 
 
@@ -205,11 +474,22 @@ def visual_for(step_id: str, title: str) -> str:
         return "embed" if index >= 9 else "tokenize"
     if "softmax" in low or step_id in {"3.5", "0.19"}:
         return "softmax"
-    if step_id in {"1.12", "1.13", "1.14", "0.20"} or "gradient" in low or "descente" in low:
+    if (
+        step_id in {"1.12", "1.13", "1.14", "0.20"}
+        or "gradient" in low
+        or "descente" in low
+    ):
         return "descent"
     if step_id in {"1.6", "1.7", "1.8"} or "relu" in low or "activation" in low:
         return "relu"
-    if any(word in low for word in ("perplex", "loss", "entrop")) or step_id in {"1.9", "1.10", "1.11", "3.6", "3.7", "3.10"}:
+    if any(word in low for word in ("perplex", "loss", "entrop")) or step_id in {
+        "1.9",
+        "1.10",
+        "1.11",
+        "3.6",
+        "3.7",
+        "3.10",
+    }:
         return "loss"
     if level == 4 and index <= 8:
         return "attention"
@@ -244,9 +524,13 @@ def visual_for(step_id: str, title: str) -> str:
     return "flow"
 
 
-def learning_aids(fields: dict[str, str], correct: str, wrong: list[str], visual: str) -> dict:
+def learning_aids(
+    fields: dict[str, str], correct: str, wrong: list[str], visual: str
+) -> dict:
     title = fields["title"].strip()
-    code_file = CODE_FILE[visual]
+    teaching = json.loads((SRC / "teaching.json").read_text(encoding="utf-8"))
+    reference = teaching["references"][fields["id"].strip()]
+    code_file = reference["file"]
     explanation = fields["explanation"].strip()
     why_first = fields["why"].strip().split(".")[0].strip()
     takeaways = [
@@ -274,6 +558,12 @@ def learning_aids(fields: dict[str, str], correct: str, wrong: list[str], visual
         "visualCaption": VISUAL_CAPTION[visual],
         "interactive": visual in INTERACTIVE,
         "codeFile": code_file,
+        "codeSymbol": reference["symbol"],
+        "tpIds": [
+            stage["id"]
+            for stage in teaching["stages"]
+            if fields["id"].strip() in stage["lessons"]
+        ],
         "takeaways": takeaways,
         "pitfalls": pitfalls,
         "hints": hints,
@@ -283,7 +573,26 @@ def learning_aids(fields: dict[str, str], correct: str, wrong: list[str], visual
 
 
 def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
-    required = ["id", "title", "tag", "minutes", "why", "objectives", "prereq", "intuition", "vocab", "explain", "code", "experiment", "exercise", "build", "question", "correct", "wrong", "explanation"]
+    required = [
+        "id",
+        "title",
+        "tag",
+        "minutes",
+        "why",
+        "objectives",
+        "prereq",
+        "intuition",
+        "vocab",
+        "explain",
+        "code",
+        "experiment",
+        "exercise",
+        "build",
+        "question",
+        "correct",
+        "wrong",
+        "explanation",
+    ]
     missing = [key for key in required if not fields.get(key, "").strip()]
     if missing:
         raise SystemExit(f"Champs vides pour {fields.get('id', '?')} : {missing}")
@@ -309,7 +618,9 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     }
     for key, minimum in limits.items():
         if len(fields[key].strip()) < minimum:
-            raise SystemExit(f"{fields['id']} : {key} trop court ({len(fields[key].strip())} < {minimum})")
+            raise SystemExit(
+                f"{fields['id']} : {key} trop court ({len(fields[key].strip())} < {minimum})"
+            )
     code = fields["code"]
     if code.startswith(":::"):
         code = code.split("\n", 1)[1]
@@ -317,13 +628,16 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
         code = code[: code.rfind(":::")].rstrip("\n")
     if len(code.strip()) < 40:
         raise SystemExit(f"{fields['id']} : exemple de code trop court")
-    visual = fields.get("visual", "").strip() or visual_for(fields["id"].strip(), fields["title"].strip())
+    visual = fields.get("visual", "").strip() or visual_for(
+        fields["id"].strip(), fields["title"].strip()
+    )
     if visual not in VISUAL_CAPTION:
         raise SystemExit(f"{fields['id']} : visuel inconnu {visual}")
     aids = learning_aids(fields, fields["correct"].strip(), wrong, visual)
-    corrections=json.loads((SRC/'corrections.json').read_text(encoding='utf-8'))
-    if fields['id'].strip() not in corrections:raise SystemExit(f"Corrigé absent : {fields['id']}")
-    aids.update(corrections[fields['id'].strip()])
+    corrections = json.loads((SRC / "corrections.json").read_text(encoding="utf-8"))
+    if fields["id"].strip() not in corrections:
+        raise SystemExit(f"Corrigé absent : {fields['id']}")
+    aids.update(corrections[fields["id"].strip()])
     return {
         "id": fields["id"].strip(),
         "title": fields["title"].strip(),
@@ -333,11 +647,32 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
         "objectives": goals,
         "prereq": fields["prereq"].strip(),
         "sections": [
-            {"kind": "intuition", "heading": "Intuition", "text": fields["intuition"].strip()},
-            {"kind": "vocab", "heading": "Vocabulaire", "text": fields["vocab"].strip()},
-            {"kind": "explain", "heading": "Explication", "text": fields["explain"].strip()},
-            {"kind": "code", "heading": "Exemple", "lang": fields.get("lang", "python").strip() or "python", "code": code.strip("\n")},
-            {"kind": "experiment", "heading": "Expérience", "text": fields["experiment"].strip()},
+            {
+                "kind": "intuition",
+                "heading": "Intuition",
+                "text": fields["intuition"].strip(),
+            },
+            {
+                "kind": "vocab",
+                "heading": "Vocabulaire",
+                "text": fields["vocab"].strip(),
+            },
+            {
+                "kind": "explain",
+                "heading": "Explication",
+                "text": fields["explain"].strip(),
+            },
+            {
+                "kind": "code",
+                "heading": "Exemple",
+                "lang": fields.get("lang", "python").strip() or "python",
+                "code": code.strip("\n"),
+            },
+            {
+                "kind": "experiment",
+                "heading": "Expérience",
+                "text": fields["experiment"].strip(),
+            },
         ],
         "exercise": fields["exercise"].strip(),
         "build": fields["build"].strip(),
@@ -363,7 +698,9 @@ def render_markdown(data: dict) -> str:
         "## Sommaire",
     ]
     for level in data["levels"]:
-        lines.append(f"- [{level['id']} — {level['title']}](#{anchor(level)}) — {len(level['steps'])} étapes")
+        lines.append(
+            f"- [{level['id']} — {level['title']}](#{anchor(level)}) — {len(level['steps'])} étapes"
+        )
     lines.append("")
     for level in data["levels"]:
         lines.append(f"## {level['id']} — {level['title']}")
@@ -383,7 +720,8 @@ def render_markdown(data: dict) -> str:
     lines.append("")
     lines.append(
         "Le parcours est réussi si tu peux expliquer une brique sans jargon inutile, la retrouver dans `model/`, "
-        "lancer son test, dire ce qu'elle coûte, la remplacer par une alternative du laboratoire et comparer le résultat à une baseline."
+        "construire et entraîner son GPT dans l'atelier, évaluer des données réservées, recharger ses poids et comparer une variation à une baseline. "
+        "Les contrôles techniques et la compréhension sans corrigé sont deux preuves distinctes. Voir atelier/PROJET_FINAL.md."
     )
     lines.append("")
     return "\n".join(lines)
@@ -397,6 +735,7 @@ def anchor(level: dict) -> str:
 
 
 def build_data() -> dict:
+    teaching = json.loads((SRC / "teaching.json").read_text(encoding="utf-8"))
     by_level: dict[int, list] = {level_id: [] for level_id, *_ in LEVELS}
     order = 0
     for path in sorted(SRC.glob("*.md")):
@@ -407,19 +746,57 @@ def build_data() -> dict:
             by_level[level_id].append(lesson)
     levels = []
     for level_id, title, summary, project in LEVELS:
-        steps = sorted(by_level[level_id], key=lambda step: [int(part) for part in step["id"].split(".")])
-        expected = {"0": 20, "1": 17, "2": 11, "3": 11, "4": 14, "5": 9, "6": 12, "7": 9, "8": 9, "9": 9, "10": 8, "11": 8, "12": 12, "13": 8}[str(level_id)]
+        steps = sorted(
+            by_level[level_id],
+            key=lambda step: [int(part) for part in step["id"].split(".")],
+        )
+        expected = {
+            "0": 20,
+            "1": 17,
+            "2": 11,
+            "3": 11,
+            "4": 14,
+            "5": 9,
+            "6": 12,
+            "7": 9,
+            "8": 9,
+            "9": 9,
+            "10": 8,
+            "11": 8,
+            "12": 12,
+            "13": 8,
+        }[str(level_id)]
         ids = [step["id"] for step in steps]
         if ids != [f"{level_id}.{index}" for index in range(1, expected + 1)]:
             raise SystemExit(f"Niveau {level_id} incomplet : {ids}")
-        levels.append({"id": level_id, "title": title, "summary": summary, "project": project, "steps": steps})
-    return {"meta": META, "levels": levels, "architecture": ARCHITECTURE, "track": TRACK}
+        levels.append(
+            {
+                "id": level_id,
+                "title": title,
+                "summary": summary,
+                "project": project,
+                "assessment": teaching["assessments"][str(level_id)],
+                "steps": steps,
+            }
+        )
+    return {
+        "meta": META,
+        "levels": levels,
+        "architecture": ARCHITECTURE,
+        "track": TRACK,
+        "learningPath": {
+            "coreLevels": teaching["coreLevels"],
+            "afterCoreLevels": teaching["afterCoreLevels"],
+        },
+    }
 
 
 def main() -> None:
     data = build_data()
     JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-    JSON_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    JSON_PATH.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     DOC_PATH.write_text(render_markdown(data), encoding="utf-8")
     total = sum(len(level["steps"]) for level in data["levels"])
     print(f"{total} leçons -> {JSON_PATH}")

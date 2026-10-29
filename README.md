@@ -15,7 +15,7 @@ La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construi
 ## Ce qui s'ajoute au parcours
 
 - `python3 -m model.bpe` n'est pas une commande : le tokenizer est `model/bpe.py`. `scripts/train_release.py` entraîne le BPE du run publié (1 500 fusions) puis le modèle. Une comparaison antérieure, plus courte, avait déjà donné moins de nats par caractère au BPE qu'aux caractères.
-- Le playground est `#/playground`. Il charge `data/gpt_browser.json`, produit par `python3 -m model.export_js`.
+- Le playground est `#/playground`. Il charge les poids publiés de `data/gpt_browser.json`. Pour tes essais, `python3 -m model.export_js` écrit un export séparé dans `runs/gpt_browser.json`.
 - Le catalogue est `#/donnees`, lu depuis `data/datasets.json`. Préparer un jeu : `python3 -m model.datasets list`, puis `python3 -m model.datasets prepare <id> --max-mb 5`. Les fichiers lourds ne sont pas commités. `python3 -m model.gpt_train --dataset <id>` ou `--plan plan.json` enchaîne pré-entraînement et ajustement.
 - L'ajustement masqué et LoRA sont dans `model/finetune.py` et `model/lora.py`. Les 294 paires du cours sont dans `model/data/instructions_fr.json`. Le compte-rendu est [`data/finetune_run.json`](data/finetune_run.json).
 - L'IDE `#/ide` et les exercices exécutables chargent Pyodide dans un worker, seulement quand le propriétaire les lance. Le pas à pas rejoue une trace, il ne fige pas la page.
@@ -114,7 +114,7 @@ Le code (site, laboratoire, scripts, tests) est sous licence [MIT](LICENSE). Le 
 - `#/espace` : notes, favoris, reprise de lecture, séances de 15/30/60 minutes, révisions datées, sauvegarde JSON et restauration avec aperçu.
 - `#/glossaire` : termes issus du vocabulaire des leçons, avec lien vers leur contexte.
 - `#/experiences` : comparaison des rapports publiés, des runs enregistrés et d'un rapport JSON local. Les données absentes restent « Non mesuré ».
-- Les 157 corrigés propres aux exercices sont édités dans `curriculum_src/corrections.json`. Les 52 exercices Python ont un squelette à compléter, une solution et des contrôles exécutés en CI. Les bilans de niveau restent des autoévaluations explicites.
+- Les 157 corrigés propres aux exercices sont édités dans `curriculum_src/corrections.json`. Les 63 exercices Python ont un squelette à compléter, une solution et des contrôles exécutés en CI. Les bilans de niveau restent des autoévaluations explicites.
 - Le playground charge le second modèle à la demande, affiche les tokens de l'invite, accepte une graine et une longueur de génération, et mesure la vitesse sur l'appareil. Les sorties ajustées s'arrêtent au premier saut de ligne. La comparaison utilise le même prompt et les mêmes réglages ; ce n'est pas un benchmark de généralisation.
 
 Les brouillons sont écrits localement à la saisie. La synchronisation distante est réservée au propriétaire. `supabase/workspace.sql` ajoute `learning_records` et une fonction d'écriture atomique avec numéro de révision, sans modifier la fonction `is_owner()` existante. Cette extension est appliquée au projet du site. Une modification concurrente conserve les deux versions jusqu'au choix dans Mon espace. La migration des fichiers historiques conserve aussi les copies divergentes. Ne supprime pas les anciennes tables avant d'avoir exporté et vérifié les données.
@@ -145,3 +145,31 @@ La recette et les données doivent rester identiques. Pour une configuration per
 La CI Chromium exécute le parcours complet. Deux jobs supplémentaires exécutent les scénarios responsive et espace personnel avec Firefox et WebKit. WebKit valide un moteur apparenté à Safari ; cela ne remplace pas un essai sur un véritable iPhone/iPad. Les scénarios incluent zoom, stockage indisponible, coupure réseau, deux appareils et conflit de révisions. Les tests qui simulent les API bloquent les service workers ; le test du cache les active explicitement pour ne pas contourner les simulations réseau.
 
 La vérification backend a confirmé les refus de lecture/écriture d'un autre compte, l'absence de droits anonymes et le refus atomique d'une révision obsolète, dans des transactions annulées. L'advisor Supabase conserve un avertissement : la protection contre les mots de passe compromis est désactivée. Ce paramètre Auth n'est pas exposé par le connecteur utilisé ; il reste à activer dans le tableau de bord lorsque le plan le permet : https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.
+
+## Atelier personnel et progression
+
+L’[atelier du site](https://sk34pk25.github.io/ai-from-zero/#/atelier) livre un projet autonome : `eleve.py` à compléter, corrigé séparé, primitives de tableaux NumPy, douze TP cumulatifs, entraînement et évaluation. Les 157 leçons restent accessibles à leurs adresses. Le tronc commun recommandé est **0 → 1 → 2 → 3 → 4 → 13**, puis 5 et 6 pour les variantes/coûts. Les autres niveaux sont des approfondissements.
+
+Les guides sont [Installation](atelier/INSTALLATION.md), [12 TP](atelier/GUIDE.md) et [Projet final](atelier/PROJET_FINAL.md). Les bilans ont quatre critères spécifiques par niveau ; les anciennes cases génériques sont conservées comme historique, pas interprétées comme maîtrise des nouveaux critères. L’épreuve finale demande code personnel, documents réservés, baselines, checkpoint rechargé et variation contrôlée. Les contrôles publics ne certifient pas l’autonomie ; la grille /20 demande aussi des explications et une reconstruction sans corrigé.
+
+Depuis le dépôt, les commandes de validation de la référence sont :
+
+```bash
+python3 atelier/verifier.py --module correction
+python3 atelier/entrainer.py --module correction --steps 120 --out runs/verification-atelier
+python3 scripts/check_examples.py
+```
+
+Le mode `correction` teste la référence. Pour apprendre, complète `eleve.py` et utilise le module par défaut. Les démos répètent des phrases synthétiques et ne démontrent pas un transfert entre livres. Le projet téléchargé fonctionne hors du dépôt avec NumPy ; aucun poids existant ni API n’est chargé.
+
+Les commandes ordinaires `model.gpt_train` et `model.gpt_sample` utilisent désormais `runs/gpt_checkpoint.npz`, et le rapport va dans `runs/gpt_run.json`. L’export CLI va dans `runs/gpt_browser.json`. Les poids et rapports publiés dans `model/data/` et `data/` sont conservés ; `scripts/train_release.py` reste le chemin explicite de publication.
+
+### Plan SFT avec validation réservée
+
+`--plan` utilise le même regroupement lexical train/validation/test que le comparateur. Des fichiers explicites se déclarent avec `instructions` (train), `validation` et `test` dans la phase SFT. Un recouvrement de groupes est refusé. Un jeu trop petit exige `diagnostic_train: true` pour annoncer un diagnostic sur train. Les rapports donnent les tailles, empreintes, cibles retenues et exemples inconnus/tronqués.
+
+```bash
+python3 -m model.gpt_train --plan examples/plan-sft.json --checkpoint runs/sft-demo/modele.npz --report runs/sft-demo/rapport.json
+```
+
+Cet exemple court valide l’outillage ; il ne promet pas un assistant utile. Compare les recettes sur validation. Après choix, demande la mesure finale avec `--test-final` ; ne réutilise pas ce résultat pour choisir d’autres réglages. Les données réservées ne servent pas aux mises à jour des poids. Le format reste mono-tour ; la fin de réponse est le saut de ligne, pas un token EOS spécialisé.

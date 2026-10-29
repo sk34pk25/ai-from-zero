@@ -17,3 +17,16 @@ Périmètre autorisé : uniquement ai-from-zero, accès propriétaire conservé.
 - La matrice CI vérifie Chromium, Firefox et WebKit. Un véritable iPhone/iPad ou appareil Android n'est pas accessible à cet environnement ; cette vérification physique reste manuelle.
 - Le mode hors connexion concerne la lecture et les modèles téléchargés volontairement. Le moteur Python et une session expirée peuvent nécessiter une connexion.
 - Le seul avertissement de l'advisor Supabase est la protection contre les mots de passe compromis désactivée. L'outil connecté n'expose pas ce réglage ; lien de configuration dans le README.
+
+## Correction de l’audit pédagogique
+
+- [x] Exemples de résidu, export, SiLU, loss stochastique, formes et sauvegarde corrigés.
+- [x] Explications du backward complet réconciliées avec le code ; références par leçon avec fonction précise.
+- [x] Tronc commun 0–4 puis 13, atelier indépendant et corrigé séparé.
+- [x] Douze TP cumulatifs et projet final entraîné, avec variation et grille d’explications.
+- [x] Exercices réalignés, nouveaux cas numériques et quatre critères propres à chaque niveau.
+- [x] Séparation documentaire, dédoublonnage exact, couverture et provenance.
+- [x] Plans SFT avec validation réservée ; test final explicite ; diagnostics de rejet/troncature.
+- [x] Vérification automatique des 152 exemples et du projet téléchargé hors dépôt.
+
+Les contrôles vérifient l’outillage et des propriétés. La réussite d’un élève, son autonomie et la qualité d’un modèle sur de nouvelles tâches demandent encore une réalisation et une relecture de son projet.

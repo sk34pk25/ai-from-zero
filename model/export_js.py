@@ -22,7 +22,8 @@ def _b64(array: np.ndarray) -> str:
     return base64.b64encode(raw).decode("ascii")
 
 
-def export_browser(model: TinyGPT, tokenizer, path: Path, prompt: str) -> dict:
+def export_browser(model: TinyGPT, tokenizer, path: str | Path, prompt: str) -> dict:
+    path = Path(path)
     rounded = TinyGPT(model.config)
     tensors = {}
     for name, value in model.params.items():
@@ -66,9 +67,11 @@ if __name__ == "__main__":
 
     from model.gpt_train import DEFAULT_CHECKPOINT, load_checkpoint
 
-    parser = argparse.ArgumentParser(description="Exporte le checkpoint vers le playground.")
+    parser = argparse.ArgumentParser(
+        description="Exporte le checkpoint vers le playground."
+    )
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
-    parser.add_argument("--out", type=Path, default=Path("data/gpt_browser.json"))
+    parser.add_argument("--out", type=Path, default=Path("runs/gpt_browser.json"))
     parser.add_argument("--prompt", default="Le ")
     args = parser.parse_args()
     trained, tokenizer, _history = load_checkpoint(args.checkpoint)

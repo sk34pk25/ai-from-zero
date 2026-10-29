@@ -1,0 +1,86 @@
+{
+  "format": "afz-atelier-run-v1",
+  "module": "correction",
+  "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+  "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+  "config": {
+    "d": 16,
+    "layers": 1,
+    "heads": 2,
+    "block": 16,
+    "seed": 0
+  },
+  "steps": 120,
+  "batch": 4,
+  "lr": 0.005,
+  "tokens_vus": 7680,
+  "parameter_count": 4032,
+  "seconds": 0.4389791060002608,
+  "train_sha256": "a82e3b313bdfd4f60ecbba1692151b6189789668d74529b81275f8f0ede83e6d",
+  "validation_sha256": "ad3f6dfd12acfc9a22db600860892d638cb2ea3dfaaee6ec33c45e9b898a8498",
+  "validation_caracteres_inconnus": 0,
+  "validation_caracteres_total": 2360,
+  "train_loss_start": 2.9461072192925273,
+  "train_loss_end": 0.3524422681857614,
+  "val_loss_start": 2.9424327123958136,
+  "val_loss_end": 0.43373444374742254,
+  "baselines": {
+    "uniforme": 2.9444389791664403,
+    "bigramme": 0.9639995094774998
+  },
+  "history": [
+    {
+      "step": 20,
+      "train": 1.9063322840339132,
+      "validation": 2.003657364589362
+    },
+    {
+      "step": 40,
+      "train": 1.1654903224157036,
+      "validation": 1.3340140384002392
+    },
+    {
+      "step": 60,
+      "train": 0.78281884344503,
+      "validation": 0.9384224870325164
+    },
+    {
+      "step": 80,
+      "train": 0.5773663356901793,
+      "validation": 0.6867498657073845
+    },
+    {
+      "step": 100,
+      "train": 0.4558474708114027,
+      "validation": 0.5704714286131891
+    },
+    {
+      "step": 120,
+      "train": 0.3524422681857614,
+      "validation": 0.43373444374742254
+    }
+  ],
+  "poids_modifies": {
+    "tok": true,
+    "pos": true,
+    "head": true,
+    "gain": true,
+    "bias": true,
+    "0.wq": true,
+    "0.wk": true,
+    "0.wv": true,
+    "0.wo": true,
+    "0.w1": true,
+    "0.w2": true,
+    "0.g1": true,
+    "0.g2": true,
+    "0.b1": true,
+    "0.b2": true
+  },
+  "rechargement_identique": true,
+  "echantillon": "le chan dourt dans le boiss.\nle chie cort dans le ch",
+  "selection": "meilleure loss validation ; test non consulté",
+  "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+  "dataset_note": "Phrases synthétiques répétées de atelier/demo/ : diagnostic de débogage, pas transfert entre livres.",
+  "environment": "Python 3.12, NumPy 2.3.5, CPU de cet environnement ; durée non transposable à un autre appareil."
+}

@@ -1,10 +1,10 @@
 [
   {
     "lessonId": "0.5",
-    "prompt": "Renvoie une salutation, sans print.",
-    "starter": "def bonjour(nom):\n    # À compléter\n    pass\n",
-    "solution": "def bonjour(nom):\n    return f\"Bonjour {nom}\"\n",
-    "check": "assert bonjour('Ada') == 'Bonjour Ada'; assert bonjour('Lin') == 'Bonjour Lin'\n"
+    "prompt": "Définis message et nombre, puis affiche-les. Les fonctions viendront en 0.9.",
+    "starter": "message = \"À compléter\"\nnombre = 0\nprint(message, nombre)\n",
+    "solution": "message = \"construire un petit modèle\"\nnombre = 42\nprint(message, nombre)\n",
+    "check": "assert message==\"construire un petit modèle\"; assert nombre==42 and isinstance(nombre,int)\n"
   },
   {
     "lessonId": "0.7",
@@ -35,6 +35,13 @@
     "check": "assert get_dim({'dim':16})==16; assert get_dim({'dim':3})==3\n"
   },
   {
+    "lessonId": "0.15",
+    "prompt": "Ajoute un biais de trois valeurs à chaque ligne d’un tableau (2,3).",
+    "starter": "import numpy as np\n\ndef ajouter_biais(x, b):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef ajouter_biais(x,b):\n    return np.asarray(x)+np.asarray(b)\n",
+    "check": "np.testing.assert_array_equal(ajouter_biais([[1,2,3],[4,5,6]],[10,20,30]),[[11,22,33],[14,25,36]])\n"
+  },
+  {
     "lessonId": "0.16",
     "prompt": "Renvoie le carré, y compris pour une entrée négative.",
     "starter": "def carre(x):\n    # À compléter\n    pass\n",
@@ -56,11 +63,18 @@
     "check": "assert matvec([[2,0],[0,3]],[4,5])==[8,15]; assert matvec([[1,2]],[3,4])==[11]\n"
   },
   {
+    "lessonId": "0.19",
+    "prompt": "Vérifie une distribution sans accepter de valeur négative ; utilise une tolérance.",
+    "starter": "def distribution(p):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def distribution(p):\n    return bool(p) and all(v>=0 for v in p) and abs(sum(p)-1)<1e-6\n",
+    "check": "assert distribution([.1,.2,.7]); assert not distribution([-.1,1.1]); assert not distribution([]); assert not distribution([.5,.6])\n"
+  },
+  {
     "lessonId": "0.20",
-    "prompt": "Écris moyenne(xs), la somme divisée par la longueur. Le contrôle appelle moyenne([2, 4]).",
-    "starter": "def moyenne(xs):\n    # À compléter\n    pass\n",
-    "check": "assert moyenne([2, 4]) == 3\n",
-    "solution": "def moyenne(xs):\n    return sum(xs) / len(xs)\n"
+    "prompt": "Écris la différence centrée de f en x, puis retrouve 8 pour x² en 4.",
+    "starter": "def derivee(f, x, eps=1e-05):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def derivee(f,x,eps=1e-5):\n    return (f(x+eps)-f(x-eps))/(2*eps)\n",
+    "check": "assert abs(derivee(lambda x:x*x,4)-8)<1e-6; assert abs(derivee(lambda x:3*x+1,-2)-3)<1e-6\n"
   },
   {
     "lessonId": "1.4",
@@ -98,11 +112,39 @@
     "check": "assert derivee(1)==24; assert derivee(0)==6\n"
   },
   {
+    "lessonId": "1.12",
+    "prompt": "Deux branches utilisent le même poids : donne d(w*w+w)/dw.",
+    "starter": "def gradient_partage(w):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def gradient_partage(w):\n    return w+w+1\n",
+    "check": "assert gradient_partage(3)==7; assert gradient_partage(-2)==-3\n"
+  },
+  {
+    "lessonId": "1.13",
+    "prompt": "Entraîne w sur (w-3)² par plusieurs pas de gradient.",
+    "starter": "def apprendre(w, lr, n):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def apprendre(w,lr,n):\n    for _ in range(n):\n        w-=lr*2*(w-3)\n    return w\n",
+    "check": "assert abs(apprendre(0,.5,2)-3)<1e-10; assert abs(apprendre(0,.1,40)-3)<.001\n"
+  },
+  {
+    "lessonId": "1.15",
+    "prompt": "Réduis le gradient diffusé d’un biais (3,) utilisé dans un lot (B,T,3).",
+    "starter": "import numpy as np\n\ndef gradient_biais(g):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef gradient_biais(g):\n    return np.asarray(g).sum(axis=(0,1))\n",
+    "check": "np.testing.assert_array_equal(gradient_biais(np.ones((2,4,3))),[8,8,8])\n"
+  },
+  {
+    "lessonId": "1.16",
+    "prompt": "Un pas applique forward, loss, dérivée et mise à jour pour y=w*x.",
+    "starter": "def pas_regression(w, x, y, lr):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def pas_regression(w,x,y,lr):\n    pred=w*x\n    loss=(pred-y)**2\n    grad=2*(pred-y)*x\n    return w-lr*grad,loss\n",
+    "check": "assert pas_regression(1,2,6,.1)==(2.6,16); assert pas_regression(3,2,6,.1)==(3,0)\n"
+  },
+  {
     "lessonId": "1.17",
-    "prompt": "Écris pas(x, gradient, lr) qui retire lr fois le gradient. Le contrôle attend 0.5.",
-    "starter": "def pas(x, gradient, lr):\n    # À compléter\n    pass\n",
-    "check": "assert pas(1, 1, 0.5) == 0.5\n",
-    "solution": "def pas(x, gradient, lr):\n    return x - lr * gradient\n"
+    "prompt": "Diagnostique une tendance : train baisse alors que validation monte.",
+    "starter": "def surapprentissage(train, val):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def surapprentissage(train,val):\n    return len(train)>1 and len(train)==len(val) and train[-1]<train[0] and val[-1]>val[0]\n",
+    "check": "assert surapprentissage([2,1],[2,3]); assert not surapprentissage([2,1],[2,1]); assert not surapprentissage([1],[2])\n"
   },
   {
     "lessonId": "2.4",
@@ -127,10 +169,10 @@
   },
   {
     "lessonId": "2.11",
-    "prompt": "Compte les caractères distincts. Le contrôle attend 2 pour « abab ».",
-    "starter": "def distincts(texte):\n    # À compléter\n    pass\n",
-    "check": "assert distincts('abab') == 2\n",
-    "solution": "def distincts(texte):\n    return len(set(texte))\n"
+    "prompt": "Construis les fenêtres x/y de taille T, avec cible décalée d’un token.",
+    "starter": "def batches(ids, t):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def batches(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t)]\n",
+    "check": "assert batches([1,2,3,4],2)==[([1,2],[2,3]),([2,3],[3,4])]; assert batches([1],2)==[]\n"
   },
   {
     "lessonId": "3.1",
@@ -168,6 +210,13 @@
     "check": "assert topk([1,3,2,0],2)==[1,2]; assert topk([9,1],1)==[0]\n"
   },
   {
+    "lessonId": "3.8",
+    "prompt": "Mets à jour une ligne de logits en utilisant softmax - one_hot.",
+    "starter": "import numpy as np\n\ndef pas_logits(z, cible, lr):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef pas_logits(z,cible,lr):\n    z=np.array(z,dtype=float)\n    e=np.exp(z-z.max());g=e/e.sum();g[cible]-=1\n    return z-lr*g\n",
+    "check": "z=pas_logits([0,0],1,.2); np.testing.assert_allclose(z,[-.1,.1]); assert pas_logits([1,0],0,.1)[0]>1\n"
+  },
+  {
     "lessonId": "3.9",
     "prompt": "Conserve seulement les t derniers tokens.",
     "starter": "def contexte(ids,t):\n    # À compléter\n    pass\n",
@@ -176,10 +225,10 @@
   },
   {
     "lessonId": "3.11",
-    "prompt": "La perplexité uniforme vaut la taille du vocabulaire. Renvoie-la.",
-    "starter": "def uniforme(taille):\n    # À compléter\n    pass\n",
-    "check": "assert uniforme(4) == 4\n",
-    "solution": "def uniforme(taille):\n    return taille\n"
+    "prompt": "Sauve puis recharge un tableau en mémoire ; aucune copie d’initialisation ne suffit.",
+    "starter": "import io\nimport numpy as np\n\ndef roundtrip(x):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import io\nimport numpy as np\ndef roundtrip(x):\n    b=io.BytesIO(); np.save(b,np.asarray(x)); b.seek(0)\n    return np.load(b,allow_pickle=False)\n",
+    "check": "np.testing.assert_array_equal(roundtrip([[1.,2.],[3.,4.]]),[[1,2],[3,4]])\n"
   },
   {
     "lessonId": "4.3",
@@ -187,6 +236,13 @@
     "starter": "def scores(q,k):\n    # À compléter\n    pass\n",
     "solution": "def scores(q,k):\n    return [[sum(a*b for a,b in zip(x,y,strict=True)) for y in k] for x in q]\n",
     "check": "assert scores([[2],[0]],[[3],[4]])==[[6,8],[0,0]]\n"
+  },
+  {
+    "lessonId": "4.4",
+    "prompt": "Calcule toute l’attention causale à une tête : scores, masque, softmax et valeurs.",
+    "starter": "import numpy as np\n\ndef attention(q, k, v):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef attention(q,k,v):\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T/q.shape[-1]**.5\n    z=np.where(np.tril(np.ones(z.shape,dtype=bool)),z,-1e9)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
+    "check": "q=np.eye(2); a=attention(q,q,[[2.,3.],[9.,8.]]); b=attention(q,q,[[2.,3.],[99.,88.]]); np.testing.assert_allclose(a[0],[2,3]); np.testing.assert_allclose(a[0],b[0]); assert a.shape==(2,2)\n"
   },
   {
     "lessonId": "4.5",
@@ -203,11 +259,25 @@
     "check": "assert echelle(64)==8; assert echelle(1)==1\n"
   },
   {
+    "lessonId": "4.7",
+    "prompt": "Passe de (B,T,D) à (B,H,T,D/H), sans mélanger les tokens.",
+    "starter": "import numpy as np\n\ndef tetes(x, h):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef tetes(x,h):\n    x=np.asarray(x);b,t,d=x.shape\n    if d%h: raise ValueError(\"dimension\")\n    return x.reshape(b,t,h,d//h).transpose(0,2,1,3)\n",
+    "check": "x=np.arange(24).reshape(2,3,4); y=tetes(x,2); assert y.shape==(2,2,3,2); np.testing.assert_array_equal(y[1,1,2],x[1,2,2:])\n"
+  },
+  {
     "lessonId": "4.8",
     "prompt": "Additionne entrée et correction coordonnée par coordonnée.",
     "starter": "def residu(x,correction):\n    # À compléter\n    pass\n",
     "solution": "def residu(x,correction):\n    return [a+b for a,b in zip(x,correction,strict=True)]\n",
     "check": "assert residu([1,2],[0,0])==[1,2]; assert residu([1,2],[2,-1])==[3,1]\n"
+  },
+  {
+    "lessonId": "4.9",
+    "prompt": "Normalise le dernier axe de chaque token, sans mélanger le batch.",
+    "starter": "import numpy as np\n\ndef normaliser(x, eps=1e-05):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "import numpy as np\ndef normaliser(x,eps=1e-5):\n    x=np.asarray(x,dtype=float)\n    return (x-x.mean(-1,keepdims=True))/np.sqrt(x.var(-1,keepdims=True)+eps)\n",
+    "check": "y=normaliser([[1,3],[20,20]]); np.testing.assert_allclose(y[0],[-1,1],atol=1e-4); np.testing.assert_array_equal(y[1],[0,0])\n"
   },
   {
     "lessonId": "4.10",
@@ -217,11 +287,18 @@
     "check": "assert poids_ffn(32)==8192; assert poids_ffn(1)==8\n"
   },
   {
+    "lessonId": "4.11",
+    "prompt": "Assemble les deux résidus pré-norme avec des fonctions fournies.",
+    "starter": "def bloc(x, attention, ffn, norm):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def bloc(x,attention,ffn,norm):\n    h=x+attention(norm(x))\n    return h+ffn(norm(h))\n",
+    "check": "assert bloc(2,lambda x:x*3,lambda x:x*2,lambda x:x)==24; assert bloc(7,lambda x:0,lambda x:0,lambda x:x)==7\n"
+  },
+  {
     "lessonId": "4.14",
-    "prompt": "Un masque causal : la colonne n'est visible que si elle est avant ou sur la ligne.",
-    "starter": "def visible(ligne, colonne):\n    # À compléter\n    pass\n",
-    "check": "assert visible(1, 1) and not visible(0, 1)\n",
-    "solution": "def visible(ligne, colonne):\n    return colonne <= ligne\n"
+    "prompt": "Fais plusieurs vrais backward et pas SGD sur une loss quadratique. Le TP 12 étend cette boucle au GPT.",
+    "starter": "from model.autograd import Tensor\n\ndef entrainer(w, n, lr):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "from model.autograd import Tensor\ndef entrainer(w,n,lr):\n    w=Tensor(float(w))\n    for _ in range(n):\n        w.zero_grad(); loss=(w-3)*(w-3); loss.backward(); w.data-=lr*w.grad\n    return float(w.data)\n",
+    "check": "assert abs(entrainer(0,30,.1)-3)<.01; assert abs(entrainer(0,1,.5)-3)<1e-8\n"
   },
   {
     "lessonId": "5.5",
@@ -239,10 +316,10 @@
   },
   {
     "lessonId": "5.9",
-    "prompt": "Le résidu ajoute l'entrée et la branche. Renvoie la somme.",
-    "starter": "def residu(entree, branche):\n    # À compléter\n    pass\n",
-    "check": "assert residu(2, 3) == 5\n",
-    "solution": "def residu(entree, branche):\n    return entree + branche\n"
+    "prompt": "Compte les valeurs K et V stockées : 2 × couches × T × têtes KV × dimension de tête.",
+    "starter": "def cache(couches, t, kv, d):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def cache(couches,t,kv,d):\n    return 2*couches*t*kv*d\n",
+    "check": "assert cache(2,10,2,4)==320; assert cache(2,20,2,4)==2*cache(2,10,2,4)\n"
   },
   {
     "lessonId": "6.1",
@@ -260,10 +337,10 @@
   },
   {
     "lessonId": "6.12",
-    "prompt": "Le coût dessiné de l'attention suit le carré de la longueur.",
-    "starter": "def cout(longueur):\n    # À compléter\n    pass\n",
-    "check": "assert cout(3) == 9\n",
-    "solution": "def cout(longueur):\n    return longueur * longueur\n"
+    "prompt": "Trie qualité décroissante puis secondes et RAM croissantes, en conservant les lignes.",
+    "starter": "def classer(lignes):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def classer(lignes):\n    return sorted(lignes,key=lambda r:(-r[\"quality\"],r[\"seconds\"],r[\"ram_bytes\"]))\n",
+    "check": "rows=[{\"name\":\"a\",\"quality\":1,\"seconds\":2,\"ram_bytes\":10},{\"name\":\"b\",\"quality\":1,\"seconds\":1,\"ram_bytes\":20}]; assert [r[\"name\"] for r in classer(rows)]==[\"b\",\"a\"]; assert rows[0][\"name\"]==\"a\"\n"
   },
   {
     "lessonId": "7.5",
@@ -274,10 +351,10 @@
   },
   {
     "lessonId": "7.9",
-    "prompt": "Le routeur ne calcule que k experts. Renvoie k s'il ne dépasse pas le total.",
-    "starter": "def actifs(total, k):\n    # À compléter\n    pass\n",
-    "check": "assert actifs(4, 2) == 2\n",
-    "solution": "def actifs(total, k):\n    return min(total, k)\n"
+    "prompt": "Distingue poids totaux des experts et poids actifs par token.",
+    "starter": "def budgets(e, k, poids_expert):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def budgets(e,k,poids_expert):\n    if not 1<=k<=e:raise ValueError(\"k\")\n    return e*poids_expert,k*poids_expert\n",
+    "check": "assert budgets(8,2,100)==(800,200); assert budgets(4,1,10)==(40,10)\n"
   },
   {
     "lessonId": "8.4",
@@ -295,10 +372,10 @@
   },
   {
     "lessonId": "8.9",
-    "prompt": "L'oubli multiplie l'état. Renvoie etat * oubli.",
-    "starter": "def etat_suivant(etat, oubli):\n    # À compléter\n    pass\n",
-    "check": "assert etat_suivant(2, 0.5) == 1\n",
-    "solution": "def etat_suivant(etat, oubli):\n    return etat * oubli\n"
+    "prompt": "Construis les modes de l’hybride : attention aux indices pairs, SSM aux impairs.",
+    "starter": "def modes(n):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def modes(n):\n    return [\"attn\" if i%2==0 else \"ssm\" for i in range(n)]\n",
+    "check": "assert modes(5)==[\"attn\",\"ssm\",\"attn\",\"ssm\",\"attn\"]; assert modes(0)==[]\n"
   },
   {
     "lessonId": "9.2",
@@ -309,10 +386,10 @@
   },
   {
     "lessonId": "9.9",
-    "prompt": "Un patch est un bloc, pas une ligne. Compte les patches d'un carré.",
-    "starter": "def patches(cote, taille):\n    # À compléter\n    pass\n",
-    "check": "assert patches(4, 2) == 4\n",
-    "solution": "def patches(cote, taille):\n    return (cote // taille) * (cote // taille)\n"
+    "prompt": "Mesure une erreur de reconstruction pixel par pixel.",
+    "starter": "def mse_image(a, b):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def mse_image(a,b):\n    if len(a)!=len(b) or not a:raise ValueError(\"tailles\")\n    return sum((x-y)**2 for x,y in zip(a,b))/len(a)\n",
+    "check": "assert mse_image([0,2],[0,0])==2; assert mse_image([1,2],[1,2])==0\n"
   },
   {
     "lessonId": "10.3",
@@ -323,17 +400,17 @@
   },
   {
     "lessonId": "10.8",
-    "prompt": "Le contexte ajouté est la question plus le document choisi.",
-    "starter": "def contexte(question, document):\n    # À compléter\n    pass\n",
-    "check": "assert contexte('ou', 'ici') == 'ou ici'\n",
-    "solution": "def contexte(question, document):\n    return question + ' ' + document\n"
+    "prompt": "Calcule l’exactitude d’un lot de réponses pour comparer avec/sans retrieval.",
+    "starter": "def exactitude(pred, cibles):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def exactitude(pred,cibles):\n    if not pred or len(pred)!=len(cibles):raise ValueError(\"tailles\")\n    return sum(p==c for p,c in zip(pred,cibles))/len(pred)\n",
+    "check": "assert exactitude([1,2,0],[1,2,3])==2/3; assert exactitude([1],[2])==0\n"
   },
   {
     "lessonId": "11.8",
-    "prompt": "L'écart est la variante moins la baseline.",
-    "starter": "def ecart(variante, baseline):\n    # À compléter\n    pass\n",
-    "check": "assert ecart(3, 1) == 2\n",
-    "solution": "def ecart(variante, baseline):\n    return variante - baseline\n"
+    "prompt": "Classe les observations selon la preuve fournie : test technique, mesure linguistique ou aucune.",
+    "starter": "def statut(forme, loss_validation):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def statut(forme,loss_validation):\n    if loss_validation is not None:return \"mesure linguistique\"\n    return \"test technique\" if forme else \"non reproduit\"\n",
+    "check": "assert statut(True,None)==\"test technique\"; assert statut(False,None)==\"non reproduit\"; assert statut(True,2.3)==\"mesure linguistique\"\n"
   },
   {
     "lessonId": "12.4",
@@ -344,10 +421,10 @@
   },
   {
     "lessonId": "12.12",
-    "prompt": "Les trois dos partagent la même forme. Renvoie-la.",
-    "starter": "def forme(batch, temps, dim):\n    # À compléter\n    pass\n",
-    "check": "assert forme(2, 4, 8) == (2, 4, 8)\n",
-    "solution": "def forme(batch, temps, dim):\n    return (batch, temps, dim)\n"
+    "prompt": "Vérifie que la fiche contient des preuves du projet : données, configuration, baselines et rechargement.",
+    "starter": "def pieces_manquantes(rapport):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def pieces_manquantes(rapport):\n    requises={\"donnees\",\"config\",\"baselines\",\"rechargement\",\"limites\"}\n    return sorted(requises-set(rapport))\n",
+    "check": "assert pieces_manquantes({\"config\":{}})==[\"baselines\",\"donnees\",\"limites\",\"rechargement\"]; assert pieces_manquantes(dict.fromkeys([\"donnees\",\"config\",\"baselines\",\"rechargement\",\"limites\"]))==[]\n"
   },
   {
     "lessonId": "13.6",
@@ -358,9 +435,9 @@
   },
   {
     "lessonId": "13.8",
-    "prompt": "La frontière de la réponse commence après la question. Renvoie l'index de « Réponse ».",
-    "starter": "def frontiere(texte):\n    # À compléter\n    pass\n",
-    "check": "assert frontiere('Question : a\\nRéponse : b') > 0\n",
-    "solution": "def frontiere(texte):\n    return texte.index('Réponse')\n"
+    "prompt": "Arrête une réponse mono-tour au premier saut de ligne. Une conversation multi-tours demanderait un autre protocole.",
+    "starter": "def arreter(texte):\n    raise NotImplementedError('À compléter')\n",
+    "solution": "def arreter(texte):\n    return texte.split(\"\\n\",1)[0]\n",
+    "check": "assert arreter(\"bonjour\\nsuite\")==\"bonjour\"; assert arreter(\"salut\")==\"salut\"\n"
   }
 ]

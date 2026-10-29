@@ -15,7 +15,7 @@ Tu lis une recette. Tu notes les ingrédients que tu as, ceux que tu n'as pas, e
 @VOCAB
 Papier : un article qui pose une question. Baseline : le système simple auquel on se compare. Résultat : un nombre obtenu dans un montage décrit. Limite : ce que le montage ne montre pas.
 @EXPLAIN
-Pour chaque papier que tu cites dans ce parcours, tu dois pouvoir remplir quatre lignes : la question, la baseline, la mesure, et ce que tu n'as pas reproduit. Le laboratoire a déjà ce format dans model/experiment.py : run_ablation prend des configurations nommées et une fonction, et renvoie une ligne par nom. Il ne télécharge pas d'article, il ne lance pas un entraînement de recherche. Les leçons suivantes appliquent ce filtre à quatre idées à la mode : raisonner sur des concepts plutôt que sur des tokens, itérer dans un temps interne, calculer dans un espace continu, remplacer l'attention, mélanger les modalités dès l'entrée. Aucune de ces leçons ne recopie un tableau de scores. Si un chiffre n'a pas été produit par pytest dans ce dépôt, il n'entre pas dans ton README.
+Pour un article, note la question, la baseline, les données, le budget et ce que tu n'as pas reproduit. Un test de forme vérifie une propriété ; un script d'expérience produit des mesures ; aucun des deux ne prouve automatiquement un gain général. Tu peux publier des résultats d'entraînement accompagnés du script, de la configuration, des empreintes de données et des limites, même s'ils ne viennent pas de pytest. Une reproduction compare les mêmes données et une unité commune, avec plusieurs graines quand c'est possible. Les lectures guidées de l'atelier proposent microgpt pour la chaîne minimale et Stanford CS336 pour le protocole de construction et d'évaluation. Le niveau reste une ouverture : les idées de concepts, temps interne et multimodalité ne sont pas reproduites par les seuls tests du laboratoire.
 @LANG python
 @CODE
 :::
@@ -42,6 +42,11 @@ Ce que tu as réellement reproduit, et ce que tu n'as pas reproduit
 - Le nombre de paramètres du Backbone
 @EXPLANATION
 Un chiffre d'article n'est pas un chiffre du dépôt. Le portfolio ne garde que les seconds, et nomme les premiers comme non reproduits.
+@CODEFILE
+model/experiment.py
+@SYMBOL
+run_ablation
+
 @@@
 @ID 11.2
 @TITLE Reproduire une expérience

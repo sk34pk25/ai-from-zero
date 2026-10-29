@@ -140,7 +140,7 @@ Le FFN GELU à deux matrices est la version 2017. SwiGLU ajoute une porte et se 
 @INTUITION
 GELU laisse passer un signal en le lissant autour de zéro, au lieu de le couper net comme ReLU. SwiGLU multiplie ce passage par une seconde branche, la porte : le bloc peut choisir d'éteindre une composante.
 @VOCAB
-GELU : une activation lisse, approchée par une tanh dans le laboratoire. SwiGLU : silu(x W_gate) * (x W_up), puis W_down. Porte : la branche qui multiplie, entre 0 et 1 après SiLU selon le signe.
+GELU : activation lisse, approchée ici par une tanh. SwiGLU : silu(x W_gate) * (x W_up), puis W_down. SiLU : x * sigmoid(x), peut être négative et dépasser 1. Seule sigmoid(x) est entre 0 et 1.
 @EXPLAIN
 Le FFN GELU a deux matrices, largeur souvent 4D. SwiGLU en a trois : gate, up, down. À largeur égale, il coûte plus cher. On prend donc souvent une largeur autour de 8D/3 pour retrouver le budget du 4D. Le mini-GPT, pour rester lisible, utilise 2D comme largeur SwiGLU et le documente : ce n'est pas le réglage de production, c'est un choix de clarté. silu(x) = x * sigmoid(x). La multiplication élément par élément est la porte. Le résidu autour du FFN ne change pas.
 @LANG python
@@ -167,6 +167,11 @@ Une troisième matrice qui sert de porte multipliée au signal
 - Une perte d'équilibrage d'experts
 @EXPLANATION
 La porte est la nouveauté. Le masque, les positions et les experts sont d'autres briques.
+@CODEFILE
+model/transformer.py
+@SYMBOL
+TinyGPT._ffn
+
 @@@
 @ID 5.5
 @TITLE MHA, MQA et GQA

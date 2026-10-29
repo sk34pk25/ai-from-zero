@@ -269,7 +269,7 @@ Tu ne peux ablater une pièce que si elle se décroche. Le Backbone est modulair
 @INTUITION
 Une pièce standard se remplace sans refaire la voiture. Si le remplacement demande de ressouder la carrosserie, ce n'est pas un module, c'est une autre voiture.
 @VOCAB
-Module : une pièce à contrat stable. Contrat du dos : forward(idx) renvoie (B, T, D). Non modulaire ici : le tokenizer, qui n'est pas branché dans Backbone, et l'entraînement complet, qui n'existe pas pour ces dos.
+Module : une pièce à contrat stable. Contrat de Backbone : forward(idx) renvoie (B,T,D). Le dos hybride n'a pas de backward complet. Le GPT standard possède, lui, un chemin d'entraînement séparé dans gpt_train.py ; partager une forme de sortie ne suffit pas à partager des poids.
 @EXPLAIN
 Les trois kinds partagent embed, la boucle de couches et le résidu. Seul le mode de couche change. L'appelant — le test — ne contient pas un if par kind, à part la construction. C'est la modularité utile pour l'étape suivante. Elle a une limite : les poids ne sont pas compatibles d'un kind à l'autre, et hybrid n'est pas « transformer plus un bouton ». Charger des poids transformer dans un ssm n'a pas de sens dans ce code, et aucune fonction ne le propose. Le tokenizer reste à part, dans son module, ce qui est une autre modularité : tu peux changer le découpage du texte sans toucher au scan. Ne survends pas : il n'y a pas de registre de plugins.
 @LANG python
@@ -313,7 +313,7 @@ Tu rends une maquette avec la liste des pièces et les essais qu'elle a passés.
 @VOCAB
 Candidate : Backbone kind hybrid, ou un autre kind si ton hypothèse change. Justification : les tests et les formules, pas un adjectif. Brique du site : « Architecture candidate », liée à cette étape.
 @EXPLAIN
-hybrid alterne attn et ssm selon la parité de l'index de couche. Avec deux couches, tu as une attention puis un scan, plus les résidus. La sortie a la forme du transformer de mêmes tailles. La causalité tient parce que l'attention du dos est causale et parce que le scan ne lit pas le futur. La justification s'arrête là. Il n'y a pas de courbe d'apprentissage de cette candidate : TinyGPT, lui, a une loss et un entraînement de tête dans d'autres modules, mais pas un entraînement complet du dos hybrid. Présenter hybrid comme « mon architecture » est juste si la phrase suivante dit ce qui est vert : forme, causalité, coût qualitatif des couches. La brique du site s'allume à cette étape, quand cette phrase est possible.
+Deux projets distincts sont possibles. Le projet obligatoire assemble ton GPT standard, entraîne ses poids depuis zéro et mesure sa perte sur des documents réservés. Tu peux modifier une largeur ou une profondeur, à données et budget documentés. Le projet avancé construit un dos hybride alternant attention et scan ; son interface (B,T,D) et sa causalité sont testées, mais il n'a pas de backward complet ici. Le TinyGPT standard, lui, dispose bien de cet entraînement dans gpt_train.py. L'architecture candidate du projet final doit donc être une modification entraînable ou une expérience explicitement limitée au forward. La justification nomme toujours ce qui change, le test, les données et ce qui n'est pas mesuré.
 @LANG python
 @CODE
 :::
@@ -329,9 +329,9 @@ print(y.shape, modele.forward(change)[0, 0].shape)
 @EXPERIMENT
 La forme est (1, 4, 8). La position 0 a la forme (8,) dans les deux cas ; le test officiel exige qu'elle soit égale.
 @EXERCISE
-Écris la phrase de justification en trois lignes : pièces, tests verts, ce qui n'est pas mesuré. Elle doit tenir sans adjectif de mode.
+Choisis une variation entraînable du GPT standard : largeur ou profondeur. Avant le run, écris baseline, changement, budget de tokens et métrique. Si tu explores plutôt le dos hybride, annonce qu'aucun gain linguistique après entraînement ne sera mesuré.
 @BUILD
-La brique « Architecture candidate » désigne ce choix de dos. Elle ne désigne pas un modèle hébergé ni un poids à télécharger.
+Prépare le projet final de l'atelier : un GPT personnel entraîné et une variation contrôlée. Le dos hybride devient une extension de recherche ; il ne remplace pas le modèle entraîné obligatoire.
 @QUESTION
 Que revendique la candidate hybrid de ce dépôt ?
 @CORRECT
@@ -342,6 +342,11 @@ Une alternance attention et scan, de forme stable et causale, sans qualité de l
 - Un agent outillé
 @EXPLANATION
 L'alternance est dans l'initialisation, la forme et la causalité sont testées. Le reste n'est pas revendiqué.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+train_gpt
+
 @@@
 @ID 12.9
 @TITLE Entraîner ce que tu sais entraîner
@@ -359,20 +364,22 @@ Tu sais faire cuire une crêpe. Tu ne dis pas que tu sais tenir un restaurant. L
 @VOCAB
 Régression : train_linear_regression dans model/mlp.py. Classifieur : train_linear_classifier dans model/train.py, entropie croisée sur une tête linéaire. Bigramme : observe, qui compte. Dos : non entraîné de bout en bout.
 @EXPLAIN
-test_classifier_loss_decreases vérifie qu'une tête linéaire convexe voit sa loss baisser. C'est un entraînement réel, petit, et compréhensible : le gradient de l'entropie croisée est testé à part contre une différence finie. Le bigramme n'utilise pas de gradient, il compte, et il est comparé à l'uniforme. Le dos hybrid a des poids tirés d'une graine, utilisés en forward, jamais mis à jour par une boucle de ce dépôt. Écrire « j'ai entraîné mon architecture » serait faux. Écrire « j'ai entraîné une tête linéaire et un bigramme, et j'ai laissé le dos à l'initialisation parce que sa rétropropagation complète n'est pas écrite » est exact. La leçon 4.14, plus tôt, a déjà séparé le forward du Transformer et un gradient complet d'attention. Cette étape ne revient pas en arrière.
+Le laboratoire sait entraîner le GPT standard et un petit réseau, estimer le bigramme par comptage et ajuster le GPT par SFT ou LoRA. Il ne sait pas entraîner le dos hybride ni les variantes modernes par ce backward. Pour le projet final, tes fonctions decoder et adamw doivent donc entraîner un GPT à positions absolues, LayerNorm et GELU. Vérifie d'abord que tu peux surapprendre un minuscule lot : c'est un test de débogage, pas le résultat final. Sépare ensuite les documents, fixe le tokenizer sur train et choisis tes réglages sur validation. Le test final reste réservé. Une loss qui baisse sur train et monte sur validation est une observation à expliquer. Les critères publics de l'atelier ne valident pas un assistant général : ils contrôlent un apprentissage et sa mesure.
 @LANG python
 @CODE
 :::
-from model.experiment import bigram_versus_uniform
-mesure = bigram_versus_uniform([0, 1, 0, 1, 0, 1, 0, 1, 0], 2)
-print(sorted(mesure))
+from model.gpt_train import assert_trainable
+from model.transformer import GPTConfig
+config = GPTConfig(vocab_size=16, d_model=8, n_heads=2, n_layers=1)
+assert_trainable(config)
+print("Le decoder standard peut être entraîné de bout en bout")
 :::
 @EXPERIMENT
 Les clés incluent les deux perplexités et les tailles de découpage. Aucune clé ne dit que le dos hybrid a vu un gradient.
 @EXERCISE
-Quelle phrase remplace « le modèle est entraîné » dans ton README ? « Le bigramme est estimé par comptage ; la tête linéaire est entraînée par descente ; le dos hybrid est initialisé et seulement exécuté. »
+Lance ton entraînement avec des sorties dans runs/. Compare ses poids initiaux et finaux, vérifie le masque causal et recharge le checkpoint. Explique la différence entre le minuscule lot de débogage et les documents réservés à la validation.
 @BUILD
-Le fil rouge marque cette limite dans la documentation de la candidate. Un entraînement futur devra ajouter un test de baisse sur une loss définie, pas seulement un forward.
+Le rapport final doit contenir les hashes des données, la configuration, les courbes train/validation et le contrôle de rechargement. Utilise atelier/entrainer.py après avoir terminé atelier/eleve.py.
 @QUESTION
 Quel entraînement le dépôt ne fait-il pas ?
 @CORRECT
@@ -383,6 +390,11 @@ La mise à jour des poids du dos hybrid par rétropropagation
 - Le calcul du gradient d'entropie croisée
 @EXPLANATION
 Ces trois derniers ont des tests. Le dos, lui, est un forward initialisé.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+train_gpt
+
 @@@
 @ID 12.10
 @TITLE Analyser un échec
@@ -485,7 +497,7 @@ Tu laisses sur la maquette une fiche : à quoi elle sert, comment la refaire, ce
 @VOCAB
 Fiche : un court texte de README ou de modèle. Commande : pytest, qui rejoue les bancs. Limite : entraînement du dos absent, énergie absente, scores d'articles absents. Candidate : le dos interchangeable.
 @EXPLAIN
-La fiche minimale tient en cinq lignes. Hypothèse : un kind change le mélangeur sans changer la forme. Baseline : transformer, et, pour le langage, le bigramme contre l'uniforme. Preuve : pytest, en particulier les tests de dos, de scan, de patches, de mémoire et d'ablation. Coût : parameter_bytes et attention_flops, avec leurs unités. Limites : pas de rétropropagation complète du dos, pas d'énergie, pas de multimodal natif, pas de chiffres recopiés. Le parcours est réussi, au sens du contrat, si tu peux montrer ces cinq lignes et ouvrir le fichier qui les rend vraies. La brique du site n'ajoute rien à la fiche : elle marque que tu es arrivé à l'étape où la fiche est possible.
+Le projet final obligatoire est un modèle que tu peux reconstruire et entraîner dans un nouveau dossier. Remets ton code, les tests, le corpus et sa provenance, le tokenizer fixé sur train, les courbes, les baselines et le checkpoint. Ajoute une génération à invites et graines fixées avant le tirage, puis une variation contrôlée. Le correcteur automatique vérifie des propriétés techniques et la présence des mesures ; la qualité de tes explications et l'indépendance des données doivent aussi être relues. La fiche résume hypothèse, protocole, résultat et limites. Une variation perdante reste un résultat valable si tu la mesures et l'expliques. Le dos hybride non entraîné, l'énergie non mesurée et le dialogue non évalué restent des limites explicites. Cocher une leçon n'est pas une certification de maîtrise.
 @LANG python
 @CODE
 :::
@@ -501,9 +513,9 @@ print(len(fiche))
 @EXPERIMENT
 Cinq lignes, aucune ne cite un score d'article. Si tu en ajoutes une sixième, elle doit pointer vers un test ou rester dans les limites.
 @EXERCISE
-Relis ta fiche et barre chaque adjectif qui n'est pas une métrique. Le texte qui reste est celui du README.
+Dans un dossier distinct, complète le projet final décrit dans atelier/PROJET_FINAL.md. Livre code, rapport, données réservées, checkpoint rechargé et variation contrôlée. Fais relire tes explications sans ouvrir le corrigé : les preuves techniques seules ne suffisent pas à démontrer l'autonomie.
 @BUILD
-Le projet final est cette fiche, branchée sur Backbone et sur les tests. Le parcours s'arrête quand la fiche et le code disent la même chose.
+La piste se termine par l'épreuve finale de l'atelier. Les critères et commandes sont dans atelier/PROJET_FINAL.md. Les extensions MoE, SSM et multimodalité sont facultatives après ce premier modèle entraîné.
 @QUESTION
 Que doit contenir la fiche pour que le parcours soit réussi ?
 @CORRECT
@@ -514,3 +526,7 @@ L'hypothèse, la baseline, les tests, les unités de coût, et les limites non m
 - Une énergie en joules
 @EXPLANATION
 Le contrat de sortie demande d'expliquer, de retrouver dans model/, de lancer le test, de dire le coût, et de comparer à une baseline. La fiche est ce contrat en cinq lignes.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+save_checkpoint
