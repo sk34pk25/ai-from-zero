@@ -12,7 +12,7 @@ import numpy as np
 from model.autograd import Tensor
 
 
-LORA_SUFFIXES = (".wq", ".wk", ".wv", ".wo", ".w1", ".w2")
+LORA_SUFFIXES = (".wq", ".wk", ".wv", ".wo", ".w1", ".w2", ".wg", ".wu", ".wd")
 
 
 def lora_names(params: dict[str, np.ndarray]) -> list[str]:

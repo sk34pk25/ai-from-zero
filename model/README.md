@@ -39,7 +39,7 @@ python3 -m pytest
 
 ## Ce que le laboratoire ne prétend pas faire
 
-- TinyGPT s'entraîne dans sa forme decoder standard : positions absolues, LayerNorm ou RMSNorm, GELU, attention multi-têtes, résidus, tête de langage. Le gradient est celui de `autograd.py`, l'optimiseur est AdamW. RoPE, SwiGLU, GQA et le cache KV restent des forwards.
+- TinyGPT s'entraîne dans toutes ses variantes : positions absolues ou RoPE, LayerNorm ou RMSNorm, FFN GELU ou SwiGLU, attention complète ou groupée (GQA, MQA), tête séparée ou partagée avec l'embedding. Le gradient est celui de `autograd.py`, vérifié par différences finies et contre PyTorch ; l'optimiseur est AdamW. Le cache KV ne sert qu'à la génération. Le playground du navigateur lit seulement la forme standard (positions absolues, LayerNorm, GELU).
 - `tiny_lm.py` reste le modèle à une tête, utile avant le bloc complet.
 - Le dos `ssm` est un scan sélectif réduit, pas un bloc Mamba (pas de convolution courte, pas de kernel CUDA).
 - L'image s'arrête au découpage en patches. Il n'y a pas d'encodeur audio, ni de décodeur d'image.
