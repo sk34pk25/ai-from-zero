@@ -115,7 +115,11 @@ try {
       console.error("Scores sous 95 :", { desktop: failed, mobile: mobileFailed });
       if (process.env.GITHUB_ACTIONS) {
         const worst = [...weak, ...mobileWeak].slice(0, 4).map((audit) => `${audit.id} ${audit.display ?? audit.score}`).join(" ; ");
-        console.log(`::error title=Lighthouse ${route}::bureau ${JSON.stringify(scores)} mobile ${JSON.stringify(mobileScores)} — ${worst}`);
+        const metric = (id) => mobile.lhr.audits[id]?.displayValue ?? "?";
+        const metrics = ["first-contentful-paint", "largest-contentful-paint", "total-blocking-time", "speed-index", "cumulative-layout-shift"]
+          .map((id) => `${id}=${metric(id)}`).join(" ");
+        const chain = JSON.stringify(mobile.lhr.audits["network-dependency-tree-insight"]?.details ?? {}).slice(0, 1500);
+        console.log(`::error title=Lighthouse ${route}::bureau ${JSON.stringify(scores)} mobile ${JSON.stringify(mobileScores)} — ${metrics} — ${worst} — ${chain}`);
       }
       process.exitCode = 1;
     }
