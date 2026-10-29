@@ -92,8 +92,6 @@ export function importMap(version) {
   return { scopes: { "./assets/js/": scope } };
 }
 
-const SUPABASE_ORIGIN = "https://qffcqvwndnpdbrmqbjpz.supabase.co";
-
 /** Empreintes des scripts inline (thème, version, import map), pour la CSP. */
 export function inlineScriptHashes(html) {
   const hashes = [];
@@ -115,7 +113,8 @@ export function contentSecurityPolicy(html) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self'",
-    `connect-src 'self' ${SUPABASE_ORIGIN} ${SUPABASE_ORIGIN.replace("https://", "wss://")}`,
+    // Tout projet Supabase (le dépôt, une copie, ou le faux serveur des tests e2e), et rien d'autre.
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
     "worker-src 'self'",
     "manifest-src 'self'",
     "object-src 'none'",
