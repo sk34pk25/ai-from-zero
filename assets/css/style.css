@@ -1337,3 +1337,18 @@ th,td { padding:.6rem;text-align:left;border-bottom:1px solid var(--line);vertic
   .account-icon { display:block; }
   .account-link { display:grid;place-items:center;width:2.5rem;height:2.5rem;padding:0;flex:0 0 auto; }
 }
+/* Actions du carnet : mêmes repères tactiles et visuels que le laboratoire. */
+.sheet button:not([class]), .learning-toolbar button, main > button {
+  display:inline-flex;align-items:center;justify-content:center;min-height:44px;
+  max-width:100%;padding:.45rem .75rem;margin:.3rem 0;
+  border:1px solid var(--line-strong);border-radius:10px;
+  background:var(--bg-elev-2);color:var(--ink);line-height:1.5;
+}
+.sheet button:not([class]):hover,.learning-toolbar button:hover,main > button:hover { border-color:var(--accent); }
+.sheet button:disabled { opacity:.55;cursor:default; }
+.sheet input[type="file"], .sheet select, .learning-toolbar select {
+  max-width:100%;min-height:44px;padding:.4rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);color:var(--ink);
+}
+@media (max-width:960px) {
+  .topbar { gap:.25rem;padding-inline:max(.5rem,env(safe-area-inset-left)); }
+}
