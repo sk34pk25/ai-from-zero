@@ -52,9 +52,9 @@
   --shadow: 0 8px 24px rgba(23, 32, 51, 0.07);
   --header: 4.25rem;
   --sidebar: 18.5rem;
-  --display: "Inter Display", Inter, "Segoe UI", system-ui, sans-serif;
+  --display: "Inter Display", Inter, "Segoe UI", "Liberation Sans", Arial, sans-serif;
   --serif: var(--display);
-  --sans: Inter, "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
+  --sans: Inter, "Segoe UI", "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
   --mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, "Liberation Mono", monospace;
   --radius: 20px;
 }
@@ -162,6 +162,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 .brand {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 0.7rem;
   color: var(--ink);
@@ -188,6 +189,9 @@ a:hover { text-decoration-thickness: 2px; }
   letter-spacing: -0.02em;
   white-space: nowrap;
   line-height: 1.15;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-launch {
@@ -1541,8 +1545,8 @@ main[tabindex="-1"]:focus { outline: none; }
 }
 
 @keyframes glance-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+  from { transform: translateY(6px); }
+  to { transform: none; }
 }
 
 .glance-cards {
