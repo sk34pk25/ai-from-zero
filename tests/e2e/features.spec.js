@@ -141,7 +141,8 @@ test("le propriétaire ouvre l'IDE, importe le modèle, entraîne et s'arrête",
   await expect(page.locator("#ide-chart .loss-bar").first()).toBeVisible();
   await page.locator("#ide-train-stop").click();
   await page.locator("#ide-save").click();
-  await expect.poll(() => writes.some((request) => request.url().includes("/rpc/save_learning_record"))).toBeTruthy();
-  const saved = writes.filter((request) => request.url().includes("/rpc/save_learning_record")).at(-1);
-  expect(saved.postDataJSON().p_key).toMatch(/^ide\//);
+  const codeWrites=()=>writes.filter(request=>request.url().includes('/rpc/save_learning_record')&&request.postDataJSON().p_key.startsWith('ide/'));
+  await expect.poll(()=>codeWrites().length).toBeGreaterThan(0);
+  const saved=codeWrites().at(-1);
+  expect(saved.postDataJSON().p_payload.content.length).toBeGreaterThan(0);
 });

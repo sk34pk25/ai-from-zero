@@ -90,11 +90,8 @@ test("glossaire, séances et bilans sont navigables à 200 %", async ({
     page.getByRole("heading", { name: "Bilan pratique du niveau" }),
   ).toBeVisible();
   await page.evaluate(() => (document.documentElement.style.zoom = "2"));
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth + 1,
-    ),
-  ).toBe(true);
+  const layout=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:innerWidth,offenders:[...document.querySelectorAll('body *')].map(e=>({tag:e.tagName,cls:String(e.className),right:e.getBoundingClientRect().right})).filter(e=>e.right>innerWidth+1).slice(0,12)}));
+  expect(layout.scroll<=layout.width+1,JSON.stringify(layout)).toBe(true);
 });
 
 test.describe("Cache public réel", () => {
