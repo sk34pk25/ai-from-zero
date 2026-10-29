@@ -11,7 +11,7 @@ Périmètre autorisé : uniquement ai-from-zero, accès propriétaire conservé.
 
 ## Vérifications et limites
 
-- Les corrigés Python des 52 exercices sont exécutés en CI. Les 157 corrections textuelles sont rédigées pour les exercices ; elles ne constituent pas une certification pédagogique externe.
+- Les corrigés Python des 63 exercices sont exécutés en CI. Les 157 corrections textuelles sont rédigées pour les exercices ; elles ne constituent pas une certification pédagogique externe.
 - Les tests de reprise exacte comparent tous les poids après sauvegarde/rechargement. Les anciens checkpoints et rapports publiés sont conservés.
 - Le backend versionné est déployé : vérifications propriétaire, autre utilisateur et absence de droits anonymes réalisées par transactions annulées.
 - La matrice CI vérifie Chromium, Firefox et WebKit. Un véritable iPhone/iPad ou appareil Android n'est pas accessible à cet environnement ; cette vérification physique reste manuelle.

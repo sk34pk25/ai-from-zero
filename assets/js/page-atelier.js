@@ -2,8 +2,9 @@
 import { h } from "./dom.js";
 import { zipStore } from "./zipstore.js";
 import { onLeave } from "./lifecycle.js";
+import { pathChoice } from "./path-choice.js";
 
-export async function paintAtelier(main) {
+export async function paintAtelier(main, index) {
   const controller = new AbortController();
   onLeave(() => controller.abort());
   const response = await fetch(new URL("data/atelier.json", document.baseURI), {
@@ -110,6 +111,10 @@ export async function paintAtelier(main) {
     "Installation Windows, macOS et Linux",
     "Guide des 12 TP",
     "Projet final et grille de relecture",
+    "Objets, matrices et gradients",
+    "Huit pannes à diagnostiquer",
+    "Banc français et questions réservées",
+    "BPE octets, PyTorch et utilisation locale",
   ];
   spec.documents.forEach((path, i) =>
     selector.append(h("option", { value: path, text: names[i] })),
@@ -138,12 +143,24 @@ export async function paintAtelier(main) {
   }
   selector.onchange = loadDoc;
   doc.append(h("h2", { text: "Lire les consignes" }), selector, content);
+  const diagnostics = h("section", { class: "sheet" }, [
+    h("h2", { text: "Apprendre à diagnostiquer" }),
+    h("p", { text: "Écris ton hypothèse avant d’ouvrir les indices. La solution donne un test à refaire avec d’autres nombres." }),
+    ...(spec.diagnostics || []).map((item) => h("article", { class: "diagnostic-card" }, [
+      h("h3", { text: item.title }), h("pre", { tabindex: "0", "aria-label": `Code à diagnostiquer : ${item.title}` }, h("code", { text: item.code })),
+      h("p", { text: item.observation }), h("p", { text: item.question }),
+      ...item.hints.map((hint, i) => h("details", {}, [h("summary", { text: `Indice ${i + 1}` }), h("p", { text: hint })])),
+      h("details", {}, [h("summary", { text: "Diagnostic et contrôle" }), h("p", { text: item.solution })]),
+      h("a", { href: `#/lecon/${item.lesson}`, text: `Revoir la leçon ${item.lesson}` }),
+    ])),
+  ]);
   main.replaceChildren(
     h("h1", { text: "Atelier : mon premier GPT" }),
     h("p", {
       class: "lead",
       text: "Construis tes composants dans un projet indépendant, entraîne ton modèle et apporte les preuves de son fonctionnement.",
     }),
+    pathChoice(index),
     h("section", { class: "callout" }, [
       h("h2", { text: "Commencer sur ton ordinateur" }),
       h("p", {
@@ -163,6 +180,7 @@ export async function paintAtelier(main) {
       }),
     ]),
     doc,
+    diagnostics,
     list,
   );
   await loadDoc();

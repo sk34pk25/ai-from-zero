@@ -95,7 +95,9 @@ class Tensor:
             if self.requires_grad:
                 self.grad += _unbroadcast(result.grad * other_t.data, self.data.shape)
             if other_t.requires_grad:
-                other_t.grad += _unbroadcast(result.grad * self.data, other_t.data.shape)
+                other_t.grad += _unbroadcast(
+                    result.grad * self.data, other_t.data.shape
+                )
 
         result = self._binary(other_t, out, backward)
         return result
@@ -221,7 +223,9 @@ class Tensor:
             if not self.requires_grad:
                 return
             probs = np.exp(out)
-            self.grad += result.grad - probs * np.sum(result.grad, axis=axis, keepdims=True)
+            self.grad += result.grad - probs * np.sum(
+                result.grad, axis=axis, keepdims=True
+            )
 
         result = Tensor(out, requires_grad=self.requires_grad)
         result._prev = (self,) if self.requires_grad else ()
@@ -253,8 +257,34 @@ def layernorm(values: Tensor, gain: Tensor, bias: Tensor, eps: float = 1e-5) -> 
             mean_d_norm = np.mean(d_normalized * normalized, axis=-1, keepdims=True)
             values.grad += (d_normalized - mean_d - normalized * mean_d_norm) * inv_std
 
-    result = Tensor(out, requires_grad=values.requires_grad or gain.requires_grad or bias.requires_grad)
+    result = Tensor(
+        out,
+        requires_grad=values.requires_grad or gain.requires_grad or bias.requires_grad,
+    )
     result._prev = tuple(node for node in (values, gain, bias) if node.requires_grad)
+    result._backward = backward
+    return result
+
+
+def rmsnorm(values: Tensor, gain: Tensor, eps: float = 1e-5) -> Tensor:
+    """RMSNorm sur le dernier axe, avec backward sans centrage ni biais."""
+    data = values.data
+    inv = 1.0 / np.sqrt(np.mean(data**2, axis=-1, keepdims=True) + eps)
+    normalized = data * inv
+
+    def backward() -> None:
+        if gain.requires_grad:
+            gain.grad += _unbroadcast(result.grad * normalized, gain.data.shape)
+        if values.requires_grad:
+            g = result.grad * gain.data
+            values.grad += g * inv - data * inv**3 * np.mean(
+                g * data, axis=-1, keepdims=True
+            )
+
+    result = Tensor(
+        normalized * gain.data, requires_grad=values.requires_grad or gain.requires_grad
+    )
+    result._prev = tuple(node for node in (values, gain) if node.requires_grad)
     result._backward = backward
     return result
 

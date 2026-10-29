@@ -2,7 +2,7 @@
 
 Le graphe couvre le decoder standard : embeddings de tokens et de positions,
 plusieurs blocs (LayerNorm, attention causale multi-têtes, MLP GELU, résidus)
-et une tête de langage. RoPE, RMSNorm, SwiGLU et GQA restent des forwards.
+et une tête de langage. RMSNorm est également entraînable. RoPE, SwiGLU et GQA restent des forwards.
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ import numpy as np
 
 from model.autograd import Tensor, cross_entropy, embedding, layernorm
 from model.bpe import BPETokenizer
+from model.byte_bpe import ByteBPETokenizer
 from model.mathutil import cross_entropy as numpy_cross_entropy
 from model.tokenizer import CharTokenizer
 from model.transformer import GPTConfig, TinyGPT, generate
@@ -32,8 +33,14 @@ DEFAULT_REPORT = ROOT / "runs" / "gpt_run.json"
 
 
 def assert_trainable(config: GPTConfig) -> None:
-    if config.pos != "absolute" or config.norm != "layer" or config.ffn != "gelu":
-        raise ValueError("l'entraînement couvre positions absolues, LayerNorm et GELU")
+    if (
+        config.pos != "absolute"
+        or config.norm not in ("layer", "rms")
+        or config.ffn != "gelu"
+    ):
+        raise ValueError(
+            "l'entraînement couvre positions absolues, LayerNorm/RMSNorm et GELU"
+        )
     if config.n_kv_heads not in (None, config.n_heads):
         raise ValueError(
             "l'entraînement couvre l'attention multi-têtes complète, pas le GQA"
@@ -114,12 +121,20 @@ def logits_tensor(
     hidden = embedding(params["tok"], tokens) + embedding(
         params["pos"], np.arange(time)
     )
+
+    def normaliser(hidden, prefix):
+        if config.norm == "rms":
+            from model.autograd import rmsnorm
+
+            return rmsnorm(hidden, params[prefix + "g"])
+        return layernorm(hidden, params[prefix + "g"], params[prefix + "b"])
+
     for layer in range(config.n_layers):
-        normed = layernorm(hidden, params[f"l{layer}.n1g"], params[f"l{layer}.n1b"])
+        normed = normaliser(hidden, f"l{layer}.n1")
         hidden = hidden + _attention_block(normed, params, layer, config)
-        normed = layernorm(hidden, params[f"l{layer}.n2g"], params[f"l{layer}.n2b"])
+        normed = normaliser(hidden, f"l{layer}.n2")
         hidden = hidden + _mlp_block(normed, params, layer)
-    hidden = layernorm(hidden, params["nfg"], params["nfb"])
+    hidden = normaliser(hidden, "nf")
     return hidden.matmul(params["head"])
 
 
@@ -290,6 +305,22 @@ def sample_text(
     seed: int = 0,
 ) -> str:
     prompt_ids = clip_prompt(tokenizer, prompt, model.config.block_size)
+    if isinstance(tokenizer, ByteBPETokenizer):
+        from model.bigram import sample_logits
+
+        tokens = prompt_ids[0].tolist()
+        rng = np.random.default_rng(seed)
+        for _ in range(steps):
+            logits, _ = model.forward(np.array([tokens[-model.config.block_size :]]))
+            last = logits[:, -1, :].copy()
+            last[:, [tokenizer.BOS, tokenizer.PAD]] = -np.inf
+            token = int(
+                sample_logits(last, rng, temperature=temperature, top_k=top_k)[0]
+            )
+            if token == tokenizer.EOS:
+                break
+            tokens.append(token)
+        return tokenizer.decode(tokens, errors="replace")
     tokens = generate(
         model,
         prompt_ids,
@@ -308,7 +339,9 @@ def save_checkpoint(
     payload: dict[str, np.ndarray] = {}
     for name, value in model.params.items():
         payload["p_" + name.replace(".", "__")] = np.asarray(value, dtype=np.float64)
-    if isinstance(tokenizer, BPETokenizer):
+    if isinstance(tokenizer, ByteBPETokenizer):
+        tokenizer_meta = tokenizer.to_dict()
+    elif isinstance(tokenizer, BPETokenizer):
         tokenizer_meta = {"kind": "bpe", "bpe": tokenizer.to_dict()}
     else:
         tokenizer_meta = {"kind": "char", "stoi": tokenizer.stoi}
@@ -318,6 +351,8 @@ def save_checkpoint(
         "tokenizer": tokenizer_meta,
         "stoi": tokenizer_meta.get("stoi", {}),
     }
+    if hasattr(model, "sft_lineage"):
+        meta["sft_lineage"] = model.sft_lineage
     state = getattr(model, "training_state", None)
     if state:
         meta["training_state"] = {
@@ -341,7 +376,9 @@ def load_checkpoint(path: Path) -> tuple[TinyGPT, CharTokenizer, dict]:
         key = "p_" + name.replace(".", "__")
         model.params[name] = np.asarray(archive[key], dtype=np.float64)
     tokenizer_meta = meta.get("tokenizer") or {"kind": "char", "stoi": meta["stoi"]}
-    if tokenizer_meta.get("kind") == "bpe":
+    if tokenizer_meta.get("kind") == "byte-bpe":
+        tokenizer = ByteBPETokenizer.from_dict(tokenizer_meta)
+    elif tokenizer_meta.get("kind") == "bpe":
         tokenizer = BPETokenizer.from_dict(tokenizer_meta["bpe"])
     else:
         tokenizer = CharTokenizer.from_stoi(
@@ -357,6 +394,8 @@ def load_checkpoint(path: Path) -> tuple[TinyGPT, CharTokenizer, dict]:
                 for name in model.params
             }
         model.training_state = state
+    if meta.get("sft_lineage"):
+        model.sft_lineage = meta["sft_lineage"]
     return model, tokenizer, meta["history"]
 
 
@@ -396,10 +435,18 @@ def _attention_snapshot(model: TinyGPT, tokenizer: CharTokenizer, prompt: str) -
         weights = np.asarray(model._last_weights[0][0, 0], dtype=np.float64)
     finally:
         model.keep_attention = False
-    tokens = [tokenizer.itos[int(index)] for index in ids[0]]
+    tokens = (
+        [tokenizer.pieces.get(int(i), b"<special>").hex() for i in ids[0]]
+        if isinstance(tokenizer, ByteBPETokenizer)
+        else [tokenizer.itos[int(index)] for index in ids[0]]
+    )
     last = weights[-1]
     return {
-        "prompt": tokenizer.decode(ids[0].tolist()),
+        "prompt": (
+            tokenizer.decode(ids[0].tolist(), errors="replace")
+            if isinstance(tokenizer, ByteBPETokenizer)
+            else tokenizer.decode(ids[0].tolist())
+        ),
         "layer": 0,
         "head": 0,
         "tokens": tokens,
@@ -436,6 +483,7 @@ def train_gpt(
     initial_model: TinyGPT | None = None,
     resume_state: bool = False,
     total_steps: int | None = None,
+    norm: str = "layer",
 ) -> tuple[TinyGPT, CharTokenizer | BPETokenizer, GPTTrainResult]:
     if steps < 2:
         raise ValueError("au moins deux pas pour comparer le début et la fin")
@@ -448,6 +496,8 @@ def train_gpt(
         tokenizer = CharTokenizer(train_text + "�")
 
     def encode_split(part):
+        if isinstance(tokenizer, ByteBPETokenizer):
+            return tokenizer.encode(part, bos=True, eos=True)
         try:
             return tokenizer.encode(part)
         except KeyError:
@@ -474,7 +524,7 @@ def train_gpt(
         n_layers=n_layers,
         block_size=block,
         ffn="gelu",
-        norm="layer",
+        norm=norm,
         pos="absolute",
         seed=seed,
     )
@@ -495,11 +545,16 @@ def train_gpt(
             else "90/10 caractères avant encodage"
         ),
     }
-    alphabet = (
-        tokenizer.vocab if isinstance(tokenizer, BPETokenizer) else tokenizer.stoi
-    )
-    provenance["unknown_train_chars"] = sum(c not in alphabet for c in train_text)
-    provenance["unknown_val_chars"] = sum(c not in alphabet for c in validation_text)
+    if isinstance(tokenizer, ByteBPETokenizer):
+        provenance["unknown_train_chars"] = provenance["unknown_val_chars"] = 0
+    else:
+        alphabet = (
+            tokenizer.vocab if isinstance(tokenizer, BPETokenizer) else tokenizer.stoi
+        )
+        provenance["unknown_train_chars"] = sum(c not in alphabet for c in train_text)
+        provenance["unknown_val_chars"] = sum(
+            c not in alphabet for c in validation_text
+        )
     previous = getattr(model, "training_state", None) if resume_state else None
     if resume_state and previous is None:
         raise ValueError(
@@ -691,6 +746,7 @@ def main() -> None:
     parser.add_argument("--heads", type=int, default=4)
     parser.add_argument("--lr", type=float, default=3e-3)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--norm", choices=["layer", "rms"], default="layer")
     parser.add_argument(
         "--test-final",
         action="store_true",
@@ -712,12 +768,27 @@ def main() -> None:
     )
     parser.add_argument("--bpe", type=Path, default=None, help="BPE déjà sauvegardé")
     parser.add_argument(
+        "--byte-bpe",
+        type=int,
+        default=None,
+        metavar="FUSIONS",
+        help="BPE octets UTF-8 ; 0 conserve les 256 octets et BOS/EOS/PAD",
+    )
+    parser.add_argument(
         "--eval-windows",
         type=int,
         default=0,
         help="plafonne l'évaluation, 0 = corpus entier",
     )
     args = parser.parse_args()
+    if args.byte_bpe is not None and (args.bpe is not None or args.bpe_merges):
+        parser.error("Choisis un seul type de tokenizer")
+    if args.resume is not None and (
+        args.bpe is not None or args.bpe_merges or args.byte_bpe is not None
+    ):
+        parser.error(
+            "La reprise conserve le tokenizer du checkpoint ; ne fournis pas un nouveau tokenizer"
+        )
     if args.plan is not None:
         _run_plan(args)
         return
@@ -729,7 +800,12 @@ def main() -> None:
     else:
         text = args.data.read_text(encoding="utf-8")
     tokenizer = None
-    if args.bpe is not None:
+    if args.byte_bpe is not None:
+        tokenizer = ByteBPETokenizer.train(
+            text if val_text is not None else text[: int(len(text) * 0.9)],
+            args.byte_bpe,
+        )
+    elif args.bpe is not None:
         tokenizer = BPETokenizer.load(args.bpe)
     elif args.bpe_merges > 0:
         tokenizer = BPETokenizer.train(
@@ -745,6 +821,7 @@ def main() -> None:
         initial_model=previous_model,
         resume_state=args.resume is not None,
         total_steps=args.total_steps,
+        norm=args.norm,
         val_text=val_text,
         steps=args.steps,
         lr=args.lr,
@@ -761,7 +838,11 @@ def main() -> None:
         args.data.relative_to(ROOT) if args.data.is_relative_to(ROOT) else args.data
     )
     history = result_payload(result, corpus_label)
-    history["tokenizer_kind"] = "bpe" if isinstance(tokenizer, BPETokenizer) else "char"
+    history["tokenizer_kind"] = (
+        "byte-bpe"
+        if isinstance(tokenizer, ByteBPETokenizer)
+        else "bpe" if isinstance(tokenizer, BPETokenizer) else "char"
+    )
     if isinstance(tokenizer, BPETokenizer):
         history["bpe_merges"] = len(tokenizer.merges)
     save_checkpoint(args.checkpoint, model, tokenizer, history)
@@ -788,11 +869,17 @@ def _run_plan(args) -> None:
     items = plan["items"] if isinstance(plan, dict) else plan
     model = None
     tokenizer = None
+    if getattr(args, "resume", None) is not None:
+        model, tokenizer, _ = load_checkpoint(args.resume)
     reports = []
     reserved_test = None
     for item in items:
         mode = item.get("mode", "pretrain")
         if mode == "pretrain":
+            if model is not None and getattr(model, "sft_lineage", None):
+                raise ValueError(
+                    "Place les pré-entraînements avant le SFT : les ensembles réservés du SFT doivent rester protégés"
+                )
             if item.get("id"):
                 text, val_text = prepared_splits(item["id"])
             else:
@@ -802,7 +889,13 @@ def _run_plan(args) -> None:
                     if item.get("validation")
                     else None
                 )
-            if tokenizer is None and item.get("bpe_merges"):
+            byte_merges = item.get("byte_bpe", getattr(args, "byte_bpe", None))
+            if tokenizer is None and byte_merges is not None:
+                tokenizer = ByteBPETokenizer.train(
+                    text if val_text is not None else text[: int(len(text) * 0.9)],
+                    byte_merges,
+                )
+            elif tokenizer is None and item.get("bpe_merges"):
                 tokenizer = BPETokenizer.train(
                     text if val_text is not None else text[: int(len(text) * 0.9)],
                     int(item["bpe_merges"]),
@@ -812,6 +905,7 @@ def _run_plan(args) -> None:
                 text,
                 val_text=val_text,
                 initial_model=model,
+                norm=item.get("norm", getattr(args, "norm", "layer")),
                 steps=int(item.get("steps", args.steps)),
                 lr=float(item.get("lr", args.lr)),
                 batch=int(item.get("batch", args.batch)),

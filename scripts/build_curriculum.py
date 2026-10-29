@@ -673,6 +673,7 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
                 "heading": "Expérience",
                 "text": fields["experiment"].strip(),
             },
+            *json.loads((SRC / "complements.json").read_text(encoding="utf-8")).get(fields["id"].strip(), []),
         ],
         "exercise": fields["exercise"].strip(),
         "build": fields["build"].strip(),

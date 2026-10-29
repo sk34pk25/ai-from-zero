@@ -45,7 +45,7 @@ pytest
 python3 -m model
 ```
 
-Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle (`tiny_lm.py`), TinyGPT entraînable (embeddings, attention multi-têtes, MLP, résidus, LayerNorm, AdamW), et les variantes en forward (RoPE, RMSNorm, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle (`tiny_lm.py`), TinyGPT entraînable (embeddings, attention multi-têtes, MLP, résidus, LayerNorm, AdamW), et RMSNorm également entraînable et les variantes en forward (RoPE, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
 
 ```bash
 python3 -m model.gpt_train --steps 400
@@ -162,6 +162,20 @@ python3 scripts/check_examples.py
 
 Le mode `correction` teste la référence. Pour apprendre, complète `eleve.py` et utilise le module par défaut. Les démos répètent des phrases synthétiques et ne démontrent pas un transfert entre livres. Le projet téléchargé fonctionne hors du dépôt avec NumPy ; aucun poids existant ni API n’est chargé.
 
+## Contrôles indépendants et modèle personnel
+
+L’atelier contrôle aussi des valeurs attendues indépendantes de l’attention, de la loss et des têtes. Les tests de mutation refusent sept erreurs volontaires : échelle, loss constante, masque, ordre des têtes, cible, résidu et accumulation. `--tp N` permet un contrôle individuel lorsque les TP précédents demandent des leçons encore non étudiées. Les nouveaux checkpoints lient poids, code, moteur, données normalisées et documents connus ; l’évaluation refuse le recouvrement connu. Les rapports neufs ne peuvent pas écraser sources ou poids.
+
+Le choix « Mon parcours » dans Atelier et Mon espace règle Continuer, les voisins et les séances : par défaut 0 → 1 → 2 → 3 → 4 → 13, puis les approfondissements. Mon espace distingue lecture, rapport de contrôles importé et explications déclarées. Ces déclarations ne certifient pas l’autonomie.
+
+Le [banc français](atelier/BANC_FR.md) contient douze textes originaux, huit train/deux validation/deux test, sans répétition automatique. Six entraînements réels comparent largeurs 16/24, trois graines appariées et 240 pas. La largeur 16 est retenue sur validation ; son test moyen vaut **2,3921 ± 0,0082 nats/caractère** (écart-type des trois graines), contre **2,4514** pour le bigramme et **3,9703** pour l’uniforme, sur les mêmes cibles. Le tokenizer réserve aussi � ; le détail de couverture est dans le rapport. Ces résultats locaux ne constituent pas une preuve de supériorité générale ni de réponses fiables. [Rapport réel](data/benchmark_fr_run.json).
+
+Les [extensions exécutables](atelier/EXTENSIONS.md) ajoutent BPE octets, BOS/EOS/PAD, un port du decoder en opérations PyTorch avec contrôle de chaque gradient, puis génération/API sur 127.0.0.1 pour le checkpoint personnel. NumPy reste suffisant pour le tronc commun. Le laboratoire accepte `--byte-bpe 64` ; le playground historique ne lit pas encore ce format. Les [fondations](atelier/FONDATIONS.md) et [pannes guidées](atelier/PANNES.md) renforcent objets, axes et gradients. Un diagnostic de [questions par familles](atelier/benchmark/questions.json) et `model.eval_questions` distingue loss, exact-match lexical et arrêt, avec relecture des sorties.
+
+Les groupes SFT sont maintenant canoniques : réordonner les lignes conserve les splits. L’historique des groupes réservés est contrôlé et conservé dans les nouveaux checkpoints entre phases SFT. Les anciens checkpoints sans cet historique restent explicitement non vérifiables. Le contrôle lexical ne garantit pas l’absence de paraphrases ou de contamination du pré-entraînement.
+
+Après modification des sources partagées, `python scripts/build_atelier.py` régénère leurs copies autonomes et les catalogues Python/atelier. `python scripts/build_curriculum.py` intègre les compléments du cours. Termine par `npm run stamp` pour les versions et le cache hors connexion.
+
 Les commandes ordinaires `model.gpt_train` et `model.gpt_sample` utilisent désormais `runs/gpt_checkpoint.npz`, et le rapport va dans `runs/gpt_run.json`. L’export CLI va dans `runs/gpt_browser.json`. Les poids et rapports publiés dans `model/data/` et `data/` sont conservés ; `scripts/train_release.py` reste le chemin explicite de publication.
 
 ### Plan SFT avec validation réservée
@@ -173,3 +187,7 @@ python3 -m model.gpt_train --plan examples/plan-sft.json --checkpoint runs/sft-d
 ```
 
 Cet exemple court valide l’outillage ; il ne promet pas un assistant utile. Compare les recettes sur validation. Après choix, demande la mesure finale avec `--test-final` ; ne réutilise pas ce résultat pour choisir d’autres réglages. Les données réservées ne servent pas aux mises à jour des poids. Le format reste mono-tour ; la fin de réponse est le saut de ligne, pas un token EOS spécialisé.
+
+Le workflow manuel « Publier un benchmark et ses checkpoints » exécute la recette fixée et joint une archive avec sources, poids et SHA256SUMS à une GitHub Release. Les futurs poids sont ainsi distribués hors de l’historique Git ; ce workflow n’est pas déclenché par les visites du site.
+
+Un plan peut repartir des poids et de l’historique SFT d’un checkpoint avec `--plan nouveau-plan.json --resume runs/precedent.npz`. Ce sont de nouvelles phases ; leurs optimiseurs sont réinitialisés. Les groupes réservés restent protégés. Une reprise exacte dans une même phase continue d’utiliser `--resume` sans `--plan`, avec la recette identique.

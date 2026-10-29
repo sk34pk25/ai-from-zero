@@ -1,5 +1,7 @@
 import { offlinePanel } from "./offline.js";
 import { h } from "./dom.js";
+import { pathChoice } from "./path-choice.js";
+import { projectEvidence } from "./project-evidence.js";
 import {
   getRecord,
   setRecord,
@@ -210,6 +212,8 @@ export async function backupDownload() {
 export function paintStudy(main, index) {
   main.replaceChildren(
     h("h1", { text: "Mon espace d’apprentissage" }),
+    pathChoice(index),
+    projectEvidence(index),
     offlinePanel(),
   );
   if (!isOwner()) {

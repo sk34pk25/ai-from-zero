@@ -7,10 +7,19 @@ avec evaluer.py, après choix sur validation.
 import argparse
 import json
 import math
+import platform
 from pathlib import Path
 import time
 import numpy as np
-from commun import module_eleve, parametres, empreinte, sauver, charger
+from commun import (
+    module_eleve,
+    parametres,
+    empreinte,
+    sauver,
+    charger,
+    provenance_texte,
+    ecrire_json,
+)
 
 
 def charger_texte(path):
@@ -28,30 +37,44 @@ def ids_couverts(m, text, vocab):
     )
 
 
-def evaluer(m, p, c, ids, max_windows=32):
-    if len(ids) <= c["block"]:
+def debuts_evaluation(ids, block, max_windows=32):
+    if len(ids) <= block:
         raise ValueError("Plus de tokens que la fenêtre sont requis")
-    starts = np.unique(
-        np.linspace(
-            0,
-            len(ids) - c["block"] - 1,
-            min(max_windows, len(ids) - c["block"]),
-            dtype=int,
-        )
-    )
-    batch = np.stack([ids[i : i + c["block"] + 1] for i in starts])
-    return float(m.perte(m.logits(batch[:, :-1], p, c), batch[:, 1:]).data)
+    last = len(ids) - block - 1
+    if max_windows is None:
+        return np.unique([*range(0, last + 1, block), last])
+    return np.unique(np.linspace(0, last, min(max_windows, last + 1), dtype=int))
+
+
+def evaluer(m, p, c, ids, max_windows=32, detail=False):
+    starts = debuts_evaluation(ids, c["block"], max_windows)
+    total = 0.0
+    for offset in range(0, len(starts), 32):
+        positions = starts[offset : offset + 32]
+        batch = np.stack([ids[i : i + c["block"] + 1] for i in positions])
+        loss = float(m.perte(m.logits(batch[:, :-1], p, c), batch[:, 1:]).data)
+        if not np.isfinite(loss):
+            raise ValueError("Évaluation non finie")
+        total += loss * len(positions)
+    result = {
+        "loss": total / len(starts),
+        "windows": len(starts),
+        "target_tokens": len(starts) * c["block"],
+        "available_target_tokens": len(ids) - 1,
+        "mode": (
+            "toutes les cibles ; dernière fenêtre éventuellement recouvrante"
+            if max_windows is None
+            else "fenêtres fixes échantillonnées"
+        ),
+    }
+    return result if detail else result["loss"]
 
 
 def baseline_bigram(train, validation, vocab, block):
     counts = np.ones((vocab, vocab))
     np.add.at(counts, (train[:-1], train[1:]), 1)
     probs = counts / counts.sum(-1, keepdims=True)
-    starts = np.unique(
-        np.linspace(
-            0, len(validation) - block - 1, min(32, len(validation) - block), dtype=int
-        )
-    )
+    starts = debuts_evaluation(validation, block)
     losses = [
         -np.log(probs[validation[i : i + block], validation[i + 1 : i + block + 1]])
         for i in starts
@@ -81,8 +104,21 @@ def entrainer(
     m = module_eleve(module)
     train_text = charger_texte(train_path)
     val_text = charger_texte(val_path)
-    if empreinte(train_path) == empreinte(val_path):
+    provenance = {
+        "train": provenance_texte(train_path),
+        "validation": provenance_texte(val_path),
+        "code_sha256": empreinte(m.__file__),
+        "moteur_sha256": empreinte(Path(__file__).with_name("moteur.py")),
+    }
+    if (
+        provenance["train"]["normalise_sha256"]
+        == provenance["validation"]["normalise_sha256"]
+    ):
         raise ValueError("Train et validation sont identiques")
+    if {r["sha256"] for r in provenance["train"].get("documents", [])} & {
+        r["sha256"] for r in provenance["validation"].get("documents", [])
+    }:
+        raise ValueError("Train et validation partagent des documents")
     vocab = m.vocabulaire(train_text + "�")
     train, _ = ids_couverts(m, train_text, vocab)
     val, unknown = ids_couverts(m, val_text, vocab)
@@ -94,6 +130,8 @@ def entrainer(
     history = []
     state = {}
     best = float("inf")
+    best_step = None
+    best_logits = None
     start = time.perf_counter()
     out.mkdir(parents=True, exist_ok=True)
     first_train = evaluer(m, p, c, train)
@@ -116,13 +154,23 @@ def entrainer(
                 raise ValueError("Validation non finie")
             if v < best:
                 best = v
-                sauver(out / "modele.npz", p, vocab, c)
-    learned = {n: bool(not np.array_equal(v.data, initial[n])) for n, v in p.items()}
+                best_step = step
+                best_logits = m.logits(val[:block][None, :], p, c).data.copy()
+                sauver(
+                    out / "modele.npz",
+                    p,
+                    vocab,
+                    c,
+                    {**provenance, "selected_step": step},
+                    remplacer=True,
+                )
     p, vocab, c = charger(out / "modele.npz")
+    learned = {n: bool(not np.array_equal(v.data, initial[n])) for n, v in p.items()}
     x = val[:block][None, :]
     before = m.logits(x, p, c).data.copy()
-    p2, _, _ = charger(out / "modele.npz")
-    reloaded = bool(np.array_equal(before, m.logits(x, p2, c).data))
+    reloaded = bool(np.array_equal(best_logits, before))
+    if not reloaded:
+        raise ValueError("Les logits ont changé pendant la sauvegarde/relecture")
     prompt = train[: min(4, block)].tolist()
     generated = list(prompt)
     sample_rng = np.random.default_rng(seed)
@@ -138,15 +186,27 @@ def entrainer(
         "moteur_sha256": empreinte(Path(__file__).with_name("moteur.py")),
         "config": c,
         "steps": steps,
+        "selected_step": best_step,
+        "selected_tokens_vus": best_step * batch * block,
         "batch": batch,
         "lr": lr,
         "tokens_vus": steps * batch * block,
         "parameter_count": sum(v.data.size for v in p.values()),
         "seconds": time.perf_counter() - start,
+        "environment": {
+            "python": platform.python_version(),
+            "numpy": np.__version__,
+            "system": platform.system(),
+            "machine": platform.machine(),
+            "processor": platform.processor(),
+        },
+        "checkpoint_sha256": empreinte(out / "modele.npz"),
+        "provenance": provenance,
         "train_sha256": empreinte(train_path),
         "validation_sha256": empreinte(val_path),
         "validation_caracteres_inconnus": unknown,
         "validation_caracteres_total": len(val_text),
+        "validation_mesure": evaluer(m, p, c, val, detail=True),
         "train_loss_start": first_train,
         "train_loss_end": evaluer(m, p, c, train),
         "val_loss_start": first_val,
@@ -162,8 +222,10 @@ def entrainer(
         "selection": "meilleure loss validation ; test non consulté",
         "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
     }
-    (out / "rapport.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    ecrire_json(
+        out / "rapport.json",
+        report,
+        (train_path, val_path, m.__file__, out / "modele.npz"),
     )
     return report
 

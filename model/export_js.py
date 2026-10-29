@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from model.bpe import BPETokenizer
+from model.byte_bpe import ByteBPETokenizer
 from model.gpt_train import clip_prompt
 from model.transformer import TinyGPT
 
@@ -23,6 +24,10 @@ def _b64(array: np.ndarray) -> str:
 
 
 def export_browser(model: TinyGPT, tokenizer, path: str | Path, prompt: str) -> dict:
+    if isinstance(tokenizer, ByteBPETokenizer):
+        raise ValueError(
+            "Le playground publié ne lit pas encore le BPE octets ; utilise model.gpt_sample pour ce checkpoint"
+        )
     path = Path(path)
     rounded = TinyGPT(model.config)
     tensors = {}

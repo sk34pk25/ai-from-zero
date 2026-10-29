@@ -1,0 +1,30 @@
+name: Publier un benchmark et ses checkpoints
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark-release:
+    runs-on: ubuntu-latest
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt
+      - name: Réaliser les contrôles puis le protocole fixé
+        run: |
+          python atelier/verifier.py --module correction
+          python atelier/benchmark.py --module correction --out runs/publication --steps 240 --widths 16,24 --seeds 0,1,2
+      - name: Archiver hors de l'historique Git
+        run: python scripts/package_benchmark.py --run runs/publication --out runs/benchmark-fr.zip
+      - name: Publier les poids, sources, données et empreintes en Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "atelier-${GITHUB_RUN_ID}" runs/benchmark-fr.zip --target "$GITHUB_SHA" --title "Banc français — ${GITHUB_SHA:0:7}" --notes-file atelier/BANC_FR.md

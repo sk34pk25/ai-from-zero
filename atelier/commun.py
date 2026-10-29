@@ -1,11 +1,28 @@
 """Infrastructure du TP : dimensions, initialisation, fichiers. Pas de forward GPT."""
 
-import hashlib
 import importlib
 import json
 from pathlib import Path
 import numpy as np
-from moteur import Tensor
+
+if __package__:
+    from .moteur import Tensor
+    from .artifacts import (
+        empreinte,
+        empreinte_texte,
+        sortie_sure,
+        ecriture_atomique,
+        ecrire_json,
+    )
+else:
+    from moteur import Tensor
+    from artifacts import (
+        empreinte,
+        empreinte_texte,
+        sortie_sure,
+        ecriture_atomique,
+        ecrire_json,
+    )
 
 
 def module_eleve(name):
@@ -14,8 +31,19 @@ def module_eleve(name):
     return importlib.import_module(name)
 
 
-def empreinte(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def provenance_texte(path):
+    path = Path(path)
+    row = {
+        "sha256": empreinte(path),
+        "normalise_sha256": empreinte_texte(path.read_text(encoding="utf-8")),
+    }
+    manifest = path.parent / "provenance.json"
+    if manifest.is_file():
+        meta = json.loads(manifest.read_text(encoding="utf-8"))
+        part = path.stem
+        if meta.get("splits", {}).get(part) == row["sha256"]:
+            row["documents"] = meta.get("documents", {}).get(part, [])
+    return row
 
 
 def parametres(vocab, d=16, layers=1, heads=2, block=16, seed=0):
@@ -44,16 +72,25 @@ def parametres(vocab, d=16, layers=1, heads=2, block=16, seed=0):
     return p, dict(d=d, layers=layers, heads=heads, block=block, seed=seed)
 
 
-def sauver(path, p, vocab, config):
-    np.savez(
-        Path(path),
-        **{k: v.data for k, v in p.items()},
-        metadata=np.array(json.dumps({"vocab": vocab, "config": config})),
+def sauver(path, p, vocab, config, provenance=None, remplacer=False):
+    meta = {
+        "format": "afz-atelier-checkpoint-v2",
+        "vocab": vocab,
+        "config": config,
+        "provenance": provenance,
+    }
+    ecriture_atomique(
+        path,
+        lambda f: np.savez(
+            f, **{k: v.data for k, v in p.items()}, metadata=np.array(json.dumps(meta))
+        ),
+        remplacer,
     )
 
 
-def charger(path):
+def charger(path, avec_metadata=False):
     with np.load(Path(path), allow_pickle=False) as z:
         meta = json.loads(str(z["metadata"]))
         p = {k: Tensor(z[k]) for k in z.files if k != "metadata"}
-    return p, meta["vocab"], meta["config"]
+    result = (p, meta["vocab"], meta["config"])
+    return (*result, meta) if avec_metadata else result

@@ -26,7 +26,7 @@ def test_published_examples_execute_and_keep_the_reference_weights():
     p = ROOT / "model/data/bpe.json"
     before = hashlib.sha256(p.read_bytes()).hexdigest()
     rows = load_script("check_examples").check_examples()
-    assert len(rows) == 152
+    assert len(rows) == 156
     assert all(r["ok"] for r in rows), [r for r in rows if not r["ok"]]
     assert hashlib.sha256(p.read_bytes()).hexdigest() == before
 
@@ -60,6 +60,13 @@ def test_references_resolve_to_real_functions_and_level_rubrics_are_specific():
 def test_manifest_is_complete_and_has_no_model_imports():
     manifest = json.loads((ROOT / "data/atelier.json").read_text())
     assert manifest == load_script("build_atelier").payload()
+    for source, copy in (
+        ("artifacts.py", "artifacts.py"),
+        ("byte_bpe.py", "octet_bpe.py"),
+    ):
+        assert (ROOT / "model" / source).read_bytes() == (
+            ROOT / "atelier" / copy
+        ).read_bytes()
     for file in manifest["files"]:
         assert file.startswith("atelier/") and ".." not in file
         if file.endswith(".py"):

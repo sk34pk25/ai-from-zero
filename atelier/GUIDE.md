@@ -8,6 +8,8 @@ Le tronc commun suit les niveaux **0, 1, 2, 3, 4, puis 13**. Les niveaux 5 et 6 
 
 Pour chaque TP : écris d'abord les formes et un exemple à la main, complète le code, lance `python verifier.py --jusqua N`, explique un cas limite. Les tests sont publics ; leur réussite ne certifie ni indépendance du code ni compréhension.
 
+Tu peux commencer certains TP avant les autres : `python verifier.py --tp 5` contrôle uniquement l’autograd scalaire au niveau 1. Les TP 1–3 utilisent les niveaux 2–3 ; `--jusqua N` reste cumulatif. Lis FONDATIONS.md avant l’autograd sur tableaux et PANNES.md pour diagnostiquer un échec. Mon espace accepte controles.json et distingue contrôles publics, explications déclarées et leçons lues.
+
 ## TP 1 — Tokenizer réversible (2.1, 2.3, 2.5)
 
 Écris `vocabulaire`, `encoder`, `decoder`. Le vocabulaire est un dictionnaire de caractères distincts triés vers des entiers contigus à partir de zéro. Le décodage inverse la table et concatène, sans supprimer les espaces ni accents. Pour « abba », attends [0,1,1,0] puis le texte d'origine. Un caractère absent doit lever KeyError ; ne reconstruis pas un vocabulaire pendant encode.
@@ -114,6 +116,10 @@ python evaluer.py --checkpoint runs/personnel/modele.npz --test corpus/test.txt 
 ```
 
 Suis ensuite PROJET_FINAL.md. Une variante perdante documentée est recevable. Un test de formes seul ne prouve pas la qualité du langage.
+
+Les nouveaux checkpoints gardent les empreintes normalisées des données, les documents connus et le code. Un fichier train renommé ne devient pas un test. L’évaluateur refuse le recouvrement connu et un code différent ; pour les anciens checkpoints, l’indépendance reste non vérifiable. Les rapports doivent être des fichiers .json neufs : ils ne remplacent ni source ni checkpoint.
+
+Pour aller plus loin : BANC_FR.md décrit le banc à documents réservés et ses questions ; EXTENSIONS.md donne les commandes BPE octets, parité PyTorch et génération/API locale. Le port PyTorch est facultatif, après ton premier GPT NumPy.
 
 ## Lectures accompagnées
 

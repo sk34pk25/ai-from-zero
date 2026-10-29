@@ -726,6 +726,17 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Affiche tokens[-1], le dernier élément. Puis lis un index égal à len(tokens) et identifie l'IndexError."
+            },
+            {
+              "kind": "explain",
+              "heading": "Une première classe avant l’autograd",
+              "text": "Une classe définit comment créer des objets qui gardent des données et des méthodes. Deux noms peuvent désigner le même objet : modifier sa donnée via un nom est visible via l’autre. Construire un nouvel objet à partir de sa valeur crée une autre identité. Ce point expliquera pourquoi w*w doit accumuler deux contributions vers le même w. Le guide FONDATIONS.md de l’atelier propose un exercice de reconstruction sans correction."
+            },
+            {
+              "kind": "code",
+              "heading": "Objet partagé et objet distinct",
+              "lang": "python",
+              "code": "class ValeurSimple:\n    def __init__(self, data):\n        self.data = float(data)\n    def double(self):\n        return 2 * self.data\n\na = ValeurSimple(3)\nb = a\nc = ValeurSimple(a.data)\nb.data = 4\nassert a.double() == 8 and c.double() == 6\nassert a is b and a is not c\nprint(a.data, b.data, c.data)"
             }
           ],
           "exercise": "Crée une configuration avec learning_rate, batch_size et epochs. Écris une fonction get_dim(config) qui renvoie config[\"dim\"] et teste-la.",
@@ -1096,6 +1107,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Crée un tableau de shape (2, 3) et un autre de shape (3,). Multiplie-les et observe le résultat diffusé, puis essaie une shape incompatible et lis l'erreur."
+            },
+            {
+              "kind": "explain",
+              "heading": "Axes, copies et broadcasting",
+              "text": "Pour x de forme (B,T,D), l’axe -1 est D. reshape conserve l’ordre des éléments, tandis que permute ou transpose change l’ordre des axes : deux tableaux de même forme peuvent donc contenir des valeurs organisées différemment. Une vue NumPy peut partager sa mémoire ; utilise copy() lorsque tu veux conserver un état avant une modification. Ajouter un biais (D,) à (B,T,D) le réutilise B*T fois. Son gradient devra sommer ces B*T contributions."
             }
           ],
           "exercise": "Charge les nombres de model/data/mesures.txt avec load_numbers et passe-les à summarize. Vérifie que n vaut 7 et que la moyenne est cohérente avec un calcul à la main.",
@@ -1320,6 +1336,17 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Remplace W par l'identité et vérifie que le résultat est égal à x. Puis essaie une matrice (2, 3) avec ce même x et lis l'erreur de forme."
+            },
+            {
+              "kind": "explain",
+              "heading": "Préparer la dérivée d’un produit matriciel",
+              "text": "Si Y=X@W et G est le gradient reçu par Y, alors dX=G@W.T et dW=X.T@G. Avec X=(B,D), W=(D,V), G=(B,V), les formes obtenues sont celles de X et W. Le calcul suivant contrôle aussi les valeurs ; les bonnes formes ne suffisent pas. Refais le calcul avec un autre X avant de regarder FONDATIONS.md."
+            },
+            {
+              "kind": "code",
+              "heading": "Deux gradients calculés à la main",
+              "lang": "python",
+              "code": "import numpy as np\nX = np.array([[1., 2.], [3., 4.]])\nW = np.array([[2.], [5.]])\nG = np.ones((2, 1))\ndX, dW = G @ W.T, X.T @ G\nnp.testing.assert_array_equal(dX, [[2., 5.], [2., 5.]])\nnp.testing.assert_array_equal(dW, [[4.], [6.]])\nprint(dX, dW)"
             }
           ],
           "exercise": "Calcule à la main [[2, 0], [0, 3]] @ [4, 5]. Le résultat attendu est [8, 15]. Confirme avec NumPy.",
@@ -1710,6 +1737,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Change les bornes pour un 70/15/15 et vérifie que la somme des longueurs reste 100. Aucun indice ne doit apparaître dans deux ensembles."
+            },
+            {
+              "kind": "explain",
+              "heading": "Ce que le découpage permet réellement de conclure",
+              "text": "Pour un premier diagnostic séquentiel, une fin de texte réservée est utile. Pour discuter le transfert vers de nouveaux documents, réserve des documents entiers avant d’apprendre le tokenizer et contrôle les copies normalisées. Pour des questions/réponses, garde les reformulations d’une même famille dans le même ensemble. Un fichier renommé n’est pas un nouveau test. Le test reste réservé pendant toutes les phases, y compris après sauvegarde et reprise."
             }
           ],
           "exercise": "Explique en trois phrases le rôle de chaque ensemble. Ajoute un exemple de triche : choisir le modèle qui a le mieux réussi sur le test, puis rapporter ce même chiffre comme résultat final.",
@@ -2380,6 +2412,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Dessine les trois contributions de w dans w*w+w : w, w et 1. Vérifie que le résultat est 7 en w=3, puis change w=2 dans un nouveau graphe et prédis le gradient avant d'exécuter."
+            },
+            {
+              "kind": "explain",
+              "heading": "Quand commencer le TP 5",
+              "text": "Le numéro du TP ne fixe pas l’ordre de lecture. Tu peux lancer python verifier.py --tp 5 pour contrôler uniquement ton graphe scalaire à ce stade. L’option --jusqua 5 contrôle aussi tokenizer, fenêtres et probabilités ; elle convient quand leurs prérequis ont été étudiés. Avant de consulter la référence, dessine y=(x+x)+(x+x) et explique pourquoi dx vaut 4."
             }
           ],
           "exercise": "Dessine trois boîtes : x et w entrent dans « produit », le produit entre dans « carré de l'écart », la loss sort. Ajoute des flèches backward. Écris sous chaque flèche quelle quantité est multipliée.",
@@ -2606,10 +2643,21 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Calcule 2*(w-3) pour w = 1 et w = 4. Les signes doivent être opposés. Si tu as PyTorch, compare à w.grad. Sinon, la valeur -4 suffit comme contrôle."
+            },
+            {
+              "kind": "explain",
+              "heading": "Un embedding lu deux fois reçoit deux gradients",
+              "text": "L’indexation d’un embedding ne crée pas un paramètre indépendant à chaque lecture. Si l’identifiant 0 apparaît deux fois, les deux chemins reviennent vers la même ligne du poids. L’exemple ci-dessous contrôle ce cumul. Refais ensuite le calcul avec la ligne 1 utilisée trois fois et sans ouvrir le moteur."
+            },
+            {
+              "kind": "code",
+              "heading": "Contrôler les lectures répétées",
+              "lang": "python",
+              "code": "import numpy as np\nfrom model.autograd import Tensor, embedding\nW = Tensor(np.array([[1., 2.], [3., 4.]]))\nembedding(W, np.array([0, 0, 1])).sum().backward()\nnp.testing.assert_array_equal(W.grad, [[2., 2.], [1., 1.]])\nprint(W.grad)"
             }
           ],
           "exercise": "Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie les trois contributions, puis explique pourquoi on somme au lieu de garder (2,3).",
-          "build": "Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 mesure une dérivée par différence finie et teste l'accumulation des lectures répétées.",
+          "build": "Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 contrôle la réduction du gradient de broadcasting. Le complément numérique ci-dessous vérifie les lectures répétées d’un embedding ; les TP 7 et 10 vérifient aussi des dérivées par différences finies.",
           "visual": "flow",
           "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
           "interactive": false,
@@ -3001,6 +3049,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Affiche la liste des octets de « café ». Compte-les à la main : c, a, f tiennent sur 1, é sur 2, soit 5 octets pour 4 caractères."
+            },
+            {
+              "kind": "explain",
+              "heading": "Prolongement : couvrir tous les octets",
+              "text": "octet_bpe.py dans l’atelier part des 256 octets et apprend ses fusions sur train. Il accepte donc des caractères nouveaux sans agrandir l’alphabet au moment de l’évaluation. BOS/EOS/PAD sont des identifiants réservés ; la chaîne littérale <eos> n’insère pas un token spécial. Un texte d’entrée UTF-8 se reconstruit exactement. Des octets générés peuvent être invalides : le mode strict les signale et le mode replace les remplace explicitement. Aucun de ces choix ne prouve que le modèle connaît une nouvelle langue."
             }
           ],
           "exercise": "Explique pourquoi un tokenizer limité aux caractères vus dans « bonjour » échoue sur « z », alors qu'un vocabulaire de 256 octets n'échoue pas.",
@@ -3301,6 +3354,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Relance avec num_merges=0. L'encodage doit avoir la longueur du texte. Puis avec 8 fusions, il doit être strictement plus court sur « banana »."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Neural Machine Translation of Rare Words with Subword Units",
+              "href": "https://arxiv.org/abs/1508.07909",
+              "text": "Retrouve le comptage des paires et les fusions dans model/bpe.py et model/byte_bpe.py. Compare vocabulaire fermé caractère et base de 256 octets ; notre code reste pédagogique."
             }
           ],
           "exercise": "Écris une fusion sur la liste [1, 2, 1, 2] en remplaçant la paire (1, 2) par 9. Donne la liste résultante et son décodage si 9 signifie (1, 2).",
@@ -4207,7 +4267,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. Les variantes RoPE, RMSNorm, SwiGLU, GQA et le dos hybride restent des forwards exploratoires. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation."
+              "text": "Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. RMSNorm dispose aussi d’un backward entraînable dans le laboratoire. RoPE, SwiGLU, GQA et le dos hybride restent des forwards exploratoires. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation."
             },
             {
               "kind": "code",
@@ -4915,6 +4975,18 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "La première ligne doit être plus piquée que la seconde. Note la probabilité de la première case dans les deux cas."
+            },
+            {
+              "kind": "explain",
+              "heading": "Un exemple qui distingue la bonne échelle",
+              "text": "Avec une tête de dimension 4, des scores QK bruts [0,4] deviennent [0,2]. À la deuxième position causale, les poids doivent être environ [0,1192 ; 0,8808], contre [0,0180 ; 0,9820] si tu oublies l’échelle. Ces deux versions ont la même forme, sont causales et peuvent avoir un gradient cohérent : il faut donc contrôler une valeur attendue indépendante. C’est maintenant le rôle du TP 7."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Attention Is All You Need",
+              "href": "https://arxiv.org/abs/1706.03762",
+              "text": "Repère QK transposé, le diviseur sqrt(d_k), softmax et V. Rejoue notre exemple numérique dans atelier/verifier.py ; la baseline étudiée ici est decoder-only, pas le système encoder-decoder du papier."
             }
           ],
           "exercise": "Pour d_k = 64, quel est le diviseur ? 8. Pour d_k = 1, quel est-il ? 1, donc l'échelle ne change rien.",
@@ -5511,7 +5583,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le decoder standard est entièrement entraînable dans model/gpt_train.py : positions absolues, LayerNorm, attention multi-têtes, FFN GELU, résidus et tête de langage. logits_tensor reconstitue le forward avec des Tensor ; sequence_loss décale entrée et cible ; backward calcule tous les gradients et AdamW modifie les paramètres. Le test compare aussi le forward autograd au forward NumPy et vérifie un gradient d'attention par différence finie. En génération, les poids restent fixes et un token est ajouté au contexte. Le cache doit retrouver les logits du calcul complet, sans lire le futur. Lance le TP 12 : entraîne depuis une graine, mesure train et validation, recharge le checkpoint, puis compare le GPT au bigramme et à l'uniforme. Un résultat insuffisant doit être expliqué, pas caché. Les options modernes et le dos hybride ne sont pas entraînés par ce chemin."
+              "text": "Le decoder standard est entièrement entraînable dans model/gpt_train.py : positions absolues, LayerNorm, attention multi-têtes, FFN GELU, résidus et tête de langage. logits_tensor reconstitue le forward avec des Tensor ; sequence_loss décale entrée et cible ; backward calcule tous les gradients et AdamW modifie les paramètres. Le test compare aussi le forward autograd au forward NumPy et vérifie un gradient d'attention par différence finie. En génération, les poids restent fixes et un token est ajouté au contexte. Le cache doit retrouver les logits du calcul complet, sans lire le futur. Lance le TP 12 : entraîne depuis une graine, mesure train et validation, recharge le checkpoint, puis compare le GPT au bigramme et à l'uniforme. Un résultat insuffisant doit être expliqué, pas caché. Le laboratoire entraîne aussi RMSNorm ; RoPE, SwiGLU, GQA et le dos hybride restent des forwards exploratoires."
             },
             {
               "kind": "code",
@@ -5523,6 +5595,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Lance le test test_transformer_shapes_cache_and_causality. Il doit passer. Lis le message si tu le modifies : la causalité est le premier invariant à ne pas casser."
+            },
+            {
+              "kind": "explain",
+              "heading": "Choisir les poids, puis mesurer le test",
+              "text": "Le lanceur de l’atelier archive le meilleur checkpoint observé sur validation, son pas selected_step, son budget de tokens et la provenance. Le budget total peut être plus grand que celui de ces poids retenus. Le rechargement doit retrouver les logits calculés en mémoire avant sauvegarde. Complète ton code, puis utilise benchmark.py pour comparer deux largeurs sur les mêmes graines ; le test ne choisit pas la largeur."
             }
           ],
           "exercise": "Dans ton atelier, termine decoder, loss et le pas AdamW. Lance verifier.py puis entrainer.py sur le corpus jouet. Joins les pertes train/validation, les baselines, une génération et le contrôle de rechargement. Indique ce que cette tâche simple ne prouve pas.",
@@ -5606,7 +5683,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Dans le mini-GPT, params[\"pos\"] a une ligne par indice de 0 à block_size-1. Le forward lève ValueError au-delà, plutôt que de relire la dernière ligne en silence. Cette erreur est honnête. Les modèles récents évitent la table : RoPE fait tourner les paires de composantes selon la position, et le score entre deux tokens ne dépend alors que de leur écart. On ne gagne pas une longueur infinie gratuite — la qualité se dégrade quand même — mais on n'a plus une coupure sèche à l'indice 32."
+              "text": "Dans le mini-GPT, params[\"pos\"] a une ligne par indice de 0 à block_size-1. Le forward lève ValueError au-delà, plutôt que de relire la dernière ligne en silence. Cette erreur est honnête. Les modèles récents évitent la table : RoPE fait tourner les paires de composantes selon la position, et le score entre deux tokens ne dépend alors que de leur écart. On ne gagne pas une longueur infinie gratuite — la qualité se dégrade quand même — mais on n'a plus une coupure sèche à l'indice 32. C’est une propriété de la représentation : le TinyGPT de ce dépôt garde néanmoins sa vérification block_size même avec RoPE. Changer ce plafond logiciel ne garantit pas la qualité hors longueur entraînée."
             },
             {
               "kind": "code",
@@ -5692,6 +5769,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "La norme de chaque vecteur de uns, au départ sqrt(4)=2, doit rester 2 après rotation. Si elle change, la rotation est fausse."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+              "href": "https://arxiv.org/abs/2104.09864",
+              "text": "Associe la rotation de Q/K à apply_rope dans model/attention.py. Distingue formule, test de norme et qualité hors longueur entraînée, qui demande une expérience distincte."
             }
           ],
           "exercise": "Pour une position 0, l'angle est nul : la rotation doit laisser le vecteur identique. Vérifie-le sur la première position du tableau ci-dessus.",
@@ -5754,7 +5838,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "rmsnorm(x) = x / sqrt(mean(x²) + eps) * gain. Il n'y a pas de β. Pour un vecteur constant [2, 2], la RMS vaut 2, donc on obtient [1, 1] avant le gain. LayerNorm, elle, verrait une variance nulle et rendrait zéro après centrage. Les deux ne sont pas interchangeables numériquement. Elles le sont architecturalement : même place, avant les sous-blocs. Le laboratoire choisit l'une ou l'autre via GPTConfig.norm. Les tests ne comparent pas les valeurs entre les deux modes, seulement la forme finale et le fait que le modèle se construit."
+              "text": "rmsnorm(x) = x / sqrt(mean(x²) + eps) * gain. Il n'y a pas de β. Pour un vecteur constant [2, 2], la RMS vaut 2, donc on obtient [1, 1] avant le gain. LayerNorm, elle, verrait une variance nulle et rendrait zéro après centrage. Les deux ne sont pas interchangeables numériquement. Elles le sont architecturalement : même place, avant les sous-blocs. Le laboratoire choisit l'une ou l'autre via GPTConfig.norm. Les deux normes ne doivent pas donner les mêmes valeurs. Le chemin autograd couvre maintenant RMSNorm : ses gradients sont comparés aux différences finies, son decoder au forward NumPy, et un petit entraînement est testé. Depuis la racine, python -m model.gpt_train --norm rms l’utilise ; aucune supériorité de qualité sur LayerNorm n’est déduite de ces contrôles."
             },
             {
               "kind": "code",
@@ -5766,6 +5850,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Essaie [[3, 0]]. La RMS vaut sqrt(4.5). Vérifie à la main le premier composant après division, avant de regarder le print."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Root Mean Square Layer Normalization",
+              "href": "https://arxiv.org/abs/1910.07467",
+              "text": "Écris le rôle du gain et l’absence de centrage/biais. Compare model/mathutil.py et le backward rmsnorm de model/autograd.py ; les gradients et un entraînement sont testés."
             }
           ],
           "exercise": "Cite les deux choses que LayerNorm fait et que RMSNorm ne fait pas : soustraire la moyenne, ajouter un biais β.",
@@ -6450,6 +6541,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Double T et observe le rapport. Puis double D en laissant T fixe. Les deux rapports ne se ressemblent pas : l'un fait grossir le terme carré, l'autre les projections."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Training Compute-Optimal Large Language Models",
+              "href": "https://arxiv.org/abs/2203.15556",
+              "text": "Note paramètres, tokens et budget de calcul. Compare le raisonnement expérimental avec les compteurs de model/bench.py ; nos petits runs ne reproduisent pas les lois d’échelle du papier."
             }
           ],
           "exercise": "Pour T=1, que reste-t-il de dominant, le terme T² ou les projections ? À un seul token, T² est petit. En génération du premier token d'un long contexte, T est le passé entier, et le terme carré a déjà été payé lors du préremplissage.",
@@ -6746,6 +6844,17 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Compare ce pas à quatre pas SGD séparés de lr 0.1 sur les mêmes gradients successifs. Les trajectoires diffèrent : l'accumulation fait un seul pas avec la moyenne, pas quatre petits pas."
+            },
+            {
+              "kind": "explain",
+              "heading": "Mesurer l’accumulation sur une petite régression",
+              "text": "Pour des micro-batches de même taille, divise chaque loss par leur nombre avant backward. Si les tailles diffèrent, pondère par leur nombre de cibles ; une simple moyenne des moyennes n’est plus correcte. L’exemple vérifie le gradient analytique de deux micro-batches d’un exemple chacun. Refais-le avec trois exemples et des tailles 1 puis 2."
+            },
+            {
+              "kind": "code",
+              "heading": "Même gradient, même mise à jour",
+              "lang": "python",
+              "code": "import numpy as np\nX = np.array([[1., 2.], [3., 4.]])\ny = np.array([[1.], [2.]])\nW = np.zeros((2, 1))\ngrand = 2 * X.T @ (X @ W - y) / len(X)\npetits = np.zeros_like(W)\nfor xx, yy in zip(X, y):\n    xx, yy = xx[None, :], yy[None, :]\n    petits += (2 * xx.T @ (xx @ W - yy)) / len(X)\nnp.testing.assert_allclose(grand, petits)\nnp.testing.assert_allclose(W - .01 * grand, W - .01 * petits)\nprint(grand)"
             }
           ],
           "exercise": "Tu accumules 8 micro-batches et tu oublies de diviser par 8. Par quel facteur le pas est-il trop grand ?",
@@ -7208,6 +7317,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "ReLU met le -2 à 0, l'identité le laisse. La sortie doit être [1, 0]. Change w2 et observe que l'expert n'est que ces poids."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+              "href": "https://arxiv.org/abs/2101.03961",
+              "text": "Retrouve routeur, capacité et équilibrage dans model/moe.py. Liste ce qui manque à notre forward pour reproduire une expérience entraînée du papier."
             }
           ],
           "exercise": "Explique pourquoi deux experts de mêmes formes peuvent quand même calculer des fonctions différentes. Où est la différence : dans les valeurs des poids.",
@@ -8336,6 +8452,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "La forme est (1, 4, 8) et le mode de couche est \"ssm\". Les deux couches SSM sont des scans, pas des attentions."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+              "href": "https://arxiv.org/abs/2312.00752",
+              "text": "Associe état et sélectivité à model/ssm.py, puis liste convolution, projections et kernel non reproduits par notre scan réduit. Ne lui attribue pas les performances du modèle publié."
             }
           ],
           "exercise": "Cite deux pièces d'un bloc Mamba publié absentes de _ssm. La convolution courte sur le temps, et un scan fusionné pour GPU.",
@@ -8650,6 +8773,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Tu dois obtenir (4, 4) et [0, 1, 4, 5]. Essaie un patch de 3 sur cette image : H n'est pas divisible par 3, la fonction doit lever une erreur."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+              "href": "https://arxiv.org/abs/2010.11929",
+              "text": "Compare les patches du papier à model/multimodal.py. Distingue découpage, projection, encodeur entraîné et raccordement à un modèle de langage ; nous ne livrons que les premières briques."
             }
           ],
           "exercise": "Pour une image 8 par 8 à 3 canaux et un patch de 4, combien de patches, et quelle longueur de vecteur ? 4 patches, longueur 4*4*3 = 48.",
@@ -9408,6 +9538,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "L'indice affiché est 0. Avec k=2 tu obtiens une seconde fiche, de score plus faible, sans changer la première."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+              "href": "https://arxiv.org/abs/2005.11401",
+              "text": "Sépare retrieval, contexte et génération. Compare à la mémoire lexicale de model/memory.py ; notre banque de mots n’est pas le système entraîné du papier."
             }
           ],
           "exercise": "Deux documents ont le même score. Lequel est devant ? Celui dont l'index est le plus petit.",
@@ -11060,7 +11197,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le laboratoire sait entraîner le GPT standard et un petit réseau, estimer le bigramme par comptage et ajuster le GPT par SFT ou LoRA. Il ne sait pas entraîner le dos hybride ni les variantes modernes par ce backward. Pour le projet final, tes fonctions decoder et adamw doivent donc entraîner un GPT à positions absolues, LayerNorm et GELU. Vérifie d'abord que tu peux surapprendre un minuscule lot : c'est un test de débogage, pas le résultat final. Sépare ensuite les documents, fixe le tokenizer sur train et choisis tes réglages sur validation. Le test final reste réservé. Une loss qui baisse sur train et monte sur validation est une observation à expliquer. Les critères publics de l'atelier ne valident pas un assistant général : ils contrôlent un apprentissage et sa mesure."
+              "text": "Le laboratoire sait entraîner le GPT standard et un petit réseau, estimer le bigramme par comptage et ajuster le GPT par SFT ou LoRA. Il entraîne aussi RMSNorm avec ce backward. Le dos hybride, RoPE, SwiGLU et GQA restent des forwards exploratoires. Pour le projet final, tes fonctions decoder et adamw doivent donc entraîner un GPT à positions absolues, LayerNorm et GELU. Vérifie d'abord que tu peux surapprendre un minuscule lot : c'est un test de débogage, pas le résultat final. Sépare ensuite les documents, fixe le tokenizer sur train et choisis tes réglages sur validation. Le test final reste réservé. Une loss qui baisse sur train et monte sur validation est une observation à expliquer. Les critères publics de l'atelier ne valident pas un assistant général : ils contrôlent un apprentissage et sa mesure."
             },
             {
               "kind": "code",
@@ -11294,6 +11431,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Cinq lignes, aucune ne cite un score d'article. Si tu en ajoutes une sixième, elle doit pointer vers un test ou rester dans les limites."
+            },
+            {
+              "kind": "explain",
+              "heading": "Une remise finale relisible",
+              "text": "Remets ton code personnel, la recette, les splits et leurs conditions d’utilisation, les contrôles, un diagnostic de panne, les mesures appariées et le checkpoint rechargé. Importe controles.json dans Mon espace pour distinguer contrôles publics et explications déclarées. Fais ensuite relire le projet avec PROJET_FINAL.md, sur un exemple nouveau. Le banc français du site mesure une petite expérience réelle ; il ne certifie ni ta compréhension ni une supériorité générale."
             }
           ],
           "exercise": "Dans un dossier distinct, complète le projet final décrit dans atelier/PROJET_FINAL.md. Livre code, rapport, données réservées, checkpoint rechargé et variation contrôlée. Fais relire tes explications sans ouvrir le corrigé : les preuves techniques seules ne suffisent pas à démontrer l'autonomie.",
@@ -11834,6 +11976,13 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Au rang 1, B reste nul tant que personne ne l'entraîne. La correction ajoutée au poids de base est donc nulle. Le test du dépôt le vérifie."
+            },
+            {
+              "kind": "reference",
+              "heading": "Lecture primaire accompagnée",
+              "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+              "href": "https://arxiv.org/abs/2106.09685",
+              "text": "Retrouve W + facteur*(A@B) dans model/lora.py et les gradients dans model/finetune.py. Compare paramètres entraînés et loss sur les mêmes splits ; le rang seul ne garantit pas une bonne adaptation."
             }
           ],
           "exercise": "Sur un modèle jouet, compare le nombre de poids entraînés en ajustement complet et en LoRA. Le second doit être plus petit.",
@@ -11908,6 +12057,11 @@
               "kind": "experiment",
               "heading": "Expérience",
               "text": "Fixe cinq invites avant de générer : une question vue, deux reformulations réservées, une nouvelle question et une demande sans réponse dans les données. Note réponse, arrêt et pertinence, même quand le modèle échoue."
+            },
+            {
+              "kind": "explain",
+              "heading": "Utiliser le modèle que tu as construit",
+              "text": "L’atelier contient generer.py : recharge ton checkpoint et utilise une invite, une graine, une température, une longueur et un critère d’arrêt explicites. Le serveur facultatif écoute sur 127.0.0.1 pour une utilisation locale. Le laboratoire principal accepte aussi --byte-bpe pour entraîner avec des octets, puis model.gpt_sample pour générer. Le port_torch.py compare d’abord logits et gradients du même decoder, puis entraîne un petit lot : la vitesse vient après la parité."
             }
           ],
           "exercise": "Écris, en une phrase, ce que cet échantillon prouve, et une chose qu'il ne prouve pas. Par exemple : il recolle une définition vue, il ne prouve pas un assistant général.",

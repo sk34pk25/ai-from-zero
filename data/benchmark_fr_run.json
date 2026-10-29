@@ -1,0 +1,1384 @@
+{
+  "format": "afz-benchmark-v1",
+  "recipe": {
+    "module": "correction",
+    "steps": 240,
+    "widths": [
+      16,
+      24
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "block": 32,
+    "batch": 4,
+    "lr": 0.005,
+    "selection": "moyenne de loss validation sur les mêmes graines ; test mesuré après le choix de largeur",
+    "runner_sha256": "fe132e975fe0ab5337923928f4eccdb37aa0b772c7b1ae3191cb3e1e74f1ce98",
+    "prompt_fixe": "Le matin"
+  },
+  "manifest": {
+    "format": "afz-benchmark-manifest-v1",
+    "source_sha256": "2480828e4c8f926961cc6a5fa89cfa1b77329066d9c07c7ceb40e55280b59da2",
+    "splits": {
+      "train": [
+        "bibliotheque",
+        "canal",
+        "jardin",
+        "pain",
+        "velo",
+        "cartes",
+        "son",
+        "archives"
+      ],
+      "validation": [
+        "observatoire",
+        "theatre"
+      ],
+      "test": [
+        "marche",
+        "atelier_bois"
+      ]
+    },
+    "prompt_fixe": "Le matin",
+    "licence": "MIT",
+    "protocole": "Sélection de largeur sur moyenne validation ; évaluation finale des graines retenues seulement."
+  },
+  "runs": [
+    {
+      "width": 16,
+      "seed": 0,
+      "folder": "d16-graine0",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 16,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 0
+      },
+      "steps": 240,
+      "selected_step": 240,
+      "selected_tokens_vus": 30720,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 5376,
+      "seconds": 1.1784229839995533,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "7ee4fae43fc746cbe71dfc55d60455b7ca00efaacaa5e771338d032e45389a6e",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.399587498900825,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.979181239115146,
+      "train_loss_end": 2.374354905238543,
+      "val_loss_start": 3.983679733592091,
+      "val_loss_end": 2.399587498900825,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 3.0699596298916205,
+          "validation": 3.0357341570405616
+        },
+        {
+          "step": 40,
+          "train": 2.739791734200373,
+          "validation": 2.7026106008834874
+        },
+        {
+          "step": 60,
+          "train": 2.632629606884045,
+          "validation": 2.5818905607881932
+        },
+        {
+          "step": 80,
+          "train": 2.5696910590624555,
+          "validation": 2.5541761623439765
+        },
+        {
+          "step": 100,
+          "train": 2.548657117740532,
+          "validation": 2.52511852113816
+        },
+        {
+          "step": 120,
+          "train": 2.484435169468718,
+          "validation": 2.485633322885669
+        },
+        {
+          "step": 140,
+          "train": 2.448033044982944,
+          "validation": 2.4772006069894656
+        },
+        {
+          "step": 160,
+          "train": 2.415863874965778,
+          "validation": 2.450741218590366
+        },
+        {
+          "step": 180,
+          "train": 2.415223404780239,
+          "validation": 2.439395363632795
+        },
+        {
+          "step": 200,
+          "train": 2.40394238236194,
+          "validation": 2.4647630971452292
+        },
+        {
+          "step": 220,
+          "train": 2.4050920835006644,
+          "validation": 2.4329136245551375
+        },
+        {
+          "step": 240,
+          "train": 2.374354905238543,
+          "validation": 2.399587498900825
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La bla coure se s pauran cise sourin panesune le s p",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "e datis ler s pauran de paute pa panesune le s paures lant cha l",
+        "seed": 0,
+        "generated_tokens": 64,
+        "seconds": 0.04417820700109587,
+        "tokens_per_second": 1448.6780778226794,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "7ee4fae43fc746cbe71dfc55d60455b7ca00efaacaa5e771338d032e45389a6e",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    },
+    {
+      "width": 16,
+      "seed": 1,
+      "folder": "d16-graine1",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 16,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 1
+      },
+      "steps": 240,
+      "selected_step": 220,
+      "selected_tokens_vus": 28160,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 5376,
+      "seconds": 1.2601093200009927,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "19935e0a5b12e3d58eef77c50a2c2040ba3360abd883c15c9f615abb955433ab",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.4110845074756595,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.9643242118873028,
+      "train_loss_end": 2.3928270334863075,
+      "val_loss_start": 3.9634911821209817,
+      "val_loss_end": 2.4110845074756595,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 3.0382917502587414,
+          "validation": 3.0023603500659224
+        },
+        {
+          "step": 40,
+          "train": 2.757438722311654,
+          "validation": 2.6992938272173648
+        },
+        {
+          "step": 60,
+          "train": 2.6306941966563153,
+          "validation": 2.5799467169530876
+        },
+        {
+          "step": 80,
+          "train": 2.553138116671711,
+          "validation": 2.5340798446559116
+        },
+        {
+          "step": 100,
+          "train": 2.5005635649344766,
+          "validation": 2.499848592625549
+        },
+        {
+          "step": 120,
+          "train": 2.4903260675060146,
+          "validation": 2.4694618751437027
+        },
+        {
+          "step": 140,
+          "train": 2.4511301325453676,
+          "validation": 2.4644881408140504
+        },
+        {
+          "step": 160,
+          "train": 2.4374278452494167,
+          "validation": 2.442508016079051
+        },
+        {
+          "step": 180,
+          "train": 2.4251104501249516,
+          "validation": 2.4352032899283254
+        },
+        {
+          "step": 200,
+          "train": 2.4078427018616266,
+          "validation": 2.4309216317213758
+        },
+        {
+          "step": 220,
+          "train": 2.3928270334863075,
+          "validation": 2.4110845074756595
+        },
+        {
+          "step": 240,
+          "train": 2.3840364619792473,
+          "validation": 2.4160490709546405
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La blonte s mare pane lene ste les lenes me pre pe p",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "es s le mare pane dene sis les lenes me pre pe paren pa poune po",
+        "seed": 1,
+        "generated_tokens": 64,
+        "seconds": 0.03441070500048227,
+        "tokens_per_second": 1859.8863347642264,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "19935e0a5b12e3d58eef77c50a2c2040ba3360abd883c15c9f615abb955433ab",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    },
+    {
+      "width": 16,
+      "seed": 2,
+      "folder": "d16-graine2",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 16,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 2
+      },
+      "steps": 240,
+      "selected_step": 220,
+      "selected_tokens_vus": 28160,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 5376,
+      "seconds": 1.3038940189999266,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "cf609f074d2b7eca18c322c49b0ef3dd49d2f8880733fbd1b2085f5eed5e94d1",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.4348071152723936,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.9657364071351866,
+      "train_loss_end": 2.368895010939377,
+      "val_loss_start": 3.9682010879197342,
+      "val_loss_end": 2.4348071152723936,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 3.053270011122274,
+          "validation": 3.0101628121389528
+        },
+        {
+          "step": 40,
+          "train": 2.7942753781764944,
+          "validation": 2.7700975924185105
+        },
+        {
+          "step": 60,
+          "train": 2.651640140896094,
+          "validation": 2.6082632840161595
+        },
+        {
+          "step": 80,
+          "train": 2.566232257194744,
+          "validation": 2.526096659626724
+        },
+        {
+          "step": 100,
+          "train": 2.5065775820024636,
+          "validation": 2.5206282012961414
+        },
+        {
+          "step": 120,
+          "train": 2.4752491505961123,
+          "validation": 2.485655243580846
+        },
+        {
+          "step": 140,
+          "train": 2.4441505893091193,
+          "validation": 2.47331451365827
+        },
+        {
+          "step": 160,
+          "train": 2.42299217308255,
+          "validation": 2.4484828219359835
+        },
+        {
+          "step": 180,
+          "train": 2.4045823207316346,
+          "validation": 2.4451358063909225
+        },
+        {
+          "step": 200,
+          "train": 2.405692002700028,
+          "validation": 2.4480684540939066
+        },
+        {
+          "step": 220,
+          "train": 2.368895010939377,
+          "validation": 2.4348071152723936
+        },
+        {
+          "step": 240,
+          "train": 2.38462799261544,
+          "validation": 2.4391631842002925
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La bles lilante de lure dese s la durte des plintar ",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "e pare che che lure dese pence poure lintes le da lesontens che ",
+        "seed": 2,
+        "generated_tokens": 64,
+        "seconds": 0.04220453600100882,
+        "tokens_per_second": 1516.424680002884,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "cf609f074d2b7eca18c322c49b0ef3dd49d2f8880733fbd1b2085f5eed5e94d1",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    },
+    {
+      "width": 24,
+      "seed": 0,
+      "folder": "d24-graine0",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 24,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 0
+      },
+      "steps": 240,
+      "selected_step": 240,
+      "selected_tokens_vus": 30720,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 10368,
+      "seconds": 1.3715899440012436,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "ef8cbea4196aeaf489be02cbe1d2d2c610e0d5e60a01a2b2edd22bf635f71c70",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.4266391602313315,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.9797541848731544,
+      "train_loss_end": 2.4007608650554584,
+      "val_loss_start": 3.9730909165397414,
+      "val_loss_end": 2.4266391602313315,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 2.921160509185026,
+          "validation": 2.876774255835584
+        },
+        {
+          "step": 40,
+          "train": 2.6954021666009167,
+          "validation": 2.6349640422225145
+        },
+        {
+          "step": 60,
+          "train": 2.588343332036252,
+          "validation": 2.5536514136775437
+        },
+        {
+          "step": 80,
+          "train": 2.539794883786074,
+          "validation": 2.5293371839469243
+        },
+        {
+          "step": 100,
+          "train": 2.539746799776613,
+          "validation": 2.5293293342289314
+        },
+        {
+          "step": 120,
+          "train": 2.4751441761674555,
+          "validation": 2.494045457871543
+        },
+        {
+          "step": 140,
+          "train": 2.444419912067128,
+          "validation": 2.4804706185543726
+        },
+        {
+          "step": 160,
+          "train": 2.42118076274918,
+          "validation": 2.4726353086068924
+        },
+        {
+          "step": 180,
+          "train": 2.403941334434351,
+          "validation": 2.4456363529812846
+        },
+        {
+          "step": 200,
+          "train": 2.4052833085758882,
+          "validation": 2.4565538275365144
+        },
+        {
+          "step": 220,
+          "train": 2.412152732524141,
+          "validation": 2.4403697956273085
+        },
+        {
+          "step": 240,
+          "train": 2.4007608650554584,
+          "validation": 2.4266391602313315
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La bla coure se s s se ma reneute re re poure pant p",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "s a sore se s rauran le paute re re poure pant r se s laron la p",
+        "seed": 0,
+        "generated_tokens": 64,
+        "seconds": 0.0494141099989065,
+        "tokens_per_second": 1295.1766206335858,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "ef8cbea4196aeaf489be02cbe1d2d2c610e0d5e60a01a2b2edd22bf635f71c70",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    },
+    {
+      "width": 24,
+      "seed": 1,
+      "folder": "d24-graine1",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 24,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 1
+      },
+      "steps": 240,
+      "selected_step": 240,
+      "selected_tokens_vus": 30720,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 10368,
+      "seconds": 1.295408125000904,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "88befac9050072c90c79f8153b1c4bc75141431c3f05e65999963c9dd6b0763b",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.4368118757992816,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.980408728108295,
+      "train_loss_end": 2.402385222349672,
+      "val_loss_start": 3.9835040749624833,
+      "val_loss_end": 2.4368118757992816,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 2.891033954430775,
+          "validation": 2.8524347503432965
+        },
+        {
+          "step": 40,
+          "train": 2.7182442648997265,
+          "validation": 2.628610794863553
+        },
+        {
+          "step": 60,
+          "train": 2.6351331492028462,
+          "validation": 2.5886644591187915
+        },
+        {
+          "step": 80,
+          "train": 2.559111939869796,
+          "validation": 2.5339850788754346
+        },
+        {
+          "step": 100,
+          "train": 2.5034155751868203,
+          "validation": 2.5033233135458053
+        },
+        {
+          "step": 120,
+          "train": 2.491303992975405,
+          "validation": 2.47874582952178
+        },
+        {
+          "step": 140,
+          "train": 2.4468903333921057,
+          "validation": 2.45730594489272
+        },
+        {
+          "step": 160,
+          "train": 2.4399316532139967,
+          "validation": 2.4489860776178958
+        },
+        {
+          "step": 180,
+          "train": 2.4275635903985213,
+          "validation": 2.448684596648987
+        },
+        {
+          "step": 200,
+          "train": 2.4289683800645028,
+          "validation": 2.4637577120664567
+        },
+        {
+          "step": 220,
+          "train": 2.3985794887365652,
+          "validation": 2.4395838664845266
+        },
+        {
+          "step": 240,
+          "train": 2.402385222349672,
+          "validation": 2.4368118757992816
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La bou senter le pan da lertoun cre lent le lis se s",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "es pent e le le che lentrse cre lert le lis sent ser pa soun cou",
+        "seed": 1,
+        "generated_tokens": 64,
+        "seconds": 0.04423090599993884,
+        "tokens_per_second": 1446.9520475137565,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "88befac9050072c90c79f8153b1c4bc75141431c3f05e65999963c9dd6b0763b",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    },
+    {
+      "width": 24,
+      "seed": 2,
+      "folder": "d24-graine2",
+      "format": "afz-atelier-run-v1",
+      "module": "correction",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f",
+      "config": {
+        "d": 24,
+        "layers": 1,
+        "heads": 2,
+        "block": 32,
+        "seed": 2
+      },
+      "steps": 240,
+      "selected_step": 220,
+      "selected_tokens_vus": 28160,
+      "batch": 4,
+      "lr": 0.005,
+      "tokens_vus": 30720,
+      "parameter_count": 10368,
+      "seconds": 1.3615716010008327,
+      "environment": {
+        "python": "3.12.14",
+        "numpy": "2.3.5",
+        "system": "Linux",
+        "machine": "x86_64",
+        "processor": "x86_64"
+      },
+      "checkpoint_sha256": "af6a467db119c9ba3d403a197cde993465ae2d2a9a74a650c4341bb162010897",
+      "provenance": {
+        "train": {
+          "sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "normalise_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+          "documents": [
+            {
+              "document": "bibliotheque",
+              "sha256": "e79f22b5e4c966ab8f7bd27849fcf441e1380136c14835d545561098af0e4240"
+            },
+            {
+              "document": "canal",
+              "sha256": "2647e9b435a4f3135d9d9c97c3f1d0bab3f36a01815249ee8af76cef4974ab1c"
+            },
+            {
+              "document": "jardin",
+              "sha256": "d348c5f3c7e17dee123004e87262fff4e42184922403bbcdbd43598df22fefb0"
+            },
+            {
+              "document": "pain",
+              "sha256": "3eeca9a7ab992f738a758e8fad7c5fe218ec7c65e0b4e7b0e20964633cce83a8"
+            },
+            {
+              "document": "velo",
+              "sha256": "7f4f49eb76e41d431a94ff2c173e7206dbf372216a3e84c04dcee8b42549f46a"
+            },
+            {
+              "document": "cartes",
+              "sha256": "a7b2884df94f9f931eaf75720c2ac189fa2c15237d358270b2332560cbbb6cb4"
+            },
+            {
+              "document": "son",
+              "sha256": "ba8376e2bb9c8ba7afc81c6e6c50da2124f04316a8bf360e3e04c7aea41712af"
+            },
+            {
+              "document": "archives",
+              "sha256": "101bd5caf6958b622eb6487885cd36f03984d4156a306637475523d0cc7b41fd"
+            }
+          ]
+        },
+        "validation": {
+          "sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "normalise_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+          "documents": [
+            {
+              "document": "observatoire",
+              "sha256": "13211a28b2f693c7115258dde7ee5a5b975a32e46ca2c1b3814d96a47839034e"
+            },
+            {
+              "document": "theatre",
+              "sha256": "0afc79bfa13bdd7d44e313becdd182402fcc2b83a8729337388306ef7a5e6e33"
+            }
+          ]
+        },
+        "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+        "moteur_sha256": "7d927c550f8728ca2343df01e186cb03d32d1594e28b8b5b9abffd7f7b3c4f7f"
+      },
+      "train_sha256": "68d1573780586523263818c09ee086ed79978898997e258cbafca4e9bc61d0fa",
+      "validation_sha256": "ab33e06d516a38b229e32b2b9a374f92467ef0692bd75e4fc08cfdd612a148fc",
+      "validation_caracteres_inconnus": 1,
+      "validation_caracteres_total": 1494,
+      "validation_mesure": {
+        "loss": 2.4390136022062383,
+        "windows": 32,
+        "target_tokens": 1024,
+        "available_target_tokens": 1493,
+        "mode": "fenêtres fixes échantillonnées"
+      },
+      "train_loss_start": 3.9721196732515356,
+      "train_loss_end": 2.3918764895571547,
+      "val_loss_start": 3.974366688069848,
+      "val_loss_end": 2.4390136022062383,
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.4549379858323412
+      },
+      "history": [
+        {
+          "step": 20,
+          "train": 2.9248945086852505,
+          "validation": 2.87175410875596
+        },
+        {
+          "step": 40,
+          "train": 2.7132734314428535,
+          "validation": 2.694977434538217
+        },
+        {
+          "step": 60,
+          "train": 2.6133749765429104,
+          "validation": 2.576723210895104
+        },
+        {
+          "step": 80,
+          "train": 2.5490885816920414,
+          "validation": 2.512752915280351
+        },
+        {
+          "step": 100,
+          "train": 2.4895840054922314,
+          "validation": 2.509362519149465
+        },
+        {
+          "step": 120,
+          "train": 2.463259719237078,
+          "validation": 2.477968078782326
+        },
+        {
+          "step": 140,
+          "train": 2.4515222570690773,
+          "validation": 2.4618030171726417
+        },
+        {
+          "step": 160,
+          "train": 2.424922310667169,
+          "validation": 2.4476280817544906
+        },
+        {
+          "step": 180,
+          "train": 2.4198171876782544,
+          "validation": 2.458555561539627
+        },
+        {
+          "step": 200,
+          "train": 2.4155499787757626,
+          "validation": 2.450020273082282
+        },
+        {
+          "step": 220,
+          "train": 2.3918764895571547,
+          "validation": 2.4390136022062383
+        },
+        {
+          "step": 240,
+          "train": 2.399793025870212,
+          "validation": 2.439402850788
+        }
+      ],
+      "poids_modifies": {
+        "tok": true,
+        "pos": true,
+        "head": true,
+        "gain": true,
+        "bias": true,
+        "0.wq": true,
+        "0.wk": true,
+        "0.wv": true,
+        "0.wo": true,
+        "0.w1": true,
+        "0.w2": true,
+        "0.g1": true,
+        "0.g2": true,
+        "0.b1": true,
+        "0.b2": true
+      },
+      "rechargement_identique": true,
+      "echantillon": "La bles lilante de lét chese per chorte les pourtar ",
+      "selection": "meilleure loss validation ; test non consulté",
+      "limite": "Fenêtres fixes échantillonnées ; corpus jouet ou documents à décrire. Ne prouve pas un assistant général.",
+      "generation_fixe": {
+        "format": "afz-generation-v1",
+        "prompt": "Le matin",
+        "text": "e part che dens se de ponten chous de pes ple le conte s pe de c",
+        "seed": 2,
+        "generated_tokens": 64,
+        "seconds": 0.05034505399999034,
+        "tokens_per_second": 1271.2271596731682,
+        "unknown_prompt_characters": 0,
+        "context_tokens": 32,
+        "stop_reason": "limite de longueur",
+        "checkpoint_sha256": "af6a467db119c9ba3d403a197cde993465ae2d2a9a74a650c4341bb162010897",
+        "provenance_verified": true,
+        "limite": "Sortie d'un petit modèle pédagogique ; vérifier son contenu."
+      }
+    }
+  ],
+  "selected_width": 16,
+  "validation_means": {
+    "16": 2.4151597072162927,
+    "24": 2.434154879412284
+  },
+  "paired": [
+    {
+      "seed": 0,
+      "validation": {
+        "16": 2.399587498900825,
+        "24": 2.4266391602313315
+      }
+    },
+    {
+      "seed": 1,
+      "validation": {
+        "16": 2.4110845074756595,
+        "24": 2.4368118757992816
+      }
+    },
+    {
+      "seed": 2,
+      "validation": {
+        "16": 2.4348071152723936,
+        "24": 2.4390136022062383
+      }
+    }
+  ],
+  "test_final": [
+    {
+      "seed": 0,
+      "format": "afz-atelier-test-v1",
+      "checkpoint_sha256": "7ee4fae43fc746cbe71dfc55d60455b7ca00efaacaa5e771338d032e45389a6e",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "test_sha256": "021b026baa91d2041a07c346983b3e09116bdcf8715807e45e05f12762067e95",
+      "test_loss": 2.382705735168793,
+      "mesure": {
+        "loss": 2.382705735168793,
+        "windows": 47,
+        "target_tokens": 1504,
+        "available_target_tokens": 1486,
+        "mode": "toutes les cibles ; dernière fenêtre éventuellement recouvrante"
+      },
+      "test_independent": true,
+      "provenance_status": "splits contrôlés ; quasi-doublons à relire",
+      "caracteres_inconnus": 1,
+      "limite": "Résultat final ; si tu le consultes pour choisir, constitue ensuite un nouveau test.",
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.451359853639887
+      }
+    },
+    {
+      "seed": 1,
+      "format": "afz-atelier-test-v1",
+      "checkpoint_sha256": "19935e0a5b12e3d58eef77c50a2c2040ba3360abd883c15c9f615abb955433ab",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "test_sha256": "021b026baa91d2041a07c346983b3e09116bdcf8715807e45e05f12762067e95",
+      "test_loss": 2.395466211599193,
+      "mesure": {
+        "loss": 2.395466211599193,
+        "windows": 47,
+        "target_tokens": 1504,
+        "available_target_tokens": 1486,
+        "mode": "toutes les cibles ; dernière fenêtre éventuellement recouvrante"
+      },
+      "test_independent": true,
+      "provenance_status": "splits contrôlés ; quasi-doublons à relire",
+      "caracteres_inconnus": 1,
+      "limite": "Résultat final ; si tu le consultes pour choisir, constitue ensuite un nouveau test.",
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.451359853639887
+      }
+    },
+    {
+      "seed": 2,
+      "format": "afz-atelier-test-v1",
+      "checkpoint_sha256": "cf609f074d2b7eca18c322c49b0ef3dd49d2f8880733fbd1b2085f5eed5e94d1",
+      "code_sha256": "fe718b2fde0284b7e6dfdc7700daed60b351251dc32f67243ec5a1d6d9e9d933",
+      "test_sha256": "021b026baa91d2041a07c346983b3e09116bdcf8715807e45e05f12762067e95",
+      "test_loss": 2.39813272683968,
+      "mesure": {
+        "loss": 2.39813272683968,
+        "windows": 47,
+        "target_tokens": 1504,
+        "available_target_tokens": 1486,
+        "mode": "toutes les cibles ; dernière fenêtre éventuellement recouvrante"
+      },
+      "test_independent": true,
+      "provenance_status": "splits contrôlés ; quasi-doublons à relire",
+      "caracteres_inconnus": 1,
+      "limite": "Résultat final ; si tu le consultes pour choisir, constitue ensuite un nouveau test.",
+      "baselines": {
+        "uniforme": 3.970291913552122,
+        "bigramme": 2.451359853639887
+      }
+    }
+  ],
+  "test_loss_mean": 2.392101557869222,
+  "test_loss_std": 0.008245525395349885,
+  "dataset_note": "Douze documents courts, un seul contexte de rédaction. Le test réserve des documents, pas des auteurs. Ce corpus ne représente pas la langue française entière.",
+  "limite": "Petit banc original, documents réservés. Trois graines décrivent une variabilité, pas une preuve statistique de supériorité ni un assistant fiable."
+}

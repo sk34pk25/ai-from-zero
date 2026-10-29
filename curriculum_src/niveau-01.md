@@ -652,7 +652,7 @@ Calcule 2*(w-3) pour w = 1 et w = 4. Les signes doivent être opposés. Si tu as
 @EXERCISE
 Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie les trois contributions, puis explique pourquoi on somme au lieu de garder (2,3).
 @BUILD
-Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 mesure une dérivée par différence finie et teste l'accumulation des lectures répétées.
+Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 contrôle la réduction du gradient de broadcasting. Le complément numérique ci-dessous vérifie les lectures répétées d’un embedding ; les TP 7 et 10 vérifient aussi des dérivées par différences finies.
 @QUESTION
 requires_grad=True indique surtout que…
 @CORRECT

@@ -103,7 +103,11 @@ try {
       .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
       .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue }))
       .sort((a, b) => a.score - b.score);
-    reports.push({ scores, mobileScores, url: result.lhr.requestedUrl, weak });
+    const mobileWeak = Object.values(mobile.lhr.audits)
+      .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
+      .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue, details: audit.details }))
+      .sort((a, b) => a.score - b.score);
+    reports.push({ scores, mobileScores, url: result.lhr.requestedUrl, weak, mobileWeak });
     console.log(JSON.stringify({ desktop: scores, mobile: mobileScores }));
     const failed = Object.entries(scores).filter(([, score]) => score < 95);
     const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 95);

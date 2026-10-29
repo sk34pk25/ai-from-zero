@@ -1356,6 +1356,11 @@ th,td { padding:.6rem;text-align:left;border-bottom:1px solid var(--line);vertic
 /* Les consignes longues restent lisibles sur petit écran et à fort zoom. */
 .atelier-guide { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 36rem; overflow: auto; font: inherit; line-height: 1.7; padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; }
 .atelier-document select { max-width: 100%; margin-bottom: 1rem; }
+.project-evidence p { overflow-wrap: anywhere; }
+.project-evidence label { display: inline-flex; gap: .5rem; align-items: flex-start; min-height: 44px; }
+.project-evidence input[type="checkbox"] { flex-shrink: 0; width: 1.25rem; height: 1.25rem; }
+.diagnostic-card { min-width: 0; border-top: 1px solid var(--line); padding-block: 1rem; }
+.diagnostic-card pre { overflow: auto; max-width: 100%; }
 .track-list > .sheet { min-width: 0; overflow-wrap: anywhere; }
 
 @media (max-width:520px) {
