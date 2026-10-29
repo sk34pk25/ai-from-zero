@@ -7,7 +7,8 @@ import { expect, test } from "@playwright/test";
 import { installOwner, signInAs } from "./session.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
-const lessons = curriculum.levels.flatMap((level) => level.steps);
+const glances = JSON.parse(readFileSync(new URL("../../data/glance.json", import.meta.url), "utf8"));
+const lessons = curriculum.levels.flatMap((level) => level.steps).map((step) => ({ ...step, glance: glances[step.id] }));
 
 function trackErrors(page) {
   const errors = [];

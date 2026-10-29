@@ -168,6 +168,7 @@ function stamp() {
       .filter((p) => p.endsWith(".woff2"))
       .map((p) => `assets/fonts/${p}`),
     "data/curriculum.json",
+    "data/glance.json",
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
   ];
   const course = [

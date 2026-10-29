@@ -75,6 +75,7 @@ const state = {
   finetuneRun: null,
   owner: false,
   local: false,
+  glancesReady: false,
   localSnapshot: null,
   localToken: null,
   quizzes: {},
@@ -250,6 +251,10 @@ async function boot() {
     applyStoredProgress();
     state.booting = false;
     render({ scroll: "top" });
+    // Les résumés visuels ne servent qu'aux leçons : chargés après le premier rendu.
+    const prefetch = () => ensureGlances().catch(() => {});
+    if (typeof requestIdleCallback === "function") requestIdleCallback(prefetch, { timeout: 2000 });
+    else setTimeout(prefetch, 300);
   } catch {
     state.booting = false;
     els.main.replaceChildren(
@@ -269,6 +274,30 @@ async function loadJsonReport(path) {
   } catch {
     return null;
   }
+}
+
+let glancesPromise = null;
+
+/** Ajoute à chaque leçon son résumé visuel (data/glance.json). Une erreur réseau permet de réessayer. */
+function ensureGlances() {
+  if (!glancesPromise)
+    glancesPromise = fetch(new URL("data/glance.json", document.baseURI))
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then((glances) => {
+        for (const [id, glance] of Object.entries(glances)) {
+          const item = state.index?.byId.get(id);
+          if (item) item.lesson.glance = glance;
+        }
+        state.glancesReady = true;
+      })
+      .catch((error) => {
+        glancesPromise = null;
+        throw error;
+      });
+  return glancesPromise;
 }
 
 let reportsPromise = null;
@@ -803,6 +832,21 @@ function paintMain(route, ticket) {
   else if (route.name === "home") paintHome();
   else if (route.name === "level") paintLevel(route.id);
   else if (route.name === "lesson") {
+    if (!state.glancesReady) {
+      els.main.replaceChildren(h("p", { class: "lead", text: "Chargement de la leçon…" }));
+      ensureGlances()
+        .then(() => {
+          if (ticket === state.pageTicket) render({ scroll: "keep" });
+        })
+        .catch(() => {
+          if (ticket !== state.pageTicket) return;
+          els.main.replaceChildren(
+            h("h1", { text: "Leçon indisponible" }),
+            h("p", { text: "Le résumé visuel n'a pas pu être chargé. Vérifie la connexion puis recharge la page." }),
+          );
+        });
+      return;
+    }
     paintLesson(route.id);
     import("./lesson-tools.js")
       .then((mod) => {

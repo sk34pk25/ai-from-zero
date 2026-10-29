@@ -1,5 +1,5 @@
 {
-  "version": "07811228cdea",
+  "version": "e31e79f0246e",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -11,6 +11,7 @@
     "assets/fonts/Inter-SemiBold.woff2",
     "assets/fonts/InterDisplay-ExtraBold.woff2",
     "data/curriculum.json",
+    "data/glance.json",
     "assets/config.js",
     "assets/css/style.css",
     "assets/js/app.js",

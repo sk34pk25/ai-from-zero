@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "curriculum_src"
 JSON_PATH = ROOT / "data" / "curriculum.json"
 DOC_PATH = ROOT / "docs" / "CURRICULUM.md"
+GLANCE_PATH = ROOT / "data" / "glance.json"
 
 PATTERN = [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
 
@@ -678,7 +679,6 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     return {
         "id": fields["id"].strip(),
         "title": fields["title"].strip(),
-        "glance": glance_for(fields["id"].strip(), load_glances()),
         "tag": fields["tag"].strip(),
         "minutes": int(fields["minutes"]),
         "why": fields["why"].strip(),
@@ -830,8 +830,22 @@ def build_data() -> dict:
     }
 
 
+def build_glances(data: dict | None = None) -> dict[str, dict]:
+    """Résumés visuels, dans l'ordre du parcours. Fichier séparé : l'accueil n'en a pas besoin."""
+    data = data or build_data()
+    glances = load_glances()
+    ordered = [step["id"] for level in data["levels"] for step in level["steps"]]
+    extra = sorted(set(glances) - set(ordered))
+    if extra:
+        raise SystemExit(f"Résumés visuels sans leçon : {extra}")
+    return {lesson_id: glance_for(lesson_id, glances) for lesson_id in ordered}
+
+
 def main() -> None:
     data = build_data()
+    GLANCE_PATH.write_text(
+        json.dumps(build_glances(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
     JSON_PATH.write_text(
         json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
