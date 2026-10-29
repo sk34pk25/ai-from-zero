@@ -58,3 +58,24 @@ def test_instruction_groups_are_disjoint():
     assert train and val and test
     sets = [set(x["answer"] for x in part) for part in (train, val, test)]
     assert not sets[0] & sets[1] and not sets[0] & sets[2] and not sets[1] & sets[2]
+
+
+def test_weight_only_checkpoint_cannot_claim_exact_resume():
+    import pytest
+
+    args = dict(
+        steps=2,
+        block=4,
+        batch=1,
+        d_model=4,
+        n_heads=1,
+        n_layers=1,
+        sample=False,
+        eval_windows=1,
+    )
+    model, tok, _ = train_gpt("ab " * 200, **args)
+    del model.training_state
+    with pytest.raises(ValueError, match="état complet"):
+        train_gpt(
+            "ab " * 200, tokenizer=tok, initial_model=model, resume_state=True, **args
+        )

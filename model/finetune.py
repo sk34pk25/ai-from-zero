@@ -216,6 +216,8 @@ def finetune(
 ) -> dict:
     if steps < 1:
         raise ValueError("au moins un pas")
+    if hasattr(model, "training_state"):
+        del model.training_state
     prepared = _prepare_rows(tokenizer, rows)
     prepared = [
         item

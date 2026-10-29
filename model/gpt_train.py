@@ -501,6 +501,10 @@ def train_gpt(
     provenance["unknown_train_chars"] = sum(c not in alphabet for c in train_text)
     provenance["unknown_val_chars"] = sum(c not in alphabet for c in validation_text)
     previous = getattr(model, "training_state", None) if resume_state else None
+    if resume_state and previous is None:
+        raise ValueError(
+            "ce checkpoint ne contient pas un état complet de reprise ; utiliser une nouvelle phase explicite"
+        )
     offset = 0
     planned = total_steps or steps
     recipe = {
