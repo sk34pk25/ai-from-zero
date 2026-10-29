@@ -1658,7 +1658,7 @@ function paintTrack() {
     h("section", { class: "callout" }, [
       h("h2", { text: "Ce que cette piste n'entraîne pas" }),
       h("p", {
-        text: "RoPE, RMSNorm, SwiGLU et GQA restent des forwards. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet.",
+        text: "RoPE, RMSNorm, SwiGLU, GQA et les poids partagés s'entraînent dans le laboratoire Python ; le playground ne lit que la forme standard. Le dos interchangeable n'est pas entraîné de bout en bout. Le scan sélectif n'est pas un bloc Mamba complet.",
       }),
     ]),
   );

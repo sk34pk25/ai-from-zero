@@ -117,11 +117,11 @@ test("la navigation clavier de la recherche boucle", () => {
   assert.equal(moveActiveIndex(0, 1, 0), -1);
 });
 
-test("le curriculum commité a 157 leçons et des réponses réparties", () => {
+test("le curriculum commité a 161 leçons et des réponses réparties", () => {
   const data = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
   const steps = data.levels.flatMap((level) => level.steps);
-  assert.equal(steps.length, 157);
-  assert.deepEqual(data.levels.map((level) => level.steps.length), [20, 17, 11, 11, 14, 9, 12, 9, 9, 9, 8, 8, 12, 8]);
+  assert.equal(steps.length, 161);
+  assert.deepEqual(data.levels.map((level) => level.steps.length), [23, 17, 11, 11, 14, 10, 12, 9, 9, 9, 8, 8, 12, 8]);
   const counts = [0, 0, 0, 0];
   for (const step of steps) {
     assert.equal(step.quiz.choices.length, 4);
@@ -140,7 +140,7 @@ test("le curriculum commité a 157 leçons et des réponses réparties", () => {
     assert.ok(step.codeFile.startsWith("model/"));
     assert.ok(step.review.includes(step.title));
   }
-  assert.deepEqual(counts, [39, 39, 39, 40]);
+  assert.deepEqual(counts, [41, 40, 40, 40]);
   assert.equal(data.track.length, 20);
   assert.equal(data.track.some((stage) => stage.file === "model/tiny_lm.py"), true);
   assert.equal(data.track.some((stage) => stage.file === "model/gpt_sample.py"), true);

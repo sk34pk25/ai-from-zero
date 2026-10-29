@@ -26,7 +26,7 @@ def test_published_examples_execute_and_keep_the_reference_weights():
     p = ROOT / "model/data/bpe.json"
     before = hashlib.sha256(p.read_bytes()).hexdigest()
     rows = load_script("check_examples").check_examples()
-    assert len(rows) == 156
+    assert len(rows) == 160
     assert all(r["ok"] for r in rows), [r for r in rows if not r["ok"]]
     assert hashlib.sha256(p.read_bytes()).hexdigest() == before
 

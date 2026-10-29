@@ -45,7 +45,7 @@ pytest
 python3 -m model
 ```
 
-Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle (`tiny_lm.py`), TinyGPT entraînable (embeddings, attention multi-têtes, MLP, résidus, LayerNorm, AdamW), et RMSNorm également entraînable et les variantes en forward (RoPE, SwiGLU, GQA, cache), MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
+Le code vit dans [`model/`](model/README.md) : tokenizer caractère, bigramme, autograd NumPy, petit modèle (`tiny_lm.py`), TinyGPT entraînable (embeddings, attention multi-têtes, MLP, résidus, LayerNorm, AdamW) avec ses variantes modernes elles aussi entraînables (RoPE, RMSNorm, SwiGLU, GQA, poids partagés ; `--pos rope --ffn swiglu --norm rms --kv-heads 2 --tie-weights`), le cache KV pour la génération, MoE, scan sélectif, patches, mémoire, ablations. Pas de PyTorch, pour que les tests restent installables partout.
 
 ```bash
 python3 -m model.gpt_train --steps 400

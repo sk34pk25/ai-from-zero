@@ -48,7 +48,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Au lancement d'un entraînement, le système lit le code et les données depuis le stockage, les copie en RAM ou en VRAM, puis le CPU ou le GPU calcule. Un modèle peut donc refuser de démarrer alors que le disque est presque vide : c'est la mémoire de travail qui est trop petite. L'inverse existe aussi. Un gros corpus occupe le stockage même si personne ne l'a chargé. Retenir trois ordres de grandeur suffit pour l'instant : un octet, un million d'octets (environ un mégaoctet) et un milliard (environ un gigaoctet). Un paramètre en float32 pèse 4 octets."
+              "text": "Au lancement d'un entraînement, le système lit le code et les données depuis le stockage, les copie en RAM ou en VRAM, puis le CPU ou le GPU calcule. Un modèle peut donc refuser de démarrer alors que le disque est presque vide : c'est la mémoire de travail qui est trop petite. L'inverse existe aussi. Un gros corpus occupe le stockage même si personne ne l'a chargé. Retenir trois ordres de grandeur suffit pour l'instant : un octet, un million d'octets (un mégaoctet, Mo) et un milliard (un gigaoctet, Go). Les systèmes comptent souvent en puissances de 2 : un Mio vaut 1024 × 1024 = 1 048 576 octets, un Gio vaut 1024 Mio. L'écart est d'environ 7 % pour les Gio : 16 Gio de RAM font environ 17,2 Go. Le code ci-dessous compte en Mio et Gio, comme le gestionnaire de tâches. Un paramètre en float32 pèse 4 octets."
             },
             {
               "kind": "code",
@@ -1531,6 +1531,231 @@
             ],
             "answer": 3,
             "explanation": "Le signe positif veut dire « ça monte ». La descente de gradient ira donc dans l'autre sens. La dérivée n'est pas bornée entre 0 et 1."
+          }
+        },
+        {
+          "id": "0.21",
+          "title": "Classes et objets",
+          "tag": "Python",
+          "minutes": 40,
+          "why": "Tout le laboratoire est écrit avec des classes : Tensor, TinyGPT, AdamW, le tokenizer. Sans savoir ce qu'est un objet, self ou une méthode, la rétropropagation du niveau 1 se lit comme une formule magique au lieu d'un mécanisme que tu peux suivre ligne par ligne.",
+          "objectives": [
+            "Écrire une classe avec __init__, des attributs et une méthode",
+            "Expliquer le rôle de self lors d'un appel de méthode",
+            "Distinguer deux noms pour un même objet et deux objets distincts"
+          ],
+          "prereq": "Fonctions (0.9), listes et dictionnaires (0.10). L'encadré « Une première classe » de l'étape 0.10 est une avant-première ; cette étape va jusqu'au bout.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Une classe est un moule à gaufres, un objet est une gaufre. Le moule dit quelle forme aura chaque gaufre et ce qu'on peut faire avec ; chaque gaufre sortie du moule a ses propres valeurs. Deux étiquettes collées sur la même gaufre ne font pas deux gaufres : croquer via l'une se voit via l'autre."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Classe : la définition, écrite avec class. Objet (ou instance) : une valeur créée à partir de la classe, par exemple Compteur(). Attribut : une donnée rangée dans l'objet, comme self.valeur. Méthode : une fonction définie dans la classe, appelée par objet.methode(). self : l'objet sur lequel la méthode travaille. __init__ : la méthode appelée automatiquement à la création."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "On lit l'exemple pas à pas. class Compteur: ouvre la définition. def __init__(self, depart=0): dit quoi faire à la naissance d'un objet ; self.valeur = depart range le nombre dans CET objet. def ajouter(self, pas): est une méthode : quand tu écris a.ajouter(2), Python appelle Compteur.ajouter(a, 2), donc self vaut a. Après a = Compteur(5), a.valeur vaut 5. Après a.ajouter(2), a.valeur vaut 7. Écrire b = a ne copie rien : b et a désignent le même objet, b.ajouter(1) fait passer a.valeur à 8. En revanche c = Compteur(a.valeur) fabrique un nouvel objet qui commence à 8 puis vit sa vie. L'opérateur is répond à la question « est-ce le même objet ? », alors que == compare des valeurs. Ce détail compte au niveau 1 : quand un même poids w sert deux fois, c'est le même objet qui doit recevoir deux contributions de gradient, et une méthode spéciale comme __mul__ permet d'écrire w * w au lieu de w.mul(w)."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "class Compteur:\n    def __init__(self, depart=0):\n        self.valeur = depart\n\n    def ajouter(self, pas):\n        self.valeur = self.valeur + pas\n        return self.valeur\n\na = Compteur(5)\na.ajouter(2)\nb = a              # un second nom pour le même objet\nb.ajouter(1)\nc = Compteur(a.valeur)  # un nouvel objet, copie de la valeur\nc.ajouter(10)\nassert a.valeur == 8 and b.valeur == 8 and c.valeur == 18\nassert a is b and a is not c\nprint(a.valeur, b.valeur, c.valeur)"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Avant de lancer, écris sur papier les trois nombres que print va afficher. Lance, compare. Ajoute ensuite une méthode remettre_a_zero et vérifie qu'elle change a et b mais pas c."
+            }
+          ],
+          "exercise": "Écris une classe Point avec deux attributs x et y, et une méthode distance_origine qui renvoie la racine de x² + y². Point(3, 4).distance_origine() doit valoir 5.0. Crée deux points égaux et montre avec is qu'ils restent deux objets distincts.",
+          "build": "Ouvre model/autograd.py et repère class Tensor : __init__ range data, grad et requires_grad dans self ; __add__ et __mul__ sont des méthodes spéciales qui fabriquent un nouvel objet résultat. Tu n'as pas à tout comprendre : identifie seulement les attributs et trois méthodes.",
+          "visual": "flow",
+          "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+          "interactive": false,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor",
+          "tpIds": [],
+          "takeaways": [
+            "L'affectation b = a colle une seconde étiquette sur le même objet. La méthode modifie self.valeur de cet objet, visible par les deux noms. Pour une copie, il faut construire un nouvel objet.",
+            "Pourquoi cette étape arrive maintenant : Tout le laboratoire est écrit avec des classes : Tensor, TinyGPT, AdamW, le tokenizer.",
+            "Le fichier à ouvrir à côté du cours est model/autograd.py."
+          ],
+          "pitfalls": [
+            "Oublier self dans la définition de la méthode : Python passe l'objet en premier argument, la méthode doit le recevoir.",
+            "Écrire x = x dans __init__ au lieu de self.x = x : la valeur reste locale et l'objet n'a pas d'attribut x."
+          ],
+          "hints": [
+            "La racine carrée s'obtient avec math.sqrt ou ** 0.5.",
+            "Écris les valeurs intermédiaires avant de conclure. Pour Point(3, 4) : x² + y² = 9 + 16 = 25, et la racine de 25 vaut 5.0."
+          ],
+          "solution": "class Point: def __init__(self, x, y): self.x = x; self.y = y. Puis def distance_origine(self): return (self.x ** 2 + self.y ** 2) ** 0.5. Point(3, 4).distance_origine() vaut 5.0. p = Point(1, 1) et q = Point(1, 1) ont les mêmes valeurs mais p is q vaut False : ce sont deux objets construits séparément. r = p donne r is p à True.",
+          "review": "Sans rouvrir la page, explique « Classes et objets » en une phrase, puis dis ce que model/autograd.py en garde vraiment.",
+          "quiz": {
+            "question": "Après a = Compteur(5) puis b = a et b.ajouter(1), que vaut a.valeur ?",
+            "choices": [
+              "6, car a et b désignent le même objet",
+              "5, car b est une copie indépendante de a",
+              "1, car ajouter remplace la valeur par le pas",
+              "Une erreur, car a n'a pas de méthode ajouter"
+            ],
+            "answer": 0,
+            "explanation": "L'affectation b = a colle une seconde étiquette sur le même objet. La méthode modifie self.valeur de cet objet, visible par les deux noms. Pour une copie, il faut construire un nouvel objet."
+          }
+        },
+        {
+          "id": "0.22",
+          "title": "Vérifier son code avec assert et pytest",
+          "tag": "Méthode",
+          "minutes": 30,
+          "why": "Chaque brique du laboratoire est verrouillée par un test, et l'atelier se contrôle avec verifier.py. Savoir écrire une vérification, la lancer et lire son échec transforme « je crois que ça marche » en une preuve reproductible que tu peux relancer après chaque modification.",
+          "objectives": [
+            "Écrire une assertion avec un résultat attendu calculé à la main",
+            "Placer des tests dans une fonction test_ et les lancer avec pytest",
+            "Lire un échec : valeur attendue, valeur obtenue, ligne"
+          ],
+          "prereq": "Fonctions (0.9), erreurs et débogage (0.12), modules (0.11).",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Un test, c'est la balance de la cuisine. Tu ne goûtes pas la pâte en te demandant si « ça a l'air bien » : tu pèses 250 g et tu compares au chiffre de la recette. Si la balance affiche 300, tu sais quoi corriger, et tu peux repeser après chaque geste."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "assert condition : ne fait rien si la condition est vraie, lève AssertionError sinon. Valeur attendue : calculée à la main AVANT d'exécuter. Fonction de test : fonction dont le nom commence par test_, sans argument. pytest : programme qui trouve ces fonctions dans les fichiers test_*.py et les exécute toutes. Cas limite : entrée au bord du domaine, comme une liste vide."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "Exemple pas à pas. On veut une fonction moyenne(valeurs). À la main : la moyenne de [2, 4, 9] vaut (2 + 4 + 9) / 3 = 15 / 3 = 5. On écrit donc assert moyenne([2, 4, 9]) == 5. Si la fonction divise par 2 au lieu de len(valeurs), l'assertion échoue et pytest affiche quelque chose comme assert 7.5 == 5 : à gauche ce que ton code a produit, à droite ce que tu attendais. Pour les nombres à virgule, 0.1 + 0.2 vaut 0.30000000000000004 ; on compare donc avec une tolérance, abs(x - 0.3) < 1e-9, ou pytest.approx(0.3). Un bon test contient au moins un cas ordinaire, un cas limite (liste vide : on décide qu'elle lève ValueError) et une valeur calculée indépendamment du code testé. On met ces tests dans test_moyenne.py, dans des fonctions test_..., puis on lance python -m pytest depuis la racine. Un test qui échoue n'est jamais « réparé » en modifiant la valeur attendue pour coller au résultat : on relit d'abord le calcul à la main."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "def moyenne(valeurs):\n    if len(valeurs) == 0:\n        raise ValueError(\"liste vide\")\n    return sum(valeurs) / len(valeurs)\n\ndef test_cas_ordinaire():\n    assert moyenne([2, 4, 9]) == 5          # (2+4+9)/3 = 15/3 calculé à la main\n\ndef test_virgule_flottante():\n    assert abs(moyenne([0.1, 0.2]) - 0.15) < 1e-12\n\ndef test_liste_vide():\n    try:\n        moyenne([])\n    except ValueError:\n        return\n    raise AssertionError(\"une liste vide doit lever ValueError\")\n\nfor test in (test_cas_ordinaire, test_virgule_flottante, test_liste_vide):\n    test()\nprint(\"3 tests réussis\")"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Copie les fonctions dans test_moyenne.py (sans la boucle finale) et lance python -m pytest test_moyenne.py. Remplace ensuite len(valeurs) par 2, relance et lis la ligne assert 7.5 == 5. Remets le code correct."
+            }
+          ],
+          "exercise": "Écris une fonction maximum(valeurs) sans utiliser max, et trois tests : [3, 9, 2] donne 9, [-5, -1] donne -1, une liste vide lève ValueError. Pour chaque test, écris en commentaire la valeur attendue calculée à la main.",
+          "build": "Lance python -m pytest tests/test_lab.py -q depuis la racine du dépôt. Ouvre ce fichier, choisis un test et retrouve la valeur attendue écrite à la main. Dans l'atelier, python verifier.py --tp 1 joue le même rôle pour ton propre code.",
+          "visual": "flow",
+          "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": [],
+          "takeaways": [
+            "La valeur de droite a été calculée à la main, indépendamment du code. Le test signale que le code s'en écarte ; modifier l'attente effacerait justement la preuve. Un calcul déterministe redonnera 7.5 à chaque relance.",
+            "Pourquoi cette étape arrive maintenant : Chaque brique du laboratoire est verrouillée par un test, et l'atelier se contrôle avec verifier.",
+            "Le fichier à ouvrir à côté du cours est model/stats.py."
+          ],
+          "pitfalls": [
+            "Initialiser le maximum à 0 : le test sur [-5, -1] le révèle, c'est pour cela qu'on teste des nombres négatifs.",
+            "Corriger la valeur attendue d'un test pour qu'il passe au lieu de corriger la fonction."
+          ],
+          "hints": [
+            "Parcours la liste en gardant le plus grand élément vu jusqu'ici.",
+            "Écris les valeurs attendues avant le code. Pour [3, 9, 2] : 3, puis 9 > 3 donc 9, puis 2 < 9, résultat 9. Pour [-5, -1] le résultat est -1, pas 0."
+          ],
+          "solution": "def maximum(valeurs): si la liste est vide, raise ValueError ; sinon meilleur = valeurs[0] puis, pour chaque v, si v > meilleur alors meilleur = v ; return meilleur. Tests : assert maximum([3, 9, 2]) == 9, assert maximum([-5, -1]) == -1, et un bloc try/except ValueError pour la liste vide. Démarrer meilleur à 0 serait faux : maximum([-5, -1]) rendrait 0.",
+          "review": "Sans rouvrir la page, explique « Vérifier son code avec assert et pytest » en une phrase, puis dis ce que model/stats.py en garde vraiment.",
+          "quiz": {
+            "question": "pytest affiche « assert 7.5 == 5 » pour assert moyenne([2, 4, 9]) == 5. Que faut-il faire ?",
+            "choices": [
+              "Remplacer 5 par 7.5 dans le test pour qu'il passe",
+              "Relire la fonction : elle a produit 7.5 alors que le calcul à la main donne 5",
+              "Supprimer le test, il est trop strict",
+              "Relancer pytest jusqu'à ce que le résultat change"
+            ],
+            "answer": 1,
+            "explanation": "La valeur de droite a été calculée à la main, indépendamment du code. Le test signale que le code s'en écarte ; modifier l'attente effacerait justement la preuve. Un calcul déterministe redonnera 7.5 à chaque relance."
+          }
+        },
+        {
+          "id": "0.23",
+          "title": "Mini-projet : un carnet de mesures",
+          "tag": "Projet",
+          "minutes": 60,
+          "why": "Avant d'attaquer l'apprentissage automatique, tu dois pouvoir assembler seul les briques du niveau 0 : fichier, boucle, dictionnaire, fonction, classe et test. Ce mini-projet est le point de contrôle : si tu le termines sans corrigé, la suite du parcours repose sur des bases solides.",
+          "objectives": [
+            "Lire un fichier texte de nombres et ignorer proprement les lignes vides",
+            "Regrouper des fonctions dans une classe qui garde ses données",
+            "Écrire un rapport JSON et le vérifier par des tests calculés à la main"
+          ],
+          "prereq": "Toutes les étapes 0.2 à 0.15, plus 0.21 et 0.22.",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Pense à un carnet de bord de vélo. Chaque ligne est une distance. Le carnet sait ajouter une sortie, donner le total, la moyenne et la plus longue, puis recopier un résumé propre sur une fiche que quelqu'un d'autre pourra relire sans ouvrir le carnet."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Parsing : transformer du texte en valeurs utilisables. strip() : enlever espaces et retours à la ligne aux bords. json.dumps : transformer un dictionnaire en texte JSON. Rapport : fichier de sortie destiné à être relu. Reproductible : la même entrée redonne exactement le même rapport."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "On découpe le projet en trois briques, chacune testée avant la suivante. Brique 1, lire : pour le texte \"12\\n\\n7.5\\n20\\n\", on découpe en lignes, on enlève les blancs, on saute les lignes vides et on convertit avec float ; on attend [12.0, 7.5, 20.0]. Brique 2, la classe Carnet garde self.distances et propose total(), moyenne() et record(). À la main : total = 12 + 7.5 + 20 = 39.5, moyenne = 39.5 / 3 ≈ 13.1667, record = 20. Brique 3, le rapport : une méthode resume() renvoie un dictionnaire {\"sorties\": 3, \"total\": 39.5, ...} que json.dumps transforme en texte trié et lisible. On arrondit la moyenne à 4 décimales pour que le rapport soit stable. Chaque brique a ses assertions, écrites avant le code. C'est exactement la démarche de model/stats.py, que tu pourras comparer à ta version une fois la tienne terminée."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "import json\n\ndef lire_distances(texte):\n    return [float(ligne) for ligne in texte.splitlines() if ligne.strip()]\n\nclass Carnet:\n    def __init__(self, distances):\n        self.distances = list(distances)\n\n    def total(self):\n        return sum(self.distances)\n\n    def moyenne(self):\n        if not self.distances:\n            raise ValueError(\"carnet vide\")\n        return self.total() / len(self.distances)\n\n    def record(self):\n        return max(self.distances)\n\n    def resume(self):\n        return {\"sorties\": len(self.distances), \"total\": self.total(),\n                \"moyenne\": round(self.moyenne(), 4), \"record\": self.record()}\n\ncarnet = Carnet(lire_distances(\"12\\n\\n7.5\\n20\\n\"))\nassert carnet.distances == [12.0, 7.5, 20.0]\nassert carnet.total() == 39.5 and carnet.record() == 20.0\nassert carnet.resume()[\"moyenne\"] == 13.1667\nprint(json.dumps(carnet.resume(), sort_keys=True))"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Crée sorties.txt avec cinq distances de ton choix, dont une ligne vide. Calcule à la main total, moyenne et record, puis fais lire le fichier par ton programme avec open(...).read() et compare. Écris le rapport dans rapport.json."
+            }
+          ],
+          "exercise": "Ajoute au Carnet une méthode au_dessus(seuil) qui renvoie la liste des distances strictement supérieures au seuil, et un test : pour [12, 7.5, 20] et le seuil 10, on attend [12, 20]. Ajoute aussi un test qui vérifie qu'un carnet vide lève ValueError pour moyenne.",
+          "build": "Compare ta solution à model/stats.py : load_numbers joue le rôle de lire_distances, summarize celui de resume, build_report celui de l'écriture du rapport. Note dans tes notes une différence de conception et la raison qui pourrait la justifier.",
+          "visual": "flow",
+          "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "build_report",
+          "tpIds": [],
+          "takeaways": [
+            "L'arrondi ne rend pas le calcul plus juste : il fixe la forme du résultat écrit, pour qu'il se relise et se compare facilement. Le test, lui, garde une valeur attendue calculée à la main.",
+            "Pourquoi cette étape arrive maintenant : Avant d'attaquer l'apprentissage automatique, tu dois pouvoir assembler seul les briques du niveau 0 : fichier, boucle, dictionnaire, fonction, classe et test.",
+            "Le fichier à ouvrir à côté du cours est model/stats.py."
+          ],
+          "pitfalls": [
+            "Utiliser >= alors que la consigne dit strictement supérieur : ajoute un test avec une distance égale au seuil.",
+            "Modifier self.distances dans au_dessus : la méthode doit renvoyer une nouvelle liste sans abîmer le carnet."
+          ],
+          "hints": [
+            "Une compréhension de liste avec une condition suffit : [d for d in self.distances if d > seuil].",
+            "Écris l'attendu avant le code. Pour [12, 7.5, 20] et le seuil 10 : 12 > 10 oui, 7.5 non, 20 oui, donc [12, 20]. Un carnet vide doit lever ValueError dans moyenne."
+          ],
+          "solution": "def au_dessus(self, seuil): return [d for d in self.distances if d > seuil]. Test : assert Carnet([12, 7.5, 20]).au_dessus(10) == [12, 20]. Pour le carnet vide : try: Carnet([]).moyenne() puis except ValueError: pass, et raise AssertionError si aucune exception n'est levée. Strictement supérieur exclut une distance égale au seuil.",
+          "review": "Sans rouvrir la page, explique « Mini-projet : un carnet de mesures » en une phrase, puis dis ce que model/stats.py en garde vraiment.",
+          "quiz": {
+            "question": "Pourquoi arrondir la moyenne à 4 décimales dans le rapport ?",
+            "choices": [
+              "Pour rendre le calcul de la moyenne plus exact",
+              "Parce que json.dumps refuse les nombres à virgule",
+              "Pour que le rapport soit stable et lisible d'une exécution à l'autre",
+              "Pour que le test passe même si la moyenne est fausse"
+            ],
+            "answer": 2,
+            "explanation": "L'arrondi ne rend pas le calcul plus juste : il fixe la forme du résultat écrit, pour qu'il se relise et se compare facilement. Le test, lui, garde une valeur attendue calculée à la main."
           }
         }
       ]
@@ -5583,7 +5808,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le decoder standard est entièrement entraînable dans model/gpt_train.py : positions absolues, LayerNorm, attention multi-têtes, FFN GELU, résidus et tête de langage. logits_tensor reconstitue le forward avec des Tensor ; sequence_loss décale entrée et cible ; backward calcule tous les gradients et AdamW modifie les paramètres. Le test compare aussi le forward autograd au forward NumPy et vérifie un gradient d'attention par différence finie. En génération, les poids restent fixes et un token est ajouté au contexte. Le cache doit retrouver les logits du calcul complet, sans lire le futur. Lance le TP 12 : entraîne depuis une graine, mesure train et validation, recharge le checkpoint, puis compare le GPT au bigramme et à l'uniforme. Un résultat insuffisant doit être expliqué, pas caché. Le laboratoire entraîne aussi RMSNorm ; RoPE, SwiGLU, GQA et le dos hybride restent des forwards exploratoires."
+              "text": "Le decoder standard est entièrement entraînable dans model/gpt_train.py : positions absolues, LayerNorm, attention multi-têtes, FFN GELU, résidus et tête de langage. logits_tensor reconstitue le forward avec des Tensor ; sequence_loss décale entrée et cible ; backward calcule tous les gradients et AdamW modifie les paramètres. Le test compare aussi le forward autograd au forward NumPy et vérifie un gradient d'attention par différence finie. En génération, les poids restent fixes et un token est ajouté au contexte. Le cache doit retrouver les logits du calcul complet, sans lire le futur. Lance le TP 12 : entraîne depuis une graine, mesure train et validation, recharge le checkpoint, puis compare le GPT au bigramme et à l'uniforme. Un résultat insuffisant doit être expliqué, pas caché. Le laboratoire entraîne aussi RMSNorm, RoPE, SwiGLU, GQA et les poids partagés (niveau 5) ; seul le dos hybride reste un forward exploratoire."
             },
             {
               "kind": "code",
@@ -6335,6 +6560,81 @@
             ],
             "answer": 1,
             "explanation": "(2T)² = 4 T². Le cache n'efface pas ce produit, il évite seulement de le refaire depuis zéro sur le passé déjà connu, et encore : le nouveau token doit quand même regarder tout le passé."
+          }
+        },
+        {
+          "id": "5.10",
+          "title": "Entraîner une variante moderne et la comparer",
+          "tag": "Expérience",
+          "minutes": 45,
+          "why": "Lire qu'une pièce moderne « marche mieux » ne suffit pas. Le laboratoire sait maintenant entraîner RoPE, RMSNorm, SwiGLU, GQA et le partage de poids : tu peux mesurer toi-même ce qu'une variante change, à budget égal, au lieu de recopier une affirmation.",
+          "objectives": [
+            "Entraîner la baseline et une variante avec les mêmes données, graine et nombre de pas",
+            "Comparer loss de validation et nombre de paramètres",
+            "Rédiger une conclusion prudente, limitée à ce qui a été mesuré"
+          ],
+          "prereq": "Les étapes 5.1 à 5.8 et l'entraînement du GPT (4.14).",
+          "sections": [
+            {
+              "kind": "intuition",
+              "heading": "Intuition",
+              "text": "Pour savoir si un nouveau pneu rend le vélo plus rapide, tu refais le même parcours, avec le même cycliste, le même vent si possible, et tu ne changes que le pneu. Sinon tu mesures la météo, pas le pneu."
+            },
+            {
+              "kind": "vocab",
+              "heading": "Vocabulaire",
+              "text": "Baseline : la configuration de référence (positions absolues, LayerNorm, GELU). Variante : une seule modification par rapport à elle. Ablation : retirer ou remplacer une pièce pour mesurer son effet. Graine : nombre qui fixe le hasard. Écart entre graines : la variation due au seul hasard, à comparer à l'effet mesuré."
+            },
+            {
+              "kind": "explain",
+              "heading": "Explication",
+              "text": "Exemple pas à pas. On entraîne deux modèles sur le même texte, 120 pas, même graine, même largeur. La baseline utilise pos=\"absolute\" ; la variante utilise pos=\"rope\", sans table de positions. On lit ensuite val_loss_end pour chacun et le nombre de paramètres : la variante en a block_size × d_model de moins, puisque la table pos disparaît. Si la variante obtient une loss plus basse d'un écart plus petit que celui observé entre deux graines de la baseline, la conclusion honnête est « pas de différence mesurable ici ». Le gradient de chaque variante est vérifié dans tests/test_modern_training.py par différences finies et, en CI, contre PyTorch : une loss qui baisse n'est donc pas un accident du backward. Depuis le terminal, la même expérience se lance avec python -m model.gpt_train --pos rope, --ffn swiglu, --norm rms, --kv-heads 2 ou --tie-weights. Une seule option à la fois, sinon tu ne sauras pas laquelle a compté."
+            },
+            {
+              "kind": "code",
+              "heading": "Exemple",
+              "lang": "python",
+              "code": "from model.gpt_train import train_gpt\n\ntexte = \"le chat dort sur le tapis. le chien court dans le jardin.\\n\" * 30\ncommun = dict(steps=60, d_model=16, n_heads=4, n_layers=1, block=16,\n              batch=4, seed=0, sample=False, eval_windows=8)\nmesures = {}\nfor nom, variante in [(\"baseline\", {}), (\"rope\", {\"pos\": \"rope\"})]:\n    modele, _, resultat = train_gpt(texte, **commun, **variante)\n    mesures[nom] = (round(resultat.val_loss_end, 3), modele.parameter_count())\nassert mesures[\"rope\"][1] == mesures[\"baseline\"][1] - 16 * 16\nprint(mesures)"
+            },
+            {
+              "kind": "experiment",
+              "heading": "Expérience",
+              "text": "Relance la comparaison avec seed=1 et seed=2. Note les six loss de validation dans un tableau. L'écart baseline/RoPE est-il plus grand que l'écart entre graines d'une même configuration ?"
+            }
+          ],
+          "exercise": "Choisis une autre variante (ffn=\"swiglu\" ou n_kv_heads=2 avec n_heads=4) et refais la comparaison sur trois graines. Rédige trois phrases : ce qui a été mesuré, le résultat, et ce que tu ne peux pas conclure.",
+          "build": "Ajoute la meilleure variante à ton plan d'expérience du niveau 12. Dans le rapport, garde la configuration exacte, les graines, les deux loss de validation et le nombre de paramètres. tests/test_modern_training.py montre comment le dépôt vérifie chaque gradient.",
+          "visual": "transformer",
+          "visualCaption": "Un bloc relit, ajoute le résidu, transforme, puis ajoute encore. La forme ne change pas.",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": [],
+          "takeaways": [
+            "Un effet ne se distingue du hasard que s'il dépasse la variation entre graines. Choisir la graine favorable reviendrait à sélectionner le résultat voulu au lieu de le mesurer.",
+            "Pourquoi cette étape arrive maintenant : Lire qu'une pièce moderne « marche mieux » ne suffit pas.",
+            "Le fichier à ouvrir à côté du cours est model/gpt_train.py."
+          ],
+          "pitfalls": [
+            "Comparer une variante entraînée 120 pas à une baseline entraînée 60 pas : on mesure alors le budget, pas la pièce.",
+            "Changer deux options à la fois : l'effet observé ne peut plus être attribué à l'une ou à l'autre."
+          ],
+          "hints": [
+            "Garde le dictionnaire commun identique : seule la clé de variante change.",
+            "Écris un tableau avant de conclure : une ligne par graine, une colonne par configuration. Calcule l'écart entre les graines d'une même configuration, puis l'écart entre configurations."
+          ],
+          "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans rien changer d'autre. Note val_loss_end et parameter_count. Si l'écart moyen entre configurations dépasse nettement l'écart entre graines, écris que la variante a amélioré la validation dans ce réglage précis (corpus, taille, nombre de pas). Sinon, écris qu'aucune différence n'est mesurable ici. Dans les deux cas, précise que rien n'est démontré pour un modèle plus grand ou un autre corpus.",
+          "review": "Sans rouvrir la page, explique « Entraîner une variante moderne et la comparer » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
+          "quiz": {
+            "question": "La variante gagne 0,01 nat sur une graine, mais deux graines de la baseline diffèrent déjà de 0,03 nat. Que conclure ?",
+            "choices": [
+              "Rien de mesurable : l'écart est plus petit que la variation due au hasard",
+              "La variante est meilleure, puisque sa loss est plus basse",
+              "La baseline est meilleure, puisqu'elle varie davantage",
+              "Il faut garder la graine la plus favorable à la variante"
+            ],
+            "answer": 0,
+            "explanation": "Un effet ne se distingue du hasard que s'il dépasse la variation entre graines. Choisir la graine favorable reviendrait à sélectionner le résultat voulu au lieu de le mesurer."
           }
         }
       ]
@@ -11197,7 +11497,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le laboratoire sait entraîner le GPT standard et un petit réseau, estimer le bigramme par comptage et ajuster le GPT par SFT ou LoRA. Il entraîne aussi RMSNorm avec ce backward. Le dos hybride, RoPE, SwiGLU et GQA restent des forwards exploratoires. Pour le projet final, tes fonctions decoder et adamw doivent donc entraîner un GPT à positions absolues, LayerNorm et GELU. Vérifie d'abord que tu peux surapprendre un minuscule lot : c'est un test de débogage, pas le résultat final. Sépare ensuite les documents, fixe le tokenizer sur train et choisis tes réglages sur validation. Le test final reste réservé. Une loss qui baisse sur train et monte sur validation est une observation à expliquer. Les critères publics de l'atelier ne valident pas un assistant général : ils contrôlent un apprentissage et sa mesure."
+              "text": "Le laboratoire sait entraîner le GPT standard et un petit réseau, estimer le bigramme par comptage et ajuster le GPT par SFT ou LoRA. Il entraîne aussi les variantes modernes avec ce backward : RMSNorm, RoPE, SwiGLU, GQA et poids partagés. Seul le dos hybride reste un forward exploratoire. Pour le projet final, tes fonctions decoder et adamw doivent entraîner un GPT à positions absolues, LayerNorm et GELU ; les variantes sont des prolongements à comparer ensuite, une à la fois. Vérifie d'abord que tu peux surapprendre un minuscule lot : c'est un test de débogage, pas le résultat final. Sépare ensuite les documents, fixe le tokenizer sur train et choisis tes réglages sur validation. Le test final reste réservé. Une loss qui baisse sur train et monte sur validation est une observation à expliquer. Les critères publics de l'atelier ne valident pas un assistant général : ils contrôlent un apprentissage et sa mesure."
             },
             {
               "kind": "code",

@@ -6,12 +6,12 @@ Point de départ : aucune connaissance informatique supposée. Une notion n'arri
 Un parcours francophone pour partir d'aucune base en informatique et arriver à concevoir, entraîner et comparer une petite architecture de modèle. Chaque étape explique une idée, montre comment elle se code, avance le même laboratoire, puis se vérifie par un quiz.
 
 ## Sommaire
-- [0 — Fondations numériques](#0--fondations-numériques) — 20 étapes
+- [0 — Fondations numériques](#0--fondations-numériques) — 23 étapes
 - [1 — Machine learning depuis zéro](#1--machine-learning-depuis-zéro) — 17 étapes
 - [2 — Transformer le langage en nombres](#2--transformer-le-langage-en-nombres) — 11 étapes
 - [3 — Premier modèle de langage](#3--premier-modèle-de-langage) — 11 étapes
 - [4 — Transformer construit à la main](#4--transformer-construit-à-la-main) — 14 étapes
-- [5 — Transformer moderne](#5--transformer-moderne) — 9 étapes
+- [5 — Transformer moderne](#5--transformer-moderne) — 10 étapes
 - [6 — Efficacité et machines modestes](#6--efficacité-et-machines-modestes) — 12 étapes
 - [7 — Mixture of Experts](#7--mixture-of-experts) — 9 étapes
 - [8 — State space models et Mamba](#8--state-space-models-et-mamba) — 9 étapes
@@ -49,6 +49,9 @@ Prendre en main la machine, Python, puis les quelques outils mathématiques qui 
 | 0.18 | Matrices | Les poids d'une couche sont une matrice. Sans la règle des formes, on ne peut ni écrire un neurone vectoriel ni lire une erreur de multiplication. | Dans TinyGPT, les projections wq, wk et wv sont des matrices de formes explicites, construites dans model/transformer.py. Le test de forme logits.shape == (1, 5, 12) est la version automatisée de cette discipline. |
 | 0.19 | Probabilités | Un modèle de langage ne choisit pas un mot au sens quotidien. Il propose une distribution sur les tokens suivants. Si cette idée est floue, softmax et la perplexité ne veulent rien dire. | BigramModel.probabilities divise chaque ligne de comptes par sa somme, précisément pour obtenir une distribution. Le lissage alpha évite les zéros absolus. Tu le verras dans model/bigram.py. |
 | 0.20 | Dérivée intuitive | Le gradient est une famille de dérivées. Avant le mot « gradient », il faut l'image : si j'augmente un peu ce poids, la loss monte-t-elle ou descend-elle ? | model/mathutil.py fournit numerical_derivative. Le test test_derivative_matches_square vérifie que la pente de x² en 3 est proche de 6. C'est le point de contrôle du niveau 0 : tu sais mesurer une variation avant de la faire calculer automatiquement. |
+| 0.21 | Classes et objets | Tout le laboratoire est écrit avec des classes : Tensor, TinyGPT, AdamW, le tokenizer. Sans savoir ce qu'est un objet, self ou une méthode, la rétropropagation du niveau 1 se lit comme une formule magique au lieu d'un mécanisme que tu peux suivre ligne par ligne. | Ouvre model/autograd.py et repère class Tensor : __init__ range data, grad et requires_grad dans self ; __add__ et __mul__ sont des méthodes spéciales qui fabriquent un nouvel objet résultat. Tu n'as pas à tout comprendre : identifie seulement les attributs et trois méthodes. |
+| 0.22 | Vérifier son code avec assert et pytest | Chaque brique du laboratoire est verrouillée par un test, et l'atelier se contrôle avec verifier.py. Savoir écrire une vérification, la lancer et lire son échec transforme « je crois que ça marche » en une preuve reproductible que tu peux relancer après chaque modification. | Lance python -m pytest tests/test_lab.py -q depuis la racine du dépôt. Ouvre ce fichier, choisis un test et retrouve la valeur attendue écrite à la main. Dans l'atelier, python verifier.py --tp 1 joue le même rôle pour ton propre code. |
+| 0.23 | Mini-projet : un carnet de mesures | Avant d'attaquer l'apprentissage automatique, tu dois pouvoir assembler seul les briques du niveau 0 : fichier, boucle, dictionnaire, fonction, classe et test. Ce mini-projet est le point de contrôle : si tu le termines sans corrigé, la suite du parcours repose sur des bases solides. | Compare ta solution à model/stats.py : load_numbers joue le rôle de lire_distances, summarize celui de resume, build_report celui de l'écriture du rapport. Note dans tes notes une différence de conception et la raison qui pourrait la justifier. |
 
 ## 1 — Machine learning depuis zéro
 
@@ -156,6 +159,7 @@ Remplacer, une par une, les pièces de 2017 par celles qu'on retrouve dans les m
 | 5.7 | Weight tying | La table d'embedding et la tête de sortie font des travaux miroirs : passer d'un identifiant à un vecteur, et d'un vecteur à des scores d'identifiants. Partager leurs poids économise V fois D paramètres. | GPTConfig.tie_weights est le drapeau. Le test moderne l'active et refuse la présence d'une seconde matrice. |
 | 5.8 | Initialisation | Les mêmes équations, mal initialisées, divergent ou n'apprennent pas. L'initialisation fixe l'échelle des poids au départ, avant le premier pas. | seed est un champ de GPTConfig. Tous les tests du dépôt fixent une graine. Un résultat non reproductible n'entre pas dans le fil rouge. |
 | 5.9 | Contexte long | Allonger la fenêtre ne se décrète pas. L'attention coûte le carré de la longueur, et une position entraînée sur 512 tokens n'est pas automatiquement bonne à 8000. | Le mini-GPT garde un block_size modeste. Le fil rouge du contexte long est la mesure, pas un modèle de 100 000 tokens. model/bench.py est l'outil. |
+| 5.10 | Entraîner une variante moderne et la comparer | Lire qu'une pièce moderne « marche mieux » ne suffit pas. Le laboratoire sait maintenant entraîner RoPE, RMSNorm, SwiGLU, GQA et le partage de poids : tu peux mesurer toi-même ce qu'une variante change, à budget égal, au lieu de recopier une affirmation. | Ajoute la meilleure variante à ton plan d'expérience du niveau 12. Dans le rapport, garde la configuration exacte, les graines, les deux loss de validation et le nombre de paramètres. tests/test_modern_training.py montre comment le dépôt vérifie chaque gradient. |
 
 ## 6 — Efficacité et machines modestes
 
