@@ -144,6 +144,8 @@ test("le curriculum commité a 157 leçons et des réponses réparties", () => {
   assert.equal(data.track.length, 20);
   assert.equal(data.track.some((stage) => stage.file === "model/tiny_lm.py"), true);
   assert.equal(data.track.some((stage) => stage.file === "model/gpt_sample.py"), true);
-  assert.equal(data.track.at(-1).file, "model/lora.py");
+  assert.equal(data.track.find((stage) => stage.id === "lora").file, "model/lora.py");
+  assert.equal(data.track.at(-1).file, "atelier/PROJET_FINAL.md");
+  assert.equal(parseHash("#/atelier").name, "atelier");
   assert.equal(data.track.some((stage) => stage.file === "model/gpt_train.py"), true);
 });

@@ -17,3 +17,4 @@ lighthouse-report.json
 .DS_Store
 model/data/downloads/
 model/data/prepared/
+runs/

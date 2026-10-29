@@ -27,8 +27,8 @@ from model.transformer import GPTConfig, TinyGPT, generate
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CORPUS = Path(__file__).resolve().parent / "data" / "francais.txt"
-DEFAULT_CHECKPOINT = Path(__file__).resolve().parent / "data" / "gpt_checkpoint.npz"
-DEFAULT_REPORT = ROOT / "data" / "gpt_run.json"
+DEFAULT_CHECKPOINT = ROOT / "runs" / "gpt_checkpoint.npz"
+DEFAULT_REPORT = ROOT / "runs" / "gpt_run.json"
 
 
 def assert_trainable(config: GPTConfig) -> None:
@@ -692,6 +692,11 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=3e-3)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument(
+        "--test-final",
+        action="store_true",
+        help="Mesure une seule fois le test réservé de la dernière phase SFT",
+    )
+    parser.add_argument(
         "--dataset",
         default=None,
         help="id préparé par python -m model.datasets prepare",
@@ -777,13 +782,14 @@ def main() -> None:
 def _run_plan(args) -> None:
     """Enchaîne des jeux préparés. mode pretrain puis sft, dans l'ordre du fichier."""
     from model.datasets import prepared_splits
-    from model.finetune import finetune, load_instructions
+    from model.finetune import finetune_phase, evaluate_instructions
 
     plan = json.loads(args.plan.read_text(encoding="utf-8"))
     items = plan["items"] if isinstance(plan, dict) else plan
     model = None
     tokenizer = None
     reports = []
+    reserved_test = None
     for item in items:
         mode = item.get("mode", "pretrain")
         if mode == "pretrain":
@@ -830,28 +836,34 @@ def _run_plan(args) -> None:
         elif mode == "sft":
             if model is None or tokenizer is None:
                 raise ValueError("le plan SFT arrive avant un pré-entraînement")
-            rows = load_instructions(item["instructions"])
-            tuned = finetune(
-                model,
-                tokenizer,
-                rows,
-                steps=int(item.get("steps", 20)),
-                lr=float(item.get("lr", 1e-3)),
-                seed=args.seed,
-                lora_rank=item.get("lora_rank"),
+            tuned, reserved_test = finetune_phase(
+                model, tokenizer, item, seed=args.seed
             )
-            reports.append(
-                {
-                    "id": item.get("id"),
-                    "mode": mode,
-                    "loss_end": tuned["loss_end"],
-                    "trainable": tuned["trainable"],
-                }
-            )
+            reports.append({"id": item.get("id"), "mode": mode, **tuned})
         else:
             raise ValueError(mode)
+    if getattr(args, "test_final", False):
+        if not reserved_test or reports[-1]["mode"] != "sft":
+            raise ValueError(
+                "le test final nécessite une dernière phase SFT avec test réservé"
+            )
+        reports[-1]["test_final"] = evaluate_instructions(
+            model, tokenizer, reserved_test
+        )
+        reports[-1]["test_consulted"] = True
     if model is not None and tokenizer is not None:
         save_checkpoint(args.checkpoint, model, tokenizer, {"plan": reports})
+    if getattr(args, "report", None):
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(
+            json.dumps(
+                {"format": "afz-training-plan-v1", "items": reports},
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     print(json.dumps(reports, ensure_ascii=False))
 
 

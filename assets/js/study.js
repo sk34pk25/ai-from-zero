@@ -313,7 +313,7 @@ export function paintStudy(main, index) {
           ]),
         );
         left -= duration;
-      } else if(!due.includes(id)) {
+      } else if (!due.includes(id)) {
         // Ne saute jamais une nouvelle leçon pour remplir artificiellement le créneau.
         break;
       }
@@ -536,23 +536,38 @@ export function levelCheckpoint(level) {
       text: "Réalise ce projet puis vérifie les critères ci-dessous. Ce bilan est une autoévaluation, pas une certification automatique.",
     }),
   );
-  const criteria = [
+  const criteria = level.assessment?.criteria || [
     "Je peux expliquer la brique sans relire le cours.",
     "Je peux exécuter son exemple et vérifier un résultat attendu.",
     "Je peux nommer une limite et un cas d’échec.",
   ];
   criteria.forEach((text, i) => {
     const box = h("input", { type: "checkbox", disabled: !isOwner() });
-    box.checked = !!saved.criteria?.[i];
+    box.checked = saved.assessmentVersion === 2 && !!saved.criteria?.[i];
     box.onchange = () => {
       const row = getRecord(key, {});
       setRecord(key, {
         ...row,
-        criteria: { ...row.criteria, [i]: box.checked },
+        assessmentVersion: 2,
+        previousCriteria:
+          row.previousCriteria ||
+          (row.assessmentVersion !== 2 ? row.criteria : undefined),
+        criteria: {
+          ...(row.assessmentVersion === 2 ? row.criteria : {}),
+          [i]: box.checked,
+        },
       });
     };
     host.append(h("label", { class: "checkpoint-criterion" }, [box, text]));
   });
+  if (level.assessment)
+    host.append(
+      h("p", { text: `Livrable : ${level.assessment.deliverable}` }),
+      h("a", {
+        href: "#/atelier",
+        text: "Ouvrir les TP et les critères du projet final",
+      }),
+    );
   const note = h("textarea", {
     rows: 4,
     "aria-label": "Compte-rendu du projet",

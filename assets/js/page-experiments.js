@@ -10,6 +10,10 @@ export async function paintExperiments(main) {
   for (const [name, path] of [
     ["Pré-entraînement publié", "data/gpt_run.json"],
     ["Ajustement publié", "data/finetune_run.json"],
+    [
+      "Atelier de référence · phrases synthétiques",
+      "data/atelier_reference_run.json",
+    ],
   ]) {
     try {
       const r = await fetch(new URL(path, document.baseURI));
@@ -80,6 +84,7 @@ export async function paintExperiments(main) {
               format(r.val_loss_end),
               format(r.seconds),
               r.dataset_note ||
+                r.limite ||
                 r.full?.evaluation ||
                 r.corpus ||
                 "Voir la recette du run",
@@ -112,10 +117,33 @@ export async function paintExperiments(main) {
         !x ||
         typeof x !== "object" ||
         Array.isArray(x) ||
-        !("train_loss_end" in x || "plan" in x || "full" in x)
+        !(
+          "train_loss_end" in x ||
+          "plan" in x ||
+          "full" in x ||
+          (x.format === "afz-training-plan-v1" && Array.isArray(x.items))
+        )
       )
         throw new Error("Format de rapport inconnu");
-      reports.push({ ...x, name: file.files[0].name });
+      if (x.format === "afz-training-plan-v1") {
+        if (
+          !x.items.length ||
+          x.items.some((r) => !r || typeof r !== "object" || Array.isArray(r))
+        )
+          throw new Error("Phases du plan invalides");
+        x.items.forEach((r, i) =>
+          reports.push({
+            ...r,
+            name: `${file.files[0].name} · phase ${i + 1} (${r.mode})`,
+            train_loss_end:
+              r.train_evaluation?.loss ?? r.train_loss_end ?? r.loss_end,
+            val_loss_end: r.validation_loss_end ?? r.val_loss_end,
+            dataset_note:
+              r.evaluation ||
+              "Pré-entraînement du plan ; voir les données de la recette",
+          }),
+        );
+      } else reports.push({ ...x, name: file.files[0].name });
       paint();
       status.textContent =
         "Rapport ajouté pour cette comparaison. Le fichier reste sur ton appareil.";

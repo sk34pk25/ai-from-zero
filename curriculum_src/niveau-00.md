@@ -147,7 +147,7 @@ Un fichier .py est du texte. L'interpréteur est le programme qui lit ce texte e
 @VOCAB
 Interpréteur : le programme python ou python3. Version : le numéro affiché par --version. REPL : la boucle interactive où tu tapes une instruction et vois le résultat tout de suite.
 @EXPLAIN
-Selon les machines, la commande s'appelle python ou python3. Les deux peuvent coexister et pointer vers des versions différentes. python --version doit afficher une version 3. La nôtre de référence est 3.12, mais 3.11 convient pour lire le cours. python -c "print(2 + 2)" exécute une instruction sans créer de fichier. Pour quitter le mode interactif, on tape exit() ou Ctrl-D. On note la version dans le README : un projet reproductible dit avec quel outil il a été vérifié.
+Installe Python 3.12 depuis python.org/downloads. Sous Windows, lance l'installateur officiel et active l'ajout de Python au PATH si cette option est proposée ; ouvre ensuite un NOUVEAU PowerShell. Essaie py -3 --version, puis py -3 -c "print(2 + 2)". Sous macOS, utilise l'installateur officiel et python3 --version dans Terminal. Sous Linux, installe python3 et le paquet venv par le gestionnaire de ta distribution. La sortie doit annoncer Python 3.12 et le calcul doit afficher 4. Si la commande est introuvable, vérifie le PATH et relance le terminal ; si le venv échoue, vérifie que le module venv de cette version est installé. Note la version et la commande qui fonctionnent. N'installe pas NumPy avant d'avoir vérifié cet interpréteur. Les commandes du cours supposent ensuite la racine du dépôt ; sous Windows, py -3 remplace python3 pour créer l'environnement. Le guide Installation de l'atelier détaille les trois systèmes.
 @LANG bash
 @CODE
 :::
@@ -159,7 +159,7 @@ Lance la commande de version, puis le calcul 2 + 2. Si python3 échoue, essaie p
 @EXERCISE
 Écris dans le README la version exacte affichée, et la commande qui l'a produite. Ajoute une phrase : un fichier .py n'est pas exécuté tout seul, il est lu par l'interpréteur.
 @BUILD
-Le dépôt déclare ses dépendances dans requirements.txt. La vérification Python vient avant pip : sans interpréteur, les bibliothèques du laboratoire ne s'installent pas.
+Note l'interpréteur qui fonctionne sur ta machine. Le fichier atelier/INSTALLATION.md donne les commandes Windows, macOS et Linux, les erreurs fréquentes et la vérification finale de NumPy. La lecture mobile reste possible ; le projet complet se réalise avec fichiers et terminal.
 @QUESTION
 À quoi sert l'interpréteur Python ?
 @CORRECT
@@ -170,6 +170,11 @@ Le dépôt déclare ses dépendances dans requirements.txt. La vérification Pyt
 - À remplacer le dossier du projet
 @EXPLANATION
 L'interpréteur est le programme qui exécute le texte Python. Il ne devine pas un modèle et ne modifie pas le matériel.
+@CODEFILE
+model/stats.py
+@SYMBOL
+build_report
+
 @@@
 @ID 0.5
 @TITLE Premier programme
@@ -198,7 +203,7 @@ print(42)
 @EXPERIMENT
 Enregistre ces deux lignes dans bonjour.py, lance python3 bonjour.py, puis retire volontairement le dernier guillemet. Lis le message, remets le guillemet, relance.
 @EXERCISE
-Affiche ton prénom, l'objectif « construire un petit modèle », et le nombre 42. Explique pourquoi 42 peut s'écrire sans guillemets alors que le prénom non.
+Crée message avec le texte « construire un petit modèle » et nombre avec l'entier 42. Affiche ces deux variables. Explique ce que changeraient des guillemets autour de 42 ; les fonctions avec return arriveront en 0.9.
 @BUILD
 Ce cycle écrire-exécuter est celui de pytest à la fin du dépôt : chaque brique de model/ a un test qui joue le rôle de l'affichage attendu. Tu viens de faire la version manuelle de ce geste.
 @QUESTION
@@ -211,6 +216,11 @@ Il affiche une valeur puis passe à la ligne
 - Il réserve de la VRAM
 @EXPLANATION
 print n'apprend rien et n'écrit pas un fichier. Il envoie une représentation de la valeur vers la sortie du terminal.
+@CODEFILE
+model/stats.py
+@SYMBOL
+summarize
+
 @@@
 @ID 0.6
 @TITLE Variables et types
@@ -529,7 +539,7 @@ Un commit n'est pas une sauvegarde automatique de chaque frappe. C'est toi qui d
 @VOCAB
 Dépôt : le projet suivi par Git. Staging : la zone de ce qui partira dans le prochain commit, remplie par git add. Commit : un état enregistré avec un message. Remote : la copie distante, ici GitHub.
 @EXPLAIN
-git status montre les fichiers modifiés, en attente, ou ignorés. git add model/tokenizer.py prépare ce fichier. git commit -m "Ajoute le tokenizer caractère" enregistre l'état. GitHub reçoit ensuite cet historique avec git push, mais le commit existe déjà en local avant le push. On ne commit pas .venv ni les poids énormes. Un bon message dit pourquoi le changement existe. Le parcours lui-même est versionné : la branche et la pull request gardent la trace de la reconstruction du site.
+git status montre les fichiers suivis modifiés et les fichiers non suivis ; les fichiers ignorés restent masqués sauf avec --ignored. git add prépare un changement et git commit enregistre un état local. GitHub reçoit ensuite cet historique avec git push. Pour un nouveau projet, commence par git init, puis configure ton nom et ton e-mail de commit si Git les demande. Pour reprendre ce dépôt, utilise git clone avec son URL, puis cd ai-from-zero. Vérifie git diff avant de committer. .venv, caches et gros fichiers d'entraînement restent ignorés. Les poids et rapports de TP vont dans runs/ ; archive les résultats utiles séparément avec leur version de code. Un message de commit dit ce que le changement apporte.
 @LANG bash
 @CODE
 :::
@@ -613,16 +623,15 @@ Une liste Python peut contenir n'importe quoi. Un tableau NumPy contient des nom
 @VOCAB
 ndarray : le tableau NumPy. shape : le tuple des dimensions. dtype : le type des nombres, souvent float64 ici. Vectorisation : une opération appliquée au tableau, sans boucle Python explicite.
 @EXPLAIN
-np.array([1.0, 2.0, 3.0]) a la shape (3,) : un axe de longueur 3. np.array([[1, 2], [3, 4]]) a la shape (2, 2). x * 2 multiplie chaque élément. Ce n'est pas une boucle que tu écris, mais le résultat est défini élément par élément. Une shape inattendue est le bug le plus fréquent des réseaux : (4, 3) multiplié par (4,) ne veut souvent pas dire ce que tu crois. On affichera les shapes avant de croire un résultat. Le laboratoire fixe float64 pour les tests, afin que les comparaisons soient stables.
+Un tableau NumPy possède une shape : (3,) est un axe de longueur trois, (2,3) a deux lignes de trois valeurs. x * 2 multiplie chaque composante ; A @ B fait un produit matriciel. x[1:] sélectionne depuis l'index 1, x[:,0] toutes les lignes de la colonne zéro. reshape change la disposition sans ajouter de valeurs : six valeurs peuvent devenir (2,3), pas (2,4). Pour le broadcasting, compare les dimensions depuis la droite : elles doivent être égales ou l'une doit valoir 1 ; un axe absent se comporte comme 1. Ainsi (2,3)+(3,) ajoute le même biais aux deux lignes, mais (2,3)+(2,) échoue. Affiche les shapes avant et après chaque opération. Le backward doit sommer les contributions des axes diffusés pour retrouver la shape du paramètre : ce sera un TP d'autograd.
 @LANG python
 @CODE
 :::
 import numpy as np
-
-x = np.array([1.0, 2.0, 3.0])
-print(x.shape, x * 2)
-matrice = np.array([[1.0, 2.0], [3.0, 4.0]])
-print(matrice.shape)
+x = np.arange(6.0).reshape(2, 3)
+biais = np.array([10., 20., 30.])
+print(x[:, 0], (x + biais).shape)
+assert (x + biais).shape == (2, 3)
 :::
 @EXPERIMENT
 Crée un tableau de shape (2, 3) et un autre de shape (3,). Multiplie-les et observe le résultat diffusé, puis essaie une shape incompatible et lis l'erreur.
@@ -640,6 +649,11 @@ Les dimensions du tableau, par exemple (2, 3)
 - Le message de la dernière erreur
 @EXPLANATION
 shape est un tuple d'entiers. Il dit comment les nombres sont rangés, pas comment la variable s'appelle.
+@CODEFILE
+model/stats.py
+@SYMBOL
+summarize
+
 @@@
 @ID 0.16
 @TITLE Nombres et fonctions utiles

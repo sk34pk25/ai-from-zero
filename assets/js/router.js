@@ -19,7 +19,9 @@ export function routeFromHref(href) {
 
 export function parseHash(hash) {
   const raw = String(hash ?? "").trim();
-  const auth = readAuthReturn(`https://afz.local/${raw.startsWith("#") || raw === "" ? raw : `#${raw}`}`);
+  const auth = readAuthReturn(
+    `https://afz.local/${raw.startsWith("#") || raw === "" ? raw : `#${raw}`}`,
+  );
   if (auth.kind !== "none") return { name: "recovery" };
   const withoutHash = raw.startsWith("#") ? raw.slice(1) : raw;
   const path = withoutHash === "" ? "/" : withoutHash;
@@ -31,6 +33,7 @@ export function parseHash(hash) {
   if (normalized === "/glossaire") return { name: "glossary" };
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
+  if (normalized === "/atelier") return { name: "atelier" };
   if (normalized === "/playground") return { name: "playground" };
   if (normalized === "/ide") return { name: "ide" };
   if (normalized === "/connexion") return { name: "connexion" };
@@ -53,6 +56,8 @@ export function hrefFor(route) {
       return "#/modele";
     case "track":
       return "#/construire";
+    case "atelier":
+      return "#/atelier";
     case "playground":
       return "#/playground";
     case "ide":

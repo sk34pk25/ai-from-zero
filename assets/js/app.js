@@ -119,6 +119,17 @@ function cacheElements() {
 }
 
 function bindChrome() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar && typeof ResizeObserver !== "undefined") {
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.borderBoxSize?.[0]?.blockSize || topbar.offsetHeight;
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${height}px`,
+      );
+    });
+    observer.observe(topbar);
+  }
   const label = modifierLabel(navigator.userAgent);
   els.searchKbd.textContent = `${label} K`;
   els.menu.addEventListener("click", () => {
@@ -593,14 +604,12 @@ function render({ scroll }) {
       ?.focus({ preventScroll: true });
   }
   if (route.focus === "roadmap") {
-    document
-      .querySelector("#roadmap")
-      ?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-        block: "start",
-      });
+    document.querySelector("#roadmap")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
   }
 }
 
@@ -688,6 +697,12 @@ function paintMain(route, ticket) {
       .catch(() => {});
   } else if (route.name === "model") paintModel();
   else if (route.name === "track") paintTrack();
+  else if (route.name === "atelier")
+    paintAsync(
+      ticket,
+      () => import("./page-atelier.js"),
+      (mod) => mod.paintAtelier(els.main),
+    );
   else if (route.name === "playground")
     paintAsync(
       ticket,
@@ -783,6 +798,7 @@ function pageTitle(route) {
   }
   if (route.name === "model") return `Mon modèle · ${base}`;
   if (route.name === "track") return `Construire mon LLM · ${base}`;
+  if (route.name === "atelier") return `Atelier LLM · ${base}`;
   if (route.name === "playground") return `Playground · ${base}`;
   if (route.name === "ide") return `IDE · ${base}`;
   if (route.name === "connexion") return `Connexion · ${base}`;
@@ -818,6 +834,11 @@ function paintHome() {
       "a",
       { class: "button button-secondary", href: "#/construire" },
       "Construire mon LLM",
+    ),
+    h(
+      "a",
+      { class: "button button-secondary", href: "#/atelier" },
+      "Ouvrir les 12 TP",
     ),
   ];
   const cards = [
@@ -1133,6 +1154,7 @@ function lessonBody(lesson, grade, done, around) {
       h("p", {}, [
         "Fichier : ",
         h("code", { text: lesson.codeFile || "model/" }),
+        lesson.codeSymbol ? ` · ${lesson.codeSymbol}` : "",
         ".",
       ]),
       h("p", {}, [
@@ -1141,6 +1163,13 @@ function lessonBody(lesson, grade, done, around) {
           text: "Ouvrir la piste « construire mon LLM ».",
         }),
       ]),
+      ...(lesson.tpIds || []).map((id) =>
+        h(
+          "p",
+          {},
+          h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` }),
+        ),
+      ),
     ]),
     h("section", { class: "callout callout-review" }, [
       h("h2", { text: "À retrouver plus tard" }),
@@ -1554,6 +1583,17 @@ function paintTrack() {
     crumb([{ href: "#/", label: "Accueil" }, { label: "Construire" }]),
     h("p", { class: "eyebrow", text: "Fil rouge" }),
     h("h1", { text: "Construire ton LLM" }),
+    h("section", { class: "callout" }, [
+      h("h2", { text: "Construire avec tes fonctions" }),
+      h("p", {
+        text: "Tronc commun : niveaux 0, 1, 2, 3, 4 puis 13. Les cases de cette piste indiquent les leçons cochées ; la preuve de maîtrise est le projet final entraîné sur tes données, avec validation, baselines et rechargement.",
+      }),
+      h("a", {
+        class: "button button-primary",
+        href: "#/atelier",
+        text: "Ouvrir les 12 TP et le projet final",
+      }),
+    ]),
     h("p", {
       class: "lead",
       text: `${stages.length} étapes, d'un dossier vide jusqu'à un petit GPT entraîné par rétropropagation. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste.`,

@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "mode": "pretrain",
+      "text": "model/data/corpus_fr.txt",
+      "steps": 40,
+      "d_model": 16,
+      "heads": 2,
+      "layers": 1,
+      "block": 64,
+      "batch": 2,
+      "bpe_merges": 200,
+      "eval_windows": 4,
+      "sample": false
+    },
+    {
+      "mode": "sft",
+      "instructions": "model/data/instructions_fr.json",
+      "steps": 20,
+      "lr": 0.001,
+      "lora_rank": 2
+    }
+  ]
+}

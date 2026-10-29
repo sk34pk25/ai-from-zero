@@ -62,11 +62,16 @@ save écrit un JSON avec vocab et merges. load et from_dict reconstruisent le to
 @LANG python
 @CODE
 :::
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from model.bpe import BPETokenizer
 tok = BPETokenizer.train("bonjour bonjour", 4)
-tok.save("model/data/bpe.json")
-autre = BPETokenizer.load("model/data/bpe.json")
-print(autre.encode("bonjour") == tok.encode("bonjour"))
+with TemporaryDirectory() as dossier:
+    chemin = Path(dossier) / "bpe.json"
+    tok.save(chemin)
+    autre = BPETokenizer.load(chemin)
+    assert autre.encode("bonjour") == tok.encode("bonjour")
+print("Vocabulaire rechargé sans modifier le tokenizer publié")
 :::
 @EXPERIMENT
 Ajoute un caractère absent, par exemple un emoji, et regarde l'erreur. Le laboratoire ne le remplace pas tout seul pendant l'entraînement.
@@ -84,6 +89,11 @@ Il lève KeyError au lieu d'inventer un identifiant
 - Il ignore le caractère et continue
 @EXPLANATION
 Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu.
+@CODEFILE
+model/bpe.py
+@SYMBOL
+BPETokenizer.save
+
 @@@
 @ID 13.3
 @TITLE Choisir le texte
@@ -102,7 +112,7 @@ Tu ne verses pas la bibliothèque entière dans la casserole. Tu suis une recett
 @VOCAB
 Catalogue : data/datasets.json, la liste tenue à jour. Étape : 1 jouet, 2 petit corpus, 3 grand corpus, 4 instructions, 5 dialogue, 6 évaluation. Gated : un jeu qu'il faut accepter à la main. Préparer : nettoyer, couper train et val, écrire la licence à côté.
 @EXPLAIN
-Chaque fiche a une URL https, une licence lue à la source, une langue, une taille, un format et une compatibilité. La compatibilité dit si le tokenizer caractère ou le BPE est le bon, et si le jeu tient dans le navigateur, sur le CPU NumPy, ou s'il demande un GPU. python -m model.datasets list affiche l'ordre. prepare télécharge, vérifie le sha256 quand il est connu, retire l'en-tête Gutenberg, et écrit train.txt, val.txt et ATTRIBUTION.md. Les gros fichiers restent hors du dépôt. --max-mb prélève un échantillon. Un jeu gated ou un parquet n'est pas téléchargé en silence.
+Chaque fiche du catalogue décrit source, licence, langue, format, taille et limites. prepare nettoie le texte pris en charge puis écrit train.txt, val.txt et attribution ; un format gated ou parquet demande une préparation manuelle. Pour ton projet, garde les frontières de documents : normalise les retours ligne et Unicode selon une règle écrite, repère les doublons exacts après cette normalisation et réserve des documents entiers avant d'apprendre le tokenizer. Contrôle aussi les quasi-doublons par relecture : deux fichiers distincts peuvent raconter la même page. Mesure la couverture de l'alphabet de train sur validation ; le remplacement � perd l'information, tandis qu'un tokenizer byte-level peut couvrir tout UTF-8. L'atelier fournit preparer.py pour les doublons exacts et les hashes, puis un bilan de couverture. Un split documentaire ne garantit pas à lui seul une généralisation ; il rend le protocole vérifiable.
 @LANG python
 @CODE
 :::
@@ -115,7 +125,7 @@ Ouvre #/donnees. Change le tokenizer et le lieu d'entraînement. Une fiche trop 
 @EXERCISE
 Repère un jeu français de l'étape 2 et un jeu marqué gated. Dis lequel le laboratoire accepte de préparer tout seul.
 @BUILD
-gpt_train.py --dataset lit un jeu déjà préparé. --plan enchaîne le pré-entraînement puis l'ajustement, dans l'ordre du fichier JSON.
+Prépare tes documents avec atelier/preparer.py, puis conserve train.txt, validation.txt, test.txt et provenance.json. Le TP données inclut un doublon volontaire et un caractère absent pour observer les deux diagnostics.
 @QUESTION
 Où est la liste des jeux que ce dépôt accepte de citer ?
 @CORRECT
@@ -126,6 +136,11 @@ Dans data/datasets.json, vérifiée par des URL https
 - Dans le cache du navigateur du visiteur
 @EXPLANATION
 Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés.
+@CODEFILE
+model/datasets.py
+@SYMBOL
+prepared_splits
+
 @@@
 @ID 13.4
 @TITLE Le playground
@@ -148,10 +163,17 @@ model/export_js.py arrondit les poids en float32, reconstruit le TinyGPT, et cal
 @LANG python
 @CODE
 :::
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from model.export_js import export_browser
 from model.gpt_train import load_checkpoint
-modele, tok, _ = load_checkpoint("model/data/gpt_checkpoint.npz")
-export_browser(modele, tok, "data/gpt_browser.json", "Le ")
+modele, tok, _ = load_checkpoint(Path("model/data/gpt_checkpoint.npz"))
+with TemporaryDirectory() as dossier:
+    fichier = Path(dossier) / "modele.json"
+    payload = export_browser(modele, tok, fichier, "Le ")
+    assert payload["format"] == "afz-gpt-f32-v1"
+    assert fichier.exists()
+print("Export temporaire vérifié")
 :::
 @EXPERIMENT
 Dans #/playground, lance un prompt court. Compare le premier token à température 0 et à température 1. Le premier doit être stable.
@@ -169,6 +191,11 @@ Pour comparer le JavaScript au même point de départ que les poids servis
 - Pour cacher la température
 @EXPLANATION
 Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là.
+@CODEFILE
+model/export_js.py
+@SYMBOL
+export_browser
+
 @@@
 @ID 13.5
 @TITLE Des questions et des réponses
@@ -230,7 +257,7 @@ L'énoncé reste au tableau. Seule la phrase de l'élève est corrigée. On ne r
 @VOCAB
 Masque : 1 sur les tokens de la réponse, 0 sur ceux de la question. Cible décalée : le token suivant, comme dans le pré-entraînement. Frontière : le caractère où « Réponse : » commence. Perte masquée : la moyenne ne compte que les positions à 1.
 @EXPLAIN
-example_ids encode la question et la réponse à part, puis colle les identifiants. Le prompt encodé au moment de répondre est alors le même préfixe qu'à l'entraînement : une fusion BPE ne recolle pas la fin de « Réponse : » avec le premier mot de la réponse. La perte ne tombe que sur les identifiants de la réponse. masked_cross_entropy suit la même forme que la perte du pré-entraînement, avec ce masque. finetune peut mettre à jour tous les poids, ou seulement les facteurs LoRA. Le test du cours vérifie que le masque change la perte, et que les deux réglages font descendre la perte sur un exemple répété.
+example_ids encode question et réponse séparément pour garder exactement le préfixe BPE utilisé à l'inférence. La cible est décalée d'un token ; les positions qui prédisent la réponse reçoivent le masque 1, celles du prompt 0. Les tokens du prompt participent au calcul comme contexte, sans loss directe sur leur reconstruction. Pour un plan SFT, le laboratoire sépare désormais des groupes de questions/réponses en train et validation ; le test reste réservé à l'évaluation finale. Un ensemble trop petit doit être déclaré diagnostic sur train, pas preuve de transfert. Vérifie les exemples refusés pour alphabet inconnu, les réponses tronquées et le nombre de cibles effectivement retenues. Une loss sur train seule ne choisit pas honnêtement une recette. L'arrêt de génération et le format de fin de réponse font aussi partie du protocole.
 @LANG python
 @CODE
 :::
@@ -253,6 +280,11 @@ Ceux dont le début est dans la réponse, pas dans la question
 - Aucun : l'ajustement ne calcule pas de perte
 @EXPLANATION
 La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière.
+@CODEFILE
+model/finetune.py
+@SYMBOL
+example_ids
+
 @@@
 @ID 13.7
 @TITLE Ajuster sans tout bouger
@@ -285,7 +317,7 @@ Au rang 1, B reste nul tant que personne ne l'entraîne. La correction ajoutée 
 @EXERCISE
 Sur un modèle jouet, compare le nombre de poids entraînés en ajustement complet et en LoRA. Le second doit être plus petit.
 @BUILD
-Le run publié choisit, pour le checkpoint de dialogue, la recette dont la perte de fin est la plus basse, et il écrit l'échantillon à côté.
+Le plan d'entraînement rapporte train et validation pour chaque phase SFT. Compare les recettes sur validation uniquement, conserve le test pour le candidat choisi. Les anciens rapports publiés restent historiques et ne sont pas une nouvelle mesure de généralisation.
 @QUESTION
 Pourquoi la correction LoRA vaut-elle zéro au premier pas ?
 @CORRECT
@@ -296,6 +328,11 @@ Parce que B commence à zéro, donc le produit BA est nul
 - Parce que la base est détruite
 @EXPLANATION
 A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice.
+@CODEFILE
+model/lora.py
+@SYMBOL
+init_lora
+
 @@@
 @ID 13.8
 @TITLE Continuer le dialogue
@@ -314,7 +351,7 @@ Tu poses une question du cours et tu écoutes. Si la réponse répète une fiche
 @VOCAB
 Température nulle : le token le plus probable, sans tirage. Échantillon : le texte écrit dans finetune_run.json. Rapport : pertes de départ et de fin, nombre de poids, recette retenue. Limite : le modèle n'a vu que le corpus préparé et les paires du cours.
 @EXPLAIN
-Après compare_finetunes, le script garde la recette à la perte la plus basse et tire une suite depuis « Question : … Réponse : ». Le playground peut charger ce second export en mode dialogue. Ce n'est pas une évaluation PIAF : PIAF est dans le catalogue pour mesurer la compréhension, et son parquet n'est pas décodé par prepare. Un visiteur peut lire le playground. Lancer un entraînement dans l'IDE, répondre aux quiz, ou enregistrer un plan de données reste réservé au propriétaire, et les tables Supabase refusent les autres comptes.
+Le format de ce laboratoire est mono-tour : une question, un marqueur Réponse et une réponse terminée par un saut de ligne. Ce saut de ligne sert ici de fin ; ce n'est pas un token EOS spécialisé. La génération doit s'arrêter au critère annoncé et respecter la fenêtre de contexte. Un dialogue multi-tours demanderait des rôles, des séparateurs, des exemples de conversations et des tests adaptés : il n'est pas fourni comme capacité entraînée. Évalue le candidat choisi sur des questions réservées, des reformulations et des questions dont l'information manque ; note la correction, les répétitions et l'arrêt. Le score de validation choisit la recette, le test final ne doit pas être réutilisé pour l'améliorer. Le playground montre les poids publiés historiques ; un changement du code d'entraînement ne rend pas ces anciens poids meilleurs.
 @LANG python
 @CODE
 :::
@@ -323,11 +360,11 @@ invite = "Question : qu'est-ce qu'un token\nRéponse :"
 print(invite)
 :::
 @EXPERIMENT
-Compare une réponse à température 0 et une réponse à température 0,8. La première doit être stable d'un lancement à l'autre, avec la même graine.
+Fixe cinq invites avant de générer : une question vue, deux reformulations réservées, une nouvelle question et une demande sans réponse dans les données. Note réponse, arrêt et pertinence, même quand le modèle échoue.
 @EXERCISE
 Écris, en une phrase, ce que cet échantillon prouve, et une chose qu'il ne prouve pas. Par exemple : il recolle une définition vue, il ne prouve pas un assistant général.
 @BUILD
-La piste s'arrête sur cette comparaison. Les gros jeux restent des fiches : on sait d'où ils viennent, et on ne prétend pas les avoir tous entraînés ici.
+L'épreuve finale SFT conserve des questions réservées et les limites du mono-tour. Le petit modèle de base est déjà un projet réussi s'il est correctement construit, entraîné et évalué ; un assistant fiable demande des preuves supplémentaires.
 @QUESTION
 Que prouve un échantillon de dialogue sur ce petit jeu ?
 @CORRECT
@@ -338,4 +375,9 @@ Qu'on peut relire une suite tirée du checkpoint ajusté, pas qu'un assistant g�
 - Que la licence des jeux externes n'a plus d'importance
 @EXPLANATION
 L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté.
+@CODEFILE
+model/finetune.py
+@SYMBOL
+evaluate_instructions
+
 @@@

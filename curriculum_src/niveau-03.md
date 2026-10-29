@@ -312,22 +312,23 @@ On montre une fenêtre, le modèle donne des scores, la loss punit le score du b
 @VOCAB
 Pas d'entraînement : une mise à jour. Tête linéaire : la dernière matrice, des vecteurs vers les logits. Features gelées : des vecteurs qu'on ne modifie pas pendant ce pas.
 @EXPLAIN
-Pour le bigramme, « entraîner » est un comptage : pas de gradient. Pour un modèle neuronal, la loss est la cross-entropy des logits. Le dépôt entraîne de façon explicite une tête linéaire sur des features fixes, parce que ce problème est convexe et le test peut exiger une baisse franche. Un Transformer complet demanderait le backward de l'attention. On ne le cache pas : le forward du mini-GPT est là, le gradient de la loss est testé, et la boucle complète sur la tête montre l'ordre réel. PyTorch, plus tard, remplira p.grad à travers les mêmes opérations.
+Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. Les variantes RoPE, RMSNorm, SwiGLU, GQA et le dos hybride restent des forwards exploratoires. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation.
 @LANG python
 @CODE
 :::
-# Ordre d'un pas, une fois les logits obtenus.
-# loss = cross_entropy(logits, cibles)
-# grad = cross_entropy_grad(logits, cibles)
-# W = W - lr * (features.T @ grad)
-print("forward, loss, gradient, pas")
+from model.gpt_train import train_gpt
+texte = "le chat dort. le chien court.\n" * 30
+modele, tok, rapport = train_gpt(texte, steps=20, batch=2, block=8,
+    d_model=8, n_heads=2, n_layers=1, sample=False, eval_windows=2)
+print(rapport.train_loss_start, rapport.train_loss_end)
+assert rapport.train_loss_end < rapport.train_loss_start
 :::
 @EXPERIMENT
 Lance le test test_classifier_loss_decreases. Il doit passer. Lis dans model/train.py la ligne qui soustrait le gradient.
 @EXERCISE
 Écris les quatre temps du pas en une phrase chacun. Souligne celui qui est différent entre un bigramme (comptage) et une tête linéaire (gradient).
 @BUILD
-model/train.py est la boucle du fil rouge pour la partie neuronale. model/bigram.py reste le comptage. Les deux prédisent le token suivant : ce sont deux estimateurs de la même tâche.
+Entraîne d'abord le petit modèle de model/tiny_lm.py, puis ouvre train_gpt pour voir le même ordre autour de plusieurs blocs. Dans l'atelier, la boucle n'utilisera que les fonctions que tu auras complétées.
 @QUESTION
 Entre un bigramme par comptage et une tête linéaire, qu'est-ce qui change dans l'entraînement ?
 @CORRECT
@@ -338,6 +339,11 @@ La façon d'ajuster le modèle : comptes d'un côté, gradient de l'autre
 - Le sens de lecture, de droite à gauche
 @EXPLANATION
 La tâche reste next-token. Seul l'estimateur change. Le bigramme compte, la tête suit un gradient.
+@CODEFILE
+model/tiny_lm.py
+@SYMBOL
+train_tiny_lm
+
 @@@
 @ID 3.9
 @TITLE Génération autoregressive
@@ -441,14 +447,27 @@ Le code est la recette. Les poids sont les réglages trouvés. Sauver la recette
 @VOCAB
 Checkpoint : un fichier d'état. state dict : les tableaux nommés. Config : les hyperparamètres qui fixent les formes. Vocabulaire : la table qu'il faut sauver avec les poids.
 @EXPLAIN
-En NumPy, np.savez écrit les tableaux, et un JSON écrit la config : vocab_size, d_model, la liste des caractères. Recharger avec une config différente casse les formes. Recharger les poids d'un tokenizer et générer avec un autre mélange les langues en silence. Le dépôt n'écrit pas de gros checkpoint dans Git : les tests reconstruisent les modèles depuis une graine. Le geste reste le même que torch.save(model.state_dict()), que tu utiliseras si tu passes à PyTorch. Un test de rejeu minimal : deux TinyGPT de même graine produisent les mêmes logits. C'est une reproductibilité par le code, plus forte qu'un fichier binaire.
+Un checkpoint réunit configuration, poids et tokenizer avec l'ordre exact de ses identifiants. Le code de la version et la provenance des données complètent cette archive. Pour reprendre exactement un entraînement, ajoute moments AdamW, compteur, générateur aléatoire et calendrier total. Le laboratoire les sauvegarde dans les nouveaux fichiers. Une graine identique ne prouve pas que la sauvegarde fonctionne : elle ne fait que reproduire une initialisation. Le vrai contrôle calcule des logits avant écriture, recharge le fichier et compare ces mêmes logits. Utilise runs/ pour tes sorties afin de préserver les checkpoints fournis. Le test de reprise va plus loin : il compare tous les poids entre un run continu et un run interrompu puis rechargé.
 @LANG python
 @CODE
 :::
-import json
-config = {"vocab_size": 12, "d_model": 16, "seed": 2}
-print(json.dumps(config))
-# Les poids suivraient dans un fichier .npz séparé.
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import numpy as np
+from model.gpt_train import save_checkpoint, load_checkpoint
+from model.transformer import TinyGPT, GPTConfig
+from model.tokenizer import CharTokenizer
+tok = CharTokenizer("ab ")
+m = TinyGPT(GPTConfig(vocab_size=3, d_model=8, n_heads=2, n_layers=1, block_size=4))
+x = np.array([[0, 1]])
+avant, _ = m.forward(x)
+with TemporaryDirectory() as dossier:
+    path = Path(dossier) / "modele.npz"
+    save_checkpoint(path, m, tok, {})
+    relu, _, _ = load_checkpoint(path)
+    apres, _ = relu.forward(x)
+assert np.array_equal(avant, apres)
+print("Logits identiques après rechargement")
 :::
 @EXPERIMENT
 Construis deux CharTokenizer sur le même texte et vérifie que leurs stoi sont identiques. Change un caractère du corpus du second et montre que les identifiants divergent.
@@ -466,3 +485,7 @@ Parce que les identifiants n'ont de sens que pour la table qui les a créés
 - Parce que la perplexité est un fichier
 @EXPLANATION
 Un entier 4 désigne des caractères différents selon la table. Les poids appris pour une table sont illisibles avec une autre.
+@CODEFILE
+model/gpt_train.py
+@SYMBOL
+save_checkpoint

@@ -30,7 +30,18 @@ export function assetFiles() {
 
 export function assetHash() {
   const hash = createHash("sha256");
-  for (const file of [...assetFiles(),"sw.js","manifest.webmanifest",...readdirSync(join(root,"data")).filter(p=>p.endsWith(".json")&&!p.endsWith("browser.json")).map(p=>`data/${p}`),...readdirSync(join(root,"model")).filter(p=>p.endsWith(".py")).map(p=>`model/${p}`)]) {
+  for (const file of [
+    ...assetFiles(),
+    "sw.js",
+    "manifest.webmanifest",
+    ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
+    ...readdirSync(join(root, "data"))
+      .filter((p) => p.endsWith(".json") && !p.endsWith("browser.json"))
+      .map((p) => `data/${p}`),
+    ...readdirSync(join(root, "model"))
+      .filter((p) => p.endsWith(".py"))
+      .map((p) => `model/${p}`),
+  ]) {
     hash.update(file);
     hash.update("\n");
     hash.update(
@@ -125,6 +136,9 @@ function stamp() {
     "data/datasets.json",
     "data/gpt_run.json",
     "data/finetune_run.json",
+    "data/atelier.json",
+    "data/atelier_reference_run.json",
+    ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
     "model/manifest.json",
     ...readdirSync(join(root, "model"))
       .filter((p) => p.endsWith(".py"))

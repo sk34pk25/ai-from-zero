@@ -203,8 +203,8 @@ kbd {
 
 .sidebar {
   position: sticky;
-  top: var(--header);
-  height: calc(100vh - var(--header));
+  top: var(--header-height, var(--header));
+  height: calc(100vh - var(--header-height, var(--header)));
   overflow: auto;
   padding: 1.25rem 0.9rem 1.5rem;
   border-right: 1px solid var(--line);
@@ -772,12 +772,12 @@ p code, li code {
   .account-link { flex: 0 0 auto; white-space: nowrap; }
   .layout {
     grid-template-columns: 1fr;
-    min-height: calc(100vh - var(--header));
+    min-height: calc(100vh - var(--header-height, var(--header)));
   }
   .sidebar {
     position: fixed;
     z-index: 30;
-    top: var(--header);
+    top: var(--header-height, var(--header));
     left: 0;
     bottom: 0;
     height: auto;
@@ -1351,4 +1351,15 @@ th,td { padding:.6rem;text-align:left;border-bottom:1px solid var(--line);vertic
 }
 @media (max-width:960px) {
   .topbar { gap:.25rem;padding-inline:max(.5rem,env(safe-area-inset-left)); }
+}
+
+/* Les consignes longues restent lisibles sur petit écran et à fort zoom. */
+.atelier-guide { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 36rem; overflow: auto; font: inherit; line-height: 1.7; padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; }
+.atelier-document select { max-width: 100%; margin-bottom: 1rem; }
+.track-list > .sheet { min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-width:520px) {
+  .topbar { flex-wrap:wrap; }
+  .brand { min-width:0; }
+  .brand-name { white-space:normal; overflow-wrap:anywhere; }
 }
