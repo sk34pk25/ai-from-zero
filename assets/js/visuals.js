@@ -461,6 +461,33 @@ function mountRetrieve(host) {
   paint();
 }
 
+/** Schéma propre à l'étape : ses trois gestes, numérotés et reliés. Sans résumé visuel, la liste générique. */
+function stepsFigure(host, lesson, fallback) {
+  const steps = lesson?.glance?.steps;
+  if (!Array.isArray(steps) || steps.length === 0) {
+    staticFigure(host, fallback);
+    return;
+  }
+  const list = document.createElement("ol");
+  list.className = "glance-steps is-large";
+  steps.forEach((step, index) => {
+    const item = document.createElement("li");
+    item.className = "glance-step";
+    item.style.setProperty("--i", String(index));
+    const num = document.createElement("span");
+    num.className = "glance-step-num";
+    num.setAttribute("aria-hidden", "true");
+    num.textContent = String(index + 1);
+    const title = document.createElement("strong");
+    title.textContent = step.title;
+    const text = document.createElement("span");
+    text.textContent = step.text;
+    item.append(num, title, text);
+    list.append(item);
+  });
+  host.append(list);
+}
+
 function staticFigure(host, lines) {
   const list = document.createElement("ol");
   list.className = "flow-list";
@@ -531,11 +558,11 @@ const MOUNTS = {
   retrieve: mountRetrieve,
   bpe: mountBpe,
   lora: mountLora,
-  machine: (host) => staticFigure(host, ["CPU — calcule", "RAM — garde les tableaux vivants", "Disque — garde le texte et les poids"]),
-  flow: (host) => staticFigure(host, ["Entrée", "Transformation", "Sortie — note la forme avant et après"]),
-  bars: (host) => staticFigure(host, ["Qualité — une métrique nommée", "Temps — des secondes, pas des FLOPs", "Mémoire — des octets estimés"]),
-  stack: (host) => staticFigure(host, ["Embedding", "Mélangeur, attention ou scan", "Résidu", "Sortie de même forme"]),
-  compare: (host) => staticFigure(host, ["Mesuré ici — un test du dépôt", "Lu ailleurs — un article, sans le chiffre", "La fiche ne mélange pas les deux"]),
+  machine: (host, lesson) => stepsFigure(host, lesson, ["CPU — calcule", "RAM — garde les tableaux vivants", "Disque — garde le texte et les poids"]),
+  flow: (host, lesson) => stepsFigure(host, lesson, ["Entrée", "Transformation", "Sortie — note la forme avant et après"]),
+  bars: (host, lesson) => stepsFigure(host, lesson, ["Qualité — une métrique nommée", "Temps — des secondes, pas des FLOPs", "Mémoire — des octets estimés"]),
+  stack: (host, lesson) => stepsFigure(host, lesson, ["Embedding", "Mélangeur, attention ou scan", "Résidu", "Sortie de même forme"]),
+  compare: (host, lesson) => stepsFigure(host, lesson, ["Mesuré ici — un test du dépôt", "Lu ailleurs — un article, sans le chiffre", "La fiche ne mélange pas les deux"]),
 };
 
 function lossLine(values, steps, className, min, max, totalSteps) {

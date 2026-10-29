@@ -1,0 +1,58 @@
+{
+  "13.1": {
+    "phrase": "BPE colle la paire la plus fréquente en un nouveau token, encore et encore.",
+    "image": "Coller « l » et « e » parce qu'on les voit toujours ensemble.",
+    "cle": "fréquence max · égalité → plus petite paire",
+    "piege": "À égalité, on ne tire pas au hasard : on suit l'ordre des morceaux.",
+    "etapes": [["Compter", "les paires"], ["Coller", "la plus fréquente"], ["Recommencer", "jusqu'au nombre de fusions"]]
+  },
+  "13.2": {
+    "phrase": "Le vocabulaire et ses fusions voyagent avec le modèle, sans être recalculés.",
+    "image": "Le carnet des collages, rangé avec les poids.",
+    "cle": "save / load : vocab + merges",
+    "piege": "Un caractère jamais vu lève KeyError au lieu d'inventer un identifiant.",
+    "etapes": [["Sauver", "vocab et fusions"], ["Recharger", "sans réapprendre"], ["Encoder", "dans l'ordre enregistré"]]
+  },
+  "13.3": {
+    "phrase": "On choisit des textes dont on connaît la source, la licence et les limites.",
+    "image": "Une recette : une goutte d'abord, puis un livre, puis plus si la machine suit.",
+    "cle": "fiche : source · licence · langue · taille",
+    "piege": "Réserver des documents entiers, pas des phrases, pour mesurer le transfert.",
+    "etapes": [["Choisir", "dans le catalogue"], ["Préparer", "train, val, attribution"], ["Réserver", "des documents entiers"]]
+  },
+  "13.4": {
+    "phrase": "Le playground rejoue le modèle dans le navigateur, token par token.",
+    "image": "Le modèle pose ses jetons sur la table, un par un.",
+    "cle": "mêmes logits en Python et en JavaScript",
+    "piege": "Les poids servis sont arrondis en float32 : on compare au même point de départ.",
+    "etapes": [["Écrire", "un début de texte"], ["Régler", "température et top-k"], ["Observer", "le token et l'attention"]]
+  },
+  "13.5": {
+    "phrase": "Pour apprendre à répondre, il faut des paires question-réponse de provenance connue.",
+    "image": "Des fiches de révision : la question au recto, la réponse au verso.",
+    "cle": "« Question : … » puis « Réponse : … »",
+    "piege": "Chaque jeu d'instructions a sa licence et ses réserves.",
+    "etapes": [["Écrire", "la question"], ["Associer", "la réponse"], ["Vérifier", "la licence"]]
+  },
+  "13.6": {
+    "phrase": "On masque la question dans la loss : seule la réponse est notée.",
+    "image": "L'énoncé reste au tableau ; seule la copie de l'élève est corrigée.",
+    "cle": "masque : prompt 0 · réponse 1",
+    "piege": "Noter toute la ligne récompense la récitation de la question.",
+    "etapes": [["Encoder", "question et réponse"], ["Masquer", "la question"], ["Noter", "seulement la réponse"]]
+  },
+  "13.7": {
+    "phrase": "LoRA ajoute une petite correction au lieu de réécrire toutes les matrices.",
+    "image": "Ajouter un tiroir sans déplacer le meuble.",
+    "cle": "W + échelle × A·B, B = 0 au départ",
+    "piege": "Comme B vaut 0, rien ne change avant le premier pas : c'est voulu.",
+    "etapes": [["Geler", "les poids d'origine"], ["Ajouter", "A et B de petit rang"], ["Entraîner", "seulement A et B"]]
+  },
+  "13.8": {
+    "phrase": "On lit ce que le modèle ajusté génère, et on dit ce qu'il ne sait pas faire.",
+    "image": "Poser une question du cours et écouter la réponse.",
+    "cle": "invite · graine · température · longueur · arrêt",
+    "piege": "Une loss qui baisse ne fait pas un assistant général.",
+    "etapes": [["Recharger", "le checkpoint"], ["Générer", "avec des réglages explicites"], ["Relire", "et noter les limites"]]
+  }
+}

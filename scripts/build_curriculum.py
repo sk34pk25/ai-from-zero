@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "curriculum_src"
 JSON_PATH = ROOT / "data" / "curriculum.json"
 DOC_PATH = ROOT / "docs" / "CURRICULUM.md"
+GLANCE_PATH = ROOT / "data" / "glance.json"
+INDEX_PATH = ROOT / "data" / "curriculum-index.json"
+INDEX_STEP_FIELDS = ("id", "title", "tag", "minutes", "visual", "interactive", "codeFile", "codeSymbol", "tpIds")
 
 PATTERN = [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
 
@@ -572,6 +575,43 @@ def learning_aids(
     }
 
 
+GLANCE_LIMITS = {"phrase": 120, "image": 95, "cle": 60, "piege": 100}
+
+
+def load_glances() -> dict[str, dict]:
+    """Version visuelle de chaque leçon : une phrase, une image, l'essentiel, le piège, trois étapes."""
+    glances: dict[str, dict] = {}
+    for path in sorted((SRC / "visuel").glob("niveau-*.json")):
+        for key, value in json.loads(path.read_text(encoding="utf-8")).items():
+            if key in glances:
+                raise SystemExit(f"Résumé visuel en double : {key}")
+            glances[key] = value
+    return glances
+
+
+def glance_for(lesson_id: str, glances: dict[str, dict]) -> dict:
+    raw = glances.get(lesson_id)
+    if raw is None:
+        raise SystemExit(f"Résumé visuel absent : {lesson_id}")
+    for field, limit in GLANCE_LIMITS.items():
+        text = str(raw.get(field, "")).strip()
+        if not text or len(text) > limit:
+            raise SystemExit(f"{lesson_id} : {field} vide ou plus long que {limit} caractères")
+    steps = raw.get("etapes")
+    if not isinstance(steps, list) or len(steps) != 3:
+        raise SystemExit(f"{lesson_id} : trois étapes visuelles requises")
+    for title, text in steps:
+        if not title.strip() or not text.strip() or len(title) > 20 or len(text) > 42:
+            raise SystemExit(f"{lesson_id} : étape visuelle trop longue ou vide")
+    return {
+        "phrase": raw["phrase"].strip(),
+        "image": raw["image"].strip(),
+        "key": raw["cle"].strip(),
+        "trap": raw["piege"].strip(),
+        "steps": [{"title": t.strip(), "text": x.strip()} for t, x in steps],
+    }
+
+
 def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     required = [
         "id",
@@ -792,8 +832,40 @@ def build_data() -> dict:
     }
 
 
+def build_glances(data: dict | None = None) -> dict[str, dict]:
+    """Résumés visuels, dans l'ordre du parcours. Fichier séparé : l'accueil n'en a pas besoin."""
+    data = data or build_data()
+    glances = load_glances()
+    ordered = [step["id"] for level in data["levels"] for step in level["steps"]]
+    extra = sorted(set(glances) - set(ordered))
+    if extra:
+        raise SystemExit(f"Résumés visuels sans leçon : {extra}")
+    return {lesson_id: glance_for(lesson_id, glances) for lesson_id in ordered}
+
+
+def build_index(data: dict | None = None) -> dict:
+    """Index léger lu au démarrage du site : le contenu des leçons arrive ensuite, à la demande."""
+    data = data or build_data()
+    return {
+        **{key: value for key, value in data.items() if key != "levels"},
+        "levels": [
+            {
+                **{key: value for key, value in level.items() if key != "steps"},
+                "steps": [{key: step[key] for key in INDEX_STEP_FIELDS} for step in level["steps"]],
+            }
+            for level in data["levels"]
+        ],
+    }
+
+
 def main() -> None:
     data = build_data()
+    INDEX_PATH.write_text(
+        json.dumps(build_index(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    GLANCE_PATH.write_text(
+        json.dumps(build_glances(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
     JSON_PATH.write_text(
         json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

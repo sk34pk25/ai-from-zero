@@ -1,0 +1,65 @@
+{
+  "9.1": {
+    "phrase": "Une modalité est une façon de mesurer le monde : texte, image, son, vidéo.",
+    "image": "Plusieurs capteurs qui doivent finir dans la même langue de vecteurs.",
+    "cle": "toute modalité → suite de vecteurs de largeur D",
+    "piege": "Le labo ne gère que l'image en entrée : le reste est décrit, pas codé.",
+    "etapes": [["Mesurer", "pixels, sons, mots"], ["Découper", "en morceaux"], ["Projeter", "vers des vecteurs D"]]
+  },
+  "9.2": {
+    "phrase": "On découpe une image en patches : chaque carré devient un token visuel.",
+    "image": "Quadriller une photo en timbres, puis aligner les timbres.",
+    "cle": "image H × W, patch p → (H/p)·(W/p) patches",
+    "piege": "Le premier patch est le carré en haut à gauche, pas la première ligne.",
+    "etapes": [["Quadriller", "en carrés p × p"], ["Aplatir", "chaque carré en ligne"], ["Aligner", "en séquence"]]
+  },
+  "9.3": {
+    "phrase": "Un encodeur visuel traduit chaque patch en vecteur de largeur D.",
+    "image": "Un dictionnaire pixels → langue du modèle.",
+    "cle": "patches (N, P) @ poids (P, D) + biais",
+    "piege": "Ici c'est une seule couche linéaire, pas un Transformer visuel complet.",
+    "etapes": [["Prendre", "un patch aplati"], ["Multiplier", "par W (P, D)"], ["Obtenir", "un vecteur D"]]
+  },
+  "9.4": {
+    "phrase": "Un spectrogramme montre, tranche par tranche, l'énergie de chaque fréquence.",
+    "image": "Une partition : le temps vers la droite, les graves en bas, les aigus en haut.",
+    "cle": "son → tranches courtes → énergie par fréquence",
+    "piege": "Le dépôt n'a pas de fonction spectrogramme : l'idée est décrite, pas codée.",
+    "etapes": [["Découper", "le son en tranches"], ["Mesurer", "les fréquences"], ["Ranger", "en tableau temps × fréquence"]]
+  },
+  "9.5": {
+    "phrase": "Un encodeur audio projette des cadres de son vers D, comme pour l'image.",
+    "image": "Un alphabet de sons, comme le BPE est un alphabet de bouts de mots.",
+    "cle": "cadres audio → vecteurs D",
+    "piege": "Aucun module audio n'est testé ici : ne cite aucun score.",
+    "etapes": [["Couper", "en cadres"], ["Encoder", "chaque cadre"], ["Projeter", "vers D"]]
+  },
+  "9.6": {
+    "phrase": "Une vidéo se découpe dans l'espace et dans le temps : les tokens explosent.",
+    "image": "Une pile de photos découpées en timbres, ou en petits cubes.",
+    "cle": "20 images × 16 patches = 320 tokens",
+    "piege": "Le coût de l'attention grandit comme le carré de ce nombre.",
+    "etapes": [["Découper", "chaque image en patches"], ["Empiler", "les images dans le temps"], ["Compter", "les tokens et le coût"]]
+  },
+  "9.7": {
+    "phrase": "Pour mélanger deux modalités, leurs vecteurs doivent avoir la même largeur et un sens comparable.",
+    "image": "Deux langues traduites vers une troisième, avec un dictionnaire chacune.",
+    "cle": "même D pour texte et patches",
+    "piege": "Même largeur ne veut pas dire même sens : il faut un entraînement commun.",
+    "etapes": [["Projeter", "le texte vers D"], ["Projeter", "l'image vers D"], ["Aligner", "par entraînement"]]
+  },
+  "9.8": {
+    "phrase": "On fusionne les modalités en les concaténant ou par attention croisée.",
+    "image": "Une seule file d'attente, ou une question posée à un voisin.",
+    "cle": "concaténation causale : l'ordre décide qui voit qui",
+    "piege": "Image puis texte : le texte lit l'image, l'image ne lit pas le texte.",
+    "etapes": [["Placer", "image puis texte"], ["Masquer", "le futur"], ["Lire", "le texte voit l'image"]]
+  },
+  "9.9": {
+    "phrase": "Sortir une image ou un son demande un décodeur et une loss sur cette modalité.",
+    "image": "Lire une légende contre peindre la photo à partir de la légende.",
+    "cle": "entrée image ≠ sortie image",
+    "piege": "Le labo va des pixels vers D, jamais de D vers les pixels.",
+    "etapes": [["Encoder", "vers D"], ["Décoder", "D → pixels"], ["Mesurer", "une loss image"]]
+  }
+}

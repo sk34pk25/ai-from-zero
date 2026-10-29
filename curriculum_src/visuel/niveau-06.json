@@ -1,0 +1,86 @@
+{
+  "6.1": {
+    "phrase": "Un nombre de paramètres devient des octets, et l'optimiseur en ajoute beaucoup.",
+    "image": "Une valise : les vêtements, plus la trousse d'Adam deux fois plus lourde.",
+    "cle": "fp16 + Adam : 2 + 8 octets par paramètre",
+    "piege": "Oublier les états d'Adam : l'entraînement pèse bien plus que l'inférence.",
+    "etapes": [["Compter", "les paramètres"], ["Convertir", "× octets par nombre"], ["Ajouter", "les états de l'optimiseur"]]
+  },
+  "6.2": {
+    "phrase": "La VRAM est le plan de travail du GPU : poids, états, activations et cache s'y serrent.",
+    "image": "Un établi trop petit : peu importe la taille de l'entrepôt.",
+    "cle": "out of memory = RAM ou VRAM, pas disque",
+    "piege": "Agrandir le batch ou la fenêtre gonfle les activations.",
+    "etapes": [["Charger", "poids et optimiseur"], ["Calculer", "les activations du lot"], ["Générer", "+ le cache KV"]]
+  },
+  "6.3": {
+    "phrase": "Les FLOPs comptent les opérations ; l'attention longue est dominée par T².",
+    "image": "Compter les gestes d'une chaîne de montage plutôt que les ouvriers.",
+    "cle": "n_layers × (8·T·D² + 4·T²·D)",
+    "piege": "Le nombre de paramètres ne dit pas le temps de calcul.",
+    "etapes": [["Projections", "8·T·D²"], ["Scores et mélange", "4·T²·D"], ["Multiplier", "par le nombre de couches"]]
+  },
+  "6.4": {
+    "phrase": "Le profiler mesure où le temps passe vraiment, au-delà des formules.",
+    "image": "Un chronomètre posé à côté de la théorie.",
+    "cle": "échauffer, mesurer plusieurs fois, garder la médiane",
+    "piege": "Une seule mesure est une anecdote, même avec trois décimales.",
+    "etapes": [["Échauffer", "quelques appels à vide"], ["Mesurer", "plusieurs fois"], ["Résumer", "la médiane"]]
+  },
+  "6.5": {
+    "phrase": "Un plus gros batch calme le gradient mais gonfle la mémoire des activations.",
+    "image": "Goûter 32 cuillères d'un coup : avis plus sûr, mais il faut 32 cuillères.",
+    "cle": "batch × 2 → activations × 2, paramètres × 1",
+    "piege": "Le batch ne change pas le nombre de paramètres.",
+    "etapes": [["Grouper", "B exemples"], ["Moyenner", "un gradient plus calme"], ["Payer", "des activations × B"]]
+  },
+  "6.6": {
+    "phrase": "Calculer en 16 bits allège et accélère, mais certains calculs restent en 32 bits.",
+    "image": "Une règle moins graduée : plus légère, moins précise.",
+    "cle": "fp16 : plage étroite · bf16 : plage de fp32",
+    "piege": "En fp16, un logit un peu grand devient infini.",
+    "etapes": [["Stocker", "en 16 bits"], ["Protéger", "softmax et normes en 32 bits"], ["Vérifier", "pas d'infini ni de NaN"]]
+  },
+  "6.7": {
+    "phrase": "Accumuler les gradients de petits lots simule un grand lot sans sa mémoire.",
+    "image": "Quatre petites pesées additionnées pour un seul grand total.",
+    "cle": "loss / nombre de micro-lots, puis un seul pas",
+    "piege": "Des micro-lots de tailles différentes se pondèrent par leurs cibles.",
+    "etapes": [["Calculer", "plusieurs petits lots"], ["Additionner", "leurs gradients"], ["Avancer", "un seul pas"]]
+  },
+  "6.8": {
+    "phrase": "On jette des activations au forward et on les recalcule au backward.",
+    "image": "Effacer son brouillon et le refaire quand on en a besoin.",
+    "cle": "moins de mémoire, plus de calcul",
+    "piege": "Le temps augmente : c'est un échange, pas un gain gratuit.",
+    "etapes": [["Garder", "les entrées des blocs"], ["Jeter", "les intermédiaires"], ["Recalculer", "au moment du backward"]]
+  },
+  "6.9": {
+    "phrase": "Quantifier stocke les poids en 8 ou 4 bits pour faire tourner le modèle sur moins.",
+    "image": "Arrondir les mesures d'une recette au gramme près.",
+    "cle": "int8 = 1 octet · int4 = 0,5 octet",
+    "piege": "La perte de qualité se mesure : elle n'est jamais nulle d'office.",
+    "etapes": [["Choisir", "une échelle"], ["Arrondir", "chaque poids"], ["Mesurer", "la qualité obtenue"]]
+  },
+  "6.10": {
+    "phrase": "Un petit modèle apprend à imiter les hésitations d'un grand modèle.",
+    "image": "Un élève qui copie le raisonnement du professeur, pas seulement sa réponse.",
+    "cle": "cible = distribution du professeur",
+    "piege": "L'élève est plus petit : rien ne garantit qu'il garde la qualité.",
+    "etapes": [["Interroger", "le professeur"], ["Imiter", "sa distribution"], ["Comparer", "taille et qualité"]]
+  },
+  "6.11": {
+    "phrase": "Le GPU excelle sur les gros calculs réguliers, pas sur les petites décisions Python.",
+    "image": "Une salle de calculateurs : inutile de la réunir pour trois nombres.",
+    "cle": "grosses matrices → GPU · boucle Python → CPU",
+    "piege": "Envoyer un scalaire au GPU à chaque pas peut coûter plus que le calcul.",
+    "etapes": [["Grouper", "de gros tableaux"], ["Calculer", "sur le GPU"], ["Décider", "côté CPU"]]
+  },
+  "6.12": {
+    "phrase": "Un tableau qualité, temps, mémoire compare des réglages en n'en changeant qu'un.",
+    "image": "Un banc d'essai : une ligne par réglage, une colonne par mesure.",
+    "cle": "qualité · temps · RAM",
+    "piege": "Comparer des qualités mesurées avec des métriques différentes.",
+    "etapes": [["Choisir", "des réglages"], ["Mesurer", "qualité, temps, RAM"], ["Trier", "et conclure prudemment"]]
+  }
+}

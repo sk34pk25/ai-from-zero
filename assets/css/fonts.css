@@ -1,0 +1,25 @@
+/* Polices du thème, chargées après le premier rendu (voir app.js) : le texte ne les attend jamais. */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: optional;
+  src: url("../fonts/Inter-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: optional;
+  src: url("../fonts/Inter-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 800;
+  font-display: optional;
+  src: url("../fonts/InterDisplay-ExtraBold.woff2") format("woff2");
+}

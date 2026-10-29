@@ -1,0 +1,100 @@
+{
+  "4.1": {
+    "phrase": "Moyenner tout le passé ou ne garder que le voisin rate les liens précis.",
+    "image": "Lire une phrase : certains mots anciens comptent plus que d'autres.",
+    "cle": "moyenne = bruit · voisin = myope",
+    "piege": "Tout pondérer pareil noie le mot utile dans le reste.",
+    "etapes": [["Moyenner", "mélange tout, même le bruit"], ["Bigramme", "jette tout sauf le voisin"], ["Attention", "pondère selon le contenu"]]
+  },
+  "4.2": {
+    "phrase": "La requête cherche, la clé s'annonce, la valeur est ce qu'on emporte.",
+    "image": "Bibliothèque : ta question, le titre au dos du livre, le chapitre photocopié.",
+    "cle": "Q = X·Wq · K = X·Wk · V = X·Wv",
+    "piege": "On compare la requête aux CLÉS, jamais directement aux valeurs.",
+    "etapes": [["Projeter", "X en Q, K et V"], ["Comparer", "Q avec chaque K"], ["Emporter", "les V des meilleures clés"]]
+  },
+  "4.3": {
+    "phrase": "Le score entre deux positions est le produit scalaire de la requête et de la clé.",
+    "image": "Deux flèches : alignées = grand score, perpendiculaires = zéro.",
+    "cle": "Q (T, D) @ Kᵀ (D, T) → scores (T, T)",
+    "piege": "Un score peut être négatif : ce n'est pas encore une probabilité.",
+    "etapes": [["Prendre", "la requête i"], ["Multiplier", "par la clé j"], ["Ranger", "dans la case (i, j)"]]
+  },
+  "4.4": {
+    "phrase": "Chaque mot choisit les mots de la même phrase qui l'aident à deviner la suite.",
+    "image": "Un projecteur : chaque mot éclaire les mots utiles.",
+    "cle": "softmax(Q·Kᵀ / √d) · V",
+    "piege": "Chaque ligne de poids doit faire exactement 100 %.",
+    "etapes": [["Comparer", "Q · K donne un score"], ["Normaliser", "softmax : la ligne fait 100 %"], ["Mélanger", "somme pondérée des V"]]
+  },
+  "4.5": {
+    "phrase": "Le masque causal interdit à chaque position de lire le futur.",
+    "image": "Écrire une phrase sans voir les mots pas encore écrits.",
+    "cle": "scores du futur → −1e9 → poids 0",
+    "piege": "Sans masque, le modèle triche : il lit le token qu'il doit prédire.",
+    "etapes": [["Dessiner", "un triangle de positions permises"], ["Bloquer", "le futur à −1e9"], ["Softmax", "le futur tombe à 0"]]
+  },
+  "4.6": {
+    "phrase": "On divise les scores par √d pour que softmax ne devienne pas un argmax.",
+    "image": "Baisser le volume avant d'enregistrer, pour ne pas saturer.",
+    "cle": "scores / √d_tête",
+    "piege": "Oublier √d : même forme, mêmes axes, mais des poids faux.",
+    "etapes": [["Calculer", "Q · K"], ["Réduire", "diviser par √d"], ["Softmax", "des poids moins piqués"]]
+  },
+  "4.7": {
+    "phrase": "Plusieurs têtes regardent la phrase de plusieurs façons en même temps.",
+    "image": "Plusieurs lecteurs, chacun avec son surligneur de couleur.",
+    "cle": "d_tête = d_model / n_têtes = 16 / 4 = 4",
+    "piege": "Un mauvais reshape garde la forme mais mélange les valeurs.",
+    "etapes": [["Découper", "D en H têtes"], ["Attendre", "chaque tête calcule seule"], ["Recoller", "concaténer puis × Wo"]]
+  },
+  "4.8": {
+    "phrase": "Le résidu ajoute la correction du bloc à son entrée, qui passe tout droit.",
+    "image": "Une autoroute avec une bretelle : le trafic principal continue.",
+    "cle": "sortie = x + f(x)",
+    "piege": "Sans résidu, un réseau profond perd son entrée et son gradient.",
+    "etapes": [["Garder", "l'entrée x"], ["Calculer", "la correction f(x)"], ["Additionner", "x + f(x)"]]
+  },
+  "4.9": {
+    "phrase": "La normalisation remet chaque vecteur à une échelle connue, couche après couche.",
+    "image": "Régler chaque micro au même volume avant le mixage.",
+    "cle": "(x − moyenne) / écart-type × γ + β",
+    "piege": "LayerNorm normalise chaque token seul, pas tout le batch.",
+    "etapes": [["Centrer", "retirer la moyenne"], ["Réduire", "diviser par l'écart-type"], ["Réétirer", "× gain + biais"]]
+  },
+  "4.10": {
+    "phrase": "Le FFN transforme chaque position séparément, avec les mêmes poids partout.",
+    "image": "Un atelier où chaque mot entre seul et ressort transformé.",
+    "cle": "gelu(x @ W1) @ W2, largeur 4D",
+    "piege": "Le FFN ne mélange pas les positions : c'est le rôle de l'attention.",
+    "etapes": [["Élargir", "D → 4D"], ["Plier", "GELU"], ["Resserrer", "4D → D"]]
+  },
+  "4.11": {
+    "phrase": "Un bloc : normaliser, relire avec l'attention, ajouter, transformer, ajouter.",
+    "image": "Un tour complet : relire le contexte, puis retravailler chaque mot.",
+    "cle": "h = x + Attn(Norm(x)) · y = h + FFN(Norm(h))",
+    "piege": "Le résidu ajoute l'entrée NON normalisée.",
+    "etapes": [["Relire", "x + Attention(Norm(x))"], ["Transformer", "h + FFN(Norm(h))"], ["Garder", "la même forme en sortie"]]
+  },
+  "4.12": {
+    "phrase": "Empiler des blocs permet de construire des liens à partir de liens déjà trouvés.",
+    "image": "Relire un texte plusieurs fois, en comprenant mieux à chaque passage.",
+    "cle": "coût ∝ n_layers",
+    "piege": "Les blocs ont la même forme mais pas les mêmes poids.",
+    "etapes": [["Bloc 1", "liens simples"], ["Bloc 2", "liens de liens"], ["Bloc n", "même forme, autres poids"]]
+  },
+  "4.13": {
+    "phrase": "Un decoder-only lit le passé et écrit la suite, sans encodeur séparé.",
+    "image": "Un écrivain qui n'a que les pages déjà écrites.",
+    "cle": "ids → embeddings → n blocs → norme → logits",
+    "piege": "Le masque est causal partout : aucun bloc ne voit le futur.",
+    "etapes": [["Encoder", "ids + positions"], ["Traverser", "n blocs causaux"], ["Projeter", "vers V logits"]]
+  },
+  "4.14": {
+    "phrase": "On entraîne le GPT complet, puis on le fait écrire un token à la fois.",
+    "image": "Apprendre à écrire, puis rédiger mot après mot.",
+    "cle": "train → checkpoint → recharger → générer",
+    "piege": "Le rechargement doit redonner exactement les mêmes logits.",
+    "etapes": [["Entraîner", "tous les blocs ensemble"], ["Sauver", "le meilleur sur validation"], ["Générer", "un token à la fois"]]
+  }
+}

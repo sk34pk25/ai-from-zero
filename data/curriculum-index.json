@@ -1,0 +1,2357 @@
+{
+  "meta": {
+    "title": "AI From Zero",
+    "language": "fr",
+    "description": "Un parcours francophone pour partir d'aucune base en informatique et arriver à concevoir, entraîner et comparer une petite architecture de modèle. Chaque étape explique une idée, montre comment elle se code, avance le même laboratoire, puis se vérifie par un quiz.",
+    "contract": "Point de départ : aucune connaissance informatique supposée. Une notion n'arrive qu'après ses prérequis. Chaque étape suit le même geste : intuition, vocabulaire, explication, exemple, expérience, exercice, fil rouge, quiz."
+  },
+  "architecture": [
+    {
+      "id": "machine",
+      "name": "Machine",
+      "step": "0.1",
+      "summary": "CPU, RAM, stockage, puis GPU : savoir quel ressource sature quand un entraînement échoue."
+    },
+    {
+      "id": "stats",
+      "name": "Statistiques",
+      "step": "0.15",
+      "summary": "Lire une série, calculer moyenne et écart-type, écrire un rapport reproductible."
+    },
+    {
+      "id": "reseau",
+      "name": "Réseau",
+      "step": "1.7",
+      "summary": "Un neurone, une activation, une couche : la fonction paramétrée que l'on va entraîner."
+    },
+    {
+      "id": "tokenizer",
+      "name": "Tokenizer",
+      "step": "2.5",
+      "summary": "La frontière entre une chaîne Unicode et les entiers que le modèle consomme."
+    },
+    {
+      "id": "bigramme",
+      "name": "Bigramme",
+      "step": "3.2",
+      "summary": "La baseline de langage : la probabilité du token suivant ne dépend que du token courant."
+    },
+    {
+      "id": "attention",
+      "name": "Attention",
+      "step": "4.4",
+      "summary": "Chaque position regarde les précédentes via requêtes, clés et valeurs."
+    },
+    {
+      "id": "transformer",
+      "name": "Transformer",
+      "step": "4.13",
+      "summary": "Empilement de blocs decoder-only, avec résidus, normalisation et tête de sortie."
+    },
+    {
+      "id": "moderne",
+      "name": "Blocs modernes",
+      "step": "5.2",
+      "summary": "RoPE, RMSNorm, SwiGLU, GQA, cache KV et poids partagés."
+    },
+    {
+      "id": "mesures",
+      "name": "Mesures",
+      "step": "6.3",
+      "summary": "Octets par paramètre, FLOPs d'attention et tableau qualité / temps / RAM."
+    },
+    {
+      "id": "moe",
+      "name": "Mixture of Experts",
+      "step": "7.4",
+      "summary": "Plusieurs FFN, un routeur top-k, une capacité et une perte d'équilibre."
+    },
+    {
+      "id": "ssm",
+      "name": "SSM",
+      "step": "8.7",
+      "summary": "État récurrent sélectif, scan parallèle, alternative linéaire à l'attention."
+    },
+    {
+      "id": "patches",
+      "name": "Patches",
+      "step": "9.2",
+      "summary": "Une image devient une séquence de patches projetés dans la dimension du modèle."
+    },
+    {
+      "id": "memoire",
+      "name": "Mémoire externe",
+      "step": "10.4",
+      "summary": "Des documents retrouvés par similarité, injectés dans le contexte, et désactivables."
+    },
+    {
+      "id": "experiences",
+      "name": "Expériences",
+      "step": "11.2",
+      "summary": "Une baseline et une variante, sur le même découpage, avec les mêmes métriques."
+    },
+    {
+      "id": "candidate",
+      "name": "Architecture candidate",
+      "step": "12.8",
+      "summary": "Le dos se change sans changer la forme de la sortie : Transformer, SSM ou hybride."
+    }
+  ],
+  "track": [
+    {
+      "id": "dossier",
+      "title": "Un dossier vide",
+      "step": "0.3",
+      "file": "model/README.md",
+      "summary": "Tu sais où tu es dans le terminal, et tu lances les commandes depuis la racine du dépôt."
+    },
+    {
+      "id": "nombres",
+      "title": "Lire des nombres",
+      "step": "0.15",
+      "file": "model/stats.py",
+      "summary": "Le premier programme utile lit une colonne et écrit un résumé. Rien n'est encore un modèle."
+    },
+    {
+      "id": "autograd",
+      "title": "La rétropropagation",
+      "step": "1.12",
+      "file": "model/autograd.py",
+      "summary": "Chaque opération se souvient de son gradient. C'est le moteur de l'entraînement."
+    },
+    {
+      "id": "descente",
+      "title": "Une perte qui descend",
+      "step": "1.14",
+      "file": "model/gpt_train.py",
+      "summary": "AdamW transforme les gradients en mises à jour ; tu codes ses moments et son compteur dans le TP 11."
+    },
+    {
+      "id": "tokenizer",
+      "title": "Du texte aux identifiants",
+      "step": "2.5",
+      "file": "model/tokenizer.py",
+      "summary": "Le tokenizer caractère est la frontière. Sans lui, le modèle ne voit que des lettres brutes."
+    },
+    {
+      "id": "bigramme",
+      "title": "La baseline",
+      "step": "3.2",
+      "file": "model/bigram.py",
+      "summary": "Avant le réseau, le bigramme lissé donne la perplexité à battre."
+    },
+    {
+      "id": "entrainement",
+      "title": "Entraîner le petit modèle",
+      "step": "3.8",
+      "file": "model/tiny_lm.py",
+      "summary": "train_tiny_lm lit un texte, descend la perte, puis propose une suite."
+    },
+    {
+      "id": "attention",
+      "title": "L'attention entraînable",
+      "step": "4.4",
+      "file": "model/tiny_lm.py",
+      "summary": "Avec attention=True, le même entraînement traverse le masque causal et le softmax."
+    },
+    {
+      "id": "tetes",
+      "title": "L'attention multi-têtes",
+      "step": "4.7",
+      "file": "model/transformer.py",
+      "summary": "Plusieurs têtes relisent le passé en parallèle. Dans TinyGPT, le gradient traverse chacune."
+    },
+    {
+      "id": "bloc",
+      "title": "Le bloc decoder complet",
+      "step": "4.11",
+      "file": "model/transformer.py",
+      "summary": "Norme, attention causale, résidu, norme, MLP GELU, résidu. Puis les embeddings, les blocs empilés et la tête."
+    },
+    {
+      "id": "gpt",
+      "title": "Entraîner ton GPT",
+      "step": "4.14",
+      "file": "model/gpt_train.py",
+      "summary": "AdamW, découpage train/val, perte, checkpoint. Le corpus français est model/data/francais.txt."
+    },
+    {
+      "id": "echantillon",
+      "title": "Échantillonner",
+      "step": "3.9",
+      "file": "model/tiny_lm.py",
+      "summary": "Générer, c'est répéter : lire les scores du dernier pas, tirer un token, le recoller."
+    },
+    {
+      "id": "suite",
+      "title": "Échantillonner ton GPT",
+      "step": "3.9",
+      "file": "model/gpt_sample.py",
+      "summary": "Température et top-k sur ton checkpoint. Le texte doit ressembler au corpus que tu as entraîné."
+    },
+    {
+      "id": "bpe",
+      "title": "Apprendre le BPE",
+      "step": "13.1",
+      "file": "model/bpe.py",
+      "summary": "Les fusions sont déterministes. Le même texte et le même nombre de fusions redonnent le même vocabulaire."
+    },
+    {
+      "id": "catalogue",
+      "title": "Choisir un jeu de données",
+      "step": "13.3",
+      "file": "model/datasets.py",
+      "summary": "data/datasets.json est la liste vérifiée. prepare écrit un train et un val, avec la licence à côté."
+    },
+    {
+      "id": "playground",
+      "title": "Lire le modèle dans le navigateur",
+      "step": "13.4",
+      "file": "model/export_js.py",
+      "summary": "Les poids float32 et les logits de référence partent dans le playground. Le JavaScript refait le même forward."
+    },
+    {
+      "id": "masque",
+      "title": "Ajuster avec un masque",
+      "step": "13.6",
+      "file": "model/finetune.py",
+      "summary": "La perte ne compte que les tokens de la réponse. La question reste visible, elle n'est pas apprise comme une cible."
+    },
+    {
+      "id": "lora",
+      "title": "Ajuster avec LoRA",
+      "step": "13.7",
+      "file": "model/lora.py",
+      "summary": "Deux petits facteurs par matrice ciblée. On compare leur perte à un ajustement de tous les poids."
+    },
+    {
+      "id": "elargir",
+      "title": "Élargir sans se raconter d'histoires",
+      "step": "12.8",
+      "file": "model/backbone.py",
+      "summary": "Après ton GPT entraîné, le dos hybride reste une exploration de formes et de causalité sans entraînement de bout en bout."
+    },
+    {
+      "id": "evaluer",
+      "title": "Évaluer sans tricher",
+      "step": "12.12",
+      "file": "atelier/PROJET_FINAL.md",
+      "summary": "Ton projet final documente les données réservées, les baselines, le rechargement et une variation contrôlée."
+    }
+  ],
+  "learningPath": {
+    "coreLevels": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      13
+    ],
+    "afterCoreLevels": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "levels": [
+    {
+      "id": 0,
+      "title": "Fondations numériques",
+      "summary": "Prendre en main la machine, Python, puis les quelques outils mathématiques qui reviendront dans chaque modèle.",
+      "project": "Un programme lit une colonne de nombres, calcule un résumé statistique et écrit un rapport. Dans le dépôt, c'est model/stats.py.",
+      "assessment": {
+        "criteria": [
+          "Créer le venv et importer NumPy avec le bon interpréteur.",
+          "Lire les sept mesures et retrouver leur moyenne à la main.",
+          "Expliquer (2,3)+(3,) et distinguer @ de *.",
+          "Estimer une dérivée centrée puis vérifier son signe."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "0.1",
+          "title": "Ordinateur, matériel, CPU, RAM et stockage",
+          "tag": "Départ",
+          "minutes": 15,
+          "visual": "machine",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.2",
+          "title": "Système, fichiers et chemins",
+          "tag": "Départ",
+          "minutes": 15,
+          "visual": "machine",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.3",
+          "title": "Terminal et commandes",
+          "tag": "Outil",
+          "minutes": 20,
+          "visual": "machine",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.4",
+          "title": "Installer et vérifier Python",
+          "tag": "Python",
+          "minutes": 20,
+          "visual": "machine",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.5",
+          "title": "Premier programme",
+          "tag": "Python",
+          "minutes": 15,
+          "visual": "machine",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.6",
+          "title": "Variables et types",
+          "tag": "Python",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.7",
+          "title": "Conditions",
+          "tag": "Python",
+          "minutes": 20,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.8",
+          "title": "Boucles",
+          "tag": "Python",
+          "minutes": 20,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.9",
+          "title": "Fonctions",
+          "tag": "Python",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.10",
+          "title": "Listes et dictionnaires",
+          "tag": "Python",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.11",
+          "title": "Modules",
+          "tag": "Python",
+          "minutes": 20,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.12",
+          "title": "Erreurs et débogage",
+          "tag": "Méthode",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.13",
+          "title": "Git et GitHub",
+          "tag": "Outil",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.14",
+          "title": "Environnement virtuel",
+          "tag": "Python",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.15",
+          "title": "NumPy et les tableaux",
+          "tag": "NumPy",
+          "minutes": 35,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": [
+            6
+          ]
+        },
+        {
+          "id": "0.16",
+          "title": "Nombres et fonctions utiles",
+          "tag": "Maths",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "softmax",
+          "tpIds": []
+        },
+        {
+          "id": "0.17",
+          "title": "Vecteurs",
+          "tag": "Maths",
+          "minutes": 35,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "scaled_dot_product_attention",
+          "tpIds": []
+        },
+        {
+          "id": "0.18",
+          "title": "Matrices",
+          "tag": "Maths",
+          "minutes": 40,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "0.19",
+          "title": "Probabilités",
+          "tag": "Maths",
+          "minutes": 35,
+          "visual": "softmax",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "softmax",
+          "tpIds": []
+        },
+        {
+          "id": "0.20",
+          "title": "Dérivée intuitive",
+          "tag": "Maths",
+          "minutes": 40,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "numerical_derivative",
+          "tpIds": [
+            4
+          ]
+        },
+        {
+          "id": "0.21",
+          "title": "Classes et objets",
+          "tag": "Python",
+          "minutes": 40,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor",
+          "tpIds": []
+        },
+        {
+          "id": "0.22",
+          "title": "Vérifier son code avec assert et pytest",
+          "tag": "Méthode",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "summarize",
+          "tpIds": []
+        },
+        {
+          "id": "0.23",
+          "title": "Mini-projet : un carnet de mesures",
+          "tag": "Projet",
+          "minutes": 60,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/stats.py",
+          "codeSymbol": "build_report",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "Machine learning depuis zéro",
+      "summary": "Comprendre ce que veut dire apprendre, puis écrire un petit réseau dont on voit passer le calcul et le gradient.",
+      "project": "Un prédicteur linéaire, puis un réseau à une couche cachée, entraînés par descente de gradient. Référence : model/mlp.py et model/train.py.",
+      "assessment": {
+        "criteria": [
+          "Calculer un forward et son gradient à la main.",
+          "Coder le graphe scalaire du TP 5, y compris un paramètre réutilisé.",
+          "Réduire un gradient de biais diffusé au TP 6.",
+          "Appliquer plusieurs pas AdamW et expliquer ses deux états."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "1.1",
+          "title": "Qu'est-ce qu'apprendre ?",
+          "tag": "Apprentissage",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/mlp.py",
+          "codeSymbol": "train_linear_regression",
+          "tpIds": []
+        },
+        {
+          "id": "1.2",
+          "title": "Données, features et labels",
+          "tag": "Données",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/train.py",
+          "codeSymbol": "train_linear_classifier",
+          "tpIds": []
+        },
+        {
+          "id": "1.3",
+          "title": "Train, validation et test",
+          "tag": "Méthode",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "split_sequence",
+          "tpIds": []
+        },
+        {
+          "id": "1.4",
+          "title": "Paramètres et hyperparamètres",
+          "tag": "Cœur",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.parameter_count",
+          "tpIds": []
+        },
+        {
+          "id": "1.5",
+          "title": "Le neurone artificiel",
+          "tag": "Réseau",
+          "minutes": 35,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/mlp.py",
+          "codeSymbol": "neuron",
+          "tpIds": []
+        },
+        {
+          "id": "1.6",
+          "title": "Fonctions d'activation",
+          "tag": "Réseau",
+          "minutes": 30,
+          "visual": "relu",
+          "interactive": true,
+          "codeFile": "model/mlp.py",
+          "codeSymbol": "relu",
+          "tpIds": []
+        },
+        {
+          "id": "1.7",
+          "title": "Un petit réseau",
+          "tag": "Réseau",
+          "minutes": 35,
+          "visual": "relu",
+          "interactive": true,
+          "codeFile": "model/mlp.py",
+          "codeSymbol": "mlp_forward",
+          "tpIds": []
+        },
+        {
+          "id": "1.8",
+          "title": "Forward pass",
+          "tag": "Calcul",
+          "minutes": 30,
+          "visual": "relu",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "1.9",
+          "title": "Loss",
+          "tag": "Apprentissage",
+          "minutes": 30,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "cross_entropy",
+          "tpIds": []
+        },
+        {
+          "id": "1.10",
+          "title": "Gradient",
+          "tag": "Apprentissage",
+          "minutes": 35,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "cross_entropy_grad",
+          "tpIds": [
+            4
+          ]
+        },
+        {
+          "id": "1.11",
+          "title": "Règle de chaîne",
+          "tag": "Apprentissage",
+          "minutes": 35,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor.__mul__",
+          "tpIds": [
+            4
+          ]
+        },
+        {
+          "id": "1.12",
+          "title": "Backpropagation",
+          "tag": "Apprentissage",
+          "minutes": 40,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor.backward",
+          "tpIds": [
+            5
+          ]
+        },
+        {
+          "id": "1.13",
+          "title": "Descente de gradient",
+          "tag": "Optimisation",
+          "minutes": 30,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/mlp.py",
+          "codeSymbol": "train_linear_regression",
+          "tpIds": []
+        },
+        {
+          "id": "1.14",
+          "title": "Optimiseurs",
+          "tag": "Optimisation",
+          "minutes": 30,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "AdamW.step",
+          "tpIds": [
+            11
+          ]
+        },
+        {
+          "id": "1.15",
+          "title": "Tenseurs et autograd",
+          "tag": "PyTorch",
+          "minutes": 35,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "_unbroadcast",
+          "tpIds": [
+            5,
+            6
+          ]
+        },
+        {
+          "id": "1.16",
+          "title": "Boucle d'entraînement",
+          "tag": "Entraînement",
+          "minutes": 35,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": [
+            11
+          ]
+        },
+        {
+          "id": "1.17",
+          "title": "Surapprentissage",
+          "tag": "Évaluation",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "corpus_loss",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Transformer le langage en nombres",
+      "summary": "Passer du texte à des identifiants, puis à des vecteurs, sans cacher le tokenizer dans une bibliothèque.",
+      "project": "Un tokenizer caractère, un mini-BPE et un visualiseur. Référence : model/tokenizer.py.",
+      "assessment": {
+        "criteria": [
+          "Encoder/décoder sans changer l’ordre des identifiants.",
+          "Montrer le cas d’un caractère absent et sa politique.",
+          "Construire des batches dont la cible est décalée de un.",
+          "Calculer (B,T,D) et le nombre de poids des embeddings."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "2.1",
+          "title": "Texte et Unicode",
+          "tag": "Données",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": [
+            1
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Construire un corpus",
+          "tag": "Données",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": []
+        },
+        {
+          "id": "2.3",
+          "title": "Caractères et octets",
+          "tag": "Encodage",
+          "minutes": 30,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": [
+            1
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Vocabulaire",
+          "tag": "Tokenizer",
+          "minutes": 25,
+          "visual": "tokenize",
+          "interactive": true,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": []
+        },
+        {
+          "id": "2.5",
+          "title": "Tokenizer caractère",
+          "tag": "Tokenizer",
+          "minutes": 40,
+          "visual": "tokenize",
+          "interactive": true,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": [
+            1
+          ]
+        },
+        {
+          "id": "2.6",
+          "title": "BPE, l'intuition",
+          "tag": "Tokenizer",
+          "minutes": 30,
+          "visual": "tokenize",
+          "interactive": true,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "MiniBPE",
+          "tpIds": []
+        },
+        {
+          "id": "2.7",
+          "title": "Construire un mini-BPE",
+          "tag": "Tokenizer",
+          "minutes": 40,
+          "visual": "tokenize",
+          "interactive": true,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "MiniBPE.encode",
+          "tpIds": []
+        },
+        {
+          "id": "2.8",
+          "title": "Identifiants de tokens",
+          "tag": "Tokenizer",
+          "minutes": 25,
+          "visual": "tokenize",
+          "interactive": true,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer.encode",
+          "tpIds": []
+        },
+        {
+          "id": "2.9",
+          "title": "Embeddings",
+          "tag": "Représentation",
+          "minutes": 35,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "embedding",
+          "tpIds": []
+        },
+        {
+          "id": "2.10",
+          "title": "Position",
+          "tag": "Séquence",
+          "minutes": 30,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "2.11",
+          "title": "Batches et séquences",
+          "tag": "Données",
+          "minutes": 30,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "sample_batch",
+          "tpIds": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Premier modèle de langage",
+      "summary": "Prédire le prochain token avec un bigramme, mesurer la perplexité, générer.",
+      "project": "Un modèle bigramme lissé, entraînable et capable d'échantillonner. Référence : model/bigram.py.",
+      "assessment": {
+        "criteria": [
+          "Estimer un bigramme sur train seulement.",
+          "Calculer une loss stable et retrouver log(V) pour l’uniforme.",
+          "Générer avec une graine et une température fixées.",
+          "Recharger des poids et vérifier les logits."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "3.1",
+          "title": "Prédire le token suivant",
+          "tag": "Langage",
+          "minutes": 30,
+          "visual": "bigram",
+          "interactive": true,
+          "codeFile": "model/bigram.py",
+          "codeSymbol": "BigramModel.observe",
+          "tpIds": [
+            2
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Le bigramme",
+          "tag": "Langage",
+          "minutes": 40,
+          "visual": "bigram",
+          "interactive": true,
+          "codeFile": "model/bigram.py",
+          "codeSymbol": "BigramModel.observe",
+          "tpIds": []
+        },
+        {
+          "id": "3.3",
+          "title": "Contexte",
+          "tag": "Langage",
+          "minutes": 30,
+          "visual": "bigram",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "sample_batch",
+          "tpIds": [
+            2
+          ]
+        },
+        {
+          "id": "3.4",
+          "title": "Logits",
+          "tag": "Langage",
+          "minutes": 25,
+          "visual": "bigram",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "3.5",
+          "title": "Softmax",
+          "tag": "Langage",
+          "minutes": 30,
+          "visual": "softmax",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "softmax",
+          "tpIds": [
+            3
+          ]
+        },
+        {
+          "id": "3.6",
+          "title": "Cross-entropy",
+          "tag": "Langage",
+          "minutes": 35,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "cross_entropy",
+          "tpIds": [
+            3
+          ]
+        },
+        {
+          "id": "3.7",
+          "title": "Température et top-k",
+          "tag": "Génération",
+          "minutes": 30,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "generate",
+          "tpIds": [
+            12
+          ]
+        },
+        {
+          "id": "3.8",
+          "title": "Entraîner le modèle de langage",
+          "tag": "Entraînement",
+          "minutes": 35,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/tiny_lm.py",
+          "codeSymbol": "train_tiny_lm",
+          "tpIds": []
+        },
+        {
+          "id": "3.9",
+          "title": "Génération autoregressive",
+          "tag": "Génération",
+          "minutes": 35,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/gpt_sample.py",
+          "codeSymbol": "main",
+          "tpIds": [
+            12
+          ]
+        },
+        {
+          "id": "3.10",
+          "title": "Perplexité",
+          "tag": "Évaluation",
+          "minutes": 30,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/bigram.py",
+          "codeSymbol": "BigramModel.perplexity",
+          "tpIds": []
+        },
+        {
+          "id": "3.11",
+          "title": "Sauvegarder et recharger",
+          "tag": "Entraînement",
+          "minutes": 25,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "save_checkpoint",
+          "tpIds": [
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Transformer construit à la main",
+      "summary": "Assembler l'attention, le masque causal, les résidus et un bloc decoder-only sans module préfabriqué.",
+      "project": "Un GPT NumPy entraîné de bout en bout, avec attention causale, sauvegarde et validation. Référence : model/gpt_train.py et atelier/.",
+      "assessment": {
+        "criteria": [
+          "Assembler attention causale, multi-têtes et deux résidus par bloc.",
+          "Comparer un gradient d’attention à une différence finie.",
+          "Entraîner le decoder standard avec les fonctions de l’atelier.",
+          "Rapporter validation, baselines et égalité après rechargement."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "4.1",
+          "title": "La limite du contexte naïf",
+          "tag": "Attention",
+          "minutes": 30,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "scaled_dot_product_attention",
+          "tpIds": []
+        },
+        {
+          "id": "4.2",
+          "title": "Requête, clé et valeur",
+          "tag": "Attention",
+          "minutes": 30,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT._attention",
+          "tpIds": [
+            7
+          ]
+        },
+        {
+          "id": "4.3",
+          "title": "Produit scalaire des scores",
+          "tag": "Attention",
+          "minutes": 25,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "scaled_dot_product_attention",
+          "tpIds": [
+            7
+          ]
+        },
+        {
+          "id": "4.4",
+          "title": "Self-attention",
+          "tag": "Attention",
+          "minutes": 35,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "scaled_dot_product_attention",
+          "tpIds": [
+            7
+          ]
+        },
+        {
+          "id": "4.5",
+          "title": "Masque causal",
+          "tag": "Attention",
+          "minutes": 30,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "causal_mask",
+          "tpIds": [
+            7
+          ]
+        },
+        {
+          "id": "4.6",
+          "title": "Attention à l'échelle",
+          "tag": "Attention",
+          "minutes": 25,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "scaled_dot_product_attention",
+          "tpIds": [
+            7
+          ]
+        },
+        {
+          "id": "4.7",
+          "title": "Multi-têtes",
+          "tag": "Attention",
+          "minutes": 30,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT._attention",
+          "tpIds": [
+            8
+          ]
+        },
+        {
+          "id": "4.8",
+          "title": "Connexions résiduelles",
+          "tag": "Bloc",
+          "minutes": 25,
+          "visual": "attention",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": [
+            9
+          ]
+        },
+        {
+          "id": "4.9",
+          "title": "Normalisation",
+          "tag": "Bloc",
+          "minutes": 30,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "layernorm",
+          "tpIds": [
+            9
+          ]
+        },
+        {
+          "id": "4.10",
+          "title": "Le réseau feed-forward",
+          "tag": "Bloc",
+          "minutes": 30,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT._ffn",
+          "tpIds": [
+            9
+          ]
+        },
+        {
+          "id": "4.11",
+          "title": "Un bloc Transformer",
+          "tag": "Bloc",
+          "minutes": 35,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": [
+            9
+          ]
+        },
+        {
+          "id": "4.12",
+          "title": "Empiler les blocs",
+          "tag": "Modèle",
+          "minutes": 25,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": [
+            10
+          ]
+        },
+        {
+          "id": "4.13",
+          "title": "Modèle decoder-only",
+          "tag": "Modèle",
+          "minutes": 35,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": [
+            10
+          ]
+        },
+        {
+          "id": "4.14",
+          "title": "Entraîner et générer",
+          "tag": "Modèle",
+          "minutes": 40,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "sequence_loss",
+          "tpIds": [
+            10,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Transformer moderne",
+      "summary": "Remplacer, une par une, les pièces de 2017 par celles qu'on retrouve dans les modèles récents.",
+      "project": "RoPE, RMSNorm, SwiGLU, GQA et weight tying sont des options du même TinyGPT.",
+      "assessment": {
+        "criteria": [
+          "Montrer la conservation de norme par RoPE.",
+          "Distinguer SiLU et sigmoïde par un contre-exemple numérique.",
+          "Comparer cache et forward complet sur les mêmes logits.",
+          "Dire quelles options restent sans backward ici."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "5.1",
+          "title": "Limites des positions absolues",
+          "tag": "Moderne",
+          "minutes": 25,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "5.2",
+          "title": "RoPE",
+          "tag": "Moderne",
+          "minutes": 40,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "apply_rope",
+          "tpIds": []
+        },
+        {
+          "id": "5.3",
+          "title": "RMSNorm",
+          "tag": "Moderne",
+          "minutes": 30,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/mathutil.py",
+          "codeSymbol": "rmsnorm",
+          "tpIds": []
+        },
+        {
+          "id": "5.4",
+          "title": "GELU et SwiGLU",
+          "tag": "Moderne",
+          "minutes": 35,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT._ffn",
+          "tpIds": []
+        },
+        {
+          "id": "5.5",
+          "title": "MHA, MQA et GQA",
+          "tag": "Moderne",
+          "minutes": 35,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/attention.py",
+          "codeSymbol": "repeat_kv",
+          "tpIds": []
+        },
+        {
+          "id": "5.6",
+          "title": "Cache KV",
+          "tag": "Moderne",
+          "minutes": 35,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "5.7",
+          "title": "Weight tying",
+          "tag": "Moderne",
+          "minutes": 25,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.forward",
+          "tpIds": []
+        },
+        {
+          "id": "5.8",
+          "title": "Initialisation",
+          "tag": "Moderne",
+          "minutes": 30,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/transformer.py",
+          "codeSymbol": "TinyGPT.__init__",
+          "tpIds": []
+        },
+        {
+          "id": "5.9",
+          "title": "Contexte long",
+          "tag": "Moderne",
+          "minutes": 30,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "attention_flops",
+          "tpIds": []
+        },
+        {
+          "id": "5.10",
+          "title": "Entraîner une variante moderne et la comparer",
+          "tag": "Expérience",
+          "minutes": 45,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Efficacité et machines modestes",
+      "summary": "Compter la mémoire, les FLOPs et le compromis qualité / vitesse / RAM avant de grossir le modèle.",
+      "project": "Des formules explicites et un tableau trié. Référence : model/bench.py.",
+      "assessment": {
+        "criteria": [
+          "Distinguer poids, gradients, optimiseur, activations et cache.",
+          "Rapporter unités, échauffement et répétitions du chronométrage.",
+          "Comparer deux budgets de tokens identiques.",
+          "Séparer coût estimé et mémoire/énergie effectivement mesurées."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "6.1",
+          "title": "Coût des paramètres",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "parameter_bytes",
+          "tpIds": []
+        },
+        {
+          "id": "6.2",
+          "title": "RAM et VRAM",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "parameter_bytes",
+          "tpIds": []
+        },
+        {
+          "id": "6.3",
+          "title": "FLOPs",
+          "tag": "Mesure",
+          "minutes": 35,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "attention_flops",
+          "tpIds": []
+        },
+        {
+          "id": "6.4",
+          "title": "Profiler",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "attention_flops",
+          "tpIds": []
+        },
+        {
+          "id": "6.5",
+          "title": "Batch",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "sample_batch",
+          "tpIds": []
+        },
+        {
+          "id": "6.6",
+          "title": "Précision mixte",
+          "tag": "Mesure",
+          "minutes": 30,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "parameter_bytes",
+          "tpIds": []
+        },
+        {
+          "id": "6.7",
+          "title": "Accumulation de gradient",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "descent",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor.zero_grad",
+          "tpIds": []
+        },
+        {
+          "id": "6.8",
+          "title": "Checkpointing des activations",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "relu",
+          "interactive": true,
+          "codeFile": "model/autograd.py",
+          "codeSymbol": "Tensor.backward",
+          "tpIds": []
+        },
+        {
+          "id": "6.9",
+          "title": "Quantification",
+          "tag": "Mesure",
+          "minutes": 30,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "parameter_bytes",
+          "tpIds": []
+        },
+        {
+          "id": "6.10",
+          "title": "Distillation",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "run_ablation",
+          "tpIds": []
+        },
+        {
+          "id": "6.11",
+          "title": "CPU et GPU",
+          "tag": "Mesure",
+          "minutes": 25,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": []
+        },
+        {
+          "id": "6.12",
+          "title": "Inférence locale et tableau",
+          "tag": "Mesure",
+          "minutes": 35,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "quality_table",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Mixture of Experts",
+      "summary": "Garder le calcul d'un petit réseau tout en augmentant le nombre de paramètres utiles.",
+      "project": "Un FFN à experts, routeur top-k, capacité et perte d'équilibrage. Référence : model/moe.py.",
+      "assessment": {
+        "criteria": [
+          "Calculer les portes top-k et contrôler les formes.",
+          "Mesurer charge, capacité et tokens rejetés.",
+          "Expliquer le poids de la perte auxiliaire.",
+          "Documenter que ce MoE est testé en forward, sans entraînement global."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "7.1",
+          "title": "Qu'est-ce qu'un expert",
+          "tag": "MoE",
+          "minutes": 25,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "expert_forward",
+          "tpIds": []
+        },
+        {
+          "id": "7.2",
+          "title": "Dense et sparse",
+          "tag": "MoE",
+          "minutes": 25,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        },
+        {
+          "id": "7.3",
+          "title": "Le routeur",
+          "tag": "MoE",
+          "minutes": 30,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        },
+        {
+          "id": "7.4",
+          "title": "Top-k",
+          "tag": "MoE",
+          "minutes": 30,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        },
+        {
+          "id": "7.5",
+          "title": "Capacité",
+          "tag": "MoE",
+          "minutes": 30,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        },
+        {
+          "id": "7.6",
+          "title": "Équilibrage de charge",
+          "tag": "MoE",
+          "minutes": 25,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "load_balance_loss",
+          "tpIds": []
+        },
+        {
+          "id": "7.7",
+          "title": "Perte auxiliaire",
+          "tag": "MoE",
+          "minutes": 30,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "load_balance_loss",
+          "tpIds": []
+        },
+        {
+          "id": "7.8",
+          "title": "Parallélisme des experts",
+          "tag": "MoE",
+          "minutes": 25,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        },
+        {
+          "id": "7.9",
+          "title": "Mémoire et calcul",
+          "tag": "MoE",
+          "minutes": 30,
+          "visual": "moe",
+          "interactive": true,
+          "codeFile": "model/moe.py",
+          "codeSymbol": "moe_ffn",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "State space models et Mamba",
+      "summary": "Une autre façon de lire une séquence : un état qui se met à jour, au lieu d'une attention quadratique.",
+      "project": "Une récurrence sélective, un scan associatif, et un dos interchangeable. Référence : model/ssm.py et model/backbone.py.",
+      "assessment": {
+        "criteria": [
+          "Dérouler une récurrence à la main.",
+          "Composer deux transformations affines dans le bon ordre.",
+          "Comparer scan et boucle, puis vérifier la causalité.",
+          "Nommer les pièces manquantes d’un Mamba complet."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "8.1",
+          "title": "La récurrence",
+          "tag": "SSM",
+          "minutes": 25,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "8.2",
+          "title": "L'état caché",
+          "tag": "SSM",
+          "minutes": 25,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "8.3",
+          "title": "Intuition d'un modèle d'état",
+          "tag": "SSM",
+          "minutes": 30,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "8.4",
+          "title": "Convolution ou récurrence",
+          "tag": "SSM",
+          "minutes": 30,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "sequential_affine",
+          "tpIds": []
+        },
+        {
+          "id": "8.5",
+          "title": "Le scan parallèle",
+          "tag": "SSM",
+          "minutes": 35,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "parallel_affine",
+          "tpIds": []
+        },
+        {
+          "id": "8.6",
+          "title": "La sélectivité",
+          "tag": "SSM",
+          "minutes": 30,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_params",
+          "tpIds": []
+        },
+        {
+          "id": "8.7",
+          "title": "Mamba, version réduite",
+          "tag": "SSM",
+          "minutes": 35,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone._ssm",
+          "tpIds": []
+        },
+        {
+          "id": "8.8",
+          "title": "Attention contre SSM",
+          "tag": "SSM",
+          "minutes": 30,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "8.9",
+          "title": "Un dos hybride",
+          "tag": "SSM",
+          "minutes": 30,
+          "visual": "scan",
+          "interactive": true,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Multimodal",
+      "summary": "Faire entrer une deuxième modalité dans le même espace de vecteurs que le texte.",
+      "project": "Découpage d'une image en patches et projection linéaire. Référence : model/multimodal.py.",
+      "assessment": {
+        "criteria": [
+          "Retrouver les pixels du premier patch.",
+          "Calculer N patches et leur largeur aplatie.",
+          "Distinguer projection de forme et alignement sémantique appris.",
+          "Préciser l’absence d’entraînement vision-langage et audio."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "9.1",
+          "title": "Les modalités",
+          "tag": "Multimodal",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "patchify",
+          "tpIds": []
+        },
+        {
+          "id": "9.2",
+          "title": "Pixels et patches",
+          "tag": "Multimodal",
+          "minutes": 30,
+          "visual": "patches",
+          "interactive": true,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "patchify",
+          "tpIds": []
+        },
+        {
+          "id": "9.3",
+          "title": "Un encodeur visuel, en idée",
+          "tag": "Multimodal",
+          "minutes": 30,
+          "visual": "patches",
+          "interactive": true,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "project_patches",
+          "tpIds": []
+        },
+        {
+          "id": "9.4",
+          "title": "Spectrogramme et audio",
+          "tag": "Multimodal",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "patchify",
+          "tpIds": []
+        },
+        {
+          "id": "9.5",
+          "title": "Encodeur audio, en idée",
+          "tag": "Multimodal",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "project_patches",
+          "tpIds": []
+        },
+        {
+          "id": "9.6",
+          "title": "La vidéo, espace et temps",
+          "tag": "Multimodal",
+          "minutes": 25,
+          "visual": "patches",
+          "interactive": true,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "patchify",
+          "tpIds": []
+        },
+        {
+          "id": "9.7",
+          "title": "Projeter vers un espace commun",
+          "tag": "Multimodal",
+          "minutes": 30,
+          "visual": "patches",
+          "interactive": true,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "project_patches",
+          "tpIds": []
+        },
+        {
+          "id": "9.8",
+          "title": "Fusionner les modalités",
+          "tag": "Multimodal",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        },
+        {
+          "id": "9.9",
+          "title": "Des sorties multimodales",
+          "tag": "Multimodal",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "patchify",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Mémoire, retrieval et calcul adaptatif",
+      "summary": "Dépasser la fenêtre de contexte par une mémoire qu'on peut éteindre et mesurer.",
+      "project": "Une recherche par similarité et un contexte construit à partir des extraits. Référence : model/memory.py.",
+      "assessment": {
+        "criteria": [
+          "Retrouver une source et conserver son identifiant.",
+          "Contrôler le cas sans mot partagé et sans document.",
+          "Comparer un protocole avec/sans retrieval.",
+          "Dire que le contexte lexical n’est pas un agent entraîné."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "10.1",
+          "title": "Contexte et mémoire",
+          "tag": "Mémoire",
+          "minutes": 25,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "build_context",
+          "tpIds": []
+        },
+        {
+          "id": "10.2",
+          "title": "Des vecteurs pour chercher",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "embed",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "bow_vector",
+          "tpIds": []
+        },
+        {
+          "id": "10.3",
+          "title": "Retrieval",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "retrieve",
+          "tpIds": []
+        },
+        {
+          "id": "10.4",
+          "title": "Une mémoire externe",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "build_context",
+          "tpIds": []
+        },
+        {
+          "id": "10.5",
+          "title": "Une récurrence de raisonnement",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        },
+        {
+          "id": "10.6",
+          "title": "La profondeur adaptative",
+          "tag": "Mémoire",
+          "minutes": 25,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        },
+        {
+          "id": "10.7",
+          "title": "Outils et agents",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "retrieve",
+          "tpIds": []
+        },
+        {
+          "id": "10.8",
+          "title": "Évaluer le raisonnement",
+          "tag": "Mémoire",
+          "minutes": 30,
+          "visual": "retrieve",
+          "interactive": true,
+          "codeFile": "model/memory.py",
+          "codeSymbol": "build_context",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Frontière de la recherche",
+      "summary": "Lire une idée récente, la réduire à une expérience, et dire ce qui n'a pas été reproduit.",
+      "project": "Un comparateur baseline / variante. Référence : model/experiment.py.",
+      "assessment": {
+        "criteria": [
+          "Résumer question, données, baseline et budget d’un article.",
+          "Distinguer test logiciel et mesure expérimentale.",
+          "Utiliser une unité commune entre tokenizers.",
+          "Séparer résultats locaux et résultats seulement lus."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "11.1",
+          "title": "Lire un papier",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "run_ablation",
+          "tpIds": []
+        },
+        {
+          "id": "11.2",
+          "title": "Reproduire une expérience",
+          "tag": "Recherche",
+          "minutes": 35,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "bigram_versus_uniform",
+          "tpIds": []
+        },
+        {
+          "id": "11.3",
+          "title": "Concepts plutôt que tokens",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/tokenizer.py",
+          "codeSymbol": "CharTokenizer",
+          "tpIds": []
+        },
+        {
+          "id": "11.4",
+          "title": "Un temps de calcul interne",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "11.5",
+          "title": "Raisonner dans un espace continu",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/ssm.py",
+          "codeSymbol": "selective_scan",
+          "tpIds": []
+        },
+        {
+          "id": "11.6",
+          "title": "Alternatives à l'attention",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        },
+        {
+          "id": "11.7",
+          "title": "Multimodal natif",
+          "tag": "Recherche",
+          "minutes": 25,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/multimodal.py",
+          "codeSymbol": "project_patches",
+          "tpIds": []
+        },
+        {
+          "id": "11.8",
+          "title": "Ce qui n'a pas été reproduit",
+          "tag": "Recherche",
+          "minutes": 30,
+          "visual": "compare",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "run_ablation",
+          "tpIds": []
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Concevoir ton architecture",
+      "summary": "Formuler une hypothèse, la mesurer contre une baseline, et documenter le compromis.",
+      "project": "Un GPT personnel entraîné, une variation contrôlée et un rapport ; le dos hybride reste une extension de forward.",
+      "assessment": {
+        "criteria": [
+          "Livrer un projet personnel exécutable avec ses composants.",
+          "Mesurer un GPT entraîné, pas seulement un dos initialisé.",
+          "Comparer une variation à budget et données documentés.",
+          "Remettre le rapport final et expliquer ses limites sans le corrigé."
+        ],
+        "deliverable": "Rapport du GPT personnel et variation contrôlée.",
+        "guide": "atelier/PROJET_FINAL.md"
+      },
+      "steps": [
+        {
+          "id": "12.1",
+          "title": "Formuler une hypothèse",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "run_ablation",
+          "tpIds": []
+        },
+        {
+          "id": "12.2",
+          "title": "La baseline",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "bigram_versus_uniform",
+          "tpIds": []
+        },
+        {
+          "id": "12.3",
+          "title": "L'ablation",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/experiment.py",
+          "codeSymbol": "run_ablation",
+          "tpIds": []
+        },
+        {
+          "id": "12.4",
+          "title": "Les métriques",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "quality_table",
+          "tpIds": []
+        },
+        {
+          "id": "12.5",
+          "title": "Un banc d'essai",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "corpus_loss",
+          "tpIds": []
+        },
+        {
+          "id": "12.6",
+          "title": "Qualité, latence, mémoire, énergie",
+          "tag": "Architecture",
+          "minutes": 35,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "parameter_bytes",
+          "tpIds": []
+        },
+        {
+          "id": "12.7",
+          "title": "La modularité",
+          "tag": "Architecture",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/backbone.py",
+          "codeSymbol": "Backbone.forward",
+          "tpIds": []
+        },
+        {
+          "id": "12.8",
+          "title": "L'architecture candidate",
+          "tag": "Architecture",
+          "minutes": 35,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": []
+        },
+        {
+          "id": "12.9",
+          "title": "Entraîner ce que tu sais entraîner",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": []
+        },
+        {
+          "id": "12.10",
+          "title": "Analyser un échec",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/bench.py",
+          "codeSymbol": "quality_table",
+          "tpIds": []
+        },
+        {
+          "id": "12.11",
+          "title": "Itérer une fois",
+          "tag": "Architecture",
+          "minutes": 25,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "train_gpt",
+          "tpIds": []
+        },
+        {
+          "id": "12.12",
+          "title": "Documenter la candidate",
+          "tag": "Architecture",
+          "minutes": 30,
+          "visual": "stack",
+          "interactive": false,
+          "codeFile": "model/gpt_train.py",
+          "codeSymbol": "save_checkpoint",
+          "tpIds": [
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Tokenizer BPE, données et ajustement",
+      "summary": "Entraîner un vrai vocabulaire, choisir un jeu de données, puis ajuster le petit GPT avec un masque et LoRA.",
+      "project": "Le BPE de model/bpe.py, le catalogue data/datasets.json, le playground, puis model/finetune.py et model/lora.py.",
+      "assessment": {
+        "criteria": [
+          "Sauver et recharger le BPE sans écraser le tokenizer fourni.",
+          "Réserver des documents et contrôler doublons/couverture.",
+          "Mesurer SFT sur validation séparée et garder le test final.",
+          "Évaluer reformulations et arrêt, en déclarant la limite mono-tour."
+        ],
+        "deliverable": "Code, résultat attendu, résultat obtenu et un cas limite.",
+        "guide": "atelier/GUIDE.md"
+      },
+      "steps": [
+        {
+          "id": "13.1",
+          "title": "Fusionner les paires",
+          "tag": "BPE",
+          "minutes": 35,
+          "visual": "bpe",
+          "interactive": true,
+          "codeFile": "model/bpe.py",
+          "codeSymbol": "BPETokenizer.train",
+          "tpIds": []
+        },
+        {
+          "id": "13.2",
+          "title": "Garder le vocabulaire",
+          "tag": "BPE",
+          "minutes": 25,
+          "visual": "bpe",
+          "interactive": true,
+          "codeFile": "model/bpe.py",
+          "codeSymbol": "BPETokenizer.save",
+          "tpIds": []
+        },
+        {
+          "id": "13.3",
+          "title": "Choisir le texte",
+          "tag": "Données",
+          "minutes": 30,
+          "visual": "bars",
+          "interactive": false,
+          "codeFile": "model/datasets.py",
+          "codeSymbol": "prepared_splits",
+          "tpIds": [
+            12
+          ]
+        },
+        {
+          "id": "13.4",
+          "title": "Le playground",
+          "tag": "Playground",
+          "minutes": 30,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/export_js.py",
+          "codeSymbol": "export_browser",
+          "tpIds": []
+        },
+        {
+          "id": "13.5",
+          "title": "Des questions et des réponses",
+          "tag": "Ajustement",
+          "minutes": 25,
+          "visual": "flow",
+          "interactive": false,
+          "codeFile": "model/finetune.py",
+          "codeSymbol": "format_pair",
+          "tpIds": []
+        },
+        {
+          "id": "13.6",
+          "title": "Masquer la question",
+          "tag": "Ajustement",
+          "minutes": 35,
+          "visual": "loss",
+          "interactive": true,
+          "codeFile": "model/finetune.py",
+          "codeSymbol": "example_ids",
+          "tpIds": []
+        },
+        {
+          "id": "13.7",
+          "title": "Ajuster sans tout bouger",
+          "tag": "LoRA",
+          "minutes": 35,
+          "visual": "lora",
+          "interactive": true,
+          "codeFile": "model/lora.py",
+          "codeSymbol": "init_lora",
+          "tpIds": []
+        },
+        {
+          "id": "13.8",
+          "title": "Continuer le dialogue",
+          "tag": "Dialogue",
+          "minutes": 25,
+          "visual": "transformer",
+          "interactive": true,
+          "codeFile": "model/finetune.py",
+          "codeSymbol": "evaluate_instructions",
+          "tpIds": []
+        }
+      ]
+    }
+  ]
+}

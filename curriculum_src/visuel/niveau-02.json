@@ -1,0 +1,79 @@
+{
+  "2.1": {
+    "phrase": "Unicode donne un numéro à chaque caractère, avant tout découpage en tokens.",
+    "image": "Un immense catalogue où chaque caractère a son numéro de page.",
+    "cle": "ord(\"A\") = 65 · ord(\"é\") = 233",
+    "piege": "Un numéro Unicode n'est pas encore un token du modèle.",
+    "etapes": [["Lire", "le texte caractère par caractère"], ["Numéroter", "ord(caractère)"], ["Retrouver", "chr(numéro)"]]
+  },
+  "2.2": {
+    "phrase": "Le corpus est la seule matière où le modèle peut trouver des régularités.",
+    "image": "Une bibliothèque : le modèle ne sait que ce qu'elle contient.",
+    "cle": "read_text(encoding=\"utf-8\")",
+    "piege": "Oublier l'encodage : les accents se cassent selon la machine.",
+    "etapes": [["Rassembler", "des textes"], ["Charger", "en UTF-8"], ["Compter", "caractères et mots"]]
+  },
+  "2.3": {
+    "phrase": "Un fichier est fait d'octets ; UTF-8 code un caractère sur 1 à 4 octets.",
+    "image": "Des colis de tailles variées : « a » tient dans 1 carton, « 🤖 » dans 4.",
+    "cle": "\"é\" = 1 caractère = 2 octets",
+    "piege": "len(texte) compte des caractères, pas des octets.",
+    "etapes": [["Prendre", "un caractère"], ["Encoder", ".encode(\"utf-8\")"], ["Compter", "les octets obtenus"]]
+  },
+  "2.4": {
+    "phrase": "Le vocabulaire est la liste fermée des unités connues, chacune avec un numéro fixe.",
+    "image": "Un alphabet de casiers numérotés : sans casier, pas de place.",
+    "cle": "sorted(set(texte))",
+    "piege": "Changer l'ordre du vocabulaire après l'entraînement change le sens des numéros.",
+    "etapes": [["Collecter", "les caractères uniques"], ["Trier", "dans un ordre stable"], ["Numéroter", "0, 1, 2…"]]
+  },
+  "2.5": {
+    "phrase": "Le tokenizer traduit le texte en numéros et les numéros en texte, sans rien perdre.",
+    "image": "Un dictionnaire à deux sens : caractère → numéro et numéro → caractère.",
+    "cle": "\"abba\" → [0, 1, 1, 0] → \"abba\"",
+    "piege": "Un aller-retour qui ne rend pas le texte d'origine est un bug.",
+    "etapes": [["Construire", "stoi et itos"], ["Encoder", "texte → ids"], ["Décoder", "ids → texte identique"]]
+  },
+  "2.6": {
+    "phrase": "BPE fusionne les paires fréquentes pour raccourcir les séquences.",
+    "image": "Des aimants : les lettres souvent voisines finissent collées.",
+    "cle": "banana : « an » apparaît 2 fois",
+    "piege": "BPE ne découpe pas en mots : il recolle des morceaux fréquents.",
+    "etapes": [["Lister", "les paires voisines"], ["Compter", "la plus fréquente"], ["Fusionner", "en un nouveau token"]]
+  },
+  "2.7": {
+    "phrase": "Chaque fusion crée un nouveau token ; décoder défait les fusions à l'envers.",
+    "image": "Une poupée russe : chaque token contient les deux qu'il a fusionnés.",
+    "cle": "nouvel id = entier suivant",
+    "piege": "Décoder dans le mauvais ordre : le texte rendu est faux.",
+    "etapes": [["Compter", "les paires"], ["Fusionner", "la gagnante, nouvel id"], ["Répéter", "num_merges fois"]]
+  },
+  "2.8": {
+    "phrase": "Un identifiant est un numéro de casier, pas une quantité.",
+    "image": "Des numéros de vestiaire : le 7 n'est pas « plus » que le 1.",
+    "cle": "{\"a\": 0, \"b\": 1}",
+    "piege": "Additionner ou comparer des ids n'a aucun sens linguistique.",
+    "etapes": [["Encoder", "en entiers"], ["Ranger", "dans un tableau"], ["Transmettre", "au modèle, sans calcul"]]
+  },
+  "2.9": {
+    "phrase": "Un embedding remplace chaque numéro par un vecteur appris.",
+    "image": "Une étagère : une ligne par token, on va chercher la bonne ligne.",
+    "cle": "ids (2, 5) → vecteurs (2, 5, D)",
+    "piege": "Ce n'est pas un calcul : c'est une lecture de ligne dans la table.",
+    "etapes": [["Créer", "une table V × D"], ["Lire", "la ligne de chaque id"], ["Apprendre", "les valeurs de la table"]]
+  },
+  "2.10": {
+    "phrase": "On ajoute un vecteur de position pour que l'ordre des mots compte.",
+    "image": "Des numéros de siège : mêmes passagers, places différentes.",
+    "cle": "vecteur = token[t] + position[t]",
+    "piege": "Au-delà de block_size, il n'existe pas de vecteur de position appris.",
+    "etapes": [["Lire", "le vecteur du token"], ["Ajouter", "celui de sa position"], ["Obtenir", "un vecteur ordonné"]]
+  },
+  "2.11": {
+    "phrase": "On entraîne par lots de fenêtres : B séquences de T tokens.",
+    "image": "Une plaque de biscuits : B rangées de T biscuits.",
+    "cle": "x = ids[i:i+T] · y = ids[i+1:i+T+1]",
+    "piege": "x = y crée une tâche de recopie : la cible est décalée d'un cran.",
+    "etapes": [["Couper", "une fenêtre de T tokens"], ["Décaler", "la cible d'un cran"], ["Empiler", "B fenêtres"]]
+  }
+}

@@ -1,3 +1,4 @@
+import { ASSET_VERSION } from "./version.js";
 import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
 import {
@@ -75,6 +76,7 @@ const state = {
   finetuneRun: null,
   owner: false,
   local: false,
+  lessonsReady: false,
   localSnapshot: null,
   localToken: null,
   quizzes: {},
@@ -122,12 +124,25 @@ document.addEventListener("DOMContentLoaded", () => {
           return null;
         }
       })(),
-      false,
+      // Sans choix enregistré, on suit le réglage clair/sombre du système, comme le script du head.
+      typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-color-scheme: light)").matches,
     ),
     false,
   );
   boot();
   registerOffline();
+});
+
+/** Les polices arrivent après le chargement : au premier passage la police système suffit, ensuite le cache sert Inter. */
+function loadThemeFonts() {
+  if (document.querySelector('link[data-theme-fonts]')) return;
+  const href = new URL(`assets/css/fonts.css?v=${ASSET_VERSION}`, document.baseURI).href;
+  document.head.append(h("link", { rel: "stylesheet", href, "data-theme-fonts": "true" }));
+}
+window.addEventListener("load", () => {
+  if (typeof requestIdleCallback === "function") requestIdleCallback(loadThemeFonts, { timeout: 3000 });
+  else setTimeout(loadThemeFonts, 200);
 });
 
 function cacheElements() {
@@ -218,7 +233,7 @@ function bindChrome() {
 async function boot() {
   try {
     const response = await fetch(
-      new URL("data/curriculum.json", document.baseURI),
+      new URL("data/curriculum-index.json", document.baseURI),
     );
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
@@ -267,6 +282,61 @@ async function loadJsonReport(path) {
   } catch {
     return null;
   }
+}
+
+let lessonsPromise = null;
+
+// Le contenu des leçons ne sert qu'aux leçons, à la recherche et au glossaire : demandé à l'approche d'un lien de leçon.
+for (const type of ["pointerover", "focusin", "touchstart"])
+  document.addEventListener(
+    type,
+    (event) => {
+      if (state.index && !state.lessonsReady && event.target?.closest?.('a[href^="#/lecon/"]'))
+        ensureLessons().catch(() => {});
+    },
+    { passive: true },
+  );
+
+/** Complète l'index léger avec le texte des leçons et leurs résumés visuels. Une erreur réseau permet de réessayer. */
+function ensureLessons() {
+  if (!lessonsPromise)
+    lessonsPromise = Promise.all(
+      ["data/curriculum.json", "data/glance.json"].map((path) =>
+        fetch(new URL(path, document.baseURI)).then((response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json();
+        }),
+      ),
+    )
+      .then(([full, glances]) => {
+        for (const level of full.levels)
+          for (const step of level.steps) {
+            const item = state.index?.byId.get(step.id);
+            if (item) Object.assign(item.lesson, step, { glance: glances[step.id] });
+          }
+        state.lessonsReady = true;
+      })
+      .catch((error) => {
+        lessonsPromise = null;
+        throw error;
+      });
+  return lessonsPromise;
+}
+
+/** Affiche un message d'attente, puis repeint la page quand le contenu des leçons est là. */
+function waitForLessons(ticket, label) {
+  els.main.replaceChildren(h("p", { class: "lead", text: label }));
+  ensureLessons()
+    .then(() => {
+      if (ticket === state.pageTicket) render({ scroll: "keep" });
+    })
+    .catch(() => {
+      if (ticket !== state.pageTicket) return;
+      els.main.replaceChildren(
+        h("h1", { text: "Contenu indisponible" }),
+        h("p", { text: "Le texte des leçons n'a pas pu être chargé. Vérifie la connexion puis recharge la page." }),
+      );
+    });
 }
 
 let reportsPromise = null;
@@ -455,7 +525,7 @@ function applyTheme(theme, store) {
   document.documentElement.style.colorScheme = theme;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta)
-    meta.setAttribute("content", theme === "light" ? "#f4f0e7" : "#14120f");
+    meta.setAttribute("content", theme === "light" ? "#f4f7fc" : "#0f1626");
   if (store) { try { safeStorage()?.setItem(THEME_KEY, theme); } catch { /* thème pour cette page */ } }
   if (els.theme) {
     const toLight = theme === "dark";
@@ -524,6 +594,12 @@ function openSearch() {
   state.searchActive = 0;
   paintSearchResults();
   els.searchInput.focus();
+  if (!state.lessonsReady)
+    ensureLessons()
+      .then(() => {
+        if (!els.dialog.hidden) paintSearchResults();
+      })
+      .catch(() => {});
 }
 
 function closeSearch() {
@@ -779,7 +855,10 @@ function paintMain(route, ticket) {
       (mod) => mod.paintExperiments(els.main),
     );
   else if (route.name === "study") paintStudy(els.main, state.index);
-  else if (route.name === "glossary") paintGlossary(els.main, state.index);
+  else if (route.name === "glossary") {
+    if (!state.lessonsReady) waitForLessons(ticket, "Chargement du glossaire…");
+    else paintGlossary(els.main, state.index);
+  }
   else if (route.name === "placement")
     paintAsync(ticket, () => import("./placement.js"), (mod) =>
       mod.paintPlacement(els.main, {
@@ -801,6 +880,10 @@ function paintMain(route, ticket) {
   else if (route.name === "home") paintHome();
   else if (route.name === "level") paintLevel(route.id);
   else if (route.name === "lesson") {
+    if (!state.lessonsReady) {
+      waitForLessons(ticket, "Chargement de la leçon…");
+      return;
+    }
     paintLesson(route.id);
     import("./lesson-tools.js")
       .then((mod) => {
@@ -1224,47 +1307,68 @@ function paintLesson(id) {
   });
 }
 
+const STEP_FIGURES = new Set(["flow", "stack", "compare", "bars", "machine"]);
+
+/** Trois gestes numérotés, reliés par des flèches : le schéma de l'étape quand elle n'a pas de figure dédiée. */
+function stepsDiagram(steps, { large = false } = {}) {
+  const list = h("ol", { class: large ? "glance-steps is-large" : "glance-steps" });
+  steps.forEach((step, index) => {
+    list.append(
+      h("li", { class: "glance-step", style: `--i: ${index}` }, [
+        h("span", { class: "glance-step-num", "aria-hidden": "true", text: String(index + 1) }),
+        h("strong", { text: step.title }),
+        h("span", { text: step.text }),
+      ]),
+    );
+  });
+  return list;
+}
+
+function glanceCards(glance) {
+  return h("div", { class: "glance-cards" }, [
+    h("section", { class: "glance-card", "aria-labelledby": "glance-image" }, [
+      h("h2", { id: "glance-image", class: "glance-label", text: "En image" }),
+      h("p", { text: glance.image }),
+    ]),
+    h("section", { class: "glance-card is-key", "aria-labelledby": "glance-key" }, [
+      h("h2", { id: "glance-key", class: "glance-label", text: "L'essentiel" }),
+      h("p", {}, h("code", { text: glance.key })),
+    ]),
+    h("section", { class: "glance-card is-trap", "aria-labelledby": "glance-trap" }, [
+      h("h2", { id: "glance-trap", class: "glance-label", text: "Piège" }),
+      h("p", { text: glance.trap }),
+    ]),
+  ]);
+}
+
+function readingMinutes(lesson) {
+  const words = [lesson.why, lesson.build, lesson.review, ...lesson.sections.map((s) => s.text || ""), ...(lesson.takeaways || []), ...(lesson.pitfalls || [])]
+    .join(" ")
+    .split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 function lessonBody(lesson, grade, done, around) {
+  const glance = lesson.glance;
+  const stepFigure = STEP_FIGURES.has(lesson.visual || "flow");
   const nodes = [
-    h("p", { class: "lead", text: lesson.why }),
-    h("figure", { class: "visual", "data-visual": lesson.visual || "flow" }, [
-      h("figcaption", { text: lesson.visualCaption || "" }),
+    h("p", { class: "lead glance-phrase", text: glance.phrase }),
+    h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
+      h("figcaption", { text: stepFigure ? "L'étape en trois gestes." : lesson.visualCaption || "" }),
       h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
   ];
-  for (const section of lesson.sections) {
-    if (section.kind === "code") nodes.push(codeBlock(section));
-    else if (section.kind === "reference") nodes.push(h("section", { class: "block block-reference" }, [
-      h("h2", { text: section.heading }),
-      h("a", { href: section.href, target: "_blank", rel: "noopener", text: section.title }),
-      ...paragraphs(section.text),
-    ]));
-    else {
-      nodes.push(
-        h("section", { class: `block block-${section.kind}` }, [
-          h("h2", { text: section.heading }),
-          ...paragraphs(section.text),
-        ]),
-      );
-    }
-  }
+  if (!stepFigure)
+    nodes.push(
+      h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
+        h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
+        stepsDiagram(glance.steps),
+      ]),
+    );
+  nodes.push(glanceCards(glance));
+  for (const section of lesson.sections) if (section.kind === "code") nodes.push(codeBlock(section));
   nodes.push(
-    h("section", { class: "callout callout-takeaway" }, [
-      h("h2", { text: "À retenir" }),
-      h(
-        "ul",
-        {},
-        (lesson.takeaways || []).map((item) => h("li", { text: item })),
-      ),
-    ]),
-    h("section", { class: "callout callout-pitfall" }, [
-      h("h2", { text: "Pièges fréquents" }),
-      h(
-        "ul",
-        {},
-        (lesson.pitfalls || []).map((item) => h("li", { text: item })),
-      ),
-    ]),
+    quizBlock(lesson, grade),
     h("section", { class: "callout callout-exercise" }, [
       h("h2", { text: "Exercice" }),
       ...paragraphs(lesson.exercise),
@@ -1299,34 +1403,7 @@ function lessonBody(lesson, grade, done, around) {
         paragraphs(lesson.solution || ""),
       ),
     ]),
-    h("section", { class: "callout callout-build" }, [
-      h("h2", { text: "Fil rouge" }),
-      ...paragraphs(lesson.build),
-      h("p", {}, [
-        "Fichier : ",
-        h("code", { text: lesson.codeFile || "model/" }),
-        lesson.codeSymbol ? ` · ${lesson.codeSymbol}` : "",
-        ".",
-      ]),
-      h("p", {}, [
-        h("a", {
-          href: "#/construire",
-          text: "Ouvrir la piste « construire mon LLM ».",
-        }),
-      ]),
-      ...(lesson.tpIds || []).map((id) =>
-        h(
-          "p",
-          {},
-          h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` }),
-        ),
-      ),
-    ]),
-    h("section", { class: "callout callout-review" }, [
-      h("h2", { text: "À retrouver plus tard" }),
-      h("p", { text: lesson.review || "" }),
-    ]),
-    quizBlock(lesson, grade),
+    lessonDeep(lesson),
     h("div", { class: "lesson-actions" }, [
       around.prev
         ? h(
@@ -1365,6 +1442,64 @@ function lessonBody(lesson, grade, done, around) {
     ]),
   );
   return nodes;
+}
+
+/** Le texte complet de l'étape, replié : il reste là pour qui veut creuser, sans encombrer la page. */
+function lessonDeep(lesson) {
+  const body = [h("p", { text: lesson.why })];
+  for (const section of lesson.sections) {
+    if (section.kind === "code") continue;
+    if (section.kind === "reference")
+      body.push(
+        h("section", { class: "block block-reference" }, [
+          h("h3", { text: section.heading }),
+          h("a", { href: section.href, target: "_blank", rel: "noopener", text: section.title }),
+          ...paragraphs(section.text),
+        ]),
+      );
+    else
+      body.push(
+        h("section", { class: `block block-${section.kind}` }, [
+          h("h3", { text: section.heading }),
+          ...paragraphs(section.text),
+        ]),
+      );
+  }
+  body.push(
+    h("section", { class: "callout callout-takeaway" }, [
+      h("h3", { text: "À retenir" }),
+      h("ul", {}, (lesson.takeaways || []).map((item) => h("li", { text: item }))),
+    ]),
+    h("section", { class: "callout callout-pitfall" }, [
+      h("h3", { text: "Pièges fréquents" }),
+      h("ul", {}, (lesson.pitfalls || []).map((item) => h("li", { text: item }))),
+    ]),
+    h("section", { class: "callout callout-build" }, [
+      h("h3", { text: "Fil rouge" }),
+      ...paragraphs(lesson.build),
+      h("p", {}, [
+        "Fichier : ",
+        h("code", { text: lesson.codeFile || "model/" }),
+        lesson.codeSymbol ? ` · ${lesson.codeSymbol}` : "",
+        ".",
+      ]),
+      h("p", {}, [h("a", { href: "#/construire", text: "Ouvrir la piste « construire mon LLM »." })]),
+      ...(lesson.tpIds || []).map((id) =>
+        h("p", {}, h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` })),
+      ),
+    ]),
+    h("section", { class: "callout callout-review" }, [
+      h("h3", { text: "À retrouver plus tard" }),
+      h("p", { text: lesson.review || "" }),
+    ]),
+  );
+  return h("details", { class: "lesson-deep" }, [
+    h("summary", {}, [
+      h("span", { class: "lesson-deep-title", text: "Pour aller plus loin" }),
+      h("span", { class: "lesson-deep-meta", text: `explication complète · environ ${readingMinutes(lesson)} min de lecture` }),
+    ]),
+    h("div", { class: "lesson-deep-body" }, body),
+  ]);
 }
 
 function paragraphs(text) {

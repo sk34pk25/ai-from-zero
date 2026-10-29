@@ -1,0 +1,58 @@
+{
+  "10.1": {
+    "phrase": "La fenêtre est la page ouverte ; une mémoire externe est une étagère consultée au besoin.",
+    "image": "Le bureau et la bibliothèque : on n'apporte que les bons livres.",
+    "cle": "fenêtre ∝ T² · mémoire : k extraits choisis",
+    "piege": "La mémoire externe n'aide que par les extraits réellement injectés.",
+    "etapes": [["Ranger", "les documents dehors"], ["Chercher", "les k plus utiles"], ["Coller", "dans le contexte"]]
+  },
+  "10.2": {
+    "phrase": "Pour chercher, on transforme question et documents en vecteurs comparables.",
+    "image": "Deux flèches de mots : même direction = mêmes proportions de mots.",
+    "cle": "sac de mots normalisé · cosinus",
+    "piege": "Un texte sans mot commun donne un vecteur nul, jamais une division par zéro.",
+    "etapes": [["Compter", "les mots"], ["Normaliser", "longueur 1"], ["Comparer", "par produit scalaire"]]
+  },
+  "10.3": {
+    "phrase": "Le retrieval note chaque document et garde les k meilleurs, de façon reproductible.",
+    "image": "Trier des fiches : à égalité, la première rangée gagne.",
+    "cle": "top-k par cosinus · égalité → plus petit indice",
+    "piege": "À score nul, aucun document n'est vraiment pertinent.",
+    "etapes": [["Noter", "chaque document"], ["Trier", "du meilleur au moins bon"], ["Garder", "les k premiers"]]
+  },
+  "10.4": {
+    "phrase": "On injecte des extraits numérotés et visibles, qu'on peut citer et éteindre.",
+    "image": "Une réponse avec ses sources en note de bas de page.",
+    "cle": "« Question : … » + « Extraits : [i] … »",
+    "piege": "Sans afficher les extraits, on ne peut pas vérifier d'où vient la réponse.",
+    "etapes": [["Chercher", "les extraits"], ["Numéroter", "avec l'index d'origine"], ["Assembler", "question + extraits"]]
+  },
+  "10.5": {
+    "phrase": "Raisonner en plusieurs passes : brouillon, relecture, correction.",
+    "image": "Relire sa copie avant de la rendre.",
+    "cle": "sortie précédente → nouvelle entrée",
+    "piege": "Ce n'est pas le scan interne du SSM : c'est une boucle de passes.",
+    "etapes": [["Répondre", "un brouillon"], ["Réinjecter", "le brouillon"], ["Corriger", "une nouvelle passe"]]
+  },
+  "10.6": {
+    "phrase": "La profondeur adaptative s'arrête tôt quand la réponse est facile.",
+    "image": "On ne relit pas dix fois une addition, mais une preuve, oui.",
+    "cle": "confiance par couche + seuil",
+    "piege": "Le dos du labo exécute toujours toutes ses couches.",
+    "etapes": [["Calculer", "couche par couche"], ["Mesurer", "la confiance"], ["S'arrêter", "au-dessus du seuil"]]
+  },
+  "10.7": {
+    "phrase": "Un outil est une fonction extérieure ; un agent décide quand l'appeler.",
+    "image": "Prêter une montre à qui on demande l'heure.",
+    "cle": "agent = boucle + outils + trace des appels",
+    "piege": "retrieve est un outil ; la boucle d'agent n'est pas écrite ici.",
+    "etapes": [["Décider", "outil ou réponse"], ["Appeler", "l'outil"], ["Tracer", "chaque appel"]]
+  },
+  "10.8": {
+    "phrase": "Une bonne réponse ne prouve pas un raisonnement : on compare avec et sans extraits.",
+    "image": "Retirer la béquille pour voir si l'on tient debout.",
+    "cle": "avec extraits vs sans extraits",
+    "piege": "Une seule bonne réponse peut venir de la chance ou de la mémoire.",
+    "etapes": [["Poser", "avec extraits"], ["Reposer", "sans extraits"], ["Comparer", "les résultats"]]
+  }
+}

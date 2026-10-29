@@ -38,3 +38,32 @@ def test_every_step_is_real_and_answers_move():
         assert step["build"]
         assert step["exercise"]
         assert step["why"]
+
+
+def test_every_step_has_a_short_visual_summary():
+    builder = load_builder()
+    data = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+    glances = json.loads((ROOT / "data" / "glance.json").read_text(encoding="utf-8"))
+    assert glances == builder.build_glances()
+    steps = [step for level in data["levels"] for step in level["steps"]]
+    assert list(glances) == [step["id"] for step in steps]
+    for step in steps:
+        glance = glances[step["id"]]
+        assert 0 < len(glance["phrase"]) <= 120, step["id"]
+        assert 0 < len(glance["image"]) <= 95, step["id"]
+        assert 0 < len(glance["key"]) <= 60, step["id"]
+        assert 0 < len(glance["trap"]) <= 100, step["id"]
+        assert len(glance["steps"]) == 3, step["id"]
+        for item in glance["steps"]:
+            assert 0 < len(item["title"]) <= 20 and 0 < len(item["text"]) <= 42, step["id"]
+    phrases = [glance["phrase"] for glance in glances.values()]
+    assert len(set(phrases)) == len(phrases), "chaque leçon a sa propre phrase clé"
+
+
+def test_site_boots_from_a_light_index_of_the_same_course():
+    builder = load_builder()
+    index = json.loads((ROOT / "data" / "curriculum-index.json").read_text(encoding="utf-8"))
+    assert index == builder.build_index()
+    full = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+    assert [s["id"] for l in index["levels"] for s in l["steps"]] == [s["id"] for l in full["levels"] for s in l["steps"]]
+    assert len((ROOT / "data" / "curriculum-index.json").read_bytes()) < len((ROOT / "data" / "curriculum.json").read_bytes()) / 8

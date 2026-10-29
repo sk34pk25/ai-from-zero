@@ -119,8 +119,11 @@ test("la navigation clavier de la recherche boucle", () => {
 
 test("le curriculum commité a 161 leçons et des réponses réparties", () => {
   const data = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
+  const glances = JSON.parse(readFileSync(new URL("../../data/glance.json", import.meta.url), "utf8"));
   const steps = data.levels.flatMap((level) => level.steps);
   assert.equal(steps.length, 161);
+  assert.deepEqual(Object.keys(glances), steps.map((step) => step.id));
+  assert.equal(JSON.stringify(data).includes('"glance"'), false, "l'accueil ne télécharge pas les résumés");
   assert.deepEqual(data.levels.map((level) => level.steps.length), [23, 17, 11, 11, 14, 10, 12, 9, 9, 9, 8, 8, 12, 8]);
   const counts = [0, 0, 0, 0];
   for (const step of steps) {
@@ -139,6 +142,9 @@ test("le curriculum commité a 161 leçons et des réponses réparties", () => {
     assert.ok(step.solution.length > 40);
     assert.ok(step.codeFile.startsWith("model/"));
     assert.ok(step.review.includes(step.title));
+    const glance = glances[step.id];
+    assert.equal(glance.steps.length, 3);
+    assert.ok(glance.phrase.length <= 120 && glance.key.length <= 60);
   }
   assert.deepEqual(counts, [41, 40, 40, 40]);
   assert.equal(data.track.length, 20);

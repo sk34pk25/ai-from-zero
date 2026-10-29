@@ -12,6 +12,12 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie les leçons aux fichiers de `model/`, du dossier vide jusqu'à un TinyGPT entraîné, puis au BPE, au catalogue de données, au playground et à l'ajustement. Le compte-rendu d'un run CPU réel est dans [`data/gpt_run.json`](data/gpt_run.json).
 
+## Design et format visuel
+
+Le site utilise le thème « Cahier lumineux » : fond clair, bleu vif `#2558E8`, surligneur jaune, polices Inter et Inter Display servies par le site (`assets/fonts/`, licence OFL). La variante sombre « Cahier nuit » suit le réglage du système et reste au choix avec le bouton de thème.
+
+Chaque leçon s'ouvre d'abord en version visuelle : une phrase clé, un schéma (manipulable quand il existe, sinon les trois gestes de l'étape), trois cartes « En image », « L'essentiel » et « Piège », l'exemple de code puis le quiz. L'explication complète reste disponible, repliée sous « Pour aller plus loin ». Les résumés visuels sont écrits dans `curriculum_src/visuel/` ; `scripts/build_curriculum.py` refuse une leçon sans résumé ou un résumé trop long.
+
 ## Ce qui s'ajoute au parcours
 
 - `python3 -m model.bpe` n'est pas une commande : le tokenizer est `model/bpe.py`. `scripts/train_release.py` entraîne le BPE du run publié (1 500 fusions) puis le modèle. Une comparaison antérieure, plus courte, avait déjà donné moins de nats par caractère au BPE qu'aux caractères.

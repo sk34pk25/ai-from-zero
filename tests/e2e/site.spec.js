@@ -7,7 +7,8 @@ import { expect, test } from "@playwright/test";
 import { installOwner, signInAs } from "./session.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url), "utf8"));
-const lessons = curriculum.levels.flatMap((level) => level.steps);
+const glances = JSON.parse(readFileSync(new URL("../../data/glance.json", import.meta.url), "utf8"));
+const lessons = curriculum.levels.flatMap((level) => level.steps).map((step) => ({ ...step, glance: glances[step.id] }));
 
 function trackErrors(page) {
   const errors = [];
@@ -48,8 +49,11 @@ test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
     await expect(page.locator("h1")).toHaveText(lesson.title);
     await expect(page.locator("figure[data-visual]")).toHaveAttribute("data-visual", lesson.visual);
     await expect(page.locator("[data-visual-host]")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "À retenir" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Fil rouge" })).toBeVisible();
+    await expect(page.locator(".glance-phrase")).toHaveText(lesson.glance.phrase);
+    await expect(page.getByRole("heading", { name: "En image" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Piège" })).toBeVisible();
+    await expect(page.locator(".glance-step")).toHaveCount(3);
+    await expect(page.locator("details.lesson-deep")).toHaveCount(1);
     await expect(page.getByRole("heading", { name: "Quiz" })).toBeVisible();
   }
   expect(errors).toEqual([]);
