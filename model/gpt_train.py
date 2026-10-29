@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 
 from model.attention import rope_cos_sin
-from model.autograd import Tensor, cross_entropy, embedding, layernorm, repeat_kv, rope
+from model.autograd import Tensor, cross_entropy, embedding, layernorm
 from model.bpe import BPETokenizer
 from model.byte_bpe import ByteBPETokenizer
 from model.mathutil import cross_entropy as numpy_cross_entropy
@@ -94,11 +94,20 @@ def _attention_block(
     key = split("wk", kv_heads)
     value = split("wv", kv_heads)
     if config.pos == "rope":
+        try:
+            from model.autograd import rope
+        except ImportError as exc:
+            raise ValueError("Ton autograd.py ne fournit pas encore rope : ajoute cette primitive pour --pos rope, ou garde les positions absolues.") from exc
         cos, sin = rope_cos_sin(np.arange(time), head_dim)
         query = rope(query, cos, sin)
         key = rope(key, cos, sin)
-    key = repeat_kv(key, heads // kv_heads)
-    value = repeat_kv(value, heads // kv_heads)
+    if kv_heads != heads:
+        try:
+            from model.autograd import repeat_kv
+        except ImportError as exc:
+            raise ValueError("Ton autograd.py ne fournit pas encore repeat_kv : ajoute cette primitive pour le GQA, ou garde toutes les têtes K/V.") from exc
+        key = repeat_kv(key, heads // kv_heads)
+        value = repeat_kv(value, heads // kv_heads)
     scores = query.matmul(key.permute((0, 1, 3, 2))) * (float(head_dim) ** -0.5)
     weights = _causal_fill(scores).softmax(axis=-1)
     context = (
@@ -112,6 +121,8 @@ def _mlp_block(
 ) -> Tensor:
     prefix = f"l{layer}"
     if config is not None and config.ffn == "swiglu":
+        if not hasattr(Tensor, "silu"):
+            raise ValueError("Ton Tensor ne fournit pas encore silu : ajoute cette méthode pour SwiGLU, ou garde GELU.")
         gate = hidden.matmul(params[f"{prefix}.wg"]).silu()
         up = hidden.matmul(params[f"{prefix}.wu"])
         return (gate * up).matmul(params[f"{prefix}.wd"])

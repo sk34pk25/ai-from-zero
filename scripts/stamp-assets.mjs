@@ -171,6 +171,7 @@ function stamp() {
     "assets/vendor/editor.js",
     "assets/vendor/supabase.js",
     "data/exercises.json",
+    "data/placement_practice.json",
     "data/debug.json",
     "data/datasets.json",
     "data/gpt_run.json",

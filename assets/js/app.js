@@ -1,3 +1,4 @@
+import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
 import {
   openWorkspace,
@@ -74,6 +75,8 @@ const state = {
   finetuneRun: null,
   owner: false,
   local: false,
+  localSnapshot: null,
+  localToken: null,
   quizzes: {},
   exercises: {},
   pageTicket: 0,
@@ -196,6 +199,14 @@ function bindChrome() {
     setMenu(false);
     render({ scroll: "top" });
   });
+  window.addEventListener("storage", (event) => {
+    if (state.owner || !state.index || !localChangeKey(event.key)) return;
+    const wasLocal = state.local;
+    refreshLocalMode(); applyStoredProgress();
+    const editing = document.activeElement?.matches("textarea, input, [contenteditable=true]");
+    if (wasLocal !== state.local || (!editing && !event.key?.includes("/draft/"))) render({ scroll: "keep" });
+    else paintChrome();
+  });
   window.addEventListener("resize", syncSidebar);
   syncSidebar();
 }
@@ -279,6 +290,8 @@ async function loadFinetuneRun() {
 function applyStoredProgress() {
   if (!state.owner && state.local && state.index) {
     const stored = normalizeProgress(readLocalProgress(safeStorage()) || emptyProgress());
+    state.localSnapshot = normalizeProgress(stored);
+    state.localToken = localToken(safeStorage());
     const known = new Set(state.index.orderedIds);
     state.done = new Set(stored.done.filter((id) => known.has(id)));
     state.quizzes = stored.quizzes || {};
@@ -294,7 +307,7 @@ function applyStoredProgress() {
   const stored = normalizeProgress(
     getRecord(
       "progress",
-      readJson(localStorage, PROGRESS_KEY, emptyProgress()),
+      readJson(safeStorage(), PROGRESS_KEY, emptyProgress()),
     ),
   );
   const known = new Set(state.index.orderedIds);
@@ -312,14 +325,16 @@ function persistDone() {
         done: ordered,
         quizzes: state.quizzes,
         exercises: state.exercises,
-      })
+      }, state.localSnapshot, state.localToken)
     )
       toast("Le navigateur refuse l'enregistrement local.");
+    refreshLocalMode();
+    applyStoredProgress();
     return;
   }
   if (!state.owner) return;
   const ordered = state.index.numericIds.filter((id) => state.done.has(id));
-  writeJson(localStorage, PROGRESS_KEY, {
+  writeJson(safeStorage(), PROGRESS_KEY, {
     v: 1,
     done: ordered,
     quizzes: state.quizzes,
@@ -337,7 +352,7 @@ let remotePullStarted = false;
 
 function rememberProgressLocal() {
   const ordered = state.index.numericIds.filter((id) => state.done.has(id));
-  writeJson(localStorage, PROGRESS_KEY, {
+  writeJson(safeStorage(), PROGRESS_KEY, {
     v: 1,
     done: ordered,
     quizzes: state.quizzes,
@@ -393,6 +408,8 @@ subscribe(() => {
 });
 window.addEventListener("afz-exercise", ({ detail }) => {
   if (!tracking()) return;
+  if (detail.scope === "local" && (state.owner || detail.localToken !== state.localToken)) return;
+  if (detail.scope === "owner" && !state.owner) return;
   state.exercises[detail.id] = { ok: detail.ok };
   recordAttempt(detail.id, "exercise", detail.ok);
   persistDone();
@@ -403,20 +420,25 @@ function reviewKey() {
 }
 
 function readReview() {
-  const stored = readJson(localStorage, reviewKey(), {});
+  if (!state.owner) return readLocalReview(safeStorage());
+  const stored = readJson(safeStorage(), reviewKey(), {});
   if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
   return stored;
 }
 
 function writeReviewStamp(id, present) {
   if (!tracking()) return;
+  if (!state.owner) {
+    writeLocalReview(safeStorage(), id, present, state.localToken);
+    return;
+  }
   const map = readReview();
   if (present) {
     if (!map[id]) map[id] = Date.now();
   } else {
     delete map[id];
   }
-  writeJson(localStorage, reviewKey(), map);
+  writeJson(safeStorage(), reviewKey(), map);
 }
 
 function currentTheme() {
@@ -429,7 +451,7 @@ function applyTheme(theme, store) {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta)
     meta.setAttribute("content", theme === "light" ? "#f4f0e7" : "#14120f");
-  if (store) localStorage.setItem(THEME_KEY, theme);
+  if (store) { try { safeStorage()?.setItem(THEME_KEY, theme); } catch { /* thème pour cette page */ } }
   if (els.theme) {
     const toLight = theme === "dark";
     const label = toLight
@@ -639,6 +661,7 @@ function render({ scroll }) {
   const route = routeFromHref(location.href);
   const routeKey = JSON.stringify(route);
   const routeChanged = routeKey !== state.lastRouteKey;
+  const firstPaint = state.lastRouteKey === "";
   if (routeChanged) {
     state.quizChoice = null;
     state.hintCount = 0;
@@ -656,11 +679,11 @@ function render({ scroll }) {
   els.main.dataset.paint = String(ticket);
   paintChrome();
   paintMain(route, ticket);
-  if (scroll === "top") window.scrollTo(0, 0);
+  if (scroll === "top") { if (!firstPaint) window.scrollTo(0, 0); }
   else window.scrollTo(0, y);
   if (scroll === "top") {
     const heading = els.main.querySelector("h1");
-    if (heading && routeChanged) {
+    if (heading && routeChanged && !firstPaint) {
       if (!heading.hasAttribute("tabindex"))
         heading.setAttribute("tabindex", "-1");
       heading.focus({ preventScroll: true });
@@ -1630,12 +1653,13 @@ function enableLocalTracking() {
   return true;
 }
 
-function importLocalProgress(progress) {
-  if (!progress || !writeLocalProgress(safeStorage(), progress)) {
+function importLocalProgress(progress, drafts = {}) {
+  if (!progress || !writeLocalProgress(safeStorage(), progress, readLocalProgress(safeStorage()), state.localToken)) {
     toast("Sauvegarde non reconnue.");
     return;
   }
   applyStoredProgress();
+  for (const [id, code] of Object.entries(drafts)) writeLocalDraft(safeStorage(), id, code, state.localToken);
   toast(`Progression importée : ${stepsLabel(progress.done.length).toLowerCase()}.`);
   render({ scroll: "keep" });
 }

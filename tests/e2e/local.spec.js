@@ -43,7 +43,9 @@ test("un visiteur garde sa progression dans ce navigateur, l'exporte puis l'effa
   await expect(page.locator("#progress-meta")).toContainText("1 étape terminée");
   await page.reload();
   await expect(page.locator("#progress-meta")).toContainText("1 étape terminée");
-  expect(await storedKeys(page)).toEqual(["afz-local-learner", "afz-local-progress-v1", "afz-local-review-v1"]);
+  const keys = await storedKeys(page);
+  expect(keys).toContain("afz-local-learner");
+  expect(keys.filter(key=>key.startsWith("afz-local-v2/")).length).toBeGreaterThanOrEqual(3);
 
   await page.goto("/");
   const [download] = await Promise.all([
@@ -74,6 +76,7 @@ test("un visiteur garde sa progression dans ce navigateur, l'exporte puis l'effa
 
 test("le positionnement conseille des étapes puis garde le résultat sur demande", async ({ page }) => {
   const seen = watch(page);
+  await page.route("**/assets/js/pyworker.js*",route=>route.fulfill({contentType:"text/javascript",body:'self.onmessage=()=>self.postMessage({type:"done"});'}));
   await page.goto("/");
   await page.getByRole("button", { name: "J'ai déjà les bases" }).click();
   await expect(page).toHaveURL(/#\/positionnement$/);
@@ -92,6 +95,9 @@ test("le positionnement conseille des étapes puis garde le résultat sur demand
 
   const levelZero = curriculum.levels[0].steps.length;
   const expected = levelZero - missed.steps.length;
+  await expect(page.getByRole("button", { name: `Garder ce résultat sur cet appareil (${expected} étapes)` })).toBeDisabled();
+  await page.getByRole("button", { name: "Vérifier mon programme" }).click();
+  await expect(page.locator(".placement-practice")).toContainText("Cas publics réussis");
   await page.getByRole("button", { name: `Garder ce résultat sur cet appareil (${expected} étapes)` }).click();
   await expect(page.locator("#progress-meta")).toContainText(`${expected} étapes terminées`);
   await page.goto(`/#/lecon/${missed.steps[0]}`);

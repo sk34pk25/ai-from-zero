@@ -1,7 +1,5 @@
 import { offlinePanel } from "./offline.js";
 import { h } from "./dom.js";
-import { pathChoice } from "./path-choice.js";
-import { projectEvidence } from "./project-evidence.js";
 import {
   getRecord,
   setRecord,
@@ -210,10 +208,17 @@ export async function backupDownload() {
   );
 }
 export function paintStudy(main, index) {
+  const extras = h("div");
+  let current = true;
+  onLeave(() => { current = false; });
+  Promise.all([import("./path-choice.js"), import("./project-evidence.js")]).then(([path, project]) => {
+    if (current) extras.replaceChildren(path.pathChoice(index), project.projectEvidence(index));
+  }).catch(() => {
+    if (current) extras.append(h("p", { role: "status", text: "Les outils du projet n'ont pas pu être chargés. Recharge la page lorsque le réseau revient." }));
+  });
   main.replaceChildren(
     h("h1", { text: "Mon espace d’apprentissage" }),
-    pathChoice(index),
-    projectEvidence(index),
+    extras,
     offlinePanel(),
   );
   if (!isOwner()) {

@@ -6,57 +6,23 @@
  */
 import { h } from "./dom.js";
 import { stepsLabel } from "./progress.js";
-import { readJson, writeJson } from "./storage.js";
 import { validateBackup } from "./workspace.js";
 
-export const LOCAL_FLAG_KEY = "afz-local-learner";
-export const LOCAL_PROGRESS_KEY = "afz-local-progress-v1";
-export const LOCAL_REVIEW_KEY = "afz-local-review-v1";
-const LOCAL_KEYS = [LOCAL_FLAG_KEY, LOCAL_PROGRESS_KEY, LOCAL_REVIEW_KEY];
+export { LOCAL_FLAG_KEY, LOCAL_PROGRESS_KEY, LOCAL_REVIEW_KEY,
+  localLearnerEnabled, enableLocalLearner, forgetLocalLearner,
+  readLocalProgress, writeLocalProgress } from "./local-records.js";
+import { browserStorage, readLocalProgress, readLocalDrafts } from "./local-records.js";
 const STEP_ID = /^\d+\.\d+$/;
 
-export function localLearnerEnabled(storage) {
-  try {
-    return storage.getItem(LOCAL_FLAG_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-export function enableLocalLearner(storage) {
-  try {
-    storage.setItem(LOCAL_FLAG_KEY, "1");
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/** Efface toutes les clés du mode local, et seulement elles. */
-export function forgetLocalLearner(storage) {
-  for (const key of LOCAL_KEYS) {
-    try {
-      storage.removeItem(key);
-    } catch {
-      /* stockage indisponible */
-    }
-  }
-}
-
-export function readLocalProgress(storage) {
-  return readJson(storage, LOCAL_PROGRESS_KEY, null);
-}
-
-export function writeLocalProgress(storage, progress) {
-  return writeJson(storage, LOCAL_PROGRESS_KEY, progress);
-}
-
-export function localBackup(progress, now = new Date()) {
+export function localBackup(progress, now = new Date(), drafts = {}) {
   return {
     format: "ai-from-zero",
     version: 1,
     createdAt: now.toISOString(),
     records: {
+      ...Object.fromEntries(Object.entries(drafts)
+        .filter(([id, code]) => STEP_ID.test(id) && typeof code === "string" && code.length <= 100000)
+        .map(([id, code]) => ["lesson/" + id, { exerciseCode: code }])),
       progress: {
         v: 1,
         done: [...(progress?.done || [])].filter((id) => STEP_ID.test(id)),
@@ -84,6 +50,13 @@ export function progressFromBackup(backup, knownIds) {
     quizzes: keep(raw.quizzes),
     exercises: keep(raw.exercises),
   };
+}
+
+export function draftsFromBackup(backup, knownIds) {
+  const known = new Set(knownIds);
+  return Object.fromEntries(Object.entries(backup.records || {})
+    .filter(([key, row]) => key.startsWith("lesson/") && known.has(key.slice(7)) && typeof row?.exerciseCode === "string" && row.exerciseCode.length <= 100000)
+    .map(([key, row]) => [key.slice(7), row.exerciseCode]));
 }
 
 // Interface du mode local : activer, exporter, importer, effacer.
@@ -126,7 +99,7 @@ export function localPanel(ctx) {
         h("p", { class: "eyebrow", text: "Sans compte" }),
         h("h2", { id: "local-title", text: "Garder ta progression" }),
         h("p", {
-          text: "Par défaut, le site n'écrit rien chez toi. Si tu le demandes, tes étapes cochées, tes quiz et tes exercices restent dans ce navigateur, sans rien envoyer. Tu pourras les exporter ou les effacer à tout moment.",
+          text: "Par défaut, le site n'écrit rien chez toi. Si tu le demandes, tes étapes cochées, tes quiz, tes résultats et tes brouillons d'exercices restent dans ce navigateur, sans rien envoyer. Tu pourras les exporter ou les effacer à tout moment.",
         }),
         localOptInButton(ctx.enable),
       ],
@@ -141,7 +114,7 @@ export function localPanel(ctx) {
       if (!file) return;
       try {
         const backup = validateBackup(JSON.parse(await file.text()));
-        ctx.importProgress(progressFromBackup(backup, ctx.orderedIds));
+        ctx.importProgress(progressFromBackup(backup, ctx.orderedIds), draftsFromBackup(backup, ctx.orderedIds));
       } catch {
         ctx.importProgress(null);
       }
@@ -165,11 +138,7 @@ export function localPanel(ctx) {
             onClick: () =>
               downloadJson(
                 `ai-from-zero-progression-${new Date().toISOString().slice(0, 10)}.json`,
-                localBackup({
-                  done: ctx.numericIds.filter((id) => ctx.done.has(id)),
-                  quizzes: ctx.quizzes,
-                  exercises: ctx.exercises,
-                }),
+                localBackup(readLocalProgress(browserStorage()), new Date(), readLocalDrafts(browserStorage())),
               ),
           },
           "Exporter",

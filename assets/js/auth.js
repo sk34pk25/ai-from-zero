@@ -107,17 +107,17 @@ export function shouldOpenAuthClient(config, href, storage) {
     }
     return false;
   } catch {
-    return true;
+    return false;
   }
 }
 
 function hasAuthWork() {
-  if (typeof window === "undefined" || !window.localStorage) return false;
-  return shouldOpenAuthClient(
-    publicConfig(),
-    window.location.href,
-    window.localStorage,
-  );
+  try {
+    if (typeof window === "undefined") return false;
+    if (readAuthReturn(window.location.href).kind !== "none") return true;
+    if (!window.localStorage) return false;
+    return shouldOpenAuthClient(publicConfig(), window.location.href, window.localStorage);
+  } catch { return false; }
 }
 
 export function currentUser() {
@@ -211,6 +211,8 @@ async function clientOf(flowType = "implicit") {
   if (!client) {
     const { createClient } = await import("../vendor/supabase.js");
     const config = publicConfig();
+    let storage;
+    try { storage = window.localStorage; } catch { /* session en mémoire */ }
     client = createClient(config.url, config.anonKey, {
       global: {
         fetch: async (input, init = {}) => {
@@ -228,11 +230,11 @@ async function clientOf(flowType = "implicit") {
         },
       },
       auth: {
-        persistSession: true,
+        persistSession: Boolean(storage),
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType,
-        storage: window.localStorage,
+        storage,
       },
     });
     client.auth.onAuthStateChange((event, session) => {

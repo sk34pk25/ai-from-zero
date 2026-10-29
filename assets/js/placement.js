@@ -5,6 +5,7 @@
  * étapes qui l'enseignent. Rien n'est enregistré par le test lui-même.
  */
 import { h } from "./dom.js";
+import { practicalPanel } from "./placement-practice.js";
 
 export const PLACEMENT = [
   {
@@ -141,6 +142,8 @@ export function knownSteps(levelZeroIds, result) {
 
 export function paintPlacement(main, { index, canTrack, onMarkKnown, enableTracking }) {
   const answers = {};
+  let markButton = null;
+  const practice = practicalPanel(() => { if (markButton) markButton.disabled = !practice.passed; });
   const levelZero = index.levels.find((level) => level.id === 0);
   const titleOf = (id) => index.byId.get(id)?.lesson.title || id;
   const result = h("section", { class: "panel placement-result", "aria-live": "polite", hidden: true });
@@ -149,7 +152,7 @@ export function paintPlacement(main, { index, canTrack, onMarkKnown, enableTrack
   const items = PLACEMENT.map((q, number) =>
     h("fieldset", { class: "placement-question" }, [
       h("legend", { text: `${number + 1}. ${q.question}` }),
-      h("pre", {}, h("code", { text: q.code })),
+      h("pre", { tabindex: "0", "aria-label": `Code et énoncé de la question ${number + 1}` }, h("code", { text: q.code })),
       h(
         "div",
         { class: "placement-choices" },
@@ -161,6 +164,8 @@ export function paintPlacement(main, { index, canTrack, onMarkKnown, enableTrack
               value: String(choiceIndex),
               onChange: () => {
                 answers[q.id] = choiceIndex;
+                result.hidden = true; result.replaceChildren();
+                markButton = null; practice.node.hidden = true;
               },
             }),
             h("span", { text: choice }),
@@ -199,39 +204,20 @@ export function paintPlacement(main, { index, canTrack, onMarkKnown, enableTrack
           outcome.review.map((id) => h("li", {}, h("a", { href: `#/lecon/${id}` }, `${id} · ${titleOf(id)}`))),
         ),
       );
-    if (outcome.unanswered === 0 && outcome.passed && levelZero) {
-      const known = knownSteps(
-        levelZero.steps.map((step) => step.id),
-        outcome,
-      );
-      nodes.push(
-        canTrack()
-          ? h(
-              "button",
-              {
-                type: "button",
-                class: "button button-primary",
-                onClick: () => onMarkKnown(known),
-              },
-              `Marquer ${known.length} étapes du niveau 0 comme connues`,
-            )
-          : h("div", {}, [
-              h("p", {
-                text: "Le site n'enregistre rien sans ton accord. Ce bouton active le suivi dans ce navigateur, sans compte ni envoi, puis marque ces étapes.",
-              }),
-              h(
-                "button",
-                {
-                  type: "button",
-                  class: "button button-primary",
-                  onClick: () => {
-                    if (enableTracking()) onMarkKnown(known);
-                  },
-                },
-                `Garder ce résultat sur cet appareil (${known.length} étapes)`,
-              ),
-            ]),
-      );
+    practice.node.hidden = !outcome.passed;
+    if (outcome.passed && levelZero) {
+      const known = knownSteps(levelZero.steps.map((step) => step.id), outcome);
+      nodes.push(h("p", { text: "Avant de marquer ces étapes, réalise aussi l’épreuve pratique ci-dessous. Tu peux continuer le cours sans passer ce contrôle." }));
+      const commit = () => {
+        const latest = scorePlacement(answers);
+        if (!practice.passed || !latest.passed) return;
+        if (!canTrack() && !enableTracking()) return;
+        onMarkKnown(knownSteps(levelZero.steps.map((step) => step.id), latest));
+      };
+      if (!canTrack()) nodes.push(h("p", { text: "Garder le résultat active le suivi dans ce navigateur, sans compte ni envoi. Les cases restent une déclaration, pas une certification." }));
+      markButton = h("button", { type: "button", class: "button button-primary", disabled: !practice.passed, onClick: commit },
+        canTrack() ? `Marquer ${known.length} étapes du niveau 0 comme connues` : `Garder ce résultat sur cet appareil (${known.length} étapes)`);
+      nodes.push(markButton);
     }
     nodes.push(h("p", {}, h("a", { href: outcome.passed ? "#/niveau/1" : "#/lecon/0.1" }, outcome.passed ? "Aller au niveau 1" : "Commencer à l'étape 0.1")));
     result.replaceChildren(...nodes);
@@ -257,10 +243,11 @@ export function paintPlacement(main, { index, canTrack, onMarkKnown, enableTrack
       h("h1", { text: "As-tu déjà les bases ?" }),
       h("p", {
         class: "lead",
-        text: "Douze questions courtes sur Python et les maths du niveau 0. Prévois le résultat sans exécuter le code. Compte cinq minutes ; rien n'est enregistré tant que tu ne le demandes pas.",
+        text: "Douze questions sur Python et les maths, puis un petit programme à écrire si tu veux survoler le niveau 0. Prévois cinq minutes pour les questions et vingt pour la pratique. Rien n'est enregistré tant que tu ne le demandes pas.",
       }),
     ]),
     form,
     result,
+    practice.node,
   );
 }

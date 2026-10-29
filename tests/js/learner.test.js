@@ -15,6 +15,8 @@ import { validateBackup } from "../../assets/js/workspace.js";
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
   return {
+    get length() { return data.size; },
+    key: (index) => [...data.keys()][index] ?? null,
     getItem: (key) => (data.has(key) ? data.get(key) : null),
     setItem: (key, value) => data.set(key, String(value)),
     removeItem: (key) => data.delete(key),
