@@ -266,7 +266,7 @@ function applyStoredProgress() {
 
 function persistDone() {
   if (!state.owner) return;
-  const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
+  const ordered = state.index.numericIds.filter((id) => state.done.has(id));
   writeJson(localStorage, PROGRESS_KEY, {
     v: 1,
     done: ordered,
@@ -284,7 +284,7 @@ function persistDone() {
 let remotePullStarted = false;
 
 function rememberProgressLocal() {
-  const ordered = state.index.orderedIds.filter((id) => state.done.has(id));
+  const ordered = state.index.numericIds.filter((id) => state.done.has(id));
   writeJson(localStorage, PROGRESS_KEY, {
     v: 1,
     done: ordered,
