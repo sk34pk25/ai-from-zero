@@ -31,7 +31,7 @@ test("l'accueil s'affiche et la navigation ouvre un niveau", async ({ page }) =>
   await page.locator("#course-nav a", { hasText: "Fondations numériques" }).click();
   await expect(page).toHaveURL(/#\/niveau\/0$/);
   await expect(page.locator("h1")).toHaveText("Fondations numériques");
-  await expect(page.locator(".chapter")).toHaveCount(20);
+  await expect(page.locator(".chapter")).toHaveCount(curriculum.levels[0].steps.length);
   expect(errors).toEqual([]);
 });
 

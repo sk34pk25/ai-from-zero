@@ -194,5 +194,25 @@
       "href": "https://arxiv.org/abs/2106.09685",
       "text": "Retrouve W + facteur*(A@B) dans model/lora.py et les gradients dans model/finetune.py. Compare paramètres entraînés et loss sur les mêmes splits ; le rang seul ne garantit pas une bonne adaptation."
     }
+  ],
+  "3.6": [
+    {
+      "kind": "explain",
+      "heading": "Exemple pas à pas : loss et gradient d'une ligne",
+      "text": "Logits z = [2, 1, 0] et la bonne réponse est le token 0. Étape 1 : softmax donne environ [0,665 ; 0,245 ; 0,090]. Étape 2 : la loss vaut −log(0,665) ≈ 0,408. Étape 3 : le gradient par rapport aux logits vaut p − onehot = [0,665 − 1 ; 0,245 ; 0,090] = [−0,335 ; 0,245 ; 0,090]. Lecture : le score de la bonne réponse doit monter (gradient négatif, la descente l'augmente), les deux autres doivent baisser, et les trois composantes se compensent exactement (leur somme vaut 0). Le code vérifie ces trois affirmations, puis compare la première composante à une différence finie."
+    },
+    {
+      "kind": "code",
+      "heading": "Vérifier le gradient à la main puis numériquement",
+      "lang": "python",
+      "code": "import numpy as np\nfrom model.mathutil import cross_entropy, cross_entropy_grad\n\nz = np.array([[2.0, 1.0, 0.0]])\ncible = np.array([0])\nloss = cross_entropy(z, cible)\ngrad = cross_entropy_grad(z, cible)\nassert abs(loss - 0.4076) < 1e-4\nassert grad[0, 0] < 0 < grad[0, 1] and abs(grad.sum()) < 1e-12\neps = 1e-6\nplus, moins = z.copy(), z.copy()\nplus[0, 0] += eps\nmoins[0, 0] -= eps\nnumerique = (cross_entropy(plus, cible) - cross_entropy(moins, cible)) / (2 * eps)\nassert abs(numerique - grad[0, 0]) < 1e-8\nprint(round(loss, 4), np.round(grad, 3))"
+    }
+  ],
+  "1.13": [
+    {
+      "kind": "explain",
+      "heading": "Trois pas calculés à la main",
+      "text": "Loss (w − 3)², départ w = 0, pas lr = 0,1. Pas 1 : gradient = 2 × (0 − 3) = −6, donc w = 0 − 0,1 × (−6) = 0,6. Pas 2 : gradient = 2 × (0,6 − 3) = −4,8, donc w = 0,6 + 0,48 = 1,08. Pas 3 : gradient = −3,84, donc w = 1,464. À chaque pas, l'écart à 3 est multiplié par 0,8 (il passe de 3 à 2,4, puis 1,92, puis 1,536) : c'est 1 − 2 × lr. Avec lr = 1, ce facteur vaut −1 et w oscille ; avec lr = 1,1, il vaut −1,2 et l'écart grandit. Le même calcul explique pourquoi un pas trop grand fait diverger un vrai réseau."
+    }
   ]
 }

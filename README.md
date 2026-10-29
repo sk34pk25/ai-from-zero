@@ -8,7 +8,7 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 ## Où en est le parcours
 
-157 étapes, 14 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Chaque leçon ouvre sur une intuition, un schéma (parfois manipulable), puis les objectifs, les pièges, des indices progressifs et une correction. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON, les aides et le plan, et les tests refusent qu'ils divergent.
+161 étapes, 14 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Chaque leçon ouvre sur une intuition, un schéma (parfois manipulable), puis les objectifs, les pièges, des indices progressifs et une correction. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON, les aides et le plan, et les tests refusent qu'ils divergent.
 
 La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie les leçons aux fichiers de `model/`, du dossier vide jusqu'à un TinyGPT entraîné, puis au BPE, au catalogue de données, au playground et à l'ajustement. Le compte-rendu d'un run CPU réel est dans [`data/gpt_run.json`](data/gpt_run.json).
 
@@ -21,7 +21,7 @@ La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construi
 - L'IDE `#/ide` et les exercices exécutables chargent Pyodide dans un worker, seulement quand le propriétaire les lance. Le pas à pas rejoue une trace, il ne fige pas la page.
 - La page À propos est `#/a-propos`.
 
-Le cadenas de l'interface laisse le site lisible pour tout le monde. Il n'est pas la sécurité : seul le compte dont l'UUID est dans `assets/config.js` peut écrire, et `supabase/schema.sql` le redit avec RLS. Le mode d'emploi est [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md). Sans configuration, tout reste en lecture seule. La progression, les quiz et les fichiers d'IDE ne sont pas enregistrés pour un visiteur. Le thème, lui, reste local.
+Le cadenas de l'interface laisse le site lisible pour tout le monde. Il n'est pas la sécurité : seul le compte dont l'UUID est dans `assets/config.js` peut écrire, et `supabase/schema.sql` le redit avec RLS. Le mode d'emploi est [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md). Sans configuration, tout reste en lecture seule. Par défaut, rien n'est enregistré pour un visiteur, à part le thème. S'il le demande (« Suivre ma progression sur cet appareil »), ses étapes cochées, quiz et exercices restent dans son navigateur, sans compte ni envoi ; il peut les exporter, les réimporter ou les effacer depuis l'accueil (`assets/js/learner.js`). L'IDE et la synchronisation restent réservés au propriétaire. Le test de positionnement `#/positionnement` propose de survoler le niveau 0 en gardant à faire les étapes liées aux erreurs.
 
 ## Lancer le site en local
 
@@ -114,7 +114,7 @@ Le code (site, laboratoire, scripts, tests) est sous licence [MIT](LICENSE). Le 
 - `#/espace` : notes, favoris, reprise de lecture, séances de 15/30/60 minutes, révisions datées, sauvegarde JSON et restauration avec aperçu.
 - `#/glossaire` : termes issus du vocabulaire des leçons, avec lien vers leur contexte.
 - `#/experiences` : comparaison des rapports publiés, des runs enregistrés et d'un rapport JSON local. Les données absentes restent « Non mesuré ».
-- Les 157 corrigés propres aux exercices sont édités dans `curriculum_src/corrections.json`. Les 63 exercices Python ont un squelette à compléter, une solution et des contrôles exécutés en CI. Les bilans de niveau restent des autoévaluations explicites.
+- Les 161 corrigés propres aux exercices sont édités dans `curriculum_src/corrections.json`. Les 66 exercices Python ont un squelette à compléter, une solution et des contrôles exécutés en CI. Les bilans de niveau restent des autoévaluations explicites.
 - Le playground charge le second modèle à la demande, affiche les tokens de l'invite, accepte une graine et une longueur de génération, et mesure la vitesse sur l'appareil. Les sorties ajustées s'arrêtent au premier saut de ligne. La comparaison utilise le même prompt et les mêmes réglages ; ce n'est pas un benchmark de généralisation.
 
 Les brouillons sont écrits localement à la saisie. La synchronisation distante est réservée au propriétaire. `supabase/workspace.sql` ajoute `learning_records` et une fonction d'écriture atomique avec numéro de révision, sans modifier la fonction `is_owner()` existante. Cette extension est appliquée au projet du site. Une modification concurrente conserve les deux versions jusqu'au choix dans Mon espace. La migration des fichiers historiques conserve aussi les copies divergentes. Ne supprime pas les anciennes tables avant d'avoir exporté et vérifié les données.
@@ -148,7 +148,7 @@ La vérification backend a confirmé les refus de lecture/écriture d'un autre c
 
 ## Atelier personnel et progression
 
-L’[atelier du site](https://sk34pk25.github.io/ai-from-zero/#/atelier) livre un projet autonome : `eleve.py` à compléter, corrigé séparé, primitives de tableaux NumPy, douze TP cumulatifs, entraînement et évaluation. Les 157 leçons restent accessibles à leurs adresses. Le tronc commun recommandé est **0 → 1 → 2 → 3 → 4 → 13**, puis 5 et 6 pour les variantes/coûts. Les autres niveaux sont des approfondissements.
+L’[atelier du site](https://sk34pk25.github.io/ai-from-zero/#/atelier) livre un projet autonome : `eleve.py` à compléter, corrigé séparé, primitives de tableaux NumPy, douze TP cumulatifs, entraînement et évaluation. Les 161 leçons restent accessibles à leurs adresses. Le tronc commun recommandé est **0 → 1 → 2 → 3 → 4 → 13**, puis 5 et 6 pour les variantes/coûts. Les autres niveaux sont des approfondissements.
 
 Les guides sont [Installation](atelier/INSTALLATION.md), [12 TP](atelier/GUIDE.md) et [Projet final](atelier/PROJET_FINAL.md). Les bilans ont quatre critères spécifiques par niveau ; les anciennes cases génériques sont conservées comme historique, pas interprétées comme maîtrise des nouveaux critères. L’épreuve finale demande code personnel, documents réservés, baselines, checkpoint rechargé et variation contrôlée. Les contrôles publics ne certifient pas l’autonomie ; la grille /20 demande aussi des explications et une reconstruction sans corrigé.
 
