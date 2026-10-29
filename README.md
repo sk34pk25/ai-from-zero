@@ -108,3 +108,40 @@ Une question absente du fichier, « explique le masque causal en une phrase », 
 ## Licences
 
 Le code (site, laboratoire, scripts, tests) est sous licence [MIT](LICENSE). Le contenu pédagogique — leçons, énoncés, quiz, plan de cours — est sous licence [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+## Espace personnel, lecture et expériences
+
+- `#/espace` : notes, favoris, reprise de lecture, séances de 15/30/60 minutes, révisions datées, sauvegarde JSON et restauration avec aperçu.
+- `#/glossaire` : termes issus du vocabulaire des leçons, avec lien vers leur contexte.
+- `#/experiences` : comparaison des rapports publiés, des runs enregistrés et d'un rapport JSON local. Les données absentes restent « Non mesuré ».
+- Les 157 corrigés propres aux exercices sont édités dans `curriculum_src/corrections.json`. Les 52 exercices Python ont un squelette à compléter, une solution et des contrôles exécutés en CI. Les bilans de niveau restent des autoévaluations explicites.
+- Le playground charge le second modèle à la demande, affiche les tokens de l'invite, accepte une graine et une longueur de génération, et mesure la vitesse sur l'appareil. Les sorties ajustées s'arrêtent au premier saut de ligne. La comparaison utilise le même prompt et les mêmes réglages ; ce n'est pas un benchmark de généralisation.
+
+Les brouillons sont écrits localement à la saisie. La synchronisation distante est réservée au propriétaire. `supabase/workspace.sql` ajoute `learning_records` et une fonction d'écriture atomique avec numéro de révision, sans modifier la fonction `is_owner()` existante. Cette extension est appliquée au projet du site. Une modification concurrente conserve les deux versions jusqu'au choix dans Mon espace. La migration des fichiers historiques conserve aussi les copies divergentes. Ne supprime pas les anciennes tables avant d'avoir exporté et vérifié les données.
+
+La sauvegarde exporte uniquement les données d'apprentissage connues, jamais les clés de session. Une restauration demande un fichier valide et un clic de confirmation ; les mêmes clés sont remplacées, les autres conservées. La réinitialisation de la progression garde notes, favoris et fichiers. La réinitialisation locale est distincte du changement synchronisé sur tous les appareils.
+
+Le site est installable depuis le menu du navigateur. Le cache public permet la lecture des cours hors connexion ; Mon espace propose aussi le téléchargement des fichiers de cours et des modèles du playground. Les appels Supabase et les sessions ne sont jamais mis dans ce cache. L'exécution Python nécessite une connexion pour charger Pyodide et NumPy ; elle n'est pas annoncée comme disponible hors connexion. Une session expirée peut demander une reconnexion avant l'accès aux données privées.
+
+## Entraînement reproductible et reprise
+
+Les nouveaux entraînements découpent le texte **avant** de construire le tokenizer. `--dataset` conserve les fichiers préparés `train.txt` et `val.txt` séparés ; `--validation chemin.txt` fournit une validation explicite. Le tokenizer fixe remplace un caractère absent par `�` lorsque cet alphabet de remplacement a été réservé ; le rapport donne le nombre de caractères inconnus, les empreintes des deux textes et les versions Python/NumPy. Les anciens rapports publiés ne sont pas recalculés ni présentés comme des évaluations nouvelles.
+
+Les éléments `pretrain` d'un `--plan` poursuivent désormais les poids du modèle précédent. Ils réinitialisent volontairement l'optimiseur et le générateur aléatoire pour chaque nouvelle phase ; l'alphabet reste fixe. Les dimensions doivent être identiques.
+
+Pour une reprise exacte au sein d'une phase, les nouveaux checkpoints conservent les moments AdamW, son compteur, le RNG, le calendrier total et les empreintes des données. Exemple miniature :
+
+```bash
+python3 -m model.gpt_train --steps 20 --total-steps 40 --checkpoint /tmp/phase.npz
+python3 -m model.gpt_train --steps 20 --resume /tmp/phase.npz --checkpoint /tmp/phase-fin.npz
+```
+
+La recette et les données doivent rester identiques. Pour une configuration personnalisée, répète ses options lors de la reprise. Un test compare tous les poids d'une exécution continue avec une exécution sauvegardée/rechargée.
+
+`compare_finetunes` réserve validation et test sur les jeux d'au moins dix paires, en regroupant réponses identiques et questions lexicalement proches. Ce regroupement n'est pas un détecteur sémantique : relire les groupes reste pertinent. Sur un jeu plus petit, le résultat est explicitement un diagnostic sur train. Le script de publication garde le même découpage pendant les essais, choisit sur validation et mesure le test réservé après sélection. Son pré-entraînement réserve un livre entier et utilise par défaut un budget fixe de 4 220 pas et cinq couches. Aucun nouveau run long n'a été exécuté pour cette mise à jour.
+
+## Vérifier les navigateurs et le backend
+
+La CI Chromium exécute le parcours complet. Deux jobs supplémentaires exécutent les scénarios responsive et espace personnel avec Firefox et WebKit. WebKit valide un moteur apparenté à Safari ; cela ne remplace pas un essai sur un véritable iPhone/iPad. Les scénarios incluent zoom, stockage indisponible, coupure réseau, deux appareils et conflit de révisions. Les tests qui simulent les API bloquent les service workers ; le test du cache les active explicitement pour ne pas contourner les simulations réseau.
+
+La vérification backend a confirmé les refus de lecture/écriture d'un autre compte, l'absence de droits anonymes et le refus atomique d'une révision obsolète, dans des transactions annulées. L'advisor Supabase conserve un avertissement : la protection contre les mots de passe compromis est désactivée. Ce paramètre Auth n'est pas exposé par le connecteur utilisé ; il reste à activer dans le tableau de bord lorsque le plan le permet : https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.

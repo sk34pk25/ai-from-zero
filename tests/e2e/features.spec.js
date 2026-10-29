@@ -141,8 +141,8 @@ test("le propriétaire ouvre l'IDE, importe le modèle, entraîne et s'arrête",
   await expect(page.locator("#ide-chart .loss-bar").first()).toBeVisible();
   await page.locator("#ide-train-stop").click();
   await page.locator("#ide-save").click();
-  await expect.poll(() => writes.some((request) => request.url().includes("/rest/v1/ide_files"))).toBeTruthy();
-  const saved = writes.filter((request) => request.url().includes("/rest/v1/ide_files")).at(-1);
-  expect(saved.headers().prefer || "").toContain("merge-duplicates");
-  expect(saved.postDataJSON().path.length).toBeGreaterThan(3);
+  const codeWrites=()=>writes.filter(request=>request.url().includes('/rpc/save_learning_record')&&request.postDataJSON().p_key.startsWith('ide/'));
+  await expect.poll(()=>codeWrites().length).toBeGreaterThan(0);
+  const saved=codeWrites().at(-1);
+  expect(saved.postDataJSON().p_payload.content.length).toBeGreaterThan(0);
 });

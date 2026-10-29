@@ -64,7 +64,9 @@ def validate_catalog(data: dict) -> list[str]:
             errors.append(f"{row.get('id', '?')} : champs manquants {missing}")
             continue
         identifier = row["id"]
-        if not isinstance(identifier, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,80}", identifier):
+        if not isinstance(identifier, str) or not re.fullmatch(
+            r"[a-z0-9][a-z0-9-]{1,80}", identifier
+        ):
             errors.append(f"id invalide : {identifier!r}")
         if identifier in seen:
             errors.append(f"id dupliqué : {identifier}")
@@ -77,22 +79,32 @@ def validate_catalog(data: dict) -> list[str]:
             errors.append(f"{identifier} : langue")
         if not isinstance(row["sizeMb"], (int, float)) or row["sizeMb"] < 0:
             errors.append(f"{identifier} : sizeMb")
-        if row["approxChars"] is not None and (not isinstance(row["approxChars"], int) or row["approxChars"] < 0):
+        if row["approxChars"] is not None and (
+            not isinstance(row["approxChars"], int) or row["approxChars"] < 0
+        ):
             errors.append(f"{identifier} : approxChars")
         if row["stage"] not in STAGES:
             errors.append(f"{identifier} : stage")
-        if not isinstance(row["order"], int) or row["order"] < 1 or row["order"] in orders:
+        if (
+            not isinstance(row["order"], int)
+            or row["order"] < 1
+            or row["order"] in orders
+        ):
             errors.append(f"{identifier} : order")
         else:
             orders.add(row["order"])
-        if not isinstance(row["prerequisites"], list) or not isinstance(row["caveats"], list):
+        if not isinstance(row["prerequisites"], list) or not isinstance(
+            row["caveats"], list
+        ):
             errors.append(f"{identifier} : listes")
         if not isinstance(row["gated"], bool):
             errors.append(f"{identifier} : gated")
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(row["checkedOn"])):
             errors.append(f"{identifier} : checkedOn")
         compat = row["compatibility"]
-        if not isinstance(compat, dict) or any(key not in compat for key in COMPAT_REQUIRED):
+        if not isinstance(compat, dict) or any(
+            key not in compat for key in COMPAT_REQUIRED
+        ):
             errors.append(f"{identifier} : compatibility")
         elif not isinstance(compat["minutes"], (int, float)) or compat["minutes"] < 0:
             errors.append(f"{identifier} : minutes")
@@ -159,14 +171,21 @@ def download_bytes(url: str, max_bytes: int | None = None) -> bytes:
         return b"".join(chunks)
 
 
-def prepare_id(identifier: str, catalog: dict | None = None, max_mb: float | None = None, root: Path | None = None) -> Path:
+def prepare_id(
+    identifier: str,
+    catalog: dict | None = None,
+    max_mb: float | None = None,
+    root: Path | None = None,
+) -> Path:
     data = catalog or load_catalog()
     errors = validate_catalog(data)
     if errors:
         raise ValueError("; ".join(errors[:8]))
     row = dataset_by_id(data, identifier)
     if row["gated"]:
-        raise RuntimeError(f"{identifier} est gated : le téléchargement automatique est refusé, voir les caveats")
+        raise RuntimeError(
+            f"{identifier} est gated : le téléchargement automatique est refusé, voir les caveats"
+        )
     if row["format"] in {"parquet", "xml.bz2"}:
         raise RuntimeError(
             f"{identifier} est au format {row['format']} ({row['sizeMb']} Mo). "
@@ -183,8 +202,11 @@ def prepare_id(identifier: str, catalog: dict | None = None, max_mb: float | Non
     (downloads / f"{identifier}.bin").write_bytes(payload)
     if row["format"] == "jsonl.gz":
         if limit is not None:
-            raise RuntimeError("un fichier gzip tronqué ne se décompresse pas : prépare ce jeu en entier")
+            raise RuntimeError(
+                "un fichier gzip tronqué ne se décompresse pas : prépare ce jeu en entier"
+            )
         import gzip
+
         text = gzip.decompress(payload).decode("utf-8", errors="replace")
         text = _text_from_jsonl(text)
     else:
@@ -220,6 +242,13 @@ def prepare_id(identifier: str, catalog: dict | None = None, max_mb: float | Non
     return destination
 
 
+def prepared_splits(identifier: str, root: Path | None = None) -> tuple[str, str]:
+    folder = (root or PREPARED) / identifier
+    return (folder / "train.txt").read_text(encoding="utf-8"), (
+        folder / "val.txt"
+    ).read_text(encoding="utf-8")
+
+
 def prepared_corpus(identifier: str, root: Path | None = None) -> str:
     folder = (root or PREPARED) / identifier
     train = folder / "train.txt"
@@ -240,7 +269,19 @@ def _text_from_json(raw: str) -> str:
         if isinstance(row, str):
             parts.append(row)
         elif isinstance(row, dict):
-            bits = [str(row[key]) for key in ("instruction", "input", "output", "question", "answer", "text", "content") if row.get(key)]
+            bits = [
+                str(row[key])
+                for key in (
+                    "instruction",
+                    "input",
+                    "output",
+                    "question",
+                    "answer",
+                    "text",
+                    "content",
+                )
+                if row.get(key)
+            ]
             if bits:
                 parts.append("\n".join(bits))
     return "\n\n".join(parts) + "\n"
@@ -262,6 +303,7 @@ def _text_from_jsonl(raw: str) -> str:
 def _rough_xml(payload: bytes) -> str:
     if payload[:2] == b"BZ" or payload[:3] == b"BZh":
         import bz2
+
         payload = bz2.decompress(payload)
     text = payload.decode("utf-8", errors="replace")
     text = re.sub(r"<[^>]+>", " ", text)
@@ -274,7 +316,9 @@ def list_rows(data: dict | None = None) -> list[dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Catalogue des jeux de données du laboratoire.")
+    parser = argparse.ArgumentParser(
+        description="Catalogue des jeux de données du laboratoire."
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("list")
     download = sub.add_parser("download")
@@ -287,7 +331,9 @@ def main() -> None:
     if args.command == "list":
         for row in list_rows():
             gate = " gated" if row["gated"] else ""
-            print(f"{row['order']:02d}  {row['id']}  étape {row['stage']}  {row['language']}  {row['sizeMb']} Mo{gate}")
+            print(
+                f"{row['order']:02d}  {row['id']}  étape {row['stage']}  {row['language']}  {row['sizeMb']} Mo{gate}"
+            )
         return
     destination = prepare_id(args.id, max_mb=args.max_mb)
     print(destination)

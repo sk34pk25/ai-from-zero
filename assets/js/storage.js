@@ -12,7 +12,7 @@ export function readJson(storage, key, fallback) {
 }
 
 export function writeJson(storage, key, value) {
-  storage.setItem(key, JSON.stringify(value));
+  try { storage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
 }
 
 export const THEME_KEY = "afz-theme";

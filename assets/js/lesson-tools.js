@@ -1,3 +1,5 @@
+import { getRecord, setRecord } from "./workspace.js";
+import { onLeave } from "./lifecycle.js";
 /** Figures, exercice et pas à pas ajoutés après le rendu de la leçon. */
 
 import { h } from "./dom.js";
@@ -12,12 +14,21 @@ export async function attachLessonTools(main, lessonId, owner) {
   if (!article || article.querySelector("[data-tools]")) return;
   const marker = h("div", { "data-tools": "true" });
   const visual = article.querySelector("figure[data-visual]");
-  const manipHost = h("div", { class: "manip-host", "data-manip-host": "true" });
+  const manipHost = h("div", {
+    class: "manip-host",
+    "data-manip-host": "true",
+  });
   if (mountManipulator(manipHost, lessonId) && visual) {
-    const figure = h("figure", { class: "manipulator", "data-manipulator": lessonId }, [
-      h("figcaption", { text: "Figure manipulable de l'étape. Le curseur ou les jetons se règlent au clavier." }),
-      manipHost,
-    ]);
+    const figure = h(
+      "figure",
+      { class: "manipulator", "data-manipulator": lessonId },
+      [
+        h("figcaption", {
+          text: "Figure manipulable de l'étape. Le curseur ou les jetons se règlent au clavier.",
+        }),
+        manipHost,
+      ],
+    );
     visual.insertAdjacentElement("afterend", figure);
   }
   const column = article.querySelector(".lesson-main");
@@ -31,7 +42,9 @@ export async function attachLessonTools(main, lessonId, owner) {
 
 async function exerciseFor(lessonId) {
   if (!exercises) {
-    const response = await fetch(new URL("data/exercises.json", document.baseURI));
+    const response = await fetch(
+      new URL("data/exercises.json", document.baseURI),
+    );
     exercises = response.ok ? await response.json() : [];
   }
   return exercises.find((item) => item.lessonId === lessonId) || null;
@@ -46,33 +59,85 @@ async function debugFor(lessonId) {
 }
 
 function exercisePanel(exercise, owner) {
-  const status = h("p", { class: "quiz-feedback", role: "status", text: owner ? "" : "Réservé au propriétaire." });
+  const status = h("p", {
+    class: "quiz-feedback",
+    role: "status",
+    text: owner ? "" : "Réservé au propriétaire.",
+  });
   const pre = h("pre");
   pre.append(h("code", { text: exercise.starter }));
-  const area = h("textarea", { class: "ide-fallback", "aria-label": "Code de l'exercice" });
-  area.value = exercise.starter;
-  const run = h("button", {
-    type: "button",
-    class: "button button-primary",
-    disabled: !owner,
-    onClick: async () => {
-      status.textContent = "Exécution…";
-      const code = `${area.value}\n${exercise.check}`;
-      const result = await request({ type: "run", code, files: [] });
-      status.textContent = result.type === "error" ? "Le contrôle n'est pas passé." : "Contrôle passé.";
+  const area = h("textarea", {
+    class: "ide-fallback",
+    "aria-label": "Code de l'exercice",
+  });
+  area.value =
+    getRecord(`lesson/${exercise.lessonId}`, {}).exerciseCode ||
+    exercise.starter;
+  const save = () => {
+    if (owner)
+      setRecord(`lesson/${exercise.lessonId}`, {
+        ...getRecord(`lesson/${exercise.lessonId}`, {}),
+        exerciseCode: area.value,
+      });
+  };
+  area.addEventListener("change", save);
+  onLeave(save);
+  const run = h(
+    "button",
+    {
+      type: "button",
+      class: "button button-primary",
+      disabled: !owner,
+      onClick: async () => {
+        save();
+        status.textContent = "Exécution…";
+        const code = `${area.value}\n${exercise.check}`;
+        const result = await request({ type: "run", code, files: [] });
+        window.dispatchEvent(
+          new CustomEvent("afz-exercise", {
+            detail: { id: exercise.lessonId, ok: result.type !== "error" },
+          }),
+        );
+        status.textContent =
+          result.type === "error"
+            ? `Le contrôle n'est pas passé. ${result.text || "Vérifie la valeur retournée et les cas limites."}`
+            : "Contrôle passé.";
+      },
     },
-  }, owner ? "Lancer le contrôle" : "Réservé au propriétaire");
-  return h("section", { class: "callout", "data-exercise": exercise.lessonId }, [
-    h("h2", { text: "Exercice exécutable" }),
-    h("p", { text: exercise.prompt }),
-    owner ? area : pre,
-    run,
-    status,
-  ]);
+    owner ? "Lancer le contrôle" : "Réservé au propriétaire",
+  );
+  return h(
+    "section",
+    { class: "callout", "data-exercise": exercise.lessonId },
+    [
+      h("h2", { text: "Exercice exécutable" }),
+      h("p", { text: exercise.prompt }),
+      owner ? area : pre,
+      run,
+      h(
+        "button",
+        { type: "button", disabled: !owner, onClick: () => stopWorker() },
+        "Arrêter le contrôle",
+      ),
+      exercise.solution && owner
+        ? h("details", {}, [
+            h("summary", { text: "Corrigé Python de cet exercice" }),
+            h("pre", {}, h("code", { text: exercise.solution })),
+          ])
+        : null,
+      status,
+    ],
+  );
 }
 
 function debugPanel(spec, owner) {
-  const status = h("p", { class: "quiz-feedback", role: "status", text: owner ? "Le pas à pas rejoue une trace enregistrée. Il ne met pas la page en pause pendant l'exécution." : "Réservé au propriétaire." });
+  const status = h("p", {
+    class: "quiz-feedback",
+    role: "status",
+    text: owner
+      ? "Le pas à pas rejoue une trace enregistrée. Il ne met pas la page en pause pendant l'exécution."
+      : "Réservé au propriétaire.",
+  });
   const line = h("p", { class: "manip-readout", text: "" });
   const locals = h("div", { class: "debug-locals" });
   const code = h("pre");
@@ -91,36 +156,79 @@ function debugPanel(spec, owner) {
       locals.append(localView(name, value));
     }
   }
-  const start = h("button", {
-    type: "button",
-    class: "button button-primary",
-    disabled: !owner,
-    onClick: async () => {
-      status.textContent = "Trace…";
-      const result = await request({ type: "debug", code: spec.code, files: [] });
-      if (result.type === "error") {
-        status.textContent = "La trace n'a pas pu être lue.";
-        return;
-      }
-      snaps = result.snapshots || [];
-      index = 0;
-      show();
-      status.textContent = `${snaps.length} pas enregistrés.`;
+  const start = h(
+    "button",
+    {
+      type: "button",
+      class: "button button-primary",
+      disabled: !owner,
+      onClick: async () => {
+        status.textContent = "Trace…";
+        const result = await request({
+          type: "debug",
+          code: spec.code,
+          files: [],
+        });
+        if (result.type === "error") {
+          status.textContent = "La trace n'a pas pu être lue.";
+          return;
+        }
+        snaps = result.snapshots || [];
+        index = 0;
+        show();
+        status.textContent = `${snaps.length} pas enregistrés.`;
+      },
     },
-  }, owner ? "Pas à pas" : "Réservé au propriétaire");
-  const next = h("button", { type: "button", class: "button button-secondary", disabled: !owner, onClick: () => { if (index < snaps.length - 1) { index += 1; show(); } } }, "Pas suivant");
-  const play = h("button", {
-    type: "button",
-    class: "button button-secondary",
-    disabled: !owner,
-    onClick: () => {
-      const timer = window.setInterval(() => {
-        if (index >= snaps.length - 1) window.clearInterval(timer);
-        else { index += 1; show(); }
-      }, 400);
+    owner ? "Pas à pas" : "Réservé au propriétaire",
+  );
+  const next = h(
+    "button",
+    {
+      type: "button",
+      class: "button button-secondary",
+      disabled: !owner,
+      onClick: () => {
+        if (index < snaps.length - 1) {
+          index += 1;
+          show();
+        }
+      },
     },
-  }, "Continuer");
-  const reset = h("button", { type: "button", class: "button button-secondary", disabled: !owner, onClick: () => { index = 0; show(); stopWorker(); } }, "Revenir au début");
+    "Pas suivant",
+  );
+  const play = h(
+    "button",
+    {
+      type: "button",
+      class: "button button-secondary",
+      disabled: !owner,
+      onClick: () => {
+        const timer = window.setInterval(() => {
+          if (index >= snaps.length - 1) window.clearInterval(timer);
+          else {
+            index += 1;
+            show();
+          }
+        }, 400);
+        onLeave(() => window.clearInterval(timer));
+      },
+    },
+    "Continuer",
+  );
+  const reset = h(
+    "button",
+    {
+      type: "button",
+      class: "button button-secondary",
+      disabled: !owner,
+      onClick: () => {
+        index = 0;
+        show();
+        stopWorker();
+      },
+    },
+    "Revenir au début",
+  );
   return h("section", { class: "callout", "data-debug": spec.lessonId }, [
     h("h2", { text: "Pas à pas" }),
     h("p", { text: spec.caption }),
@@ -135,10 +243,15 @@ function debugPanel(spec, owner) {
 function localView(name, value) {
   const block = h("div", { class: "debug-var" }, [h("p", { text: name })]);
   if (value.kind === "array") {
-    block.append(h("p", { class: "muted", text: `forme ${value.shape.join(" × ")}` }));
+    block.append(
+      h("p", { class: "muted", text: `forme ${value.shape.join(" × ")}` }),
+    );
     const grid = h("div", { class: "heat-grid" });
     for (const item of value.preview || []) {
-      const cell = h("span", { class: "heat-cell", text: Number(item).toFixed(2) });
+      const cell = h("span", {
+        class: "heat-cell",
+        text: Number(item).toFixed(2),
+      });
       grid.append(cell);
     }
     block.append(grid);

@@ -81,11 +81,15 @@ const server = await startServer(4175);
 try {
   const chrome = await chromeLauncher.launch({
     chromePath: process.env.CHROME_PATH,
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"],
+    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
   });
   try {
-    const result = await lighthouse("http://127.0.0.1:4175/", { port: chrome.port, output: "json" }, desktop);
-    const mobile = await lighthouse("http://127.0.0.1:4175/", {
+    const routes=JSON.parse(process.env.LIGHTHOUSE_ROUTES||'["/"]');
+    if(!Array.isArray(routes)||routes.some(route=>typeof route!=="string"||!route.startsWith("/")||route.startsWith("//")))throw new Error("Routes invalides");
+    const reports=[];
+    for(const route of routes){
+    const result = await lighthouse(`http://127.0.0.1:4175${route}`, { port: chrome.port, output: "json" }, desktop);
+    const mobile = await lighthouse(`http://127.0.0.1:4175${route}`, {
       port: chrome.port,
       output: "json",
       onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
@@ -99,7 +103,7 @@ try {
       .filter((audit) => typeof audit.score === "number" && audit.score < 1 && audit.scoreDisplayMode !== "informative")
       .map((audit) => ({ id: audit.id, score: audit.score, title: audit.title, display: audit.displayValue }))
       .sort((a, b) => a.score - b.score);
-    writeFileSync("lighthouse-report.json", JSON.stringify({ scores, mobileScores, url: result.lhr.requestedUrl, weak }, null, 2));
+    reports.push({ scores, mobileScores, url: result.lhr.requestedUrl, weak });
     console.log(JSON.stringify({ desktop: scores, mobile: mobileScores }));
     const failed = Object.entries(scores).filter(([, score]) => score < 95);
     const mobileFailed = Object.entries(mobileScores).filter(([, score]) => score < 95);
@@ -107,6 +111,8 @@ try {
       console.error("Scores sous 95 :", { desktop: failed, mobile: mobileFailed });
       process.exitCode = 1;
     }
+    }
+    writeFileSync("lighthouse-report.json",JSON.stringify(reports,null,2));
   } finally {
     await chrome.kill();
   }

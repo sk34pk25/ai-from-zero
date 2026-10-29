@@ -36,13 +36,17 @@ class BPETokenizer:
             raise KeyError(f"identifiant hors vocabulaire : {index}") from error
 
     @classmethod
-    def train(cls, text: str, num_merges: int, on_merge=None) -> "BPETokenizer":
+    def train(
+        cls, text: str, num_merges: int, on_merge=None, fallback: bool = False
+    ) -> "BPETokenizer":
         if not text:
             raise ValueError("le corpus d'entraînement est vide")
         if num_merges < 0:
             raise ValueError("num_merges doit être positif ou nul")
         merges = _learn_merges(text, num_merges, on_merge)
         vocab = _vocab_from_merges(text, merges)
+        if fallback and "�" not in vocab:
+            vocab["�"] = len(vocab)
         return cls(vocab, merges)
 
     def encode(self, text: str) -> list[int]:
@@ -65,7 +69,10 @@ class BPETokenizer:
     def save(self, path: str | Path) -> None:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(json.dumps(self.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        destination.write_text(
+            json.dumps(self.to_dict(), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     @classmethod
     def load(cls, path: str | Path) -> "BPETokenizer":
@@ -107,13 +114,17 @@ def _learn_merges(text: str, num_merges: int, on_merge=None) -> list[tuple[str, 
         for pair in state.affected:
             count = state.counts.get(pair, 0)
             if count > 0:
-                heapq.heappush(heap, (-count, itos[pair[0]], itos[pair[1]], pair[0], pair[1]))
+                heapq.heappush(
+                    heap, (-count, itos[pair[0]], itos[pair[1]], pair[0], pair[1])
+                )
         if on_merge is not None and (step + 1 == num_merges or (step + 1) % 200 == 0):
             on_merge(step + 1, len(merges))
     return merges
 
 
-def _pop_best(heap: list[tuple], counts: dict[tuple[int, int], int]) -> tuple[int, int] | None:
+def _pop_best(
+    heap: list[tuple], counts: dict[tuple[int, int], int]
+) -> tuple[int, int] | None:
     import heapq
 
     while heap:
@@ -125,7 +136,9 @@ def _pop_best(heap: list[tuple], counts: dict[tuple[int, int], int]) -> tuple[in
     return None
 
 
-def _encode_with_merges(text: str, vocab: dict[str, int], merges: list[tuple[str, str]]) -> list[int]:
+def _encode_with_merges(
+    text: str, vocab: dict[str, int], merges: list[tuple[str, str]]
+) -> list[int]:
     if not text:
         return []
     state = _LinkState.from_text(text, vocab)
@@ -138,7 +151,9 @@ def _encode_with_merges(text: str, vocab: dict[str, int], merges: list[tuple[str
 class _LinkState:
     """Liste chaînée de jetons. Les comptes de paires suivent les fusions locales."""
 
-    def __init__(self, tok: list[int], prev: list[int], nxt: list[int], alive: bytearray):
+    def __init__(
+        self, tok: list[int], prev: list[int], nxt: list[int], alive: bytearray
+    ):
         self.tok = tok
         self.prev = prev
         self.nxt = nxt
@@ -251,7 +266,9 @@ def reference_merges(text: str, num_merges: int) -> list[tuple[str, str]]:
     return merges
 
 
-def reference_encode(text: str, vocab: dict[str, int], merges: list[tuple[str, str]]) -> list[int]:
+def reference_encode(
+    text: str, vocab: dict[str, int], merges: list[tuple[str, str]]
+) -> list[int]:
     tokens = list(text)
     for pair in merges:
         tokens = _merge(tokens, pair)

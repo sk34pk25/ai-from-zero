@@ -64,11 +64,11 @@ test("le quiz refuse une mauvaise réponse puis enregistre la bonne", async ({ p
   const complete = page.getByRole("button", { name: "Marquer comme terminée" });
   await expect(complete).toBeDisabled();
   await page.locator(`[data-choice="${wrong}"]`).click();
-  await expect(page.locator(".quiz-feedback")).toContainText("Ce n'est pas la bonne réponse");
+  await expect(page.locator(".quiz .quiz-feedback")).toContainText("Ce n'est pas la bonne réponse");
   await expect(complete).toBeDisabled();
-  await expect(page.locator(".quiz-feedback")).not.toContainText(lesson.quiz.explanation);
+  await expect(page.locator(".quiz .quiz-feedback")).not.toContainText(lesson.quiz.explanation);
   await page.locator(`[data-choice="${lesson.quiz.answer}"]`).click();
-  await expect(page.locator(".quiz-feedback")).toContainText("Bonne réponse");
+  await expect(page.locator(".quiz .quiz-feedback")).toContainText("Bonne réponse");
   await complete.click();
   await expect(page.locator("#progress-meta")).toContainText("1 étape terminée");
   await page.reload();

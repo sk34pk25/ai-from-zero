@@ -12,10 +12,27 @@ import time
 from pathlib import Path
 
 from model.bpe import BPETokenizer
-from model.datasets import dataset_by_id, load_catalog, prepare_id, prepared_corpus
+from model.datasets import (
+    dataset_by_id,
+    load_catalog,
+    prepare_id,
+    prepared_corpus,
+    prepared_splits,
+)
 from model.export_js import export_browser
-from model.finetune import compare_finetunes, example_ids, load_instructions
-from model.gpt_train import load_checkpoint, result_payload, sample_text, save_checkpoint, train_gpt
+from model.finetune import (
+    compare_finetunes,
+    example_ids,
+    load_instructions,
+    evaluate_instructions,
+)
+from model.gpt_train import (
+    load_checkpoint,
+    result_payload,
+    sample_text,
+    save_checkpoint,
+    train_gpt,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,14 +74,16 @@ def load_books() -> tuple[str, list[dict]]:
             text = prepared_corpus(identifier)
         row = dataset_by_id(catalog, identifier)
         parts.append(text.strip())
-        meta.append({
-            "id": identifier,
-            "name": row["name"],
-            "url": row["url"],
-            "licence": row["licence"],
-            "chars": len(text),
-            "sha256": row.get("sha256"),
-        })
+        meta.append(
+            {
+                "id": identifier,
+                "name": row["name"],
+                "url": row["url"],
+                "licence": row["licence"],
+                "chars": len(text),
+                "sha256": row.get("sha256"),
+            }
+        )
     return "\n\n".join(parts) + "\n", meta
 
 
@@ -101,7 +120,12 @@ def _fit_report(tokenizer, rows, block: int) -> dict:
             kept += 1
         else:
             truncated += 1
-    return {"kept_intact": kept, "truncated": truncated, "missing_chars": missing, "written": len(rows)}
+    return {
+        "kept_intact": kept,
+        "truncated": truncated,
+        "missing_chars": missing,
+        "written": len(rows),
+    }
 
 
 def _downsample(values: list[float], limit: int = 120) -> list[float]:
@@ -110,7 +134,9 @@ def _downsample(values: list[float], limit: int = 120) -> list[float]:
     if len(values) <= limit:
         picked = range(len(values))
     else:
-        picked = [round(index * (len(values) - 1) / (limit - 1)) for index in range(limit)]
+        picked = [
+            round(index * (len(values) - 1) / (limit - 1)) for index in range(limit)
+        ]
     return [round(float(values[index]), 4) for index in picked]
 
 
@@ -136,32 +162,58 @@ def _attempt_summary(name: str, compared: dict) -> dict:
 def _chat_sample(model, tokenizer, question: str) -> dict:
     prompt = f"Question : {question}\nRéponse :"
     try:
-        text = sample_text(model, tokenizer, prompt, 24, temperature=0.0, top_k=1, seed=0)
+        text = sample_text(
+            model, tokenizer, prompt, 24, temperature=0.0, top_k=1, seed=0
+        )
         error = ""
     except KeyError as exc:
         text = ""
         error = str(exc)
-    return {"question": question, "prompt": prompt, "temperature": 0.0, "top_k": 1, "text": text, "error": error}
+    return {
+        "question": question,
+        "prompt": prompt,
+        "temperature": 0.0,
+        "top_k": 1,
+        "text": text,
+        "error": error,
+    }
 
 
-def run_dialogue(model, tokenizer, rows, attempts: list[dict] | None = None) -> tuple[dict, object]:
+def run_dialogue(
+    model, tokenizer, rows, attempts: list[dict] | None = None
+) -> tuple[dict, object]:
     """Ajuste le dialogue. Le premier essai long est précédé d'un court sondage de pas LoRA."""
     probes = []
     for rate, rank in ((2e-3, 32), (8e-4, 32), (3e-3, 16)):
         compared = compare_finetunes(
-            model, tokenizer, rows, steps=400, lr=1e-3, lora_lr=rate, rank=rank, seed=4,
+            model,
+            tokenizer,
+            rows,
+            steps=400,
+            lr=1e-3,
+            lora_lr=rate,
+            rank=rank,
+            seed=5,
         )
-        probes.append({
-            "lora_lr": rate,
-            "rank": rank,
-            "steps": 400,
-            "eval_loss_end": compared["lora"]["eval_loss_end"],
-            "eval_loss_start": compared["lora"]["eval_loss_start"],
-        })
-        print(f"probe lora lr {rate} rank {rank} {probes[-1]['eval_loss_start']:.3f}->{probes[-1]['eval_loss_end']:.3f}", flush=True)
+        probes.append(
+            {
+                "lora_lr": rate,
+                "rank": rank,
+                "steps": 400,
+                "eval_loss_end": compared["lora"]["eval_loss_end"],
+                "eval_loss_start": compared["lora"]["eval_loss_start"],
+            }
+        )
+        print(
+            f"probe lora lr {rate} rank {rank} {probes[-1]['eval_loss_start']:.3f}->{probes[-1]['eval_loss_end']:.3f}",
+            flush=True,
+        )
     best_probe = min(probes, key=lambda item: item["eval_loss_end"])
     sft_steps = 4000
-    print(f"sft long steps {sft_steps} lora lr {best_probe['lora_lr']} rank {best_probe['rank']}", flush=True)
+    print(
+        f"sft long steps {sft_steps} lora lr {best_probe['lora_lr']} rank {best_probe['rank']}",
+        flush=True,
+    )
     planned = compare_finetunes(
         model,
         tokenizer,
@@ -181,10 +233,18 @@ def run_dialogue(model, tokenizer, rows, attempts: list[dict] | None = None) -> 
     stored.append(attempt)
     best_side = min(("full", "lora"), key=lambda side: attempt[side]["eval_loss_end"])
     chat_model = planned[f"{best_side}_model"]
+    final_test = (
+        evaluate_instructions(chat_model, tokenizer, planned["test_rows"])
+        if planned["test_rows"]
+        else None
+    )
     samples = []
     for question in CHAT_QUESTIONS:
         sample = _chat_sample(chat_model, tokenizer, question)
-        sample["reference"] = next(row["answer"] for row in rows if row["question"] == question)
+        sample["seen_in_train"] = question in planned["train_questions"]
+        sample["reference"] = next(
+            row["answer"] for row in rows if row["question"] == question
+        )
         samples.append(sample)
     held = _chat_sample(chat_model, tokenizer, HELD_OUT)
     report = {
@@ -194,6 +254,7 @@ def run_dialogue(model, tokenizer, rows, attempts: list[dict] | None = None) -> 
         "attempts": stored,
         "lora_probes": probes,
         "chosen": best_side,
+        "reserved_test": final_test,
         "chosen_attempt": "aligned",
         "chosen_eval_loss": attempt[best_side]["eval_loss_end"],
         "instructions": "model/data/instructions_fr.json",
@@ -216,7 +277,12 @@ def write_chat(report: dict, chat_model, tokenizer) -> None:
     )
     chat_path = ROOT / "model" / "data" / "chat_checkpoint.npz"
     save_checkpoint(chat_path, chat_model, tokenizer, report)
-    export_browser(chat_model, tokenizer, ROOT / "data" / "chat_browser.json", report["sample_prompt"])
+    export_browser(
+        chat_model,
+        tokenizer,
+        ROOT / "data" / "chat_browser.json",
+        report["sample_prompt"],
+    )
     print(
         f"chat {report['chosen_attempt']} {report['chosen']} "
         f"eval {report['chosen_eval_loss']:.3f} checkpoint {chat_path.stat().st_size}",
@@ -229,14 +295,18 @@ def write_chat(report: dict, chat_model, tokenizer) -> None:
     print(report["held_out"]["text"], flush=True)
 
 
-def pretrain() -> tuple[object, object]:
+def pretrain(fixed_steps: int = 4220) -> tuple[object, object]:
     started = time.perf_counter()
     text, books = load_books()
-    print("corpus", len(text), "books", len(books), flush=True)
+    # Dernier livre entièrement réservé : le tokenizer ne voit que les six premiers.
+    validation_text = prepared_corpus(BOOKS[-1])
+    text = "\n\n".join(prepared_corpus(identifier) for identifier in BOOKS[:-1])
+    print("corpus train", len(text), "livre val", BOOKS[-1], flush=True)
     bpe_started = time.perf_counter()
     tokenizer = BPETokenizer.train(
         text,
         MERGES,
+        fallback=True,
         on_merge=lambda done, _total: print(f"bpe {done}", flush=True),
     )
     tokenizer.save(ROOT / "model" / "data" / "bpe.json")
@@ -252,14 +322,20 @@ def pretrain() -> tuple[object, object]:
     else:
         layers = 4
         per_step, params_shallow = _seconds_per_step(text, tokenizer, 4)
-        print(f"bench 4 layers {per_step:.3f}s/step params {params_shallow}", flush=True)
+        print(
+            f"bench 4 layers {per_step:.3f}s/step params {params_shallow}", flush=True
+        )
     steps = int(PRETRAIN_BUDGET_S / max(per_step, 1e-3))
-    steps = max(1500, min(steps, 7000))
+    steps = fixed_steps
+    if steps < 2:
+        raise ValueError("au moins deux pas")
+    layers = 5
     warmup = min(400, max(100, steps // 15))
     print(f"plan layers {layers} steps {steps} warmup {warmup}", flush=True)
     model, tokenizer, result = train_gpt(
         text,
         steps=steps,
+        val_text=validation_text,
         lr=PRETRAIN_LR,
         batch=BATCH,
         block=BLOCK,
@@ -288,9 +364,13 @@ def pretrain() -> tuple[object, object]:
         flush=True,
     )
     for sample in result.samples:
-        print("---", sample["prompt"], sample["temperature"], sample["top_k"], flush=True)
+        print(
+            "---", sample["prompt"], sample["temperature"], sample["top_k"], flush=True
+        )
         print(sample["text"], flush=True)
-    history = result_payload(result, "sept livres Project Gutenberg préparés, non commités")
+    history = result_payload(
+        result, "sept livres Project Gutenberg préparés, non commités"
+    )
     history["tokenizer_kind"] = "bpe"
     history["bpe_merges"] = len(tokenizer.merges)
     history["min_lr_ratio"] = 0.1
@@ -298,7 +378,7 @@ def pretrain() -> tuple[object, object]:
     history["eval_spread"] = True
     history["books"] = books
     history["dataset_note"] = (
-        "Validation : les 10 % de tokens en fin de corpus, donc la fin du dernier livre. "
+        "Validation : dernier livre entièrement réservé, tokenizer appris sur les six livres de train. "
         "Les pertes train et val sont une moyenne de 24 fenêtres réparties sur chaque partie, pas le corpus entier."
     )
     history["tokenizer_choice"] = (
@@ -313,26 +393,38 @@ def pretrain() -> tuple[object, object]:
         encoding="utf-8",
     )
     export_browser(model, tokenizer, ROOT / "data" / "gpt_browser.json", PROMPTS[1][0])
-    print("checkpoint", checkpoint.stat().st_size, f"total {time.perf_counter() - started:.1f}s", flush=True)
+    print(
+        "checkpoint",
+        checkpoint.stat().st_size,
+        f"total {time.perf_counter() - started:.1f}s",
+        flush=True,
+    )
     return model, tokenizer
 
 
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Entraîne ou réajuste le modèle publié.")
+    parser = argparse.ArgumentParser(
+        description="Entraîne ou réajuste le modèle publié."
+    )
     parser.add_argument("--finetune-only", action="store_true")
+    parser.add_argument("--pretrain-steps", type=int, default=4220)
     args = parser.parse_args()
     rows = load_instructions(INSTRUCTIONS)
     if args.finetune_only:
-        model, tokenizer, _history = load_checkpoint(ROOT / "model" / "data" / "gpt_checkpoint.npz")
+        model, tokenizer, _history = load_checkpoint(
+            ROOT / "model" / "data" / "gpt_checkpoint.npz"
+        )
         previous = []
         report_path = ROOT / "data" / "finetune_run.json"
         if report_path.exists():
-            previous = json.loads(report_path.read_text(encoding="utf-8")).get("attempts", [])
+            previous = json.loads(report_path.read_text(encoding="utf-8")).get(
+                "attempts", []
+            )
         report, chat_model = run_dialogue(model, tokenizer, rows, previous)
     else:
-        model, tokenizer = pretrain()
+        model, tokenizer = pretrain(args.pretrain_steps)
         report, chat_model = run_dialogue(model, tokenizer, rows, None)
     write_chat(report, chat_model, tokenizer)
 

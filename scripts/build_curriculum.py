@@ -321,6 +321,9 @@ def lesson_from_fields(fields: dict[str, str], answer_index: int) -> dict:
     if visual not in VISUAL_CAPTION:
         raise SystemExit(f"{fields['id']} : visuel inconnu {visual}")
     aids = learning_aids(fields, fields["correct"].strip(), wrong, visual)
+    corrections=json.loads((SRC/'corrections.json').read_text(encoding='utf-8'))
+    if fields['id'].strip() not in corrections:raise SystemExit(f"Corrigé absent : {fields['id']}")
+    aids.update(corrections[fields['id'].strip()])
     return {
         "id": fields["id"].strip(),
         "title": fields["title"].strip(),

@@ -42,7 +42,11 @@ export function publicConfig() {
 }
 
 export function isConfigured(config = publicConfig()) {
-  return config.url.startsWith("https://") && config.anonKey.length >= 20 && config.ownerId.length >= 8;
+  return (
+    config.url.startsWith("https://") &&
+    config.anonKey.length >= 20 &&
+    config.ownerId.length >= 8
+  );
 }
 
 const RECOVERY_TOKEN_KEY = "afz-recovery-token";
@@ -62,7 +66,8 @@ function readStoredTokenHash() {
   if (pendingRecoveryToken) return pendingRecoveryToken;
   if (typeof window === "undefined") return "";
   try {
-    pendingRecoveryToken = window.sessionStorage.getItem(RECOVERY_TOKEN_KEY) || "";
+    pendingRecoveryToken =
+      window.sessionStorage.getItem(RECOVERY_TOKEN_KEY) || "";
   } catch {
     pendingRecoveryToken = "";
   }
@@ -108,7 +113,11 @@ export function shouldOpenAuthClient(config, href, storage) {
 
 function hasAuthWork() {
   if (typeof window === "undefined" || !window.localStorage) return false;
-  return shouldOpenAuthClient(publicConfig(), window.location.href, window.localStorage);
+  return shouldOpenAuthClient(
+    publicConfig(),
+    window.location.href,
+    window.localStorage,
+  );
 }
 
 export function currentUser() {
@@ -167,7 +176,8 @@ export function settleRecoveryLocation() {
     return;
   }
   const auth = readAuthReturn(window.location.href);
-  if (auth.kind !== "implicit" && auth.kind !== "pkce") holdRecoveryRoute = false;
+  if (auth.kind !== "implicit" && auth.kind !== "pkce")
+    holdRecoveryRoute = false;
 }
 
 export function isPasswordRecovery() {
@@ -202,6 +212,21 @@ async function clientOf(flowType = "implicit") {
     const { createClient } = await import("../vendor/supabase.js");
     const config = publicConfig();
     client = createClient(config.url, config.anonKey, {
+      global: {
+        fetch: async (input, init = {}) => {
+          const controller = new AbortController();
+          const abort = () => controller.abort();
+          if (init.signal?.aborted) controller.abort();
+          init.signal?.addEventListener("abort", abort, { once: true });
+          const timer = setTimeout(abort, 20000);
+          try {
+            return await fetch(input, { ...init, signal: controller.signal });
+          } finally {
+            clearTimeout(timer);
+            init.signal?.removeEventListener("abort", abort);
+          }
+        },
+      },
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -214,7 +239,9 @@ async function clientOf(flowType = "implicit") {
       if (event !== "PASSWORD_RECOVERY") return;
       const next = session?.user ?? null;
       if (!next || next.id !== publicConfig().ownerId) {
-        rememberRecoveryFailure("Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.");
+        rememberRecoveryFailure(
+          "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.",
+        );
         queueMicrotask(() => {
           signOut();
         });
@@ -239,7 +266,10 @@ function replaceAuthLocation(next) {
 }
 
 export async function restoreSession() {
-  const auth = typeof window === "undefined" ? { kind: "none", params: {} } : readAuthReturn(window.location.href);
+  const auth =
+    typeof window === "undefined"
+      ? { kind: "none", params: {} }
+      : readAuthReturn(window.location.href);
   if (auth.kind === "implicit") {
     // Avant createClient : supabase-js lit window.location et ignore un second fragment.
     replaceAuthLocation(normalizeImplicitHref(window.location.href));
@@ -249,7 +279,12 @@ export async function restoreSession() {
     rememberTokenHash(auth.params.token_hash);
     replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
   } else if (auth.kind === "error") {
-    rememberRecoveryFailure(recoveryErrorMessage(auth.params.error_code, auth.params.error_description));
+    rememberRecoveryFailure(
+      recoveryErrorMessage(
+        auth.params.error_code,
+        auth.params.error_description,
+      ),
+    );
     replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
   } else if (auth.kind === "pkce") {
     holdRecoveryRoute = true;
@@ -267,23 +302,33 @@ export async function restoreSession() {
       await supabase.auth.signOut();
       user = null;
       if (auth.kind === "implicit" || auth.kind === "pkce") {
-        rememberRecoveryFailure("Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.");
+        rememberRecoveryFailure(
+          "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.",
+        );
       }
     } else {
       user = next;
     }
-    if ((auth.kind === "implicit" || auth.kind === "pkce") && !user && !recoveryNotice) {
+    if (
+      (auth.kind === "implicit" || auth.kind === "pkce") &&
+      !user &&
+      !recoveryNotice
+    ) {
       rememberRecoveryFailure(
         auth.kind === "pkce"
           ? "Ce lien n'a pas pu être vérifié dans ce navigateur. Demande un nouveau message, puis ouvre-le ici."
           : "Ce lien de réinitialisation n'a pas pu ouvrir de session. Demande un nouveau message.",
       );
-      replaceAuthLocation(cleanAuthLocation(window.location.href, RECOVERY_HASH));
+      replaceAuthLocation(
+        cleanAuthLocation(window.location.href, RECOVERY_HASH),
+      );
     }
   } catch {
     user = null;
     if (auth.kind !== "none") {
-      rememberRecoveryFailure("Ce lien de réinitialisation n'a pas pu être vérifié. Demande un nouveau message.");
+      rememberRecoveryFailure(
+        "Ce lien de réinitialisation n'a pas pu être vérifié. Demande un nouveau message.",
+      );
     }
   }
   settleRecoveryLocation();
@@ -293,20 +338,33 @@ export async function restoreSession() {
 
 export async function signIn(email, password) {
   if (!isConfigured()) {
-    return { ok: false, message: "Supabase n'est pas configuré. Le site reste en lecture seule." };
+    return {
+      ok: false,
+      message: "Supabase n'est pas configuré. Le site reste en lecture seule.",
+    };
   }
   const supabase = await clientOf();
-  const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
   if (error || !data?.user) {
     user = null;
     emit();
-    return { ok: false, message: "Connexion refusée. Vérifie l'adresse et le mot de passe." };
+    return {
+      ok: false,
+      message: "Connexion refusée. Vérifie l'adresse et le mot de passe.",
+    };
   }
   if (data.user.id !== publicConfig().ownerId) {
     await supabase.auth.signOut();
     user = null;
     emit();
-    return { ok: false, message: "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule." };
+    return {
+      ok: false,
+      message:
+        "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.",
+    };
   }
   user = data.user;
   emit();
@@ -354,12 +412,28 @@ function passwordWriteFailure(error, recovery) {
   const code = error?.code || "";
   const text = error?.message || "";
   if (code === "same_password" || /different from the old/i.test(text)) {
-    return { ok: false, code, message: "Le nouveau mot de passe doit être différent de l'ancien." };
+    return {
+      ok: false,
+      code,
+      message: "Le nouveau mot de passe doit être différent de l'ancien.",
+    };
   }
-  if (code === "weak_password" || /weak password/i.test(text) || /at least/i.test(text)) {
-    return { ok: false, code, message: "Ce mot de passe est refusé. Utilise au moins 12 caractères." };
+  if (
+    code === "weak_password" ||
+    /weak password/i.test(text) ||
+    /at least/i.test(text)
+  ) {
+    return {
+      ok: false,
+      code,
+      message: "Ce mot de passe est refusé. Utilise au moins 12 caractères.",
+    };
   }
-  if (code === "reauthentication_needed" || code === "reauthentication_required" || /reauthentication/i.test(text)) {
+  if (
+    code === "reauthentication_needed" ||
+    code === "reauthentication_required" ||
+    /reauthentication/i.test(text)
+  ) {
     return {
       ok: false,
       code: code || "reauthentication_needed",
@@ -368,7 +442,11 @@ function passwordWriteFailure(error, recovery) {
         : "Supabase demande une session toute récente. Déconnecte-toi, reconnecte-toi, puis réessaie ici. Aucun e-mail n'est envoyé.",
     };
   }
-  if (/session/i.test(text) || code === "session_not_found" || code === "session_expired") {
+  if (
+    /session/i.test(text) ||
+    code === "session_not_found" ||
+    code === "session_expired"
+  ) {
     return {
       ok: false,
       code: code || "session",
@@ -377,17 +455,30 @@ function passwordWriteFailure(error, recovery) {
         : "La session a expiré. Reconnecte-toi pour changer le mot de passe.",
     };
   }
-  if (error?.name === "AuthRetryableFetchError" || error?.status === 0 || /failed to fetch|network/i.test(text)) {
+  if (
+    error?.name === "AuthRetryableFetchError" ||
+    error?.status === 0 ||
+    /failed to fetch|network/i.test(text)
+  ) {
     return {
       ok: false,
       code: "network",
-      message: "Le mot de passe n'a pas pu être enregistré : le réseau ou Supabase ne répond pas. Réessaie dans un moment.",
+      message:
+        "Le mot de passe n'a pas pu être enregistré : le réseau ou Supabase ne répond pas. Réessaie dans un moment.",
     };
   }
   if (code) {
-    return { ok: false, code, message: `Le mot de passe n'a pas pu être enregistré (code ${code}).` };
+    return {
+      ok: false,
+      code,
+      message: `Le mot de passe n'a pas pu être enregistré (code ${code}).`,
+    };
   }
-  return { ok: false, code: "unknown", message: "Le mot de passe n'a pas pu être enregistré." };
+  return {
+    ok: false,
+    code: "unknown",
+    message: "Le mot de passe n'a pas pu être enregistré.",
+  };
 }
 
 async function writePassword(password, { recovery }) {
@@ -404,7 +495,9 @@ async function writePassword(password, { recovery }) {
     return passwordWriteFailure(error, recovery);
   }
   if (recovery) passwordSaved = true;
-  else accountPasswordNoticeText = "Mot de passe mis à jour. L'ancien ne fonctionne plus. Aucun e-mail n'a été envoyé.";
+  else
+    accountPasswordNoticeText =
+      "Mot de passe mis à jour. L'ancien ne fonctionne plus. Aucun e-mail n'a été envoyé.";
   emit();
   return {
     ok: true,
@@ -425,17 +518,25 @@ export { passwordResetRedirect };
 export async function confirmRecoveryLink() {
   const tokenHash = readStoredTokenHash();
   if (!tokenHash) {
-    const message = "Ce lien ne contient pas de jeton à vérifier. Demande un nouveau message.";
+    const message =
+      "Ce lien ne contient pas de jeton à vérifier. Demande un nouveau message.";
     rememberRecoveryFailure(message);
     emit();
     return { ok: false, message };
   }
   if (!isConfigured()) {
-    return { ok: false, message: "Supabase n'est pas configuré : le lien ne peut pas être vérifié." };
+    return {
+      ok: false,
+      message:
+        "Supabase n'est pas configuré : le lien ne peut pas être vérifié.",
+    };
   }
   try {
     const supabase = await clientOf("implicit");
-    const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "recovery",
+    });
     const next = data?.session?.user ?? null;
     if (error || !next) {
       const message = recoveryErrorMessage(error?.code, error?.message);
@@ -445,7 +546,8 @@ export async function confirmRecoveryLink() {
       return { ok: false, message };
     }
     if (rejectForeignUser(next)) {
-      const message = "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.";
+      const message =
+        "Ce compte n'est pas le propriétaire. L'accès reste en lecture seule.";
       rememberRecoveryFailure(message);
       forgetTokenHash();
       user = null;
@@ -465,7 +567,8 @@ export async function confirmRecoveryLink() {
     emit();
     return { ok: true, message: "" };
   } catch {
-    const message = "Ce lien de réinitialisation n'a pas pu être vérifié. Demande un nouveau message.";
+    const message =
+      "Ce lien de réinitialisation n'a pas pu être vérifié. Demande un nouveau message.";
     rememberRecoveryFailure(message);
     forgetTokenHash();
     emit();
@@ -475,7 +578,12 @@ export async function confirmRecoveryLink() {
 
 export async function resetPassword(email, redirectTo) {
   if (!isConfigured()) {
-    return { ok: false, code: "config", message: "Supabase n'est pas configuré : le message de réinitialisation ne peut pas partir." };
+    return {
+      ok: false,
+      code: "config",
+      message:
+        "Supabase n'est pas configuré : le message de réinitialisation ne peut pas partir.",
+    };
   }
   const storage = window.localStorage;
   const target = redirectTo || passwordResetRedirect(document.baseURI);
@@ -484,15 +592,24 @@ export async function resetPassword(email, redirectTo) {
     return {
       ok: false,
       code: claim.reason === "busy" ? "busy" : "cooldown",
-      message: claim.reason === "busy" ? RECOVERY_EMAIL_BUSY : recoveryCooldownMessage(claim.remaining),
+      message:
+        claim.reason === "busy"
+          ? RECOVERY_EMAIL_BUSY
+          : recoveryCooldownMessage(claim.remaining),
     };
   }
   try {
     const supabase = await clientOf();
-    const { error } = await supabase.auth.resetPasswordForEmail(String(email || "").trim(), { redirectTo: target });
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      String(email || "").trim(),
+      { redirectTo: target },
+    );
     if (error) {
       const failure = resetEmailFailure(error);
-      settleRecoverySend(storage, failure.code === "over_email_send_rate_limit" ? "limited" : "failed");
+      settleRecoverySend(
+        storage,
+        failure.code === "over_email_send_rate_limit" ? "limited" : "failed",
+      );
       return failure;
     }
     settleRecoverySend(storage, "sent");
@@ -525,4 +642,21 @@ export async function selectRows(table) {
   const { data, error } = await supabase.from(table).select("*");
   if (error) throw new Error("lecture refusée");
   return data || [];
+}
+
+/** Écriture atomique : le serveur refuse d'écraser une révision plus récente. */
+export async function saveLearningRecord(key, payload, revision) {
+  const supabase = await requireOwnerClient();
+  const { data, error } = await supabase.rpc("save_learning_record", {
+    p_key: key,
+    p_payload: payload,
+    p_revision: revision,
+  });
+  if (error) {
+    const failure = new Error("Synchronisation refusée");
+    failure.code = error.code;
+    throw failure;
+  }
+  if (!data?.[0]) throw new Error("Réponse de synchronisation absente");
+  return data[0];
 }

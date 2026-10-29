@@ -133,8 +133,9 @@ test("le curriculum commité a 157 leçons et des réponses réparties", () => {
     assert.equal(step.visual.length > 0, true);
     assert.equal(typeof step.interactive, "boolean");
     assert.equal(step.takeaways.length, 3);
-    assert.equal(step.pitfalls.length, 3);
-    assert.equal(step.hints.length, 3);
+    assert.ok(step.pitfalls.length >= 1);
+    assert.ok(step.hints.length >= 2);
+    assert.equal(new Set(step.hints).size, step.hints.length);
     assert.ok(step.solution.length > 40);
     assert.ok(step.codeFile.startsWith("model/"));
     assert.ok(step.review.includes(step.title));

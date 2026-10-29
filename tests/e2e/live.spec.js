@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "../../assets/config.js";
 
-const TABLES = ["ide_files", "progress", "quiz_results", "training_runs", "training_plans"];
+const TABLES = ["ide_files", "progress", "quiz_results", "training_runs", "training_plans", "learning_records"];
 
 test("l'anonyme est refusé sur le projet réel et les inscriptions sont fermées", async ({ request }) => {
   expect(SUPABASE_URL).toBe("https://qffcqvwndnpdbrmqbjpz.supabase.co");

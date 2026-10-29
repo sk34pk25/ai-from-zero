@@ -25,8 +25,9 @@ function tableName(url) {
   return match ? match[1] : "";
 }
 
-export async function installOwner(page, { userId = OWNER_ID, tables = {} } = {}) {
+export async function installOwner(page, { userId = OWNER_ID, tables = {}, sharedLearning = null } = {}) {
   const writes = [];
+  const learning = sharedLearning || new Map((tables.learning_records||[]).map(r=>[r.key,r]));
   await page.route(/\/assets\/config\.js(?:\?.*)?$/, (route) => route.fulfill({
     contentType: "text/javascript",
     body: `export const SUPABASE_URL = "https://example.supabase.co";
@@ -42,8 +43,15 @@ export const OWNER_ID = "${OWNER_ID}";
     }
     const url = request.url();
     if (request.method() === "POST" && url.includes("/rest/v1/")) writes.push(request);
+    if(url.includes('/rest/v1/rpc/save_learning_record')) {
+      const {p_key,p_payload,p_revision}=request.postDataJSON();
+      const previous=learning.get(p_key);
+      if((previous?.revision||0)!==p_revision){await route.fulfill({status:409,headers:CORS,json:{code:'40001',message:'revision conflict'}});return;}
+      const row={key:p_key,payload:p_payload,revision:p_revision+1,updated_at:new Date().toISOString()};learning.set(p_key,row);
+      await route.fulfill({status:200,headers:CORS,json:[row]});return;
+    }
     if (request.method() === "GET" && url.includes("/rest/v1/")) {
-      const rows = tables[tableName(url)] || [];
+      const rows = tableName(url)==="learning_records" ? [...learning.values()] : tables[tableName(url)] || [];
       await route.fulfill({ status: 200, headers: CORS, json: rows });
       return;
     }
