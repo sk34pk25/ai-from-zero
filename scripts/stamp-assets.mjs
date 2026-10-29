@@ -167,6 +167,7 @@ function stamp() {
     ...readdirSync(join(root, "assets", "fonts"))
       .filter((p) => p.endsWith(".woff2"))
       .map((p) => `assets/fonts/${p}`),
+    "data/curriculum-index.json",
     "data/curriculum.json",
     "data/glance.json",
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),

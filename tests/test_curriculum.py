@@ -58,3 +58,12 @@ def test_every_step_has_a_short_visual_summary():
             assert 0 < len(item["title"]) <= 20 and 0 < len(item["text"]) <= 42, step["id"]
     phrases = [glance["phrase"] for glance in glances.values()]
     assert len(set(phrases)) == len(phrases), "chaque leçon a sa propre phrase clé"
+
+
+def test_site_boots_from_a_light_index_of_the_same_course():
+    builder = load_builder()
+    index = json.loads((ROOT / "data" / "curriculum-index.json").read_text(encoding="utf-8"))
+    assert index == builder.build_index()
+    full = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+    assert [s["id"] for l in index["levels"] for s in l["steps"]] == [s["id"] for l in full["levels"] for s in l["steps"]]
+    assert len((ROOT / "data" / "curriculum-index.json").read_bytes()) < len((ROOT / "data" / "curriculum.json").read_bytes()) / 8

@@ -17,6 +17,8 @@ SRC = ROOT / "curriculum_src"
 JSON_PATH = ROOT / "data" / "curriculum.json"
 DOC_PATH = ROOT / "docs" / "CURRICULUM.md"
 GLANCE_PATH = ROOT / "data" / "glance.json"
+INDEX_PATH = ROOT / "data" / "curriculum-index.json"
+INDEX_STEP_FIELDS = ("id", "title", "tag", "minutes", "visual", "interactive", "codeFile", "codeSymbol", "tpIds")
 
 PATTERN = [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
 
@@ -841,8 +843,26 @@ def build_glances(data: dict | None = None) -> dict[str, dict]:
     return {lesson_id: glance_for(lesson_id, glances) for lesson_id in ordered}
 
 
+def build_index(data: dict | None = None) -> dict:
+    """Index léger lu au démarrage du site : le contenu des leçons arrive ensuite, à la demande."""
+    data = data or build_data()
+    return {
+        **{key: value for key, value in data.items() if key != "levels"},
+        "levels": [
+            {
+                **{key: value for key, value in level.items() if key != "steps"},
+                "steps": [{key: step[key] for key in INDEX_STEP_FIELDS} for step in level["steps"]],
+            }
+            for level in data["levels"]
+        ],
+    }
+
+
 def main() -> None:
     data = build_data()
+    INDEX_PATH.write_text(
+        json.dumps(build_index(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     GLANCE_PATH.write_text(
         json.dumps(build_glances(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

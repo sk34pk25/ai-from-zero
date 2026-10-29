@@ -76,7 +76,7 @@ const state = {
   finetuneRun: null,
   owner: false,
   local: false,
-  glancesReady: false,
+  lessonsReady: false,
   localSnapshot: null,
   localToken: null,
   quizzes: {},
@@ -233,7 +233,7 @@ function bindChrome() {
 async function boot() {
   try {
     const response = await fetch(
-      new URL("data/curriculum.json", document.baseURI),
+      new URL("data/curriculum-index.json", document.baseURI),
     );
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
@@ -284,39 +284,59 @@ async function loadJsonReport(path) {
   }
 }
 
-let glancesPromise = null;
+let lessonsPromise = null;
 
-// Les résumés visuels ne servent qu'aux leçons : on les demande dès qu'un lien de leçon est survolé ou visé.
+// Le contenu des leçons ne sert qu'aux leçons, à la recherche et au glossaire : demandé à l'approche d'un lien de leçon.
 for (const type of ["pointerover", "focusin", "touchstart"])
   document.addEventListener(
     type,
     (event) => {
-      if (state.index && !state.glancesReady && event.target?.closest?.('a[href^="#/lecon/"]'))
-        ensureGlances().catch(() => {});
+      if (state.index && !state.lessonsReady && event.target?.closest?.('a[href^="#/lecon/"]'))
+        ensureLessons().catch(() => {});
     },
     { passive: true },
   );
 
-/** Ajoute à chaque leçon son résumé visuel (data/glance.json). Une erreur réseau permet de réessayer. */
-function ensureGlances() {
-  if (!glancesPromise)
-    glancesPromise = fetch(new URL("data/glance.json", document.baseURI))
-      .then((response) => {
-        if (!response.ok) throw new Error(String(response.status));
-        return response.json();
-      })
-      .then((glances) => {
-        for (const [id, glance] of Object.entries(glances)) {
-          const item = state.index?.byId.get(id);
-          if (item) item.lesson.glance = glance;
-        }
-        state.glancesReady = true;
+/** Complète l'index léger avec le texte des leçons et leurs résumés visuels. Une erreur réseau permet de réessayer. */
+function ensureLessons() {
+  if (!lessonsPromise)
+    lessonsPromise = Promise.all(
+      ["data/curriculum.json", "data/glance.json"].map((path) =>
+        fetch(new URL(path, document.baseURI)).then((response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json();
+        }),
+      ),
+    )
+      .then(([full, glances]) => {
+        for (const level of full.levels)
+          for (const step of level.steps) {
+            const item = state.index?.byId.get(step.id);
+            if (item) Object.assign(item.lesson, step, { glance: glances[step.id] });
+          }
+        state.lessonsReady = true;
       })
       .catch((error) => {
-        glancesPromise = null;
+        lessonsPromise = null;
         throw error;
       });
-  return glancesPromise;
+  return lessonsPromise;
+}
+
+/** Affiche un message d'attente, puis repeint la page quand le contenu des leçons est là. */
+function waitForLessons(ticket, label) {
+  els.main.replaceChildren(h("p", { class: "lead", text: label }));
+  ensureLessons()
+    .then(() => {
+      if (ticket === state.pageTicket) render({ scroll: "keep" });
+    })
+    .catch(() => {
+      if (ticket !== state.pageTicket) return;
+      els.main.replaceChildren(
+        h("h1", { text: "Contenu indisponible" }),
+        h("p", { text: "Le texte des leçons n'a pas pu être chargé. Vérifie la connexion puis recharge la page." }),
+      );
+    });
 }
 
 let reportsPromise = null;
@@ -574,6 +594,12 @@ function openSearch() {
   state.searchActive = 0;
   paintSearchResults();
   els.searchInput.focus();
+  if (!state.lessonsReady)
+    ensureLessons()
+      .then(() => {
+        if (!els.dialog.hidden) paintSearchResults();
+      })
+      .catch(() => {});
 }
 
 function closeSearch() {
@@ -829,7 +855,10 @@ function paintMain(route, ticket) {
       (mod) => mod.paintExperiments(els.main),
     );
   else if (route.name === "study") paintStudy(els.main, state.index);
-  else if (route.name === "glossary") paintGlossary(els.main, state.index);
+  else if (route.name === "glossary") {
+    if (!state.lessonsReady) waitForLessons(ticket, "Chargement du glossaire…");
+    else paintGlossary(els.main, state.index);
+  }
   else if (route.name === "placement")
     paintAsync(ticket, () => import("./placement.js"), (mod) =>
       mod.paintPlacement(els.main, {
@@ -851,19 +880,8 @@ function paintMain(route, ticket) {
   else if (route.name === "home") paintHome();
   else if (route.name === "level") paintLevel(route.id);
   else if (route.name === "lesson") {
-    if (!state.glancesReady) {
-      els.main.replaceChildren(h("p", { class: "lead", text: "Chargement de la leçon…" }));
-      ensureGlances()
-        .then(() => {
-          if (ticket === state.pageTicket) render({ scroll: "keep" });
-        })
-        .catch(() => {
-          if (ticket !== state.pageTicket) return;
-          els.main.replaceChildren(
-            h("h1", { text: "Leçon indisponible" }),
-            h("p", { text: "Le résumé visuel n'a pas pu être chargé. Vérifie la connexion puis recharge la page." }),
-          );
-        });
+    if (!state.lessonsReady) {
+      waitForLessons(ticket, "Chargement de la leçon…");
       return;
     }
     paintLesson(route.id);
