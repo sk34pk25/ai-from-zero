@@ -18,17 +18,24 @@ function filesIn(dir, acc = []) {
 }
 
 export function assetFiles() {
-  return [...filesIn(join(root, "assets", "js")), ...filesIn(join(root, "assets", "css")), join(root, "assets", "config.js")]
+  return [
+    ...filesIn(join(root, "assets", "js")),
+    ...filesIn(join(root, "assets", "css")),
+    join(root, "assets", "config.js"),
+    ...filesIn(join(root, "assets", "vendor")),
+  ]
     .map((full) => relative(root, full).split("\\").join("/"))
     .sort();
 }
 
 export function assetHash() {
   const hash = createHash("sha256");
-  for (const file of assetFiles()) {
+  for (const file of [...assetFiles(),"sw.js","manifest.webmanifest",...readdirSync(join(root,"data")).filter(p=>p.endsWith(".json")&&!p.endsWith("browser.json")).map(p=>`data/${p}`),...readdirSync(join(root,"model")).filter(p=>p.endsWith(".py")).map(p=>`model/${p}`)]) {
     hash.update(file);
     hash.update("\n");
-    hash.update(readFileSync(join(root, file)).toString("utf8").replace(/\r\n/g, "\n"));
+    hash.update(
+      readFileSync(join(root, file)).toString("utf8").replace(/\r\n/g, "\n"),
+    );
     hash.update("\n");
   }
   return hash.digest("hex").slice(0, 12);
@@ -56,14 +63,21 @@ export function collectSpecifiers() {
 }
 
 export function targetFor(specifier, version) {
-  if (specifier.startsWith("./")) return `./assets/js/${specifier.slice(2)}?v=${version}`;
-  if (specifier.startsWith("../")) return `./assets/${specifier.slice(3)}?v=${version}`;
+  if (specifier.startsWith("./"))
+    return `./assets/js/${specifier.slice(2)}?v=${version}`;
+  if (specifier.startsWith("../"))
+    return `./assets/${specifier.slice(3)}?v=${version}`;
   throw new Error(`spécificateur inattendu : ${specifier}`);
 }
 
 export function importMap(version) {
   const scope = {};
-  for (const specifier of collectSpecifiers()) scope[specifier] = targetFor(specifier, version);
+  for (const specifier of collectSpecifiers())
+    scope[
+      specifier.startsWith("./")
+        ? `./assets/js/${specifier.slice(2)}`
+        : `./assets/${specifier.slice(3)}`
+    ] = targetFor(specifier, version);
   return { scopes: { "./assets/js/": scope } };
 }
 
@@ -84,10 +98,53 @@ function stamp() {
     /<script type="importmap" id="afz-importmap">[\s\S]*?<\/script>/,
     `<script type="importmap" id="afz-importmap">\n${json}\n</script>`,
   );
-  writeFileSync(join(root, "assets", "js", "version.js"), `/** Version des assets statiques. Réécrite par scripts/stamp-assets.mjs. */\nexport const ASSET_VERSION = "${next}";\n`);
-  writeFileSync(join(root, "version.json"), `${JSON.stringify({ version: next }, null, 2)}\n`);
+  writeFileSync(
+    join(root, "assets", "js", "version.js"),
+    `/** Version des assets statiques. Réécrite par scripts/stamp-assets.mjs. */\nexport const ASSET_VERSION = "${next}";\n`,
+  );
+  writeFileSync(
+    join(root, "version.json"),
+    `${JSON.stringify({ version: next }, null, 2)}\n`,
+  );
   writeFileSync(join(root, "index.html"), html);
+  const shell = [
+    "offline-manifest.json",
+    "index.html",
+    "favicon.svg",
+    "manifest.webmanifest",
+    "assets/icon-192.png",
+    "assets/icon-512.png",
+    "data/curriculum.json",
+    ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
+  ];
+  const course = [
+    "assets/vendor/editor.js",
+    "assets/vendor/supabase.js",
+    "data/exercises.json",
+    "data/debug.json",
+    "data/datasets.json",
+    "data/gpt_run.json",
+    "data/finetune_run.json",
+    "model/manifest.json",
+    ...readdirSync(join(root, "model"))
+      .filter((p) => p.endsWith(".py"))
+      .map((p) => `model/${p}`),
+  ];
+  writeFileSync(
+    join(root, "offline-manifest.json"),
+    JSON.stringify(
+      {
+        version: next,
+        shell: [...new Set(shell)],
+        course,
+        models: ["data/gpt_browser.json", "data/chat_browser.json"],
+      },
+      null,
+      2,
+    ),
+  );
   return next;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) stamp();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
+  stamp();

@@ -28,3 +28,12 @@ def test_manifest_lists_the_python_package():
         if "__pycache__" not in path.parts
     )
     assert manifest["files"] == found
+
+
+def test_versioned_workspace_is_owner_only_and_atomic():
+    sql=(ROOT/'supabase'/'workspace.sql').read_text()
+    assert 'enable row level security' in sql
+    assert 'security invoker' in sql
+    assert 'revision=p_revision' in sql
+    assert "errcode='40001'" in sql
+    assert 'from public,anon' in sql

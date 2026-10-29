@@ -1,0 +1,1572 @@
+{
+  "0.1": {
+    "hints": [
+      "Sépare ce qui reste sur disque de ce qui sert au calcul courant.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le stockage conserve le programme et les fichiers après extinction."
+    ],
+    "solution": "Le stockage conserve le programme et les fichiers après extinction. La RAM contient les données et résultats intermédiaires pendant l'exécution et perd son contenu à l'arrêt. Le CPU lit et exécute les instructions ; ce n'est pas un espace de stockage de fichiers.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Sépare ce qui reste sur disque de ce qui sert au calcul courant."
+    ]
+  },
+  "0.2": {
+    "hints": [
+      "Le chemin relatif commence au dossier courant, pas à la racine du disque.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Depuis ai-lab, les chemins sont model/stats.py et notes/machine.txt."
+    ],
+    "solution": "Depuis ai-lab, les chemins sont model/stats.py et notes/machine.txt. Ces deux chemins relatifs dépendent du dossier courant : tous deux peuvent échouer depuis un autre dossier. Un chemin absolu identifie le fichier depuis la racine, mais reste propre à la machine.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le chemin relatif commence au dossier courant, pas à la racine du disque."
+    ]
+  },
+  "0.3": {
+    "hints": [
+      "Commence par vérifier où tu te trouves avec pwd.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Sous un terminal POSIX : cd chemin/vers/ai-lab, puis pwd et ls."
+    ],
+    "solution": "Sous un terminal POSIX : cd chemin/vers/ai-lab, puis pwd et ls. Le résultat de ls doit contenir notes. Sous PowerShell, utilise Set-Location et Get-ChildItem. Copie tes commandes réelles : le chemin vers ai-lab dépend de ton installation.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Commence par vérifier où tu te trouves avec pwd."
+    ]
+  },
+  "0.4": {
+    "hints": [
+      "Ne devine pas le numéro de version de ta machine.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exécute python3 --version, puis reporte exactement sa sortie dans le README avec la commande."
+    ],
+    "solution": "Exécute python3 --version, puis reporte exactement sa sortie dans le README avec la commande. Si seule python fonctionne, écris cette commande. Ajoute : « Le fichier .py est lu et exécuté par l'interpréteur Python. » Une version d'exemple n'est pas une vérification locale.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Ne devine pas le numéro de version de ta machine."
+    ]
+  },
+  "0.5": {
+    "hints": [
+      "print accepte plusieurs arguments de types différents.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. print(\"Ada\", \"construire un petit modèle\", 42) affiche les trois valeurs."
+    ],
+    "solution": "print(\"Ada\", \"construire un petit modèle\", 42) affiche les trois valeurs. Remplace Ada par le prénom choisi. Les guillemets créent des chaînes ; 42 sans guillemets est un entier. print(\"42\") afficherait aussi 42, mais la valeur aurait le type str.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : print accepte plusieurs arguments de types différents."
+    ]
+  },
+  "0.6": {
+    "hints": [
+      "Affecte un texte, un entier et un nombre avec une partie décimale.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. model_name = \"tiny\" ; n_layers = 2 ; temperature = 0.8."
+    ],
+    "solution": "model_name = \"tiny\" ; n_layers = 2 ; temperature = 0.8. Les appels type(model_name), type(n_layers), type(temperature) renvoient str, int et float. Écrire temperature = \"0.8\" créerait une chaîne et empêcherait certains calculs numériques.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Affecte un texte, un entier et un nombre avec une partie décimale."
+    ]
+  },
+  "0.7": {
+    "hints": [
+      "Teste d'abord le seuil le plus petit, puis utilise elif.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. if n_params < 1_000_000: print(\"modèle léger\") ; elif n_params <= 10_000_000: print(\"moyen\") ; else: print(\"lourd\")."
+    ],
+    "solution": "if n_params < 1_000_000: print(\"modèle léger\") ; elif n_params <= 10_000_000: print(\"moyen\") ; else: print(\"lourd\"). Mets chaque branche sur ses lignes avec indentation. Vérifie 999999, 1000000, 10000000 et 10000001 : les deux valeurs frontières appartiennent à moyen.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Teste d'abord le seuil le plus petit, puis utilise elif."
+    ]
+  },
+  "0.8": {
+    "hints": [
+      "La borne de fin de range n'est pas incluse.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. for i in range(5): print(i * i) affiche 0, 1, 4, 9, 16."
+    ],
+    "solution": "for i in range(5): print(i * i) affiche 0, 1, 4, 9, 16. Le compteur prend 0 à 4. range(1, 6) ferait également cinq tours, mais terminerait à 25 ; le nombre de tours ne fixe donc pas la valeur initiale.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La borne de fin de range n'est pas incluse."
+    ]
+  },
+  "0.9": {
+    "hints": [
+      "return transmet la valeur à l'appelant ; print ne le fait pas.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Définis def ajoute(a, b): puis return a + b dans le bloc indenté."
+    ],
+    "solution": "Définis def ajoute(a, b): puis return a + b dans le bloc indenté. assert ajoute(2, 5) == 7 et assert ajoute(-1, 1) == 0 doivent passer. Sans return, Python renvoie None même si un print affiche la somme.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : return transmet la valeur à l'appelant ; print ne le fait pas."
+    ]
+  },
+  "0.10": {
+    "hints": [
+      "Le dictionnaire doit aussi contenir la clé dim pour le test.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une configuration possible est {\"learning_rate\": 0.01, \"batch_size\": 8, \"epochs\": 3, \"dim\": 16}."
+    ],
+    "solution": "Une configuration possible est {\"learning_rate\": 0.01, \"batch_size\": 8, \"epochs\": 3, \"dim\": 16}. def get_dim(config): return config[\"dim\"] renvoie 16. Une clé dim absente lève KeyError : ce n'est pas la même chose qu'une dimension nulle.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le dictionnaire doit aussi contenir la clé dim pour le test."
+    ]
+  },
+  "0.11": {
+    "hints": [
+      "Le fichier outils.py doit être importable depuis principal.py.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Dans outils.py, définis carre(x) avec return x * x."
+    ],
+    "solution": "Dans outils.py, définis carre(x) avec return x * x. Dans principal.py, écris from outils import carre puis assert carre(-3) == 9. Place les deux fichiers dans le même dossier et lance principal.py depuis ce projet. Ne nomme pas ton fichier numpy.py.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le fichier outils.py doit être importable depuis principal.py."
+    ]
+  },
+  "0.12": {
+    "hints": [
+      "Lis le type d'exception et la dernière ligne du traceback.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple : NameError ; ligne print(resultat) ; cause : resultat n'a jamais été défini."
+    ],
+    "solution": "Exemple : NameError ; ligne print(resultat) ; cause : resultat n'a jamais été défini. Correction : affecter resultat avant le print ou corriger son nom. Relance après correction pour vérifier que l'exception disparaît ; recopier seulement le message ne prouve pas la correction.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Lis le type d'exception et la dernière ligne du traceback."
+    ]
+  },
+  "0.13": {
+    "hints": [
+      "Un message doit nommer le comportement changé.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Trois exemples : « Ajouter le calcul de moyenne dans stats », « Construire le vocabulaire trié du tokenizer », « Tester le décodage des espaces »."
+    ],
+    "solution": "Trois exemples : « Ajouter le calcul de moyenne dans stats », « Construire le vocabulaire trié du tokenizer », « Tester le décodage des espaces ». Chaque commit regroupe un changement cohérent ; git diff avant le commit permet de vérifier ce qu'il contient.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un message doit nommer le comportement changé."
+    ]
+  },
+  "0.14": {
+    "hints": [
+      "La commande d'activation dépend du terminal.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Sur Linux/macOS : python3 -m venv .venv ; source .venv/bin/activate ; python -m pip install -r requirements.txt."
+    ],
+    "solution": "Sur Linux/macOS : python3 -m venv .venv ; source .venv/bin/activate ; python -m pip install -r requirements.txt. Sous PowerShell : .venv\\Scripts\\Activate.ps1 pour l'activation. Ajoute .venv/ au .gitignore : les dépendances se réinstallent, elles ne se commitent pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La commande d'activation dépend du terminal."
+    ]
+  },
+  "0.15": {
+    "hints": [
+      "Compare la somme divisée par le nombre de mesures au résumé produit.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Depuis la racine, appelle load_numbers(\"model/data/mesures.txt\"), puis summarize sur le tableau."
+    ],
+    "solution": "Depuis la racine, appelle load_numbers(\"model/data/mesures.txt\"), puis summarize sur le tableau. Vérifie n == 7. Calcule séparément sum(valeurs) / len(valeurs) : cette moyenne doit correspondre au champ de moyenne du résumé, à l'arrondi près.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compare la somme divisée par le nombre de mesures au résumé produit."
+    ]
+  },
+  "0.16": {
+    "hints": [
+      "Le carré enlève le signe de l'erreur sans annuler les écarts opposés.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. def carre(x): return x * x donne carre(-3) == 9."
+    ],
+    "solution": "def carre(x): return x * x donne carre(-3) == 9. Pour des erreurs -2 et +2, la moyenne brute vaut zéro alors que les prédictions sont fausses. Les carrés valent chacun 4 ; leur moyenne conserve la pénalité et reste différentiable.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le carré enlève le signe de l'erreur sans annuler les écarts opposés."
+    ]
+  },
+  "0.17": {
+    "hints": [
+      "Multiplie les coordonnées correspondantes avant d'additionner.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le produit scalaire vaut 2 × 3 + 1 × 4 = 10."
+    ],
+    "solution": "Le produit scalaire vaut 2 × 3 + 1 × 4 = 10. np.array([2, 1]) @ np.array([3, 4]) confirme 10. Une multiplication élément par élément donne [6, 4] : il manque alors la somme.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Multiplie les coordonnées correspondantes avant d'additionner."
+    ]
+  },
+  "0.18": {
+    "hints": [
+      "Chaque ligne de la matrice produit une coordonnée de sortie.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La première ligne donne 2 × 4 + 0 × 5 = 8 ; la seconde 0 × 4 + 3 × 5 = 15."
+    ],
+    "solution": "La première ligne donne 2 × 4 + 0 × 5 = 8 ; la seconde 0 × 4 + 3 × 5 = 15. np.array([[2, 0], [0, 3]]) @ np.array([4, 5]) renvoie [8, 15], un vecteur de forme (2,).",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Chaque ligne de la matrice produit une coordonnée de sortie."
+    ]
+  },
+  "0.19": {
+    "hints": [
+      "Chaque probabilité doit être positive ou nulle et la somme doit valoir un.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple : chat 0,6 ; chien 0,4 ; dort 0."
+    ],
+    "solution": "Exemple : chat 0,6 ; chien 0,4 ; dort 0. La somme vaut 1, chat est le plus probable et dort est impossible dans cette distribution. Une probabilité de zéro ne signifie pas que le token est impossible dans tous les contextes.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Chaque probabilité doit être positive ou nulle et la somme doit valoir un."
+    ]
+  },
+  "0.20": {
+    "hints": [
+      "Utilise une différence centrée autour de x = 4.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec epsilon = 0.00001, calcule ((4+epsilon)**2 - (4-epsilon)**2)/(2*epsilon) : le résultat est proche de 8."
+    ],
+    "solution": "Avec epsilon = 0.00001, calcule ((4+epsilon)**2 - (4-epsilon)**2)/(2*epsilon) : le résultat est proche de 8. Une pente positive conduit à diminuer x pour descendre localement la fonction. Le pas doit rester assez petit pour ne pas dépasser le minimum.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Utilise une différence centrée autour de x = 4."
+    ]
+  },
+  "1.1": {
+    "hints": [
+      "Cherche d'abord le facteur entre chaque entrée et sa cible.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. w = 2 et b = 0 donnent 2, 4, 6 pour x = 1, 2, 3 ; les erreurs sont nulles."
+    ],
+    "solution": "w = 2 et b = 0 donnent 2, 4, 6 pour x = 1, 2, 3 ; les erreurs sont nulles. La famille y = w*x+b est choisie par le programmeur. Les valeurs de w et b sont les paramètres que l'entraînement peut ajuster à partir des exemples.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Cherche d'abord le facteur entre chaque entrée et sa cible."
+    ]
+  },
+  "1.2": {
+    "hints": [
+      "Une feature légitime doit être disponible avant de connaître le label.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le nombre de liens et la présence d'un mot promotionnel dans le message sont deux features possibles."
+    ],
+    "solution": "Le nombre de liens et la présence d'un mot promotionnel dans le message sont deux features possibles. « Résultat de la modération spam » est interdite comme entrée : elle révèle déjà la réponse. Sépare aussi les messages du même fil pour éviter une fuite entre ensembles.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une feature légitime doit être disponible avant de connaître le label."
+    ]
+  },
+  "1.3": {
+    "hints": [
+      "Distingue apprendre, choisir et mesurer une seule fois à la fin.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Train sert à ajuster les poids."
+    ],
+    "solution": "Train sert à ajuster les poids. Validation sert à choisir les réglages et le moment d'arrêt. Test reste réservé à la mesure finale. Choisir le meilleur modèle sur test puis présenter ce même score comme indépendant transforme le test en validation et rend le résultat optimiste.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Distingue apprendre, choisir et mesurer une seule fois à la fin."
+    ]
+  },
+  "1.4": {
+    "hints": [
+      "Une seule équation à deux inconnues admet plusieurs solutions.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec x = 3, w = 2 et b = 1 donnent 7."
+    ],
+    "solution": "Avec x = 3, w = 2 et b = 1 donnent 7. w = 1 et b = 4 donnent aussi 7. Ce seul exemple ne permet pas d'identifier une paire unique ; d'autres entrées sont nécessaires pour distinguer les fonctions.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une seule équation à deux inconnues admet plusieurs solutions."
+    ]
+  },
+  "1.5": {
+    "hints": [
+      "La nouvelle entrée ajoute seulement w3 × x3 au z précédent.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Calcule d'abord z_initial avec les valeurs de l'exemple."
+    ],
+    "solution": "Calcule d'abord z_initial avec les valeurs de l'exemple. La troisième entrée apporte 0,4 × 1 = 0,4 : z_nouveau = z_initial + 0,4. Étends les vecteurs x et w avec ces valeurs, conserve le même biais et vérifie neuron(x, w, b) contre ce calcul.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La nouvelle entrée ajoute seulement w3 × x3 au z précédent."
+    ]
+  },
+  "1.6": {
+    "hints": [
+      "Teste une entrée négative avant d'ajouter la non-linéarité.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Sans activation, 2*(2*x) = 4*x ; pour x = -1, cela vaut -4."
+    ],
+    "solution": "Sans activation, 2*(2*x) = 4*x ; pour x = -1, cela vaut -4. Avec ReLU entre les deux multiplications, 2*max(0, 2*x) vaut 0. La composition avec activation ne se réduit donc plus à la même multiplication linéaire.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Teste une entrée négative avant d'ajouter la non-linéarité."
+    ]
+  },
+  "1.7": {
+    "hints": [
+      "Le biais de sortie s'ajoute après la dernière multiplication.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Pour une entrée de largeur D, une couche cachée H et une sortie O : x est (D,), x@W1 est (H,), h@W2 est (O,)."
+    ],
+    "solution": "Pour une entrée de largeur D, une couche cachée H et une sortie O : x est (D,), x@W1 est (H,), h@W2 est (O,). En ajoutant b2 = 0,5, chaque sortie augmente de 0,5, sans changer sa shape. Reprends les matrices numériques de l'exemple pour vérifier.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le biais de sortie s'ajoute après la dernière multiplication."
+    ]
+  },
+  "1.8": {
+    "hints": [
+      "Choisis des poids simples afin de vérifier le forward à la main.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple avec deux neurones successifs : x = 2 ; z1 = 3*x+1 = 7 ; h = ReLU(z1) = 7 ; prédiction = 2*h-1 = 13."
+    ],
+    "solution": "Exemple avec deux neurones successifs : x = 2 ; z1 = 3*x+1 = 7 ; h = ReLU(z1) = 7 ; prédiction = 2*h-1 = 13. Si la cible choisie est 10, elle reste 10 : le forward produit 13 sans modifier aucun poids.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Choisis des poids simples afin de vérifier le forward à la main."
+    ]
+  },
+  "1.9": {
+    "hints": [
+      "La moyenne se calcule après le carré de chaque erreur.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Pour 10 contre 6, (10-6)² = 16."
+    ],
+    "solution": "Pour 10 contre 6, (10-6)² = 16. Pour le second exemple 0 contre 0, l'erreur carrée vaut 0. La moyenne sur les deux vaut (16+0)/2 = 8. Le carré de l'erreur moyenne vaudrait 4 : ce n'est pas la même loss.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La moyenne se calcule après le carré de chaque erreur."
+    ]
+  },
+  "1.10": {
+    "hints": [
+      "Applique w_nouveau = w - lr × gradient avec le signe donné.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 3 - 0,1 × (-4) = 3,4."
+    ],
+    "solution": "3 - 0,1 × (-4) = 3,4. On s'éloigne de 3. Pour la loss (w-3)² évaluée en w=3, le gradient réel serait zéro, pas -4 ; cet exercice vérifie donc le signe de la mise à jour, pas la cohérence de ce gradient avec cette loss.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Applique w_nouveau = w - lr × gradient avec le signe donné."
+    ]
+  },
+  "1.11": {
+    "hints": [
+      "Multiplie les dérivées locales le long de la chaîne.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. En x=1, u=3*1+1=4."
+    ],
+    "solution": "En x=1, u=3*1+1=4. dy/du=2u=8 et du/dx=3. Le produit vaut 24. Écrire seulement 2u oublie la dépendance de u à x.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Multiplie les dérivées locales le long de la chaîne."
+    ]
+  },
+  "1.12": {
+    "hints": [
+      "Commence par nommer p = xw et L = (p-y)².",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le backward renvoie dL/dp = 2(p-y) depuis le carré."
+    ],
+    "solution": "Le backward renvoie dL/dp = 2(p-y) depuis le carré. Le produit transmet ensuite dL/dw = 2(p-y)*x et dL/dx = 2(p-y)*w. Dessine les flèches de la loss vers p, puis vers les deux entrées ; la cible y est tenue fixe.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Commence par nommer p = xw et L = (p-y)²."
+    ]
+  },
+  "1.13": {
+    "hints": [
+      "Recalcule le gradient après le premier déplacement.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Au départ w=0 : gradient=-6 et w_nouveau=0-0,5*(-6)=3."
+    ],
+    "solution": "Au départ w=0 : gradient=-6 et w_nouveau=0-0,5*(-6)=3. Le gradient suivant vaut 2*(3-3)=0, donc le second pas conserve w=3. Ce résultat dépend de cette parabole et de ce pas précis ; un réseau n'a pas cette courbure simple partout.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Recalcule le gradient après le premier déplacement."
+    ]
+  },
+  "1.14": {
+    "hints": [
+      "Adam conserve deux tableaux d'état par paramètre.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Dans l'estimation simplifiée du cours, les moments de premier et deuxième ordre sont deux nombres float32, soit 8 octets supplémentaires par paramètre."
+    ],
+    "solution": "Dans l'estimation simplifiée du cours, les moments de premier et deuxième ordre sont deux nombres float32, soit 8 octets supplémentaires par paramètre. SGD sans momentum n'a pas ces deux états. La mémoire réelle doit aussi compter gradients, activations et précision effectivement utilisée.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Adam conserve deux tableaux d'état par paramètre."
+    ]
+  },
+  "1.15": {
+    "hints": [
+      "Distingue une nouvelle passe backward d'une remise à zéro.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Sur l'exemple du cours, un passage produit un gradient -4."
+    ],
+    "solution": "Sur l'exemple du cours, un passage produit un gradient -4. Si tu reconstruis et rétropropages le même calcul sans zero_grad, les contributions s'accumulent et donnent -8. Avec ce petit autograd, réutiliser exactement le même graphe sans vider aussi ses gradients intermédiaires n'est pas une opération générale garantie : reconstruis le forward à chaque pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Distingue une nouvelle passe backward d'une remise à zéro."
+    ]
+  },
+  "1.16": {
+    "hints": [
+      "La remise à zéro précède le forward du nouveau lot.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'ordre est : remettre les gradients à zéro ; calculer les prédictions ; calculer la loss ; rétropropager ; mettre à jour les poids."
+    ],
+    "solution": "L'ordre est : remettre les gradients à zéro ; calculer les prédictions ; calculer la loss ; rétropropager ; mettre à jour les poids. Sans remise à zéro, la mise à jour utilise les contributions de plusieurs lots au lieu du seul lot courant, sauf accumulation volontaire et correctement normalisée.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La remise à zéro précède le forward du nouveau lot."
+    ]
+  },
+  "1.17": {
+    "hints": [
+      "Demande où la loss a été mesurée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une loss de train plus basse peut venir de la mémorisation des exemples vus."
+    ],
+    "solution": "Une loss de train plus basse peut venir de la mémorisation des exemples vus. Mesure la même métrique sur une validation séparée, sans l'utiliser pour ajuster les poids. Si train baisse et validation monte durablement, tu observes un signe de surapprentissage ; le test final reste hors sélection.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Demande où la loss a été mesurée."
+    ]
+  },
+  "2.1": {
+    "hints": [
+      "ord donne le point de code d'un caractère.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. ord('A') = 65, ord('é') = 233 et ord('€') = 8364."
+    ],
+    "solution": "ord('A') = 65, ord('é') = 233 et ord('€') = 8364. Un identifiant de token dépend du vocabulaire construit pour le modèle ; il n'a aucune obligation d'être égal au point de code Unicode du caractère.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : ord donne le point de code d'un caractère."
+    ]
+  },
+  "2.2": {
+    "hints": [
+      "Un bigramme ne voit que le token immédiatement précédent.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple : « le chat dort."
+    ],
+    "solution": "Exemple : « le chat dort. le chat dort. le chat mange. ». Un bigramme de mots peut compter que chat suit souvent le et que dort suit chat. Il ne distingue pas deux histoires différentes qui ont le même dernier token ; au niveau caractère, il compte seulement les transitions de caractères.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un bigramme ne voit que le token immédiatement précédent."
+    ]
+  },
+  "2.3": {
+    "hints": [
+      "Pense à l'alphabet fixe du tokenizer, pas à la taille du texte.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le vocabulaire de bonjour ne contient pas z : l'encodage caractère échoue."
+    ],
+    "solution": "Le vocabulaire de bonjour ne contient pas z : l'encodage caractère échoue. Un tokenizer utilisant les 256 valeurs d'octet peut représenter les octets UTF-8 de n'importe quel texte Unicode valide. Une lettre accentuée peut alors demander plusieurs unités ; le décodage doit reconstruire correctement UTF-8.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Pense à l'alphabet fixe du tokenizer, pas à la taille du texte."
+    ]
+  },
+  "2.4": {
+    "hints": [
+      "Supprime les doublons, trie, puis numérote.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les unités distinctes de abba sont a et b."
+    ],
+    "solution": "Les unités distinctes de abba sont a et b. L'ordre trié donne a→0, b→1 : le vocabulaire contient deux unités. Le nombre de caractères dans le corpus est quatre ; ce n'est pas la taille du vocabulaire.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Supprime les doublons, trie, puis numérote."
+    ]
+  },
+  "2.5": {
+    "hints": [
+      "Vérifie l'aller-retour, pas seulement la longueur.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec a→0 et b→1, abba s'encode [0,1,1,0]."
+    ],
+    "solution": "Avec a→0 et b→1, abba s'encode [0,1,1,0]. En remplaçant chaque identifiant par son caractère, on retrouve abba. Pour conserver un espace, il faut que l'espace soit lui aussi présent dans le vocabulaire et dans la séquence.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Vérifie l'aller-retour, pas seulement la longueur."
+    ]
+  },
+  "2.6": {
+    "hints": [
+      "Remplace les occurrences non chevauchantes de la paire a,n.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. banana commence par [b,a,n,a,n,a]."
+    ],
+    "solution": "banana commence par [b,a,n,a,n,a]. La fusion de an donne [b,an,an,a], soit quatre pièces. Le décodage concatène leurs textes et reconstitue banana ; apprendre une fusion ne supprime aucun caractère.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Remplace les occurrences non chevauchantes de la paire a,n."
+    ]
+  },
+  "2.7": {
+    "hints": [
+      "Avance de deux positions quand la paire est remplacée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. [1,2,1,2] devient [9,9]."
+    ],
+    "solution": "[1,2,1,2] devient [9,9]. Si 9 décode la paire [1,2], on retrouve [1,2,1,2]. Faire une substitution sans sauter les deux anciennes positions risquerait de traiter des éléments déjà fusionnés.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Avance de deux positions quand la paire est remplacée."
+    ]
+  },
+  "2.8": {
+    "hints": [
+      "Un identifiant nomme une catégorie ; son ordre numérique n'est pas une mesure.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le token 20 n'est pas deux fois plus grand que le token 10."
+    ],
+    "solution": "Le token 20 n'est pas deux fois plus grand que le token 10. On utilise cet entier pour sélectionner une ligne d'embedding. Ce vecteur de nombres réels peut ensuite être normalisé ; normaliser l'identifiant détruirait l'index qui sert à la recherche.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un identifiant nomme une catégorie ; son ordre numérique n'est pas une mesure."
+    ]
+  },
+  "2.9": {
+    "hints": [
+      "La table contient une ligne de D valeurs pour chacun des V tokens.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 1000 × 64 = 64 000 paramètres."
+    ],
+    "solution": "1000 × 64 = 64 000 paramètres. Pour B=2 et T=8, la sélection des embeddings donne la forme (2,8,64). La dimension du vocabulaire ne reste pas dans cette sortie : elle a servi à choisir les lignes.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La table contient une ligne de D valeurs pour chacun des V tokens."
+    ]
+  },
+  "2.10": {
+    "hints": [
+      "Un tableau de longueur huit n'a pas d'index huit.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les positions valides sont 0,1,2,3,4,5,6,7."
+    ],
+    "solution": "Les positions valides sont 0,1,2,3,4,5,6,7. Demander l'index 8 sort de la table absolue de huit positions. Pour aller plus loin, il faut modifier la configuration et apprendre les positions supplémentaires, ou étudier une autre représentation positionnelle.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un tableau de longueur huit n'a pas d'index huit."
+    ]
+  },
+  "2.11": {
+    "hints": [
+      "Garde l'ordre batch, temps, vocabulaire.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. x a la forme (4,16) et les logits (4,16,50)."
+    ],
+    "solution": "x a la forme (4,16) et les logits (4,16,50). La sortie (16,4,50) échange temps et batch : les opérations de masque et de décalage des cibles interpréteraient alors les mauvaises dimensions.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Garde l'ordre batch, temps, vocabulaire."
+    ]
+  },
+  "3.1": {
+    "hints": [
+      "Associe chaque position au token de la position suivante.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La séquence [5,5,8,5] donne (5,5), (5,8), (8,5)."
+    ],
+    "solution": "La séquence [5,5,8,5] donne (5,5), (5,8), (8,5). Le dernier token n'a pas de suivant dans cet exemple et ne fournit pas une quatrième paire. La cible de chaque paire vient donc d'un décalage d'une position.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Associe chaque position au token de la position suivante."
+    ]
+  },
+  "3.2": {
+    "hints": [
+      "Ajoute un pseudo-compte à chacune des trois colonnes.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La ligne du contexte 0 contient deux transitions vers 2 et zéro vers 0 ou 1."
+    ],
+    "solution": "La ligne du contexte 0 contient deux transitions vers 2 et zéro vers 0 ou 1. Avec alpha=1 : [1,1,3], de somme 5. La probabilité de 2 après 0 vaut 3/5 = 0,6. Le lissage évite des probabilités nulles pour les deux autres tokens.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Ajoute un pseudo-compte à chacune des trois colonnes."
+    ]
+  },
+  "3.3": {
+    "hints": [
+      "Chaque fenêtre de deux entrées a besoin d'un troisième token pour les cibles.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Fenêtre 0 : x=[4,4], y=[4,9]."
+    ],
+    "solution": "Fenêtre 0 : x=[4,4], y=[4,9]. Fenêtre 1 : x=[4,9], y=[9,4]. Il n'y a pas de troisième fenêtre complète, car il manquerait la cible suivant le dernier 4.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Chaque fenêtre de deux entrées a besoin d'un troisième token pour les cibles."
+    ]
+  },
+  "3.4": {
+    "hints": [
+      "Multiplie les trois dimensions pour le nombre total de scores.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 2 × 5 × 20 = 200 scores."
+    ],
+    "solution": "2 × 5 × 20 = 200 scores. Il y a deux séquences, cinq positions dans chacune et vingt candidats du vocabulaire par position. Ces valeurs sont des logits, pas encore des probabilités normalisées.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Multiplie les trois dimensions pour le nombre total de scores."
+    ]
+  },
+  "3.5": {
+    "hints": [
+      "Des scores égaux doivent recevoir des probabilités égales.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. exp(a)/(exp(a)+exp(a)) = 1/2 pour chacun des deux logits."
+    ],
+    "solution": "exp(a)/(exp(a)+exp(a)) = 1/2 pour chacun des deux logits. softmax(np.array([2.,2.])) doit donc donner [0.5,0.5]. Ajouter une même constante aux deux logits ne change pas ce résultat.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Des scores égaux doivent recevoir des probabilités égales."
+    ]
+  },
+  "3.6": {
+    "hints": [
+      "La fonction -log(p) diminue quand la probabilité de la cible augmente.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. -ln(0,5) ≈ 0,693147 ; -ln(0,9) ≈ 0,105361."
+    ],
+    "solution": "-ln(0,5) ≈ 0,693147 ; -ln(0,9) ≈ 0,105361. La seconde prédiction a une loss plus basse et est meilleure pour cette cible. L'unité est le nat parce que le logarithme est naturel.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La fonction -log(p) diminue quand la probabilité de la cible augmente."
+    ]
+  },
+  "3.7": {
+    "hints": [
+      "Trie les indices selon les scores, pas selon leur numéro.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les scores 3 et 2 sont aux indices 1 et 2 : ce sont les deux candidats retenus."
+    ],
+    "solution": "Les scores 3 et 2 sont aux indices 1 et 2 : ce sont les deux candidats retenus. Les indices 0 et 3 sont exclus avant renormalisation. Le token final reste un tirage parmi les candidats sauf si la température est nulle.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Trie les indices selon les scores, pas selon leur numéro."
+    ]
+  },
+  "3.8": {
+    "hints": [
+      "Le calcul du prochain token et la mesure restent nécessaires dans les deux cas.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Préparer les couples entrée/cible ; produire les distributions ; mesurer la perte ; ajuster le modèle."
+    ],
+    "solution": "Préparer les couples entrée/cible ; produire les distributions ; mesurer la perte ; ajuster le modèle. Pour le bigramme, l'ajustement repose sur les comptes de transitions. Pour la tête linéaire, il repose sur le gradient de la perte et une mise à jour des poids.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le calcul du prochain token et la mesure restent nécessaires dans les deux cas."
+    ]
+  },
+  "3.9": {
+    "hints": [
+      "La fenêtre contient les trois derniers tokens, graine comprise.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La suite complète est [4,4,7,1,9]."
+    ],
+    "solution": "La suite complète est [4,4,7,1,9]. La fenêtre suivante est [7,1,9]. La graine n'est pas un emplacement permanent du contexte ; elle est écartée dès qu'elle sort des trois dernières positions.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La fenêtre contient les trois derniers tokens, graine comprise."
+    ]
+  },
+  "3.10": {
+    "hints": [
+      "La perplexité est l'exponentielle de la loss moyenne en nats.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. exp(2) ≈ 7,389."
+    ],
+    "solution": "exp(2) ≈ 7,389. Pour une loi uniforme sur V=100, la perplexité vaut 100. Le modèle fait donc mieux sur ce jeu mesuré, sous réserve du même tokenizer, des mêmes cibles et d'un découpage indépendant.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La perplexité est l'exponentielle de la loss moyenne en nats."
+    ]
+  },
+  "3.11": {
+    "hints": [
+      "Compte séparément les objets nécessaires au calcul et au décodage.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Il faut archiver le code/version, la configuration, les poids et le tokenizer avec l'ordre de ses identifiants."
+    ],
+    "solution": "Il faut archiver le code/version, la configuration, les poids et le tokenizer avec l'ordre de ses identifiants. Une mauvaise table du tokenizer transforme les bonnes sorties numériques en mauvais texte. Pour reprendre l'entraînement exactement, ajoute l'optimiseur, le RNG et le calendrier des pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte séparément les objets nécessaires au calcul et au décodage."
+    ]
+  },
+  "4.1": {
+    "hints": [
+      "Un pronom ne contient pas à lui seul son référent.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Elle peut ici renvoyer à la clef ; selon le contexte porte reste une ambiguïté possible que l'attention seule ne résout pas magiquement."
+    ],
+    "solution": "Elle peut ici renvoyer à la clef ; selon le contexte porte reste une ambiguïté possible que l'attention seule ne résout pas magiquement. Une moyenne donne le même mélange à tous les liens et dilue les mots utiles. Une attention conditionnée par la requête peut pondérer différemment ces sources.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un pronom ne contient pas à lui seul son référent."
+    ]
+  },
+  "4.2": {
+    "hints": [
+      "Le produit conserve une dimension par position de requête et de clé.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Q, K et V ont chacun la forme (3,4) dans cette attention simple."
+    ],
+    "solution": "Q, K et V ont chacun la forme (3,4) dans cette attention simple. Q@K.T produit (3,3). La sortie pondérée par V revient à (3,4) ; les scores ne sont donc pas déjà la représentation finale.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le produit conserve une dimension par position de requête et de clé."
+    ]
+  },
+  "4.3": {
+    "hints": [
+      "Chaque cellule est le produit de la requête de sa ligne et de la clé de sa colonne.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Q@K.T vaut [[2*3,2*4],[0*3,0*4]], donc [[6,8],[0,0]]."
+    ],
+    "solution": "Q@K.T vaut [[2*3,2*4],[0*3,0*4]], donc [[6,8],[0,0]]. Avec D=1, diviser par sqrt(D) ne change rien. Ces scores nécessitent ensuite masque et softmax selon le contexte.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Chaque cellule est le produit de la requête de sa ligne et de la clé de sa colonne."
+    ]
+  },
+  "4.4": {
+    "hints": [
+      "Multiplie chaque valeur par son poids puis additionne.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 0,2*[1,0] + 0,8*[0,1] = [0,2 ; 0,8], soit le vecteur Python [0.2,0.8]."
+    ],
+    "solution": "0,2*[1,0] + 0,8*[0,1] = [0,2 ; 0,8], soit le vecteur Python [0.2,0.8]. La somme des poids vaut 1 ; la sortie est une combinaison des valeurs, pas une sélection obligatoire d'une seule valeur.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Multiplie chaque valeur par son poids puis additionne."
+    ]
+  },
+  "4.5": {
+    "hints": [
+      "Vérifie la somme des probabilités après avoir supprimé le futur.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si une ligne vaut [0.2,0.3,0.5] et le dernier token est futur, mettre sa probabilité à zéro laisse une somme de 0,5."
+    ],
+    "solution": "Si une ligne vaut [0.2,0.3,0.5] et le dernier token est futur, mettre sa probabilité à zéro laisse une somme de 0,5. Il faudrait renormaliser les deux autres en [0.4,0.6]. Un score très négatif avant softmax rend l'exponentielle du futur négligeable et normalise directement sur les positions autorisées.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Vérifie la somme des probabilités après avoir supprimé le futur."
+    ]
+  },
+  "4.6": {
+    "hints": [
+      "L'échelle est la racine carrée de la largeur d'une tête.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. sqrt(64)=8 et sqrt(1)=1."
+    ],
+    "solution": "sqrt(64)=8 et sqrt(1)=1. On divise les produits scalaires par ces valeurs avant le softmax. Cela limite la croissance de leur variance avec la dimension ; ce n'est pas une division par le nombre de tokens.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : L'échelle est la racine carrée de la largeur d'une tête."
+    ]
+  },
+  "4.7": {
+    "hints": [
+      "Divise d_model par le nombre de têtes puis sépare cette dimension.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. d_k=32/8=4."
+    ],
+    "solution": "d_k=32/8=4. Dans la convention (B,H,T,Dh), Q prend la forme (2,8,5,4). Les scores par tête ont ensuite la forme (2,8,5,5). Ne confonds pas huit têtes et huit tokens.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Divise d_model par le nombre de têtes puis sépare cette dimension."
+    ]
+  },
+  "4.8": {
+    "hints": [
+      "Applique deux fois la relation sortie = entrée + correction.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Premier bloc : x+0=x."
+    ],
+    "solution": "Premier bloc : x+0=x. Second bloc : x+0=x. L'identité reste donc un chemin possible à travers les résidus. Des corrections non nulles et les normalisations peuvent toutefois changer le signal : le résidu ne garantit pas que tout réseau conserve exactement x.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Applique deux fois la relation sortie = entrée + correction."
+    ]
+  },
+  "4.9": {
+    "hints": [
+      "Observe de quelles dimensions les statistiques de normalisation dépendent.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. BatchNorm utilise des statistiques du batch et éventuellement des moyennes stockées, ce qui complique la cohérence entre entraînement et génération séquentielle."
+    ],
+    "solution": "BatchNorm utilise des statistiques du batch et éventuellement des moyennes stockées, ce qui complique la cohérence entre entraînement et génération séquentielle. LayerNorm normalise les caractéristiques de chaque token indépendamment des autres exemples. Un batch de taille un n'interdit pas toute BatchNorm, mais ne correspond pas au même mécanisme.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Observe de quelles dimensions les statistiques de normalisation dépendent."
+    ]
+  },
+  "4.10": {
+    "hints": [
+      "W1 va de D à 4D et W2 revient de 4D à D.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. W1 a la forme (32,128), W2 (128,32)."
+    ],
+    "solution": "W1 a la forme (32,128), W2 (128,32). Chacune contient 4096 paramètres, soit 8192 au total sans biais. La largeur cachée 128 n'augmente pas le nombre de positions temporelles.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : W1 va de D à 4D et W2 revient de 4D à D."
+    ]
+  },
+  "4.11": {
+    "hints": [
+      "Sépare les projections d'attention des matrices du MLP.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Wq, Wk et Wv projettent requêtes, clés et valeurs ; Wo reprojette les têtes réunies."
+    ],
+    "solution": "Wq, Wk et Wv projettent requêtes, clés et valeurs ; Wo reprojette les têtes réunies. W1 et W2 appartiennent au feed-forward. Il y a donc quatre matrices principales d'attention, puis deux matrices FFN, et non quatre matrices pour tout le bloc.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Sépare les projections d'attention des matrices du MLP."
+    ]
+  },
+  "4.12": {
+    "hints": [
+      "Les couches répètent les poids du bloc, pas la fenêtre.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Passer de 2 à 6 couches multiplie approximativement par trois les paramètres des blocs."
+    ],
+    "solution": "Passer de 2 à 6 couches multiplie approximativement par trois les paramètres des blocs. Les embeddings et la tête restent des termes fixes, donc le nombre total n'est pas exactement triplé. T et la fenêtre configurée ne changent pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Les couches répètent les poids du bloc, pas la fenêtre."
+    ]
+  },
+  "4.13": {
+    "hints": [
+      "Commence par les identifiants, puis suis le decoder jusqu'au vocabulaire.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Identifiants → embeddings de tokens et positions → blocs pré-norme avec attention causale et résidus → FFN et résidus → normalisation finale → projection vocabulaire → logits."
+    ],
+    "solution": "Identifiants → embeddings de tokens et positions → blocs pré-norme avec attention causale et résidus → FFN et résidus → normalisation finale → projection vocabulaire → logits. Le softmax sert à la loss ou à l'échantillonnage. Aucun encodeur séparé n'est traversé.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Commence par les identifiants, puis suis le decoder jusqu'au vocabulaire."
+    ]
+  },
+  "4.14": {
+    "hints": [
+      "Demande si backward et l'optimiseur sont exécutés.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'entraînement voit des entrées et des cibles décalées, calcule une perte, rétropropage puis met à jour les poids."
+    ],
+    "solution": "L'entraînement voit des entrées et des cibles décalées, calcule une perte, rétropropage puis met à jour les poids. La génération calcule les logits, choisit un token et l'ajoute au contexte. Elle garde les poids fixes et peut utiliser un cache KV.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Demande si backward et l'optimiseur sont exécutés."
+    ]
+  },
+  "5.1": {
+    "hints": [
+      "Une table finie et une relation de position ne posent pas la même question.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La table absolue n'a pas de ligne apprise pour une position hors de sa taille."
+    ],
+    "solution": "La table absolue n'a pas de ligne apprise pour une position hors de sa taille. Une représentation relative exprime des écarts, comme trois places en arrière. Cela ne garantit pas une bonne extrapolation à toute longueur : la fenêtre, les données et les calculs restent limitants.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une table finie et une relation de position ne posent pas la même question."
+    ]
+  },
+  "5.2": {
+    "hints": [
+      "À l'angle zéro, cos vaut un et sin vaut zéro.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La paire (x,y) devient (x*1-y*0, x*0+y*1)=(x,y)."
+    ],
+    "solution": "La paire (x,y) devient (x*1-y*0, x*0+y*1)=(x,y). Avec apply_rope sur la position 0, compare la sortie à l'entrée avec np.allclose. Les autres positions peuvent changer les coordonnées tout en conservant la norme de chaque paire.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : À l'angle zéro, cos vaut un et sin vaut zéro."
+    ]
+  },
+  "5.3": {
+    "hints": [
+      "Regarde la moyenne et le biais additif dans les formules.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. LayerNorm soustrait la moyenne puis divise par l'écart-type stabilisé ; la version du cours ajoute aussi un biais beta."
+    ],
+    "solution": "LayerNorm soustrait la moyenne puis divise par l'écart-type stabilisé ; la version du cours ajoute aussi un biais beta. RMSNorm divise par la racine de la moyenne des carrés sans recentrage et utilise ici seulement un gain. Il ne faut pas confondre moyenne des carrés et variance.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Regarde la moyenne et le biais additif dans les formules."
+    ]
+  },
+  "5.4": {
+    "hints": [
+      "Compte les chemins de projection avant la sortie.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le FFN GELU possède W1 et W2 : deux matrices."
+    ],
+    "solution": "Le FFN GELU possède W1 et W2 : deux matrices. SwiGLU possède une projection de valeur, une de porte, puis une de sortie : trois. Réduire d_ff peut maintenir un budget de paramètres comparable ; sinon la comparaison attribuerait aussi l'effet d'un réseau plus gros à l'activation.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte les chemins de projection avant la sortie."
+    ]
+  },
+  "5.5": {
+    "hints": [
+      "Répartis huit requêtes en deux groupes de même taille.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 8/2=4 têtes de requête partagent chaque tête KV."
+    ],
+    "solution": "8/2=4 têtes de requête partagent chaque tête KV. Avec un head_dim inchangé, la largeur de sortie de wk passe de 8*head_dim à 2*head_dim, soit un quart du MHA. Le cache KV diminue aussi ; la largeur des requêtes reste inchangée.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Répartis huit requêtes en deux groupes de même taille."
+    ]
+  },
+  "5.6": {
+    "hints": [
+      "Les positions du cache comptent déjà quatre tokens.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les anciens tokens occupent 0 à 3 ; la nouvelle requête utilise la position 4."
+    ],
+    "solution": "Les anciens tokens occupent 0 à 3 ; la nouvelle requête utilise la position 4. Revenir à zéro appliquerait une mauvaise phase RoPE et rendrait le décodage avec cache différent du forward complet. Teste l'égalité numérique entre ces deux chemins.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Les positions du cache comptent déjà quatre tokens."
+    ]
+  },
+  "5.7": {
+    "hints": [
+      "La tête supprimée a une valeur pour chaque couple vocabulaire-dimension.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 32000*256=8 192 000 paramètres partagés."
+    ],
+    "solution": "32000*256=8 192 000 paramètres partagés. En float32, cela économise 32 768 000 octets, soit 32,768 Mo décimaux ou 31,25 Mio. Cela ne compte ni les activations ni les éventuelles économies sur gradients et optimiseur.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La tête supprimée a une valeur pour chaque couple vocabulaire-dimension."
+    ]
+  },
+  "5.8": {
+    "hints": [
+      "La graine change l'initialisation et parfois les lots.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Deux graines différentes introduisent une autre cause possible de l'écart observé."
+    ],
+    "solution": "Deux graines différentes introduisent une autre cause possible de l'écart observé. Compare positions absolues et RoPE sur les mêmes données, découpage, budget et graines appariées ; répète sur plusieurs graines si tu veux estimer la variabilité. Une seule exécution ne prouve pas une supériorité générale.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La graine change l'initialisation et parfois les lots."
+    ]
+  },
+  "5.9": {
+    "hints": [
+      "Le cache évite de recalculer les anciennes clés, pas de les lire.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. À chaque token, une clé et une valeur s'ajoutent par couche : le cache grandit linéairement avec T."
+    ],
+    "solution": "À chaque token, une clé et une valeur s'ajoutent par couche : le cache grandit linéairement avec T. La nouvelle requête doit comparer son score à toutes les clés du passé ; ce travail augmente avec T. Un cache ne rend donc pas le coût par token constant.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le cache évite de recalculer les anciennes clés, pas de les lire."
+    ]
+  },
+  "6.1": {
+    "hints": [
+      "Compte deux octets par poids fp16, puis nomme les termes absents.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 7 milliards × 2 = 14 milliards d'octets, soit 14 Go décimaux de poids seuls."
+    ],
+    "solution": "7 milliards × 2 = 14 milliards d'octets, soit 14 Go décimaux de poids seuls. Il faut encore le cache KV, les activations, les buffers et les frais du runtime. Un entraînement ajoute gradients et états d'optimiseur : ce chiffre ne le dimensionne pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte deux octets par poids fp16, puis nomme les termes absents."
+    ]
+  },
+  "6.2": {
+    "hints": [
+      "Un SSD libre n'ajoute pas de VRAM au GPU.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La VRAM est saturée."
+    ],
+    "solution": "La VRAM est saturée. Réduire le batch peut diminuer les activations ; en génération, réduire le contexte ou le cache peut être nécessaire. Acheter un disque plus gros ne corrige pas directement ce manque, même si un runtime permet un offload explicite avec d'autres compromis.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un SSD libre n'ajoute pas de VRAM au GPU."
+    ]
+  },
+  "6.3": {
+    "hints": [
+      "Compare les termes 8*T*D² et 4*T²*D à D fixé.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. À T=1 et pour D usuel, les projections en D² dominent ce calcul d'attention simplifié."
+    ],
+    "solution": "À T=1 et pour D usuel, les projections en D² dominent ce calcul d'attention simplifié. Le préremplissage d'un long prompt paie le terme quadratique de ce prompt. Après préremplissage avec cache, le coût de la nouvelle attention croît avec la longueur du passé et ne se réduit pas à T=1 partout.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compare les termes 8*T*D² et 4*T²*D à D fixé."
+    ]
+  },
+  "6.4": {
+    "hints": [
+      "La machine paie aussi les lancements, transferts et accès mémoire.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un algorithme avec moins de FLOPs peut multiplier de minuscules kernels et transferts, laissant le GPU attendre."
+    ],
+    "solution": "Un algorithme avec moins de FLOPs peut multiplier de minuscules kernels et transferts, laissant le GPU attendre. Chronomètre après échauffement, sur les mêmes entrées et avec une synchronisation adaptée. Les FLOPs estimés ne suffisent pas à prédire la latence réelle.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La machine paie aussi les lancements, transferts et accès mémoire."
+    ]
+  },
+  "6.5": {
+    "hints": [
+      "Le batch ne peut plus descendre sous un.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Réduis la longueur de contexte pour diminuer le cache KV et le travail d'attention."
+    ],
+    "solution": "Réduis la longueur de contexte pour diminuer le cache KV et le travail d'attention. Selon le runtime, réduis aussi la précision du cache ou utilise un modèle plus petit. Ne prétends pas que le SSD libre supprime ce besoin de mémoire de calcul.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le batch ne peut plus descendre sous un."
+    ]
+  },
+  "6.6": {
+    "hints": [
+      "fp16 représente une plage de valeurs plus étroite.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Des sommes ou exponentielles intermédiaires peuvent déborder en fp16 alors que fp32 les représente."
+    ],
+    "solution": "Des sommes ou exponentielles intermédiaires peuvent déborder en fp16 alors que fp32 les représente. Calcule la réduction de la loss et les opérations sensibles en fp32, avec un softmax stabilisé. Cela ne répare pas un gradient mathématiquement divergent : il faut aussi contrôler le pas et les entrées.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : fp16 représente une plage de valeurs plus étroite."
+    ]
+  },
+  "6.7": {
+    "hints": [
+      "La moyenne des gradients n'est pas leur somme.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Oublier de diviser par huit donne un gradient huit fois plus grand pour huit lots de même taille."
+    ],
+    "solution": "Oublier de diviser par huit donne un gradient huit fois plus grand pour huit lots de même taille. Avec SGD et un même lr, le déplacement est huit fois plus grand. Avec Adam, la normalisation interne complique ce facteur exact, mais l'objectif accumulé reste mal normalisé.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La moyenne des gradients n'est pas leur somme."
+    ]
+  },
+  "6.8": {
+    "hints": [
+      "L'un échange mémoire contre recalcul ; l'autre conserve un état entre exécutions.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le checkpointing d'activations supprime certains résultats intermédiaires et les recalcule au backward."
+    ],
+    "solution": "Le checkpointing d'activations supprime certains résultats intermédiaires et les recalcule au backward. Un fichier de checkpoint enregistre poids et éventuellement état d'entraînement sur disque pour une reprise ultérieure. Sauvegarder les poids ne réduit pas à lui seul les activations d'une passe.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : L'un échange mémoire contre recalcul ; l'autre conserve un état entre exécutions."
+    ]
+  },
+  "6.9": {
+    "hints": [
+      "Compare la dégradation sur le même jeu et le même tokenizer.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La première option passe de 12 à 12,4, soit une dégradation modeste avec mémoire divisée par quatre."
+    ],
+    "solution": "La première option passe de 12 à 12,4, soit une dégradation modeste avec mémoire divisée par quatre. La seconde atteint 30 : elle dégrade beaucoup plus la qualité mesurée. Garde la première si elle respecte ton seuil de qualité et vérifie aussi sa vitesse réelle ; ce compromis n'est pas décidé par la mémoire seule.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compare la dégradation sur le même jeu et le même tokenizer."
+    ]
+  },
+  "6.10": {
+    "hints": [
+      "L'élève doit être utile sur le matériel visé.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Cherche une baisse de la latence et de la mémoire, voire de l'énergie mesurée."
+    ],
+    "solution": "Cherche une baisse de la latence et de la mémoire, voire de l'énergie mesurée. Sur le même test indépendant, la qualité — par exemple la perplexité — doit rester dans une tolérance fixée à l'avance. La taille plus petite seule ne prouve ni rapidité ni bonne réponse.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : L'élève doit être utile sur le matériel visé."
+    ]
+  },
+  "6.11": {
+    "hints": [
+      "Le travail doit être assez gros pour amortir le déplacement vers le GPU.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Pour un tout petit modèle et un seul token, transferts CPU-GPU, lancements et synchronisations peuvent coûter plus que le calcul."
+    ],
+    "solution": "Pour un tout petit modèle et un seul token, transferts CPU-GPU, lancements et synchronisations peuvent coûter plus que le calcul. Mesure le chemin complet à batch et contexte identiques. Un GPU puissant n'accélère pas automatiquement chaque petite opération NumPy.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le travail doit être assez gros pour amortir le déplacement vers le GPU."
+    ]
+  },
+  "6.12": {
+    "hints": [
+      "Garde architecture et protocole identiques sauf la position.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE."
+    ],
+    "solution": "Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE. Entre les deux TinyGPT, ne change que pos, avec dimensions, données, graine et protocole identiques. Ici RoPE n'a pas le backward du decoder entraînable : une comparaison forward mesure forme, causalité et temps, pas une qualité linguistique après entraînement identique.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Garde architecture et protocole identiques sauf la position."
+    ]
+  },
+  "7.1": {
+    "hints": [
+      "Les shapes décrivent les interfaces, pas la fonction exacte.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Deux FFN de mêmes dimensions possèdent des matrices de mêmes formes mais des valeurs différentes."
+    ],
+    "solution": "Deux FFN de mêmes dimensions possèdent des matrices de mêmes formes mais des valeurs différentes. Ces poids changent les activations et la sortie pour le même token. Avec tous les poids strictement identiques, les experts ne seraient pas spécialisés par leur seul numéro.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Les shapes décrivent les interfaces, pas la fonction exacte."
+    ]
+  },
+  "7.2": {
+    "hints": [
+      "Sépare paramètres stockés et experts activés par token.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un MoE conserve E experts mais n'en exécute que k par token."
+    ],
+    "solution": "Un MoE conserve E experts mais n'en exécute que k par token. Avec k petit, le calcul actif peut rester proche d'un dense, alors que la RAM nécessaire pour les poids totaux augmente. Routeur, communication et tokens rejetés ajoutent leurs propres coûts.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Sépare paramètres stockés et experts activés par token."
+    ]
+  },
+  "7.3": {
+    "hints": [
+      "Applique softmax à quatre valeurs égales.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Chaque exponentielle vaut 1 et leur somme vaut 4 : chaque probabilité vaut 1/4 = 0,25."
+    ],
+    "solution": "Chaque exponentielle vaut 1 et leur somme vaut 4 : chaque probabilité vaut 1/4 = 0,25. Cela décrit les probabilités, pas forcément les comptes d'affectation après un argmax avec égalités.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Applique softmax à quatre valeurs égales."
+    ]
+  },
+  "7.4": {
+    "hints": [
+      "Renormalise seulement les experts sélectionnés.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec k=1, le seul poids de porte vaut exp(score)/exp(score)=1."
+    ],
+    "solution": "Avec k=1, le seul poids de porte vaut exp(score)/exp(score)=1. La sortie est celle de l'expert 3 si sa capacité n'est pas dépassée. Si cette affectation est rejetée, le résultat du laboratoire peut être nul pour ce token : vérifie le compteur dropped.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Renormalise seulement les experts sélectionnés."
+    ]
+  },
+  "7.5": {
+    "hints": [
+      "Calcule d'abord le nombre moyen de tokens par expert.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 128/8=16 ; ceil(1,25*16)=20."
+    ],
+    "solution": "128/8=16 ; ceil(1,25*16)=20. Si les 128 tokens choisissent le même expert avec k=1, vingt affectations passent et 108 sont rejetées. Le facteur de capacité ne garantit pas une répartition équilibrée.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Calcule d'abord le nombre moyen de tokens par expert."
+    ]
+  },
+  "7.6": {
+    "hints": [
+      "Des probabilités égales ne forcent pas un tirage réparti.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec quatre logits égaux, P_i=0,25."
+    ],
+    "solution": "Avec quatre logits égaux, P_i=0,25. Un argmax qui choisit toujours l'index zéro peut donner f=[1,0,0,0]. Le départage stable rend le calcul reproductible, mais pas équilibré. Il faut examiner les affectations, pas seulement les probabilités moyennes.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Des probabilités égales ne forcent pas un tirage réparti."
+    ]
+  },
+  "7.7": {
+    "hints": [
+      "L'optimiseur combine plusieurs objectifs pondérés.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si lambda*loss_aux domine la perte de langage, le routeur peut privilégier une répartition uniforme au détriment des experts utiles à la prédiction."
+    ],
+    "solution": "Si lambda*loss_aux domine la perte de langage, le routeur peut privilégier une répartition uniforme au détriment des experts utiles à la prédiction. Fixe lambda sur validation et rapporte à la fois perplexité, distribution des charges et taux de rejet.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : L'optimiseur combine plusieurs objectifs pondérés."
+    ]
+  },
+  "7.8": {
+    "hints": [
+      "Distribue les 128 affectations également entre quatre experts.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une répartition idéale donne 32 tokens à chaque expert, soit f_i=32/128=0,25."
+    ],
+    "solution": "Une répartition idéale donne 32 tokens à chaque expert, soit f_i=32/128=0,25. Cela ne garantit pas un temps égal si les experts ont des coûts différents ou si la communication déséquilibre les GPU. Le temps mesuré reste nécessaire.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Distribue les 128 affectations également entre quatre experts."
+    ]
+  },
+  "7.9": {
+    "hints": [
+      "Vérifie d'abord si les poids tiennent réellement en mémoire.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. À qualité égale, choisis le dense RAM 1 pour une machine contrainte plutôt que le MoE RAM 4."
+    ],
+    "solution": "À qualité égale, choisis le dense RAM 1 pour une machine contrainte plutôt que le MoE RAM 4. Si le MoE atteint une perplexité 15 au lieu de 20, il devient une option seulement si RAM et latence respectent le budget. Une meilleure perplexité ne fait pas tenir un modèle hors capacité.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Vérifie d'abord si les poids tiennent réellement en mémoire."
+    ]
+  },
+  "8.1": {
+    "hints": [
+      "Le coefficient d'oubli multiplie la contribution passée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si le coefficient vaut zéro, l'ancien état est entièrement supprimé avant l'ajout du nouvel apport."
+    ],
+    "solution": "Si le coefficient vaut zéro, l'ancien état est entièrement supprimé avant l'ajout du nouvel apport. Aucune contribution de x0 ne survit par ce chemin à l'étape suivante. Un autre mécanisme, comme une connexion résiduelle, pourrait conserver de l'information séparément.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le coefficient d'oubli multiplie la contribution passée."
+    ]
+  },
+  "8.2": {
+    "hints": [
+      "Calcule exp(delta*a), et non delta*a seul.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. a=0 et delta=1 donnent exp(0)=1."
+    ],
+    "solution": "a=0 et delta=1 donnent exp(0)=1. La récurrence devient h_nouveau=h_précédent+b*x. Il n'y a pas d'oubli exponentiel à ce pas ; le nouvel apport continue toutefois à changer l'état.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Calcule exp(delta*a), et non delta*a seul."
+    ]
+  },
+  "8.3": {
+    "hints": [
+      "Observe les multiplications élément par élément de l'état.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un SSM diagonal multiplie chaque coordonnée de h par son propre facteur de décroissance, sans produit matriciel mélangeant les coordonnées pendant la récurrence."
+    ],
+    "solution": "Un SSM diagonal multiplie chaque coordonnée de h par son propre facteur de décroissance, sans produit matriciel mélangeant les coordonnées pendant la récurrence. Les projections avant et après celle-ci peuvent, elles, mélanger les canaux.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Observe les multiplications élément par élément de l'état."
+    ]
+  },
+  "8.4": {
+    "hints": [
+      "Déroule successivement les trois premiers états.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec h avant x0 égal à zéro : h0=x0 ; h1=0,5*x0+x1 ; h2=0,25*x0+0,5*x1+x2."
+    ],
+    "solution": "Avec h avant x0 égal à zéro : h0=x0 ; h1=0,5*x0+x1 ; h2=0,25*x0+0,5*x1+x2. Chaque ancien apport porte une puissance supplémentaire du facteur 0,5.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Déroule successivement les trois premiers états."
+    ]
+  },
+  "8.5": {
+    "hints": [
+      "Applique la seconde transformation au résultat de la première.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. La première donne 2h+3 ; la seconde 4*(2h+3)+5=8h+17."
+    ],
+    "solution": "La première donne 2h+3 ; la seconde 4*(2h+3)+5=8h+17. La transformation composée est donc (8,17). L'ordre inverse donnerait un autre décalage : la composition est associative, pas commutative.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Applique la seconde transformation au résultat de la première."
+    ]
+  },
+  "8.6": {
+    "hints": [
+      "Le pas delta multiplie aussi l'apport de l'entrée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. softplus est théoriquement positif, mais les limites numériques peuvent produire une valeur très petite."
+    ],
+    "solution": "softplus est théoriquement positif, mais les limites numériques peuvent produire une valeur très petite. Ajouter 1e-4 impose un plancher positif et évite de figer accidentellement l'écriture. Ce choix modifie le modèle et doit rester explicite.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le pas delta multiplie aussi l'apport de l'entrée."
+    ]
+  },
+  "8.7": {
+    "hints": [
+      "Compare les blocs réellement présents, pas seulement leur nom.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le _ssm du laboratoire ne contient ni convolution courte temporelle ni kernel GPU fusionné du scan."
+    ],
+    "solution": "Le _ssm du laboratoire ne contient ni convolution courte temporelle ni kernel GPU fusionné du scan. C'est une récurrence sélective réduite pour vérifier formes et causalité. Il ne faut pas reprendre les performances d'un Mamba publié comme mesure de ce code.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compare les blocs réellement présents, pas seulement leur nom."
+    ]
+  },
+  "8.8": {
+    "hints": [
+      "Distingue rappel exact d'un élément et résumé compact d'une suite.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'attention convient pour chercher ou recopier un identifiant précis dans la fenêtre."
+    ],
+    "solution": "L'attention convient pour chercher ou recopier un identifiant précis dans la fenêtre. Un état récurrent peut suffire pour suivre une tendance ou résumer un flux régulier. Ce sont des hypothèses d'usage : seule une évaluation sur ces tâches départage les variantes concrètes.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Distingue rappel exact d'un élément et résumé compact d'une suite."
+    ]
+  },
+  "8.9": {
+    "hints": [
+      "Le contrat commun porte sur l'interface et l'absence de fuite.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Transformer, SSM et hybride doivent renvoyer (B,T,D) et ne pas dépendre des tokens futurs."
+    ],
+    "solution": "Transformer, SSM et hybride doivent renvoyer (B,T,D) et ne pas dépendre des tokens futurs. Leurs calculs et poids diffèrent, donc leurs valeurs de sortie n'ont pas à être égales. L'égalité numérique ne serait attendue que pour deux implémentations de la même fonction.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le contrat commun porte sur l'interface et l'absence de fuite."
+    ]
+  },
+  "9.1": {
+    "hints": [
+      "Relie chaque modalité à une transformation effectivement codée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le texte est déjà transformé par le tokenizer."
+    ],
+    "solution": "Le texte est déjà transformé par le tokenizer. patchify découpe une image numérique en blocs aplatis. Cela ne signifie pas qu'un modèle vision-texte a été entraîné : le dépôt démontre ici la préparation de cette seconde modalité.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Relie chaque modalité à une transformation effectivement codée."
+    ]
+  },
+  "9.2": {
+    "hints": [
+      "Compte les patches par côté puis les composantes par patch.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. 8/4=2 patches par côté, donc 4 patches."
+    ],
+    "solution": "8/4=2 patches par côté, donc 4 patches. Chacun contient 4*4*3=48 valeurs. La sortie aplatie a la forme (4,48), en supposant que la disposition des canaux est celle attendue par patchify.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte les patches par côté puis les composantes par patch."
+    ]
+  },
+  "9.3": {
+    "hints": [
+      "La multiplication doit transformer la dernière dimension 48 en 16.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les poids ont la forme (48,16) et le biais (16,)."
+    ],
+    "solution": "Les poids ont la forme (48,16) et le biais (16,). Un tableau de quatre patches (4,48) donne une sortie (4,16). L'opération assure une shape commune, pas un alignement sémantique appris avec le texte.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La multiplication doit transformer la dernière dimension 48 en 16."
+    ]
+  },
+  "9.4": {
+    "hints": [
+      "Identifie ce que représentent les deux axes du tableau.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un spectrogramme organise l'énergie selon temps et fréquence ; il peut être découpé en patches comme une grille."
+    ],
+    "solution": "Un spectrogramme organise l'énergie selon temps et fréquence ; il peut être découpé en patches comme une grille. Les axes ne sont toutefois pas des positions spatiales d'une photo. Leur sens et la normalisation doivent rester adaptés à l'audio.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Identifie ce que représentent les deux axes du tableau."
+    ]
+  },
+  "9.5": {
+    "hints": [
+      "Une projection initialisée n'est pas un système de compression appris.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le produit matriciel montre comment changer une dimension de représentation."
+    ],
+    "solution": "Le produit matriciel montre comment changer une dimension de représentation. Un codec audio publié comprend une architecture et des poids entraînés pour encoder et reconstruire un signal, absents ici. Une shape correcte ne démontre ni qualité sonore ni débit de compression.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une projection initialisée n'est pas un système de compression appris."
+    ]
+  },
+  "9.6": {
+    "hints": [
+      "Un tube regroupe plusieurs positions temporelles.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Passer de 320 patches à 80 tubes réduit le nombre de tokens en regroupant des instants."
+    ],
+    "solution": "Passer de 320 patches à 80 tubes réduit le nombre de tokens en regroupant des instants. Sans mécanisme supplémentaire qui conserve leur détail, on perd la distinction fine des événements à l'intérieur d'un tube. Le gain de longueur a donc un coût de résolution temporelle.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un tube regroupe plusieurs positions temporelles."
+    ]
+  },
+  "9.7": {
+    "hints": [
+      "La concaténation sur le temps exige une même largeur de vecteur.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si les quatre vecteurs ont une largeur différente de 16, on ne peut pas les concaténer à des embeddings de largeur 16 le long de l'axe des tokens."
+    ],
+    "solution": "Si les quatre vecteurs ont une largeur différente de 16, on ne peut pas les concaténer à des embeddings de largeur 16 le long de l'axe des tokens. Ajoute une projection dont la sortie est 16, puis vérifie les shapes avant la fusion.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La concaténation sur le temps exige une même largeur de vecteur."
+    ]
+  },
+  "9.8": {
+    "hints": [
+      "Applique la règle clé_position ≤ requête_position.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Avec les patches avant le texte, les tokens de texte peuvent regarder les patches parce qu'ils sont dans leur passé."
+    ],
+    "solution": "Avec les patches avant le texte, les tokens de texte peuvent regarder les patches parce qu'ils sont dans leur passé. Les patches ne peuvent pas lire les tokens de texte futurs sous ce même masque causal. Un masque différent constituerait une autre architecture.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Applique la règle clé_position ≤ requête_position."
+    ]
+  },
+  "9.9": {
+    "hints": [
+      "La métrique doit correspondre à la représentation de sortie.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Pour des pixels continus, une erreur de reconstruction sur pixels ou patches est une mesure possible, avec ses limites perceptuelles."
+    ],
+    "solution": "Pour des pixels continus, une erreur de reconstruction sur pixels ou patches est une mesure possible, avec ses limites perceptuelles. La perplexité classique concerne une distribution sur des symboles discrets ; elle ne s'applique pas directement à ces valeurs. Une image tokenisée discrètement demanderait un autre protocole.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La métrique doit correspondre à la représentation de sortie."
+    ]
+  },
+  "10.1": {
+    "hints": [
+      "Le contexte a un coût même pour les extraits inutiles.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Injecter tous les documents consomme des tokens et peut diluer l'information pertinente."
+    ],
+    "solution": "Injecter tous les documents consomme des tokens et peut diluer l'information pertinente. Le retrieval choisit seulement les extraits utiles à la question dans une limite k. Il faut ensuite vérifier que la réponse se fonde réellement sur ces sources.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le contexte a un coût même pour les extraits inutiles."
+    ]
+  },
+  "10.2": {
+    "hints": [
+      "Ne divise pas un vecteur nul par sa norme nulle.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si aucun mot ne correspond au vocabulaire, tous les comptes valent zéro et la norme vaut zéro."
+    ],
+    "solution": "Si aucun mot ne correspond au vocabulaire, tous les comptes valent zéro et la norme vaut zéro. bow_vector renvoie directement ce vecteur. La similarité avec des documents reste alors nulle et ne fournit aucun indice sémantique utile.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Ne divise pas un vecteur nul par sa norme nulle."
+    ]
+  },
+  "10.3": {
+    "hints": [
+      "Le tri utilise le score puis un second critère stable.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. À scores égaux, le plus petit index d'origine arrive en premier."
+    ],
+    "solution": "À scores égaux, le plus petit index d'origine arrive en premier. Le résultat est déterministe. Cela ne veut pas dire que ce document est plus pertinent : une égalité de score lexical ne permet pas ce jugement.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le tri utilise le score puis un second critère stable."
+    ]
+  },
+  "10.4": {
+    "hints": [
+      "Le classement peut changer quand la requête change.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'index d'origine permet de retrouver le même document après filtrage et tri."
+    ],
+    "solution": "L'index d'origine permet de retrouver le même document après filtrage et tri. Un numéro dépendant du rang courant changerait avec k ou la requête. Conserve cet identifiant avec l'extrait pour rendre la citation vérifiable.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le classement peut changer quand la requête change."
+    ]
+  },
+  "10.5": {
+    "hints": [
+      "Compte ce qui constitue un pas de chaque mécanisme.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. selective_scan avance l'état à travers les tokens pendant une passe."
+    ],
+    "solution": "selective_scan avance l'état à travers les tokens pendant une passe. La boucle de raisonnement relance un calcul sur une lecture entière, potentiellement avec un état ou un texte mis à jour. Elle ajoute donc un coût supplémentaire par itération et ne démontre pas seule une amélioration du raisonnement.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte ce qui constitue un pas de chaque mécanisme."
+    ]
+  },
+  "10.6": {
+    "hints": [
+      "Un arrêt adaptatif nécessite un signal et un seuil.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le laboratoire exécute son nombre de couches prévu, sans critère testé permettant de s'arrêter au milieu du forward."
+    ],
+    "solution": "Le laboratoire exécute son nombre de couches prévu, sans critère testé permettant de s'arrêter au milieu du forward. Ajouter une sortie précoce demanderait une règle, un entraînement ou une calibration, puis une mesure qualité/coût. Une simple déclaration d'intention ne l'implémente pas.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Un arrêt adaptatif nécessite un signal et un seuil."
+    ]
+  },
+  "10.7": {
+    "hints": [
+      "L'outil est une action externe, même si un modèle décide de l'appeler.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une couche applique une transformation paramétrée dans le réseau."
+    ],
+    "solution": "Une couche applique une transformation paramétrée dans le réseau. Un outil peut lire un fichier, interroger une source ou calculer hors des poids, avec une entrée et un résultat inspectables. Il faut encadrer ses droits et gérer ses erreurs séparément du forward.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : L'outil est une action externe, même si un modèle décide de l'appeler."
+    ]
+  },
+  "10.8": {
+    "hints": [
+      "Prépare plusieurs exemples jamais utilisés pour choisir la solution.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une réussite peut être due à la chance, à une paire mémorisée ou à un bon extrait."
+    ],
+    "solution": "Une réussite peut être due à la chance, à une paire mémorisée ou à un bon extrait. Mesure plusieurs questions, avec et sans retrieval, des distracteurs et des références attendues. Garde les mêmes conditions pour attribuer l'écart au mécanisme testé.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Prépare plusieurs exemples jamais utilisés pour choisir la solution."
+    ]
+  },
+  "11.1": {
+    "hints": [
+      "Transforme le titre de l'article en question mesurable.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Écris une phrase du type « À données et budget comparables, la variante réduit-elle la perte par rapport à la baseline ? »."
+    ],
+    "solution": "Écris une phrase du type « À données et budget comparables, la variante réduit-elle la perte par rapport à la baseline ? ». Remplace variante et mesure par celles de l'article réellement lu. Note séparément données, baseline, résultat annoncé et parties que tu n'as pas reproduites.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Transforme le titre de l'article en question mesurable."
+    ]
+  },
+  "11.2": {
+    "hints": [
+      "Ne mélange pas les tokens individuels d'une séquence.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une coupe contiguë conserve les transitions et réserve une fin non observée pendant l'estimation."
+    ],
+    "solution": "Une coupe contiguë conserve les transitions et réserve une fin non observée pendant l'estimation. Mélanger les tokens modifierait la tâche et ses dépendances. Pour plusieurs documents, réserve aussi des documents entiers si tu veux tester le transfert entre textes ; la coupe contiguë n'est pas une garantie universelle de généralisation.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Ne mélange pas les tokens individuels d'une séquence."
+    ]
+  },
+  "11.3": {
+    "hints": [
+      "La métrique doit rester comparable après changement de l'unité prédite.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Prends le même texte prédit au niveau caractère comme baseline."
+    ],
+    "solution": "Prends le même texte prédit au niveau caractère comme baseline. Ramène les deux sorties à une unité commune, par exemple les nats par caractère, puis compare qualité et coût. Une perte par concept n'est pas directement comparable à une perte par caractère.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La métrique doit rester comparable après changement de l'unité prédite."
+    ]
+  },
+  "11.4": {
+    "hints": [
+      "Fixe le plafond avant de regarder les réponses.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Choisis par exemple K_max=3 lectures internes et conserve ce plafond pour baseline et variante comparées en coût total."
+    ],
+    "solution": "Choisis par exemple K_max=3 lectures internes et conserve ce plafond pour baseline et variante comparées en coût total. Mesure les appels et la latence réellement utilisés. Augmenter K jusqu'à obtenir la bonne réponse puis ne rapporter que ce cas fausse la comparaison.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Fixe le plafond avant de regarder les réponses."
+    ]
+  },
+  "11.5": {
+    "hints": [
+      "Une grande norme peut provenir d'un simple changement d'échelle.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Multiplier tous les vecteurs par deux augmente leur norme sans prouver une réponse plus juste."
+    ],
+    "solution": "Multiplier tous les vecteurs par deux augmente leur norme sans prouver une réponse plus juste. Mesure la tâche finale avec des cibles indépendantes et le même budget. La norme peut être un diagnostic interne, pas une preuve de raisonnement.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une grande norme peut provenir d'un simple changement d'échelle."
+    ]
+  },
+  "11.6": {
+    "hints": [
+      "Lis exactement ce que le test vérifie.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un test de shape et de causalité ne mesure pas le français."
+    ],
+    "solution": "Un test de shape et de causalité ne mesure pas le français. Tu peux écrire « le SSM respecte l'interface et n'utilise pas le futur sur ces cas ». Tu ne peux pas conclure « le SSM est meilleur en français » sans entraînement et évaluation linguistique comparables.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Lis exactement ce que le test vérifie."
+    ]
+  },
+  "11.7": {
+    "hints": [
+      "La fusion d'entrées n'apprend pas seule leur correspondance.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Il manque des exemples appariés image-texte et un objectif qui relie les deux modalités."
+    ],
+    "solution": "Il manque des exemples appariés image-texte et un objectif qui relie les deux modalités. Il faut aussi des poids entraînables et une évaluation indépendante. Concaténer des patches aléatoires avec du texte ne constitue pas un entraînement multimodal natif.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La fusion d'entrées n'apprend pas seule leur correspondance."
+    ]
+  },
+  "11.8": {
+    "hints": [
+      "Chaque limite doit nommer un mécanisme et une mesure absente.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemples : « Le temps interne n'est pas entraîné ni évalué sur des problèmes réservés » ; « Le scan réduit ne reproduit pas le kernel Mamba » ; « Les patches ne sont pas accompagnés d'un apprentissage image-texte »."
+    ],
+    "solution": "Exemples : « Le temps interne n'est pas entraîné ni évalué sur des problèmes réservés » ; « Le scan réduit ne reproduit pas le kernel Mamba » ; « Les patches ne sont pas accompagnés d'un apprentissage image-texte ». Ces limites décrivent le dépôt sans juger l'intérêt des travaux externes.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Chaque limite doit nommer un mécanisme et une mesure absente."
+    ]
+  },
+  "12.1": {
+    "hints": [
+      "Remplace intelligent par une quantité observable et un protocole.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense »."
+    ],
+    "solution": "Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense ». Mesure réellement ces durées à D, batch et machine constants. Une formule de complexité n'est pas encore une mesure de temps.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Remplace intelligent par une quantité observable et un protocole."
+    ]
+  },
+  "12.2": {
+    "hints": [
+      "La baseline doit être un point de comparaison défini à l'avance.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride."
+    ],
+    "solution": "Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride. Choisir l'hybride après avoir regardé ses résultats rendrait la référence opportuniste. Une autre baseline reste possible si tu la justifies avant l'essai et conserves le même protocole.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : La baseline doit être un point de comparaison défini à l'avance."
+    ]
+  },
+  "12.3": {
+    "hints": [
+      "Change une cause par ligne pour lire son effet.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches."
+    ],
+    "solution": "Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches. Ajoute une quatrième ligne autre kind à quatre couches pour mesurer l'interaction. Une seule ligne qui change kind et profondeur ne permet pas d'attribuer le résultat.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Change une cause par ligne pour lire son effet."
+    ]
+  },
+  "12.4": {
+    "hints": [
+      "quality_table trie la qualité du plus grand au plus petit.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe."
+    ],
+    "solution": "Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe. Une perplexité 10 donne -10 et doit passer avant une perplexité 20 donnant -20. Conserve aussi la valeur originale pour faciliter la lecture.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : quality_table trie la qualité du plus grand au plus petit."
+    ]
+  },
+  "12.5": {
+    "hints": [
+      "Le banc doit rester commun aux configurations comparées.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Changer d_model modifie paramètres, calcul et mémoire."
+    ],
+    "solution": "Changer d_model modifie paramètres, calcul et mémoire. Relance toutes les configurations, y compris la baseline, avec cette nouvelle largeur et le même protocole. Un ancien score de baseline à une autre largeur n'isole plus l'effet du kind.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le banc doit rester commun aux configurations comparées."
+    ]
+  },
+  "12.6": {
+    "hints": [
+      "Vérifie l'unité derrière chaque colonne.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. attention_flops compte des opérations estimées, pas des secondes."
+    ],
+    "solution": "attention_flops compte des opérations estimées, pas des secondes. Remplis seconds avec un chronométrage et documente échauffement, répétitions et synchronisation. L'énergie demanderait une mesure dédiée ; elle ne se déduit pas automatiquement des FLOPs.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Vérifie l'unité derrière chaque colonne."
+    ]
+  },
+  "12.7": {
+    "hints": [
+      "Deux interfaces identiques n'impliquent pas des poids interchangeables.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Les kinds utilisent des clés et opérations différentes : attention et scan ne donnent pas le même sens aux tableaux."
+    ],
+    "solution": "Les kinds utilisent des clés et opérations différentes : attention et scan ne donnent pas le même sens aux tableaux. Ne copie que des paramètres dont le rôle et la shape sont explicitement compatibles. Sinon réinitialise et compare l'architecture, sans prétendre transférer ses poids.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Deux interfaces identiques n'impliquent pas des poids interchangeables."
+    ]
+  },
+  "12.8": {
+    "hints": [
+      "Sépare construction, vérifications et qualité non mesurée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple : « Candidate hybride : alternance attention et scan diagonal."
+    ],
+    "solution": "Exemple : « Candidate hybride : alternance attention et scan diagonal. Les tests de shape (B,T,D) et de causalité passent. Aucun gain de perplexité après entraînement du dos hybride n'est mesuré. » Ajoute uniquement des chiffres que tu as réellement produits.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Sépare construction, vérifications et qualité non mesurée."
+    ]
+  },
+  "12.9": {
+    "hints": [
+      "Nomme le type d'apprentissage de chaque composant.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Écris : « Le bigramme est estimé par comptage ; la tête linéaire est entraînée par descente ; le dos hybride est initialisé et exécuté sans apprentissage de ses poids."
+    ],
+    "solution": "Écris : « Le bigramme est estimé par comptage ; la tête linéaire est entraînée par descente ; le dos hybride est initialisé et exécuté sans apprentissage de ses poids. » Un forward qui termine sans erreur ne justifie pas d'appeler ce dernier modèle entraîné.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Nomme le type d'apprentissage de chaque composant."
+    ]
+  },
+  "12.10": {
+    "hints": [
+      "Une fuite de futur invalide la comparaison de qualité.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future."
+    ],
+    "solution": "Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future. Relance les tests de causalité, puis les mesures avec le même protocole. Une baisse de loss obtenue grâce à une fuite n'est pas une amélioration du SSM.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une fuite de futur invalide la comparaison de qualité."
+    ]
+  },
+  "12.11": {
+    "hints": [
+      "Une itération doit correspondre à un changement exécutable et mesurable.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Refuse l'ajout d'un temps interne seulement décrit dans le texte."
+    ],
+    "solution": "Refuse l'ajout d'un temps interne seulement décrit dans le texte. Choisis plutôt une modification implémentée, un test qui la couvre et un budget fixe. Fais une seule itération, conserve baseline et résultat, puis explique ce que tu as observé sans inventer une capacité.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une itération doit correspondre à un changement exécutable et mesurable."
+    ]
+  },
+  "12.12": {
+    "hints": [
+      "Associe chaque affirmation à une preuve ou retire-la.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Remplace « rapide » par une durée et sa machine, « léger » par une mémoire et ce qu'elle inclut, « meilleur » par une métrique et une baseline."
+    ],
+    "solution": "Remplace « rapide » par une durée et sa machine, « léger » par une mémoire et ce qu'elle inclut, « meilleur » par une métrique et une baseline. Pour une propriété non mesurée, écris « non évalué ». La fiche finale doit être vérifiable par quelqu'un qui n'a pas vu la conversation.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Associe chaque affirmation à une preuve ou retire-la."
+    ]
+  },
+  "13.1": {
+    "hints": [
+      "Compte les paires avant d'invoquer le départage.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Dans abab, ab apparaît deux fois et ba une fois."
+    ],
+    "solution": "Dans abab, ab apparaît deux fois et ba une fois. La première fusion est donc ab par fréquence, sans égalité à départager. BPETokenizer.train(\"abab\",1).encode(\"abab\") doit utiliser deux pièces ab et decode doit retrouver abab. Le départage lexical ne sert que lorsque les fréquences sont égales.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte les paires avant d'invoquer le départage."
+    ]
+  },
+  "13.2": {
+    "hints": [
+      "Recharge le vocabulaire et les fusions, pas seulement une taille.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Entraîne le tokenizer sur le corpus, note encode(phrase), appelle save sur un chemin temporaire puis BPETokenizer.load."
+    ],
+    "solution": "Entraîne le tokenizer sur le corpus, note encode(phrase), appelle save sur un chemin temporaire puis BPETokenizer.load. Réencode la même phrase et compare les listes exactement. Vérifie aussi decode ; des identifiants réordonnés peuvent donner la même taille sans le même sens.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Recharge le vocabulaire et les fusions, pas seulement une taille."
+    ]
+  },
+  "13.3": {
+    "hints": [
+      "Le drapeau gated bloque l'automatisation même si l'URL est connue.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Dans le catalogue, prends un livre Gutenberg français de l'étape 2, par exemple Candide, et une fiche gated."
+    ],
+    "solution": "Dans le catalogue, prends un livre Gutenberg français de l'étape 2, par exemple Candide, et une fiche gated. prepare accepte le livre dans son format pris en charge ; la fiche gated doit être préparée manuellement après ses conditions d'accès. Lis aussi format et licence : l'absence de gating ne suffit pas à assurer le décodage.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le drapeau gated bloque l'automatisation même si l'URL est connue."
+    ]
+  },
+  "13.4": {
+    "hints": [
+      "Le navigateur ne lit pas exactement les mêmes nombres que les poids float64 d'origine.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'export arrondit les poids en float32."
+    ],
+    "solution": "L'export arrondit les poids en float32. La référence doit recalculer les logits avec ces poids arrondis pour comparer le même modèle au forward JavaScript. Sinon un écart dû à la précision serait attribué à tort à un bug de formule.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le navigateur ne lit pas exactement les mêmes nombres que les poids float64 d'origine."
+    ]
+  },
+  "13.5": {
+    "hints": [
+      "Distingue une paire écrite par toi d'un contenu emprunté.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Exemple original : question « Que masque le masque causal ? », réponse « Les positions futures de la séquence."
+    ],
+    "solution": "Exemple original : question « Que masque le masque causal ? », réponse « Les positions futures de la séquence. ». Cette paire peut rejoindre le jouet sous la licence choisie pour tes propres contributions. Une paire copiée d'un corpus externe nécessite sa provenance et le respect de sa licence ; ne la rebaptise pas MIT.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Distingue une paire écrite par toi d'un contenu emprunté."
+    ]
+  },
+  "13.6": {
+    "hints": [
+      "Le prompt doit rester visible sans devenir la cible récompensée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Un masque de un partout compte la perte sur la question et les marqueurs, répétés dans chaque exemple."
+    ],
+    "solution": "Un masque de un partout compte la perte sur la question et les marqueurs, répétés dans chaque exemple. Le modèle peut progresser en les recopiant sans améliorer autant les réponses. Avec le masque, les tokens du prompt restent contexte, mais seules les positions de réponse contribuent à la perte.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Le prompt doit rester visible sans devenir la cible récompensée."
+    ]
+  },
+  "13.7": {
+    "hints": [
+      "Compte r*(entrée+sortie) pour chaque matrice adaptée.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Une matrice 8×8 contient 64 poids ; au rang 2, ses facteurs ont 8×2 + 2×8 = 32 poids entraînables."
+    ],
+    "solution": "Une matrice 8×8 contient 64 poids ; au rang 2, ses facteurs ont 8×2 + 2×8 = 32 poids entraînables. Additionne ces nombres pour toutes les matrices ciblées, puis compare au total complet. Pour un rang trop grand, LoRA peut ne plus économiser : vérifie au lieu de le supposer.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Compte r*(entrée+sortie) pour chaque matrice adaptée."
+    ]
+  },
+  "13.8": {
+    "hints": [
+      "Une bonne réponse déjà vue n'est pas un test de reformulation.",
+      "Écris les valeurs ou les étapes intermédiaires avant de conclure. L'échantillon montre qu'un checkpoint ajusté peut produire une suite ressemblant à une réponse du jeu vu."
+    ],
+    "solution": "L'échantillon montre qu'un checkpoint ajusté peut produire une suite ressemblant à une réponse du jeu vu. Il ne prouve ni assistant général ni réponse fiable aux questions nouvelles. Mesure des questions réservées, des reformulations et les fins de réponse avant de conclure à une généralisation.",
+    "pitfalls": [
+      "Ne confonds pas le résultat attendu avec sa vérification : Une bonne réponse déjà vue n'est pas un test de reformulation."
+    ]
+  }
+}

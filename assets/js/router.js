@@ -26,6 +26,9 @@ export function parseHash(hash) {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (normalized === "/" || normalized === "/accueil") return { name: "home" };
   if (normalized === "/parcours") return { name: "home", focus: "roadmap" };
+  if (normalized === "/experiences") return { name: "experiments" };
+  if (normalized === "/espace") return { name: "study" };
+  if (normalized === "/glossaire") return { name: "glossary" };
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
   if (normalized === "/playground") return { name: "playground" };
