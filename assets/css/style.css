@@ -1251,3 +1251,54 @@ p code, li code {
 @media (max-width: 800px) {
   .stage-timeline, .ide-layout { grid-template-columns: 1fr; }
 }
+
+/* Reflow : les panneaux rétrécissent, le code défile dans son propre cadre. */
+html { scroll-padding-top: calc(var(--header) + 1rem); }
+body { min-height: 100dvh; }
+button, input, select, textarea { font: inherit; color: inherit; }
+textarea { resize: vertical; }
+main { width: 100%; overflow-wrap: anywhere; }
+.hero > *, .lesson-grid > *, .model-shell > *, .ide-layout > *,
+.filter-row > *, .dataset-card, .sheet, .code-block { min-width: 0; }
+pre { max-width: 100%; overflow-wrap: normal; overscroll-behavior-x: contain; }
+.ide-layout { grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr); }
+.ide-main, .ide-editor, .ide-output { min-width: 0; max-width: 100%; }
+.ide-editor .cm-scroller { overflow: auto; }
+.ide-tabs, .ide-file, .run-sample, .prob-label { overflow-wrap: anywhere; }
+.prob-row { grid-template-columns: minmax(0, 4.5rem) minmax(0, 1fr) auto; }
+input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--accent); }
+.dialog { overflow-y: auto; padding-top: min(10vh, 3rem); }
+.dialog-panel { min-width: 0; max-height: calc(100dvh - 4rem); overflow-y: auto; }
+.site-footer { padding-bottom: max(1.4rem, env(safe-area-inset-bottom)); }
+@media (max-width: 1200px) and (min-width: 961px) {
+  .hero, .lesson-grid, .model-shell { grid-template-columns: minmax(0, 1fr); }
+  .lesson-aside, .component-info { position: static; }
+  .stage-timeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 800px) {
+  .ide-layout { grid-template-columns: minmax(0, 1fr); }
+  .ide-tree { flex-direction: row; overflow-x: auto; max-height: 10rem; padding-bottom: .5rem; }
+  .ide-file { flex: 0 0 auto; max-width: 16rem; min-height: 44px; }
+  .stage-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filter-row { grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); }
+}
+@media (max-width: 520px) {
+  main { padding: 1.5rem 1rem 4rem; }
+  h1 { font-size: clamp(1.9rem, 8vw, 2.4rem); }
+  .topbar { gap: .3rem; padding-inline: max(.4rem, env(safe-area-inset-left)); }
+  .brand { gap: .3rem; }
+  .brand-mark { display: none; }
+  .brand-name { font-size: 1rem; }
+  .icon-button, .search-launch, .account-link { width: 2.75rem; height: 2.75rem; }
+  .button, .visual-button, .quiz-choice, .nav-level, .side-actions button { min-height: 44px; }
+  .hero-actions > .button { flex: 1 1 9rem; }
+  .stage-timeline { grid-template-columns: minmax(0, 1fr); }
+  .password-field { flex-wrap: wrap; }
+  .password-field input { flex-basis: 12rem; }
+  .sheet, .dataset-card { padding: .8rem; }
+}
+@media (max-height: 500px) and (max-width: 960px) {
+  .topbar { position: relative; }
+  .dialog { padding-top: .5rem; }
+  .dialog-panel { max-height: calc(100dvh - 1rem); }
+}
