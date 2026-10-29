@@ -46,7 +46,7 @@ jobs:
       - name: Lighthouse pages lourdes
         run: CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
         env:
-          LIGHTHOUSE_ROUTES: '["/#/playground","/#/ide"]'
+          LIGHTHOUSE_ROUTES: '["/#/playground","/#/ide","/#/atelier"]'
 
       - uses: actions/upload-artifact@v4
         if: always()
