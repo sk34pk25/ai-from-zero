@@ -101,6 +101,10 @@ function safeStorage() {
   }
 }
 
+function editingFieldActive() {
+  return document.activeElement?.matches("textarea, input, [contenteditable=true]");
+}
+
 function refreshLocalMode() {
   const storage = safeStorage();
   state.local = !state.owner && Boolean(storage) && localLearnerEnabled(storage);
@@ -203,7 +207,7 @@ function bindChrome() {
     if (state.owner || !state.index || !localChangeKey(event.key)) return;
     const wasLocal = state.local;
     refreshLocalMode(); applyStoredProgress();
-    const editing = document.activeElement?.matches("textarea, input, [contenteditable=true]");
+    const editing = editingFieldActive();
     if (wasLocal !== state.local || (!editing && !event.key?.includes("/draft/"))) render({ scroll: "keep" });
     else paintChrome();
   });
@@ -383,7 +387,7 @@ async function pullRemote() {
       if (workspaceReady()) persistDone();
     } else applyStoredProgress();
     rememberProgressLocal();
-    if (!["connexion", "password", "recovery"].includes(state.route.name))
+    if (!["connexion", "password", "recovery"].includes(state.route.name) && !editingFieldActive())
       render({ scroll: "keep" });
     else paintChrome();
   } catch {
@@ -400,7 +404,8 @@ subscribe(() => {
     applyStoredProgress();
     rememberProgressLocal();
     if (
-      !["connexion", "password", "recovery", "study"].includes(state.route.name)
+      !["connexion", "password", "recovery", "study"].includes(state.route.name) &&
+      !editingFieldActive()
     )
       render({ scroll: "keep" });
     else paintChrome();
