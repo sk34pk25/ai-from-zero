@@ -1,5 +1,6 @@
 import { h } from "./dom.js";
 import { isOwner, selectRows } from "./auth.js";
+import { normalizeReports } from "./evidence.js";
 export async function paintExperiments(main) {
   const stamp = main.dataset.paint;
   main.replaceChildren(
@@ -14,10 +15,15 @@ export async function paintExperiments(main) {
       "Atelier de référence · phrases synthétiques",
       "data/atelier_reference_run.json",
     ],
+    ["Banc français · documents réservés", "data/benchmark_fr_run.json"],
   ]) {
     try {
       const r = await fetch(new URL(path, document.baseURI));
-      if (r.ok) reports.push({ name, ...(await r.json()) });
+      if (r.ok) {
+        const value = await r.json();
+        if (value.format === "afz-benchmark-v1") reports.push(...normalizeReports(value, name));
+        else reports.push({ name, ...value });
+      }
     } catch {
       /* affichage partiel */
     }
@@ -38,7 +44,7 @@ export async function paintExperiments(main) {
     }
   }
   if (main.dataset.paint !== stamp) return;
-  const board = h("div", { class: "table-scroll" });
+  const board = h("div", { class: "table-scroll", tabindex: "0", role: "region", "aria-label": "Tableau de comparaison des expériences" });
   const status = h("p", { role: "status" });
   const format = (v) =>
     typeof v === "number"
@@ -62,6 +68,7 @@ export async function paintExperiments(main) {
             "Paramètres",
             "Perte train fin",
             "Perte validation",
+            "Perte test final",
             "Durée (s)",
             "Données / limites",
           ].map((text) => h("th", { scope: "col", text })),
@@ -82,6 +89,7 @@ export async function paintExperiments(main) {
               format(r.parameter_count),
               format(r.train_loss_end ?? r.full?.eval_loss_end),
               format(r.val_loss_end),
+              format(r.test_loss ?? r.test_final?.test_loss),
               format(r.seconds),
               r.dataset_note ||
                 r.limite ||
@@ -113,37 +121,7 @@ export async function paintExperiments(main) {
       if (!file.files[0] || file.files[0].size > 5_000_000)
         throw new Error("Rapport trop volumineux");
       const x = JSON.parse(await file.files[0].text());
-      if (
-        !x ||
-        typeof x !== "object" ||
-        Array.isArray(x) ||
-        !(
-          "train_loss_end" in x ||
-          "plan" in x ||
-          "full" in x ||
-          (x.format === "afz-training-plan-v1" && Array.isArray(x.items))
-        )
-      )
-        throw new Error("Format de rapport inconnu");
-      if (x.format === "afz-training-plan-v1") {
-        if (
-          !x.items.length ||
-          x.items.some((r) => !r || typeof r !== "object" || Array.isArray(r))
-        )
-          throw new Error("Phases du plan invalides");
-        x.items.forEach((r, i) =>
-          reports.push({
-            ...r,
-            name: `${file.files[0].name} · phase ${i + 1} (${r.mode})`,
-            train_loss_end:
-              r.train_evaluation?.loss ?? r.train_loss_end ?? r.loss_end,
-            val_loss_end: r.validation_loss_end ?? r.val_loss_end,
-            dataset_note:
-              r.evaluation ||
-              "Pré-entraînement du plan ; voir les données de la recette",
-          }),
-        );
-      } else reports.push({ ...x, name: file.files[0].name });
+      reports.push(...normalizeReports(x, file.files[0].name));
       paint();
       status.textContent =
         "Rapport ajouté pour cette comparaison. Le fichier reste sur ton appareil.";

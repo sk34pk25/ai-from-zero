@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import numpy as np
 from moteur import Tensor
-from commun import module_eleve, parametres, empreinte
+from commun import module_eleve, parametres, empreinte, ecrire_json, sortie_sure
 
 
 def controles(m):
@@ -40,7 +40,14 @@ def controles(m):
         p = m.softmax(np.array([[1000, 1000], [1, 3.0]]))
         np.testing.assert_allclose(p.sum(-1), [1, 1])
         np.testing.assert_allclose(p[0], [0.5, 0.5])
+        np.testing.assert_allclose(p[1], [1 / (1 + np.exp(2)), 1 / (1 + np.exp(-2))])
         assert np.isclose(m.entropie(np.zeros((2, 5)), np.array([1, 3])), np.log(5))
+        assert np.isclose(
+            m.entropie(np.array([[0.0, np.log(3)]]), np.array([1])), -np.log(0.75)
+        ), "La loss doit dépendre des logits ET de la cible"
+        assert np.isclose(
+            m.entropie(np.array([[0.0, np.log(3)]]), np.array([0])), -np.log(0.25)
+        )
         assert np.isfinite(m.entropie(np.array([[1000.0, -1000.0]]), np.array([1])))
 
     def pente():
@@ -57,6 +64,12 @@ def controles(m):
         y = u + u
         y.backward()
         assert np.isclose(x.grad, -8)
+        x = m.Valeur(2)
+        a, b = x + x, x + x
+        (a + b).backward()
+        assert np.isclose(
+            x.grad, 4
+        ), "Les contributions de branches distinctes doivent s'additionner"
 
     def broadcast():
         g = m.reduire_gradient(np.ones((2, 4, 3)), (1, 3))
@@ -64,6 +77,16 @@ def controles(m):
         assert m.reduire_gradient(np.ones((2, 3)), ()).shape == ()
 
     def attention():
+        q0 = np.ones((1, 1, 2, 4))
+        k0 = np.array([[[[0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0]]]])
+        v0 = np.array([[[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]]]])
+        actual = m.attention(Tensor(q0), Tensor(k0), Tensor(v0)).data
+        np.testing.assert_allclose(
+            actual[0, 0],
+            [[1, 0, 0, 0], [1 / (1 + np.exp(2)), 1 / (1 + np.exp(-2)), 0, 0]],
+            atol=1e-10,
+            err_msg="Vérifie l'échelle sqrt(d_k), le masque et l'axe du softmax",
+        )
         rng = np.random.default_rng(19)
         raw = [rng.normal(size=(1, 2, 4, 3)) for _ in range(3)]
         q, k, v = [Tensor(x.copy()) for x in raw]
@@ -93,6 +116,19 @@ def controles(m):
         x = Tensor(np.random.default_rng(5).normal(size=(2, 4, 8)))
         z = m.multi_tetes(x, p, "0.", 2)
         assert z.data.shape == x.data.shape
+        # Référence indépendante : découpe explicite des têtes, pas de reshape inverse partagé.
+        raw = [x.data @ p["0." + n].data for n in ("wq", "wk", "wv")]
+        heads = []
+        for head in range(2):
+            q, k, v = [a[:, :, head * 4 : (head + 1) * 4] for a in raw]
+            scores = q @ k.swapaxes(-1, -2) / 2
+            scores = np.where(np.tril(np.ones((4, 4), bool)), scores, -np.inf)
+            weights = np.exp(scores - scores.max(-1, keepdims=True))
+            weights /= weights.sum(-1, keepdims=True)
+            heads.append(weights @ v)
+        np.testing.assert_allclose(
+            z.data, np.concatenate(heads, axis=-1) @ p["0.wo"].data, atol=1e-10
+        )
         z.sum().backward()
         assert np.isfinite(p["0.wq"].grad).all()
         assert np.linalg.norm(p["0.wv"].grad) > 0
@@ -116,6 +152,13 @@ def controles(m):
             m.logits(other, p, c).data[:, :-1], z.data[:, :-1], atol=1e-10
         )
         loss = m.perte(z, np.roll(x, -1, axis=1))
+        targets = np.roll(x, -1, axis=1)
+        a = z.data - z.data.max(-1, keepdims=True)
+        expected = np.mean(
+            np.log(np.exp(a).sum(-1))
+            - np.take_along_axis(a, targets[..., None], -1)[..., 0]
+        )
+        np.testing.assert_allclose(float(loss.data), expected, atol=1e-12)
         loss.backward()
         assert np.isfinite(float(loss.data))
         for name in ("tok", "0.wq", "1.w1", "head"):
@@ -170,10 +213,12 @@ def controles(m):
     ]
 
 
-def verifier(module="eleve", jusqua=12):
+def verifier(module="eleve", jusqua=12, tp=None):
     m = module_eleve(module)
     results = []
     for i, test in enumerate(controles(m)[:jusqua], 1):
+        if tp is not None and i != tp:
+            continue
         try:
             test()
             results.append({"tp": i, "nom": test.__name__, "ok": True})
@@ -202,10 +247,19 @@ if __name__ == "__main__":
     p.add_argument("--module", default="eleve")
     p.add_argument("--jusqua", type=int, choices=range(1, 13), default=12)
     p.add_argument("--rapport", type=Path)
+    p.add_argument(
+        "--tp",
+        type=int,
+        choices=range(1, 13),
+        help="Contrôle individuel, sans exiger les TP précédents",
+    )
     a = p.parse_args()
-    r = verifier(a.module, a.jusqua)
+    if a.rapport:
+        sortie_sure(a.rapport, (module_eleve(a.module).__file__,))
+        if a.rapport.suffix.lower() != ".json":
+            p.error("Un rapport doit avoir l'extension .json")
+    r = verifier(a.module, a.jusqua, a.tp)
     print(json.dumps(r, ensure_ascii=False, indent=2))
     if a.rapport:
-        a.rapport.parent.mkdir(parents=True, exist_ok=True)
-        a.rapport.write_text(json.dumps(r, ensure_ascii=False, indent=2) + "\n")
+        ecrire_json(a.rapport, r, (module_eleve(a.module).__file__,))
     raise SystemExit(0 if r["reussis"] == r["total"] else 1)

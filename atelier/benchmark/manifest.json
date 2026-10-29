@@ -1,0 +1,27 @@
+{
+  "format": "afz-benchmark-manifest-v1",
+  "source_sha256": "2480828e4c8f926961cc6a5fa89cfa1b77329066d9c07c7ceb40e55280b59da2",
+  "splits": {
+    "train": [
+      "bibliotheque",
+      "canal",
+      "jardin",
+      "pain",
+      "velo",
+      "cartes",
+      "son",
+      "archives"
+    ],
+    "validation": [
+      "observatoire",
+      "theatre"
+    ],
+    "test": [
+      "marche",
+      "atelier_bois"
+    ]
+  },
+  "prompt_fixe": "Le matin",
+  "licence": "MIT",
+  "protocole": "Sélection de largeur sur moyenne validation ; évaluation finale des graines retenues seulement."
+}

@@ -15,7 +15,7 @@ Si tu as appris 32 chaises numérotées, la 33e n'existe pas. Une position qui d
 @VOCAB
 Position absolue : un vecteur par indice, appris. Extrapolation : utiliser une longueur non vue à l'entraînement. Position relative : une relation entre deux places, pas une case fixe.
 @EXPLAIN
-Dans le mini-GPT, params["pos"] a une ligne par indice de 0 à block_size-1. Le forward lève ValueError au-delà, plutôt que de relire la dernière ligne en silence. Cette erreur est honnête. Les modèles récents évitent la table : RoPE fait tourner les paires de composantes selon la position, et le score entre deux tokens ne dépend alors que de leur écart. On ne gagne pas une longueur infinie gratuite — la qualité se dégrade quand même — mais on n'a plus une coupure sèche à l'indice 32.
+Dans le mini-GPT, params["pos"] a une ligne par indice de 0 à block_size-1. Le forward lève ValueError au-delà, plutôt que de relire la dernière ligne en silence. Cette erreur est honnête. Les modèles récents évitent la table : RoPE fait tourner les paires de composantes selon la position, et le score entre deux tokens ne dépend alors que de leur écart. On ne gagne pas une longueur infinie gratuite — la qualité se dégrade quand même — mais on n'a plus une coupure sèche à l'indice 32. C’est une propriété de la représentation : le TinyGPT de ce dépôt garde néanmoins sa vérification block_size même avec RoPE. Changer ce plafond logiciel ne garantit pas la qualité hors longueur entraînée.
 @LANG python
 @CODE
 :::
@@ -100,7 +100,7 @@ Au lieu de demander « à quelle distance de la moyenne suis-je », RMSNorm dema
 @VOCAB
 RMS : root mean square, racine de la moyenne des carrés. Gain : le vecteur γ, appris, souvent initialisé à 1. eps : un petit terme pour ne pas diviser par zéro.
 @EXPLAIN
-rmsnorm(x) = x / sqrt(mean(x²) + eps) * gain. Il n'y a pas de β. Pour un vecteur constant [2, 2], la RMS vaut 2, donc on obtient [1, 1] avant le gain. LayerNorm, elle, verrait une variance nulle et rendrait zéro après centrage. Les deux ne sont pas interchangeables numériquement. Elles le sont architecturalement : même place, avant les sous-blocs. Le laboratoire choisit l'une ou l'autre via GPTConfig.norm. Les tests ne comparent pas les valeurs entre les deux modes, seulement la forme finale et le fait que le modèle se construit.
+rmsnorm(x) = x / sqrt(mean(x²) + eps) * gain. Il n'y a pas de β. Pour un vecteur constant [2, 2], la RMS vaut 2, donc on obtient [1, 1] avant le gain. LayerNorm, elle, verrait une variance nulle et rendrait zéro après centrage. Les deux ne sont pas interchangeables numériquement. Elles le sont architecturalement : même place, avant les sous-blocs. Le laboratoire choisit l'une ou l'autre via GPTConfig.norm. Les deux normes ne doivent pas donner les mêmes valeurs. Le chemin autograd couvre maintenant RMSNorm : ses gradients sont comparés aux différences finies, son decoder au forward NumPy, et un petit entraînement est testé. Depuis la racine, python -m model.gpt_train --norm rms l’utilise ; aucune supériorité de qualité sur LayerNorm n’est déduite de ces contrôles.
 @LANG python
 @CODE
 :::

@@ -138,6 +138,7 @@ function stamp() {
     "data/finetune_run.json",
     "data/atelier.json",
     "data/atelier_reference_run.json",
+    "data/benchmark_fr_run.json",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
     "model/manifest.json",
     ...readdirSync(join(root, "model"))

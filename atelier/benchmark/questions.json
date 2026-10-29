@@ -1,0 +1,27 @@
+{
+  "format": "afz-questions-fr-v1",
+  "licence": "MIT",
+  "origine": "Questions originales pour un diagnostic pédagogique de réponse mono-tour.",
+  "items": [
+    {"group": "token", "split": "train", "question": "Que représente un token dans ce cours ?", "answer": "un morceau de texte représenté par un entier"},
+    {"group": "token", "split": "train", "question": "Un token correspond à quoi ici ?", "answer": "un morceau de texte représenté par un entier"},
+    {"group": "bigramme", "split": "train", "question": "Quel passé utilise le bigramme ?", "answer": "uniquement le token courant"},
+    {"group": "bigramme", "split": "train", "question": "Quelle information conditionne la prédiction du bigramme ?", "answer": "uniquement le token courant"},
+    {"group": "logits", "split": "train", "question": "Les logits sont-ils déjà des probabilités ?", "answer": "non, ce sont des scores bruts"},
+    {"group": "logits", "split": "train", "question": "Quelle est la nature des logits avant softmax ?", "answer": "non, ce sont des scores bruts"},
+    {"group": "seed", "split": "train", "question": "À quoi sert une graine fixée ?", "answer": "à reproduire un tirage dans les mêmes conditions"},
+    {"group": "seed", "split": "train", "question": "Pourquoi conserver la graine de génération ?", "answer": "à reproduire un tirage dans les mêmes conditions"},
+    {"group": "residu", "split": "train", "question": "Que fait le résidu autour d'un sous-bloc ?", "answer": "il ajoute l'entrée à la sortie du sous-bloc"},
+    {"group": "residu", "split": "train", "question": "Comment combiner entrée et branche résiduelle ?", "answer": "il ajoute l'entrée à la sortie du sous-bloc"},
+    {"group": "validation", "split": "train", "question": "Quel ensemble aide à choisir les réglages ?", "answer": "la validation, sans mise à jour des poids sur ses exemples"},
+    {"group": "validation", "split": "train", "question": "Sur quelles données compare-t-on les recettes avant le test ?", "answer": "la validation, sans mise à jour des poids sur ses exemples"},
+    {"group": "gradient", "split": "validation", "question": "Comment combiner deux contributions au même gradient ?", "answer": "en additionnant les contributions"},
+    {"group": "gradient", "split": "validation", "question": "Un poids réutilisé doit recevoir quel cumul ?", "answer": "en additionnant les contributions"},
+    {"group": "utf8", "split": "validation", "question": "Que représente UTF-8 ?", "answer": "un encodage de caractères en octets"},
+    {"group": "utf8", "split": "validation", "question": "Quel lien UTF-8 établit-il entre caractères et octets ?", "answer": "un encodage de caractères en octets"},
+    {"group": "causalite", "split": "test", "question": "Quel accès interdit le masque causal ?", "answer": "l'accès aux positions futures"},
+    {"group": "causalite", "split": "test", "question": "Quelles positions la prédiction présente ne doit-elle pas consulter ?", "answer": "l'accès aux positions futures"},
+    {"group": "inconnu", "split": "test", "question": "Combien de livres personnels possède le lecteur de ce cours ?", "answer": "cette information n'est pas fournie", "kind": "information_absente", "accepted": ["je ne sais pas", "cette information n'est pas fournie"]},
+    {"group": "inconnu", "split": "test", "question": "Quel est le nombre exact de livres chez la personne qui apprend ?", "answer": "cette information n'est pas fournie", "kind": "information_absente", "accepted": ["je ne sais pas", "cette information n'est pas fournie"]}
+  ]
+}

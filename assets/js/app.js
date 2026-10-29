@@ -18,7 +18,7 @@ import {
   paintGlossary,
   levelCheckpoint,
 } from "./study.js";
-import { indexCurriculum, levelProgress, neighbors } from "./curriculum.js";
+import { indexCurriculum, levelProgress, neighbors, applyLearningPath, preferredLearningPath } from "./curriculum.js";
 import { appendChildren, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
 import {
@@ -53,6 +53,7 @@ import { mountChatRun, mountTrainingRun, mountVisual } from "./visuals.js";
 const REVIEW_KEY = "afz-review";
 
 const state = {
+  booting: true,
   index: null,
   done: new Set(),
   route: { name: "home" },
@@ -119,6 +120,12 @@ function cacheElements() {
 }
 
 function bindChrome() {
+  window.addEventListener("afz-path-change", (event) => {
+    if (!state.index) return;
+    applyLearningPath(state.index, event.detail);
+    state.index.focusPathChoice = true;
+    render({ scroll: "keep" });
+  });
   const topbar = document.querySelector(".topbar");
   if (topbar && typeof ResizeObserver !== "undefined") {
     const observer = new ResizeObserver(([entry]) => {
@@ -171,7 +178,7 @@ async function boot() {
     );
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
-    state.index = indexCurriculum(data);
+    state.index = indexCurriculum(data, preferredLearningPath());
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     onAuth(() => {
       const wasOwner = state.owner;
@@ -181,6 +188,8 @@ async function boot() {
       updateAccountLink();
       if (state.owner && !wasOwner) openWorkspace().then(pullRemote);
       if (!state.owner) closeWorkspace();
+      // restoreSession émet avant de se résoudre : boot peint une seule fois.
+      if (state.booting) return;
       const next = routeFromHref(location.href);
       if (next.name === "connexion" && !isPasswordRecovery()) return;
       // Le formulaire affiche lui-même le résultat. Repeindre alors que
@@ -191,8 +200,10 @@ async function boot() {
     await restoreSession();
     state.owner = isOwner();
     applyStoredProgress();
+    state.booting = false;
     render({ scroll: "top" });
   } catch {
+    state.booting = false;
     els.main.replaceChildren(
       h("h1", { text: "Parcours indisponible" }),
       h("p", {
@@ -566,7 +577,7 @@ function stats() {
 }
 
 function render({ scroll }) {
-  const y = window.scrollY;
+  const y = scroll === "keep" ? window.scrollY : 0;
   leavePage();
   document.body.classList.remove("reading-mode");
   const route = routeFromHref(location.href);
@@ -701,7 +712,7 @@ function paintMain(route, ticket) {
     paintAsync(
       ticket,
       () => import("./page-atelier.js"),
-      (mod) => mod.paintAtelier(els.main),
+      (mod) => mod.paintAtelier(els.main, state.index),
     );
   else if (route.name === "playground")
     paintAsync(
@@ -1088,6 +1099,11 @@ function lessonBody(lesson, grade, done, around) {
   ];
   for (const section of lesson.sections) {
     if (section.kind === "code") nodes.push(codeBlock(section));
+    else if (section.kind === "reference") nodes.push(h("section", { class: "block block-reference" }, [
+      h("h2", { text: section.heading }),
+      h("a", { href: section.href, target: "_blank", rel: "noopener", text: section.title }),
+      ...paragraphs(section.text),
+    ]));
     else {
       nodes.push(
         h("section", { class: `block block-${section.kind}` }, [

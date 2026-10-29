@@ -1,0 +1,198 @@
+{
+  "0.10": [
+    {
+      "kind": "explain",
+      "heading": "Une première classe avant l’autograd",
+      "text": "Une classe définit comment créer des objets qui gardent des données et des méthodes. Deux noms peuvent désigner le même objet : modifier sa donnée via un nom est visible via l’autre. Construire un nouvel objet à partir de sa valeur crée une autre identité. Ce point expliquera pourquoi w*w doit accumuler deux contributions vers le même w. Le guide FONDATIONS.md de l’atelier propose un exercice de reconstruction sans correction."
+    },
+    {
+      "kind": "code",
+      "heading": "Objet partagé et objet distinct",
+      "lang": "python",
+      "code": "class ValeurSimple:\n    def __init__(self, data):\n        self.data = float(data)\n    def double(self):\n        return 2 * self.data\n\na = ValeurSimple(3)\nb = a\nc = ValeurSimple(a.data)\nb.data = 4\nassert a.double() == 8 and c.double() == 6\nassert a is b and a is not c\nprint(a.data, b.data, c.data)"
+    }
+  ],
+  "0.15": [
+    {
+      "kind": "explain",
+      "heading": "Axes, copies et broadcasting",
+      "text": "Pour x de forme (B,T,D), l’axe -1 est D. reshape conserve l’ordre des éléments, tandis que permute ou transpose change l’ordre des axes : deux tableaux de même forme peuvent donc contenir des valeurs organisées différemment. Une vue NumPy peut partager sa mémoire ; utilise copy() lorsque tu veux conserver un état avant une modification. Ajouter un biais (D,) à (B,T,D) le réutilise B*T fois. Son gradient devra sommer ces B*T contributions."
+    }
+  ],
+  "0.18": [
+    {
+      "kind": "explain",
+      "heading": "Préparer la dérivée d’un produit matriciel",
+      "text": "Si Y=X@W et G est le gradient reçu par Y, alors dX=G@W.T et dW=X.T@G. Avec X=(B,D), W=(D,V), G=(B,V), les formes obtenues sont celles de X et W. Le calcul suivant contrôle aussi les valeurs ; les bonnes formes ne suffisent pas. Refais le calcul avec un autre X avant de regarder FONDATIONS.md."
+    },
+    {
+      "kind": "code",
+      "heading": "Deux gradients calculés à la main",
+      "lang": "python",
+      "code": "import numpy as np\nX = np.array([[1., 2.], [3., 4.]])\nW = np.array([[2.], [5.]])\nG = np.ones((2, 1))\ndX, dW = G @ W.T, X.T @ G\nnp.testing.assert_array_equal(dX, [[2., 5.], [2., 5.]])\nnp.testing.assert_array_equal(dW, [[4.], [6.]])\nprint(dX, dW)"
+    }
+  ],
+  "1.3": [
+    {
+      "kind": "explain",
+      "heading": "Ce que le découpage permet réellement de conclure",
+      "text": "Pour un premier diagnostic séquentiel, une fin de texte réservée est utile. Pour discuter le transfert vers de nouveaux documents, réserve des documents entiers avant d’apprendre le tokenizer et contrôle les copies normalisées. Pour des questions/réponses, garde les reformulations d’une même famille dans le même ensemble. Un fichier renommé n’est pas un nouveau test. Le test reste réservé pendant toutes les phases, y compris après sauvegarde et reprise."
+    }
+  ],
+  "1.12": [
+    {
+      "kind": "explain",
+      "heading": "Quand commencer le TP 5",
+      "text": "Le numéro du TP ne fixe pas l’ordre de lecture. Tu peux lancer python verifier.py --tp 5 pour contrôler uniquement ton graphe scalaire à ce stade. L’option --jusqua 5 contrôle aussi tokenizer, fenêtres et probabilités ; elle convient quand leurs prérequis ont été étudiés. Avant de consulter la référence, dessine y=(x+x)+(x+x) et explique pourquoi dx vaut 4."
+    }
+  ],
+  "1.15": [
+    {
+      "kind": "explain",
+      "heading": "Un embedding lu deux fois reçoit deux gradients",
+      "text": "L’indexation d’un embedding ne crée pas un paramètre indépendant à chaque lecture. Si l’identifiant 0 apparaît deux fois, les deux chemins reviennent vers la même ligne du poids. L’exemple ci-dessous contrôle ce cumul. Refais ensuite le calcul avec la ligne 1 utilisée trois fois et sans ouvrir le moteur."
+    },
+    {
+      "kind": "code",
+      "heading": "Contrôler les lectures répétées",
+      "lang": "python",
+      "code": "import numpy as np\nfrom model.autograd import Tensor, embedding\nW = Tensor(np.array([[1., 2.], [3., 4.]]))\nembedding(W, np.array([0, 0, 1])).sum().backward()\nnp.testing.assert_array_equal(W.grad, [[2., 2.], [1., 1.]])\nprint(W.grad)"
+    }
+  ],
+  "2.3": [
+    {
+      "kind": "explain",
+      "heading": "Prolongement : couvrir tous les octets",
+      "text": "octet_bpe.py dans l’atelier part des 256 octets et apprend ses fusions sur train. Il accepte donc des caractères nouveaux sans agrandir l’alphabet au moment de l’évaluation. BOS/EOS/PAD sont des identifiants réservés ; la chaîne littérale <eos> n’insère pas un token spécial. Un texte d’entrée UTF-8 se reconstruit exactement. Des octets générés peuvent être invalides : le mode strict les signale et le mode replace les remplace explicitement. Aucun de ces choix ne prouve que le modèle connaît une nouvelle langue."
+    }
+  ],
+  "4.6": [
+    {
+      "kind": "explain",
+      "heading": "Un exemple qui distingue la bonne échelle",
+      "text": "Avec une tête de dimension 4, des scores QK bruts [0,4] deviennent [0,2]. À la deuxième position causale, les poids doivent être environ [0,1192 ; 0,8808], contre [0,0180 ; 0,9820] si tu oublies l’échelle. Ces deux versions ont la même forme, sont causales et peuvent avoir un gradient cohérent : il faut donc contrôler une valeur attendue indépendante. C’est maintenant le rôle du TP 7."
+    },
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Attention Is All You Need",
+      "href": "https://arxiv.org/abs/1706.03762",
+      "text": "Repère QK transposé, le diviseur sqrt(d_k), softmax et V. Rejoue notre exemple numérique dans atelier/verifier.py ; la baseline étudiée ici est decoder-only, pas le système encoder-decoder du papier."
+    }
+  ],
+  "4.14": [
+    {
+      "kind": "explain",
+      "heading": "Choisir les poids, puis mesurer le test",
+      "text": "Le lanceur de l’atelier archive le meilleur checkpoint observé sur validation, son pas selected_step, son budget de tokens et la provenance. Le budget total peut être plus grand que celui de ces poids retenus. Le rechargement doit retrouver les logits calculés en mémoire avant sauvegarde. Complète ton code, puis utilise benchmark.py pour comparer deux largeurs sur les mêmes graines ; le test ne choisit pas la largeur."
+    }
+  ],
+  "6.7": [
+    {
+      "kind": "explain",
+      "heading": "Mesurer l’accumulation sur une petite régression",
+      "text": "Pour des micro-batches de même taille, divise chaque loss par leur nombre avant backward. Si les tailles diffèrent, pondère par leur nombre de cibles ; une simple moyenne des moyennes n’est plus correcte. L’exemple vérifie le gradient analytique de deux micro-batches d’un exemple chacun. Refais-le avec trois exemples et des tailles 1 puis 2."
+    },
+    {
+      "kind": "code",
+      "heading": "Même gradient, même mise à jour",
+      "lang": "python",
+      "code": "import numpy as np\nX = np.array([[1., 2.], [3., 4.]])\ny = np.array([[1.], [2.]])\nW = np.zeros((2, 1))\ngrand = 2 * X.T @ (X @ W - y) / len(X)\npetits = np.zeros_like(W)\nfor xx, yy in zip(X, y):\n    xx, yy = xx[None, :], yy[None, :]\n    petits += (2 * xx.T @ (xx @ W - yy)) / len(X)\nnp.testing.assert_allclose(grand, petits)\nnp.testing.assert_allclose(W - .01 * grand, W - .01 * petits)\nprint(grand)"
+    }
+  ],
+  "12.12": [
+    {
+      "kind": "explain",
+      "heading": "Une remise finale relisible",
+      "text": "Remets ton code personnel, la recette, les splits et leurs conditions d’utilisation, les contrôles, un diagnostic de panne, les mesures appariées et le checkpoint rechargé. Importe controles.json dans Mon espace pour distinguer contrôles publics et explications déclarées. Fais ensuite relire le projet avec PROJET_FINAL.md, sur un exemple nouveau. Le banc français du site mesure une petite expérience réelle ; il ne certifie ni ta compréhension ni une supériorité générale."
+    }
+  ],
+  "13.8": [
+    {
+      "kind": "explain",
+      "heading": "Utiliser le modèle que tu as construit",
+      "text": "L’atelier contient generer.py : recharge ton checkpoint et utilise une invite, une graine, une température, une longueur et un critère d’arrêt explicites. Le serveur facultatif écoute sur 127.0.0.1 pour une utilisation locale. Le laboratoire principal accepte aussi --byte-bpe pour entraîner avec des octets, puis model.gpt_sample pour générer. Le port_torch.py compare d’abord logits et gradients du même decoder, puis entraîne un petit lot : la vitesse vient après la parité."
+    }
+  ],
+  "2.7": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Neural Machine Translation of Rare Words with Subword Units",
+      "href": "https://arxiv.org/abs/1508.07909",
+      "text": "Retrouve le comptage des paires et les fusions dans model/bpe.py et model/byte_bpe.py. Compare vocabulaire fermé caractère et base de 256 octets ; notre code reste pédagogique."
+    }
+  ],
+  "5.2": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+      "href": "https://arxiv.org/abs/2104.09864",
+      "text": "Associe la rotation de Q/K à apply_rope dans model/attention.py. Distingue formule, test de norme et qualité hors longueur entraînée, qui demande une expérience distincte."
+    }
+  ],
+  "5.3": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Root Mean Square Layer Normalization",
+      "href": "https://arxiv.org/abs/1910.07467",
+      "text": "Écris le rôle du gain et l’absence de centrage/biais. Compare model/mathutil.py et le backward rmsnorm de model/autograd.py ; les gradients et un entraînement sont testés."
+    }
+  ],
+  "6.3": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Training Compute-Optimal Large Language Models",
+      "href": "https://arxiv.org/abs/2203.15556",
+      "text": "Note paramètres, tokens et budget de calcul. Compare le raisonnement expérimental avec les compteurs de model/bench.py ; nos petits runs ne reproduisent pas les lois d’échelle du papier."
+    }
+  ],
+  "7.1": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+      "href": "https://arxiv.org/abs/2101.03961",
+      "text": "Retrouve routeur, capacité et équilibrage dans model/moe.py. Liste ce qui manque à notre forward pour reproduire une expérience entraînée du papier."
+    }
+  ],
+  "8.7": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+      "href": "https://arxiv.org/abs/2312.00752",
+      "text": "Associe état et sélectivité à model/ssm.py, puis liste convolution, projections et kernel non reproduits par notre scan réduit. Ne lui attribue pas les performances du modèle publié."
+    }
+  ],
+  "9.2": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+      "href": "https://arxiv.org/abs/2010.11929",
+      "text": "Compare les patches du papier à model/multimodal.py. Distingue découpage, projection, encodeur entraîné et raccordement à un modèle de langage ; nous ne livrons que les premières briques."
+    }
+  ],
+  "10.3": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "href": "https://arxiv.org/abs/2005.11401",
+      "text": "Sépare retrieval, contexte et génération. Compare à la mémoire lexicale de model/memory.py ; notre banque de mots n’est pas le système entraîné du papier."
+    }
+  ],
+  "13.7": [
+    {
+      "kind": "reference",
+      "heading": "Lecture primaire accompagnée",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "href": "https://arxiv.org/abs/2106.09685",
+      "text": "Retrouve W + facteur*(A@B) dans model/lora.py et les gradients dans model/finetune.py. Compare paramètres entraînés et loss sur les mêmes splits ; le rang seul ne garantit pas une bonne adaptation."
+    }
+  ]
+}

@@ -75,3 +75,15 @@ jobs:
       - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js
         env:
           PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+
+  torch-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt
+      - run: python -m pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Logits, loss et tous les gradients NumPy/PyTorch
+        run: python -m pytest tests/test_torch_parity.py -q

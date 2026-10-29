@@ -9,6 +9,7 @@ Le format est volontairement court, pour tenir dans un bloc CPU :
 from __future__ import annotations
 
 import json
+import unicodedata
 from pathlib import Path
 
 import numpy as np
@@ -216,6 +217,15 @@ def finetune(
 ) -> dict:
     if steps < 1:
         raise ValueError("au moins un pas")
+    lineage = getattr(model, "sft_lineage", None)
+    if lineage:
+        _assert_separate_instructions(
+            {
+                "train": rows,
+                "validation": lineage["validation"],
+                "test": lineage["test"],
+            }
+        )
     if hasattr(model, "training_state"):
         del model.training_state
     prepared = _prepare_rows(tokenizer, rows)
@@ -299,9 +309,25 @@ def compare_finetunes(
         for name, value in model.params.items()
     }
     original_rows = rows
+    if getattr(model, "sft_lineage", None):
+        import copy
+
+        full_model.sft_lineage = copy.deepcopy(model.sft_lineage)
+        lora_model.sft_lineage = copy.deepcopy(model.sft_lineage)
     if len(rows) >= 10:
         rows, validation, test = split_instructions(rows, seed)
         label = "validation réservée par groupes lexicaux"
+        prior = getattr(
+            model, "sft_lineage", {"train": [], "validation": [], "test": []}
+        )
+        combined = {
+            "train": prior["train"] + rows,
+            "validation": prior["validation"] + validation,
+            "test": prior["test"] + test,
+        }
+        _assert_separate_instructions(combined)
+        full_model.sft_lineage = combined
+        lora_model.sft_lineage = combined
     else:
         validation, test = rows, []
         label = "diagnostic sur train : trop peu de paires pour conclure à la généralisation"
@@ -365,8 +391,20 @@ def split_instructions(
     from difflib import SequenceMatcher
 
     def norm(text):
-        return re.sub(r"[^\w]+", " ", text.casefold()).strip()
+        return re.sub(
+            r"[^\w]+", " ", unicodedata.normalize("NFC", text).casefold()
+        ).strip()
 
+    # Canonicaliser AVANT de grouper et mélanger : le fichier peut être réordonné.
+    rows = sorted(
+        rows,
+        key=lambda r: (
+            norm(r["question"]),
+            norm(r["answer"]),
+            r["question"],
+            r["answer"],
+        ),
+    )
     parent = list(range(len(rows)))
 
     def find(i):
@@ -431,7 +469,9 @@ def _assert_separate_instructions(parts):
     from difflib import SequenceMatcher
 
     def norm(text):
-        return re.sub(r"[^\w]+", " ", text.casefold()).strip()
+        return re.sub(
+            r"[^\w]+", " ", unicodedata.normalize("NFC", text).casefold()
+        ).strip()
 
     named = list(parts.items())
     for i, (left_name, left) in enumerate(named):
@@ -477,6 +517,17 @@ def finetune_phase(model, tokenizer, item, seed=0):
         rows, validation, test = split_instructions(rows, seed)
         label = "validation réservée par groupes lexicaux"
     parts = {"train": rows, "validation": validation, "test": test}
+    previous = getattr(model, "sft_lineage", {k: [] for k in parts})
+    lineage = {}
+    for name, values in parts.items():
+        # Un diagnostic sur train n'est jamais un ensemble réservé.
+        values = (
+            [] if item.get("diagnostic_train") is True and name != "train" else values
+        )
+        combined = previous[name] + values
+        unique = {(r["question"], r["answer"]): r for r in combined}
+        lineage[name] = [unique[k] for k in sorted(unique)]
+    _assert_separate_instructions(lineage)
     diagnostics = {
         name: instruction_diagnostics(tokenizer, part, model.config.block_size)
         for name, part in parts.items()
@@ -492,6 +543,7 @@ def finetune_phase(model, tokenizer, item, seed=0):
         lora_rank=item.get("lora_rank"),
     )
     after = evaluate_instructions(model, tokenizer, validation)
+    model.sft_lineage = lineage
     import hashlib, json
 
     def digest(part):
@@ -509,5 +561,8 @@ def finetune_phase(model, tokenizer, item, seed=0):
         split_sha256={name: digest(part) for name, part in parts.items()},
         diagnostics=diagnostics,
         test_consulted=False,
+        lineage_split={name: len(part) for name, part in lineage.items()},
+        lineage_sha256={name: digest(part) for name, part in lineage.items()},
+        split_protocol="groupes canoniques ; recouvrement contrôlé sur toutes les phases SFT connues",
     )
     return report, test

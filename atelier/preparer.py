@@ -51,6 +51,10 @@ def preparer(source, destination, seed=0):
         )
     meta = {
         "seed": seed,
+        "splits": {
+            k: hashlib.sha256((destination / (k + ".txt")).read_bytes()).hexdigest()
+            for k in groups
+        },
         "normalisation": "NFC, retours ligne LF, bords retirés",
         "doublons_retires": duplicates,
         "documents": {
