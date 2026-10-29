@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-8K3pyPQMxhQ6fUqqUH5ZBWU5d8Q+NqB4hlkMkBIaqeM=' 'sha256-yK4QqZra4WMtEukeD9XS9EmvE17rb/+yvlCBieRl1yE=' 'sha256-wsy+yelYU/lYmmQOtHzdX8a9gIET0QZ1jnCC7uDWQ+8='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-8K3pyPQMxhQ6fUqqUH5ZBWU5d8Q+NqB4hlkMkBIaqeM=' 'sha256-U54D7MG/OJ23dgZTNqFKKTVI/8dVg1bIYfNOMq3rOos=' 'sha256-09RMv0N+CJ/1+Y8WwF/Em4QIJERbNUePweT41JyuJEk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <meta name="theme-color" content="#f4f7fc">
@@ -24,7 +24,7 @@
 </script>
 <script>
 (function () {
-  var expected = "e2c8e6411f3d";
+  var expected = "f0eda1d24c94";
   var arrival = location.href;
   fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (response) {
     return response.ok ? response.json() : null;
@@ -43,50 +43,50 @@
 {
   "scopes": {
     "./assets/js/": {
-      "./assets/config.js": "./assets/config.js?v=e2c8e6411f3d",
-      "./assets/vendor/editor.js": "./assets/vendor/editor.js?v=e2c8e6411f3d",
-      "./assets/vendor/supabase.js": "./assets/vendor/supabase.js?v=e2c8e6411f3d",
-      "./assets/js/auth-return.js": "./assets/js/auth-return.js?v=e2c8e6411f3d",
-      "./assets/js/auth.js": "./assets/js/auth.js?v=e2c8e6411f3d",
-      "./assets/js/bpe.js": "./assets/js/bpe.js?v=e2c8e6411f3d",
-      "./assets/js/curriculum.js": "./assets/js/curriculum.js?v=e2c8e6411f3d",
-      "./assets/js/dom.js": "./assets/js/dom.js?v=e2c8e6411f3d",
-      "./assets/js/evidence.js": "./assets/js/evidence.js?v=e2c8e6411f3d",
-      "./assets/js/gpt.js": "./assets/js/gpt.js?v=e2c8e6411f3d",
-      "./assets/js/learner.js": "./assets/js/learner.js?v=e2c8e6411f3d",
-      "./assets/js/lesson-tools.js": "./assets/js/lesson-tools.js?v=e2c8e6411f3d",
-      "./assets/js/lifecycle.js": "./assets/js/lifecycle.js?v=e2c8e6411f3d",
-      "./assets/js/local-records.js": "./assets/js/local-records.js?v=e2c8e6411f3d",
-      "./assets/js/manipulators.js": "./assets/js/manipulators.js?v=e2c8e6411f3d",
-      "./assets/js/offline.js": "./assets/js/offline.js?v=e2c8e6411f3d",
-      "./assets/js/page-about.js": "./assets/js/page-about.js?v=e2c8e6411f3d",
-      "./assets/js/page-atelier.js": "./assets/js/page-atelier.js?v=e2c8e6411f3d",
-      "./assets/js/page-connexion.js": "./assets/js/page-connexion.js?v=e2c8e6411f3d",
-      "./assets/js/page-donnees.js": "./assets/js/page-donnees.js?v=e2c8e6411f3d",
-      "./assets/js/page-experiments.js": "./assets/js/page-experiments.js?v=e2c8e6411f3d",
-      "./assets/js/page-ide.js": "./assets/js/page-ide.js?v=e2c8e6411f3d",
-      "./assets/js/page-model.js": "./assets/js/page-model.js?v=e2c8e6411f3d",
-      "./assets/js/page-password.js": "./assets/js/page-password.js?v=e2c8e6411f3d",
-      "./assets/js/page-playground.js": "./assets/js/page-playground.js?v=e2c8e6411f3d",
-      "./assets/js/page-recovery.js": "./assets/js/page-recovery.js?v=e2c8e6411f3d",
-      "./assets/js/page-track.js": "./assets/js/page-track.js?v=e2c8e6411f3d",
-      "./assets/js/path-choice.js": "./assets/js/path-choice.js?v=e2c8e6411f3d",
-      "./assets/js/placement-practice.js": "./assets/js/placement-practice.js?v=e2c8e6411f3d",
-      "./assets/js/placement.js": "./assets/js/placement.js?v=e2c8e6411f3d",
-      "./assets/js/progress.js": "./assets/js/progress.js?v=e2c8e6411f3d",
-      "./assets/js/project-evidence.js": "./assets/js/project-evidence.js?v=e2c8e6411f3d",
-      "./assets/js/pybridge.js": "./assets/js/pybridge.js?v=e2c8e6411f3d",
-      "./assets/js/quiz.js": "./assets/js/quiz.js?v=e2c8e6411f3d",
-      "./assets/js/recovery-mail.js": "./assets/js/recovery-mail.js?v=e2c8e6411f3d",
-      "./assets/js/router.js": "./assets/js/router.js?v=e2c8e6411f3d",
-      "./assets/js/search.js": "./assets/js/search.js?v=e2c8e6411f3d",
-      "./assets/js/storage.js": "./assets/js/storage.js?v=e2c8e6411f3d",
-      "./assets/js/study.js": "./assets/js/study.js?v=e2c8e6411f3d",
-      "./assets/js/text.js": "./assets/js/text.js?v=e2c8e6411f3d",
-      "./assets/js/version.js": "./assets/js/version.js?v=e2c8e6411f3d",
-      "./assets/js/visuals.js": "./assets/js/visuals.js?v=e2c8e6411f3d",
-      "./assets/js/workspace.js": "./assets/js/workspace.js?v=e2c8e6411f3d",
-      "./assets/js/zipstore.js": "./assets/js/zipstore.js?v=e2c8e6411f3d"
+      "./assets/config.js": "./assets/config.js?v=f0eda1d24c94",
+      "./assets/vendor/editor.js": "./assets/vendor/editor.js?v=f0eda1d24c94",
+      "./assets/vendor/supabase.js": "./assets/vendor/supabase.js?v=f0eda1d24c94",
+      "./assets/js/auth-return.js": "./assets/js/auth-return.js?v=f0eda1d24c94",
+      "./assets/js/auth.js": "./assets/js/auth.js?v=f0eda1d24c94",
+      "./assets/js/bpe.js": "./assets/js/bpe.js?v=f0eda1d24c94",
+      "./assets/js/curriculum.js": "./assets/js/curriculum.js?v=f0eda1d24c94",
+      "./assets/js/dom.js": "./assets/js/dom.js?v=f0eda1d24c94",
+      "./assets/js/evidence.js": "./assets/js/evidence.js?v=f0eda1d24c94",
+      "./assets/js/gpt.js": "./assets/js/gpt.js?v=f0eda1d24c94",
+      "./assets/js/learner.js": "./assets/js/learner.js?v=f0eda1d24c94",
+      "./assets/js/lesson-tools.js": "./assets/js/lesson-tools.js?v=f0eda1d24c94",
+      "./assets/js/lifecycle.js": "./assets/js/lifecycle.js?v=f0eda1d24c94",
+      "./assets/js/local-records.js": "./assets/js/local-records.js?v=f0eda1d24c94",
+      "./assets/js/manipulators.js": "./assets/js/manipulators.js?v=f0eda1d24c94",
+      "./assets/js/offline.js": "./assets/js/offline.js?v=f0eda1d24c94",
+      "./assets/js/page-about.js": "./assets/js/page-about.js?v=f0eda1d24c94",
+      "./assets/js/page-atelier.js": "./assets/js/page-atelier.js?v=f0eda1d24c94",
+      "./assets/js/page-connexion.js": "./assets/js/page-connexion.js?v=f0eda1d24c94",
+      "./assets/js/page-donnees.js": "./assets/js/page-donnees.js?v=f0eda1d24c94",
+      "./assets/js/page-experiments.js": "./assets/js/page-experiments.js?v=f0eda1d24c94",
+      "./assets/js/page-ide.js": "./assets/js/page-ide.js?v=f0eda1d24c94",
+      "./assets/js/page-model.js": "./assets/js/page-model.js?v=f0eda1d24c94",
+      "./assets/js/page-password.js": "./assets/js/page-password.js?v=f0eda1d24c94",
+      "./assets/js/page-playground.js": "./assets/js/page-playground.js?v=f0eda1d24c94",
+      "./assets/js/page-recovery.js": "./assets/js/page-recovery.js?v=f0eda1d24c94",
+      "./assets/js/page-track.js": "./assets/js/page-track.js?v=f0eda1d24c94",
+      "./assets/js/path-choice.js": "./assets/js/path-choice.js?v=f0eda1d24c94",
+      "./assets/js/placement-practice.js": "./assets/js/placement-practice.js?v=f0eda1d24c94",
+      "./assets/js/placement.js": "./assets/js/placement.js?v=f0eda1d24c94",
+      "./assets/js/progress.js": "./assets/js/progress.js?v=f0eda1d24c94",
+      "./assets/js/project-evidence.js": "./assets/js/project-evidence.js?v=f0eda1d24c94",
+      "./assets/js/pybridge.js": "./assets/js/pybridge.js?v=f0eda1d24c94",
+      "./assets/js/quiz.js": "./assets/js/quiz.js?v=f0eda1d24c94",
+      "./assets/js/recovery-mail.js": "./assets/js/recovery-mail.js?v=f0eda1d24c94",
+      "./assets/js/router.js": "./assets/js/router.js?v=f0eda1d24c94",
+      "./assets/js/search.js": "./assets/js/search.js?v=f0eda1d24c94",
+      "./assets/js/storage.js": "./assets/js/storage.js?v=f0eda1d24c94",
+      "./assets/js/study.js": "./assets/js/study.js?v=f0eda1d24c94",
+      "./assets/js/text.js": "./assets/js/text.js?v=f0eda1d24c94",
+      "./assets/js/version.js": "./assets/js/version.js?v=f0eda1d24c94",
+      "./assets/js/visuals.js": "./assets/js/visuals.js?v=f0eda1d24c94",
+      "./assets/js/workspace.js": "./assets/js/workspace.js?v=f0eda1d24c94",
+      "./assets/js/zipstore.js": "./assets/js/zipstore.js?v=f0eda1d24c94"
     }
   }
 }
@@ -99,22 +99,21 @@
 <meta property="og:type" content="website">
 <title>AI From Zero — le parcours pour construire la tienne</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/style.css?v=e2c8e6411f3d">
+<link rel="stylesheet" href="assets/css/style.css?v=f0eda1d24c94">
 <link rel="preload" href="data/curriculum.json" as="fetch" crossorigin="anonymous">
 <link rel="preload" href="assets/fonts/Inter-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
-<link rel="preload" href="assets/fonts/InterDisplay-ExtraBold.woff" as="font" type="font/woff" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/app.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/local-records.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/visuals.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/curriculum.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/dom.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/quiz.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/progress.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/router.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/search.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/storage.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/text.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/learner.js?v=e2c8e6411f3d" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/app.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/local-records.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/visuals.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/curriculum.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/dom.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/quiz.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/progress.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/router.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/search.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/storage.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/text.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/learner.js?v=f0eda1d24c94" crossorigin="anonymous">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -206,13 +205,13 @@
 </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<link rel="modulepreload" href="assets/config.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/auth.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/auth-return.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/workspace.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/study.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/offline.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<link rel="modulepreload" href="assets/js/lifecycle.js?v=e2c8e6411f3d" crossorigin="anonymous">
-<script type="module" src="assets/js/app.js?v=e2c8e6411f3d"></script>
+<link rel="modulepreload" href="assets/config.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/auth.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/auth-return.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/workspace.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/study.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/offline.js?v=f0eda1d24c94" crossorigin="anonymous">
+<link rel="modulepreload" href="assets/js/lifecycle.js?v=f0eda1d24c94" crossorigin="anonymous">
+<script type="module" src="assets/js/app.js?v=f0eda1d24c94"></script>
 </body>
 </html>

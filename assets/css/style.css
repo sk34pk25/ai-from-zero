@@ -5,7 +5,7 @@
   font-family: "Inter";
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url("../fonts/Inter-Regular.woff") format("woff");
 }
 
@@ -13,7 +13,7 @@
   font-family: "Inter";
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: optional;
   src: url("../fonts/Inter-SemiBold.woff") format("woff");
 }
 
@@ -21,7 +21,7 @@
   font-family: "Inter Display";
   font-style: normal;
   font-weight: 800;
-  font-display: swap;
+  font-display: optional;
   src: url("../fonts/InterDisplay-ExtraBold.woff") format("woff");
 }
 
