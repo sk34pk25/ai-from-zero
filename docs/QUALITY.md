@@ -87,3 +87,11 @@ Le banc littéraire et sa recette figée sont décrits dans atelier/BANC_FR.md. 
 Validation locale de cette version : 177 tests Python collectés, 173 réussis et 4 tests optionnels PyTorch ignorés dans cet environnement ; 51 tests JavaScript réussis ; HTML valide ; 46 scénarios navigateur ciblés réussis. La CI installe PyTorch dans un job dédié et étend les régressions locales à Firefox et WebKit. Lighthouse conserve son seuil de 95 et inclut maintenant le positionnement. La CI de la PR nº 12 identifie le commit exact contrôlé.
 
 RELECTURE.md fournit des tableaux vierges et un protocole d'observation. Les essais sur matériel physique et auprès de débutants restent à réaliser : aucun résultat de terrain n'est inventé. L'avis Supabase sur les mots de passe compromis est documenté avec ses conditions d'offre ; aucune modification d'abonnement n'a été faite.
+
+## Complément : exécution Python réelle dans le navigateur
+
+Le premier échec de téléchargement de Pyodide restait en mémoire et empêchait les tentatives suivantes. Le démarrage ne publie désormais le moteur qu'après le chargement vérifié de NumPy ; une erreur libère la tentative pour permettre de réessayer. Deux tests de régression échouaient avant le correctif. Les trois contrôles du démarrage passent après correction, portant la suite JavaScript à 54 tests.
+
+L'épreuve pratique propose aussi « Arrêter le contrôle », qui interrompt le worker et laisse relancer le programme. La suite `npm run test:python-runtime` charge le vrai Pyodide/NumPy épinglé par le site : premier téléchargement interrompu, nouvelle tentative, calcul NumPy, erreur Python, deux pas de TinyGPT et génération, boucle réellement démarrée puis interrompue, et redémarrage. Elle exécute aussi les cas du positionnement sur une fenêtre de 360 pixels, avec erreur, réussite, arrêt et nouvelle réussite. Seul le premier téléchargement est volontairement interrompu ; les résultats du moteur ne sont pas simulés.
+
+Cette suite dédiée est exécutée en CI sous Chromium, Firefox et WebKit, en plus des tests d'interface existants. Elle nécessite HTTPS vers jsDelivr et ne constitue pas un essai sur appareil physique. Les rapports des tests réels sont conservés à part des rapports d'interface.

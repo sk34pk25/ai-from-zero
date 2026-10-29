@@ -63,10 +63,11 @@ npm test
 npm run validate:html
 npx playwright install chromium
 npm run test:e2e
+npm run test:python-runtime
 CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")" npm run lighthouse
 ```
 
-L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, visuels, axe, catalogue, IDE) et Lighthouse. Le script Lighthouse sert les fichiers compressés, comme GitHub Pages, et refuse un score sous 95 au bureau comme sur mobile.
+L'intégration continue est dans [`.github/workflows/ci.yml`](.github/workflows/ci.yml) : pytest, tests JavaScript, validation HTML, Playwright (parcours, leçons, quiz, recherche au clavier, thème, historique, mobile, visuels, axe, catalogue, IDE) et Lighthouse. La suite `test:python-runtime` demande HTTPS vers jsDelivr : elle charge réellement Python/NumPy, entraîne un petit GPT, vérifie le positionnement et l'arrêt/redémarrage du moteur sous Chromium, Firefox et WebKit. Le script Lighthouse sert les fichiers compressés, comme GitHub Pages, et refuse un score sous 95 au bureau comme sur mobile.
 
 Les bundles `assets/vendor/editor.js` et `assets/vendor/supabase.js` sont déjà construits, pour que le site n'ait pas d'étape de build. Pour les refaire : `npx esbuild scripts/vendor-editor.js --bundle --format=esm --outfile=assets/vendor/editor.js` et la même commande pour `scripts/vendor-supabase.js`.
 

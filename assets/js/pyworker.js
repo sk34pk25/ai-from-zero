@@ -8,10 +8,15 @@ async function ensure() {
   if (!booting) {
     booting = (async () => {
       importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
-      pyodide = await loadPyodide();
-      await pyodide.loadPackage("numpy");
+      const python = await loadPyodide();
+      await python.loadPackage("numpy");
+      python.runPython("import numpy");
+      pyodide = python;
       return pyodide;
-    })();
+    })().catch((error) => {
+      booting = null;
+      throw error;
+    });
   }
   return booting;
 }
