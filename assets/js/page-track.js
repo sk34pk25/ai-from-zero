@@ -7,12 +7,12 @@ export function paintTrack(main, { track, done, reports, loadReports, isCurrent 
   const doneCount = stages.filter((stage) => done.has(stage.step)).length;
   const list = h("ol", { class: "track-list" });
   stages.forEach((stage, index) => {
-    const done = done.has(stage.step);
-    const item = h("li", { class: done ? "track-step is-done" : "track-step" });
+    const checked = done.has(stage.step);
+    const item = h("li", { class: checked ? "track-step is-done" : "track-step" });
     appendChildren(item, [
       h("p", {
         class: "eyebrow",
-        text: done ? `Étape ${index + 1} · cochée` : `Étape ${index + 1}`,
+        text: checked ? `Étape ${index + 1} · cochée` : `Étape ${index + 1}`,
       }),
       h("h2", { text: stage.title }),
       h("p", { text: stage.summary }),
