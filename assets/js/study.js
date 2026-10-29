@@ -313,6 +313,9 @@ export function paintStudy(main, index) {
           ]),
         );
         left -= duration;
+      } else if(!due.includes(id)) {
+        // Ne saute jamais une nouvelle leçon pour remplir artificiellement le créneau.
+        break;
       }
     }
     session.replaceChildren(...chosen);
