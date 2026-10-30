@@ -106,7 +106,7 @@ Le modèle n'apprend que le texte qu'on lui donne. Un catalogue vérifié évite
 - Lire l'ordre recommandé des jeux
 - Repérer une licence et une réserve
 - Préparer un extrait sans le versionner
-@PREREQ Le BPE sait s'enregistrer.
+@PREREQ Corpus et tokenizer, étapes 2.2 et 2.5 ; premier GPT, étape 4.14.
 @INTUITION
 Tu ne verses pas la bibliothèque entière dans la casserole. Tu suis une recette : d'abord une goutte, puis un livre, puis, seulement si la machine suit, un plus grand texte.
 @VOCAB

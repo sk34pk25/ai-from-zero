@@ -4,6 +4,7 @@ import ast
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -54,7 +55,7 @@ def test_references_resolve_to_real_functions_and_level_rubrics_are_specific():
                 s["codeSymbol"],
             )
     assert len({tuple(l["assessment"]["criteria"]) for l in c["levels"]}) == 14
-    assert c["learningPath"]["coreLevels"] == [0, 1, 2, 3, 4, 13]
+    assert c["learningPath"]["coreLevels"] == [0, 1, 2, 3, 4, 13, 12]
 
 
 def test_manifest_is_complete_and_has_no_model_imports():
@@ -193,3 +194,34 @@ def test_reference_report_matches_the_delivered_code_and_data():
         < report["baselines"]["uniforme"]
     )
     assert report["rechargement_identique"] is True
+
+
+def test_core_path_has_every_prerequisite_before_use_and_ends_with_delivery():
+    c = json.loads((ROOT / "data/curriculum.json").read_text())
+    lessons = {s["id"]: s for l in c["levels"] for s in l["steps"]}
+    path = c["learningPath"]["coreSteps"]
+    assert len(path) == len(set(path)) == 86
+    assert path[-1] == "12.12"
+    assert path[path.index("4.14") + 1] == "13.3"
+    assert not {"13.1", "13.6", "13.7", "12.7", "12.8", "12.9"} & set(path)
+    seen = set()
+    for id in path:
+        assert set(re.findall(r"\b\d+\.\d+\b", lessons[id]["prereq"])) <= seen, (id, lessons[id]["prereq"])
+        seen.add(id)
+    exercises = json.loads((ROOT / "data/exercises.json").read_text())
+    python_ids = {e["lessonId"] for e in exercises}
+    assert len(python_ids) == 66
+    assert {id for id, s in lessons.items() if s["activityKind"] == "python"} == python_ids
+
+
+def test_glossary_groups_contexts_and_keeps_curated_examples():
+    rows = json.loads((ROOT / "data/glossary.json").read_text())
+    assert rows == load_script("build_curriculum").build_glossary()
+    terms = [row["term"].casefold() for row in rows]
+    assert len(terms) == len(set(terms))
+    baseline = next(row for row in rows if row["term"] == "Baseline")
+    assert {"3.2", "12.2"} <= {context["lesson"] for context in baseline["contexts"]}
+    assert len(baseline["contexts"]) == len({context["lesson"] for context in baseline["contexts"]})
+    assert baseline["example"] and baseline["english"]
+    core = json.loads((ROOT / "data/glossary-core.json").read_text())
+    assert len(core) == 20 and all(row["example"] for row in core)

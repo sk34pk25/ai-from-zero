@@ -144,7 +144,7 @@ test("la synchronisation initiale conserve la note active et son focus", async (
   await installOwner(page, { sharedLearning });
   let release;
   const initialSync = new Promise(resolve => { release = resolve; });
-  await page.route("https://example.supabase.co/rest/v1/learning_records**", async route => {
+  await page.route("https://127.0.0.1:4173/rest/v1/learning_records**", async route => {
     await initialSync;
     await route.fallback();
   });
@@ -182,7 +182,7 @@ test("deux appareils voient les notes et détectent une modification concurrente
     // Le PC garde volontairement la révision 1 pendant la saisie tablette.
     // Sans ce contrôle, un rafraîchissement lié au scroll peut déjà lui
     // apporter la révision 2 : ce ne serait alors plus un conflit.
-    await pc.route("https://example.supabase.co/rest/v1/learning_records**", async route => {
+    await pc.route("https://127.0.0.1:4173/rest/v1/learning_records**", async route => {
       await resumePc;
       await route.fallback();
     });

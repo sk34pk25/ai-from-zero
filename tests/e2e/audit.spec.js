@@ -4,9 +4,9 @@ import { expect, test } from "@playwright/test";
 import { installOwner, signInAs } from "./session.js";
 
 const ROUTES = [
-  ["/", /architecture/],
-  ["/#/accueil", /architecture/],
-  ["/#/parcours", /architecture|niveaux|Fondations/],
+  ["/", /modèle de langage/],
+  ["/#/accueil", /modèle de langage/],
+  ["/#/parcours", /modèle de langage/],
   ["/#/niveau/0", /Fondations numériques/],
   ["/#/niveau/13", /.+/],
   ["/#/lecon/0.1", /.+/],
@@ -73,7 +73,7 @@ test("chaque route publique s'ouvre, au bureau et sur un iPhone", async ({ page 
 test("l'en-tête mobile reste sur une ligne", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("architecture");
+  await expect(page.locator("h1")).toContainText("modèle de langage");
   await headerFits(page);
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

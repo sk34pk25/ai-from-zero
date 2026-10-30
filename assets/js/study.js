@@ -17,6 +17,7 @@ import {
 import { isOwner } from "./auth.js";
 import { onLeave } from "./lifecycle.js";
 import { sessionPlanner, courseProgress } from "./course-guide.js";
+import { studyScope } from "./study-scope.js";
 import { browserStorage, readLocalProgress, readLocalReading, localLearnerEnabled } from "./local-records.js";
 export function recordAttempt(id, type, ok) {
   if (!isOwner()) return;
@@ -38,11 +39,19 @@ export function dueLessons(index) {
   });
 }
 export function lessonNotebook(id) {
-  if (!isOwner()) return h("details", { class: "sheet notebook-access" }, [
-    h("summary", { text: "Carnet synchronisé · compte propriétaire" }),
-    h("p", { text: "Les notes synchronisées et les favoris utilisent le compte propriétaire. Les leçons, les TP et le planificateur sont publics ; le suivi local permet de garder tes quiz et brouillons d’exercices sur cet appareil." }),
-    h("a", { href: "#/connexion", text: "Connexion propriétaire" }),
-  ]);
+  if (!isOwner()) {
+    const scope = studyScope(), key = `lesson/${id}`;
+    const note = h("textarea", { rows: 4, "aria-label": "Mes notes pour cette leçon" });
+    note.value = scope.get(key).note || "";
+    const status = h("p", { role: "status", class: "muted", text: scope.message });
+    const favorite = h("button", { type: "button", "aria-pressed": String(!!scope.get(key).favorite) }, scope.get(key).favorite ? "Retirer des favoris" : "Ajouter aux favoris");
+    favorite.onclick = () => {
+      const row = scope.get(key), value = !row.favorite;
+      if (scope.set(key, { ...row, favorite: value })) { favorite.textContent = value ? "Retirer des favoris" : "Ajouter aux favoris"; favorite.setAttribute("aria-pressed", String(value)); }
+    };
+    note.oninput = () => { if (!scope.set(key, { ...scope.get(key), note: note.value })) status.textContent = "Notes non enregistrées : le suivi a été effacé ou le stockage est refusé. Copie-les avant de fermer."; };
+    return h("details", { class: "sheet notebook-access" }, [h("summary", { text: "Mon carnet local" }), favorite, h("label", {}, ["Notes personnelles", note]), status]);
+  }
   const data = getRecord(`lesson/${id}`, {});
   const host = h("section", { class: "sheet notebook" });
   const favorite = h(
@@ -216,13 +225,13 @@ export async function backupDownload() {
     await completeBackup(),
   );
 }
-export function paintStudy(main, index) {
-  const progress = () => isOwner() ? getRecord("progress", {}).done || [] : readLocalProgress(browserStorage())?.done || [];
+export function paintStudy(main, index, sessionProgress = () => []) {
+  const progress = () => isOwner() ? getRecord("progress", {}).done || [] : readLocalProgress(browserStorage())?.done || sessionProgress();
   const extras = h("div");
   let current = true;
   onLeave(() => { current = false; });
   Promise.all([import("./path-choice.js"), import("./project-evidence.js")]).then(([path, project]) => {
-    if (current) extras.replaceChildren(...[path.pathChoice(index), isOwner() ? project.projectEvidence(index) : null].filter(Boolean));
+    if (current) extras.replaceChildren(path.pathChoice(index), project.projectEvidence(index));
   }).catch(() => {
     if (current) extras.append(h("p", { role: "status", text: "Les outils du projet n'ont pas pu être chargés. Recharge la page lorsque le réseau revient." }));
   });
@@ -236,7 +245,7 @@ export function paintStudy(main, index) {
   if (!isOwner()) {
     main.append(
       h("p", {
-        text: "Sans compte : lis le cours, télécharge les TP et prépare tes séances. Le suivi sur cet appareil conserve les quiz et brouillons d’exercices ; active-le et exporte-les depuis l’accueil. Les notes synchronisées, les preuves importées et l’IDE nécessitent le compte propriétaire.",
+        text: "Sans compte : cours, quiz, exercices, notes et dossier de preuves sont disponibles. Le suivi local conserve ton travail sur cet appareil ; tu peux l’exporter depuis l’accueil. La synchronisation et l’IDE du propriétaire demandent sa connexion.",
       }),
       h("a", { href: "#/", text: "Gérer le suivi sur cet appareil" }),
       h("p", {}, h("a", { href: "#/connexion", text: "Connexion propriétaire pour les outils synchronisés" })),
@@ -455,47 +464,8 @@ export function paintStudy(main, index) {
   );
 }
 export function paintGlossary(main, index) {
-  main.replaceChildren(h("h1", { text: "Glossaire du laboratoire" }));
-  const input = h("input", {
-    type: "search",
-    "aria-label": "Rechercher un terme",
-    placeholder: "Gradient, token, attention…",
-  });
-  const list = h("div");
-  const entries = [];
-  for (const id of index.orderedIds) {
-    const lesson = index.byId.get(id).lesson;
-    const text = lesson.sections.find((s) => s.kind === "vocab")?.text || "";
-    for (const part of text.split(/\.\s+(?=[A-ZÀÉÈÎÔ])/)) {
-      const at = part.indexOf(":");
-      if (at > 0 && at < 65)
-        entries.push({
-          term: part.slice(0, at).trim(),
-          definition: part.slice(at + 1).trim(),
-          id,
-        });
-    }
-  }
-  const paint = () => {
-    const q = input.value.toLocaleLowerCase("fr");
-    list.replaceChildren(
-      ...entries
-        .filter((e) =>
-          (e.term + " " + e.definition).toLocaleLowerCase("fr").includes(q),
-        )
-        .sort((a, b) => a.term.localeCompare(b.term, "fr"))
-        .map((e) =>
-          h("article", { class: "sheet" }, [
-            h("h2", { text: e.term }),
-            h("p", { text: e.definition }),
-            h("a", { href: `#/lecon/${e.id}`, text: `Voir la leçon ${e.id}` }),
-          ]),
-        ),
-    );
-  };
-  input.oninput = paint;
-  main.append(input, list);
-  paint();
+  main.replaceChildren(h("h1", { text: "Glossaire du laboratoire" }), h("p", { role: "status", text: "Chargement des définitions…" }));
+  import("./glossary.js").then(mod => { if (main.isConnected && location.hash.includes("/glossaire")) void mod.paintGlossaryPage(main); });
 }
 
 export function levelCheckpoint(level) {

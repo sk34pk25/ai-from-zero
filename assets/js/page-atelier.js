@@ -4,6 +4,8 @@ import { zipStore } from "./zipstore.js";
 import { onLeave } from "./lifecycle.js";
 import { pathChoice } from "./path-choice.js";
 import { publicAssetUrl } from "./public-url.js";
+import { renderMarkdown, tpGuideSection } from "./markdown.js";
+import { projectEvidence } from "./project-evidence.js";
 
 export async function paintAtelier(main, index, targetTp) {
   const controller = new AbortController();
@@ -67,20 +69,12 @@ export async function paintAtelier(main, index, targetTp) {
     "Télécharger mon atelier (.zip)",
   );
   const core = h("ol", { class: "chapter-list" });
-  const titles = [
-    "Fondations",
-    "Apprentissage",
-    "Texte et nombres",
-    "Premier modèle",
-    "Transformer",
-    "Données et ajustement",
-  ];
-  spec.coreLevels.forEach((id, i) =>
+  spec.coreLevels.forEach((id) =>
     core.append(
       h(
         "li",
         {},
-        h("a", { href: `#/niveau/${id}` }, `Niveau ${id} · ${titles[i]}`),
+        h("a", { href: `#/niveau/${id}` }, `Niveau ${id} · ${index.allLevels.find(l => l.id === id)?.title || "Méthode du projet"}`),
       ),
     ),
   );
@@ -91,9 +85,14 @@ export async function paintAtelier(main, index, targetTp) {
         h("h2", { text: `TP ${stage.id} · ${stage.title}` }),
         h("p", { text: stage.contract }),
         h("p", {}, ["À compléter : ", h("code", { text: stage.functions })]),
+        h("p", { class: "muted", text: "Préparer ce TP : étudier toutes les leçons associées avant de le réaliser. Le contrôle individuel ne demande pas les autres TP." }),
+        h("details", { "data-tp-guide": stage.id, open: targetTp === stage.id }, [
+          h("summary", { text: `Énoncé, exemple et étapes du TP ${stage.id}` }),
+          h("div", { "data-tp-content": stage.id }, "Chargement de l’énoncé…"),
+        ]),
         h("p", {}, [
           "Contrôle : ",
-          h("code", { text: `python verifier.py --jusqua ${stage.id}` }),
+          h("code", { text: `python verifier.py --tp ${stage.id}` }),
         ]),
         h(
           "p",
@@ -127,7 +126,7 @@ export async function paintAtelier(main, index, targetTp) {
   spec.documents.forEach((path, i) =>
     selector.append(h("option", { value: path, text: names[i] })),
   );
-  const content = h("pre", {
+  const content = h("div", {
     class: "atelier-guide",
     tabindex: "0",
     "aria-label": "Document de l’atelier",
@@ -142,7 +141,7 @@ export async function paintAtelier(main, index, targetTp) {
       });
       if (!r.ok) throw new Error("Guide absent");
       const text = await r.text();
-      if (ticket === documentTicket) content.textContent = text;
+      if (ticket === documentTicket) content.replaceChildren(renderMarkdown(text, { baseURL: publicAssetUrl(selector.value) }));
     } catch (e) {
       if (e.name !== "AbortError" && ticket === documentTicket)
         content.textContent =
@@ -182,6 +181,7 @@ export async function paintAtelier(main, index, targetTp) {
     ]),
     tpNavigation,
     list,
+    h("details", { class: "atelier-resources" }, [h("summary", { text: "Mon dossier : contrôles, explications et export" }), projectEvidence(index)]),
     h("section", { class: "sheet" }, [
       h("h2", { text: "Le tronc commun recommandé" }),
       core,
@@ -207,6 +207,20 @@ export async function paintAtelier(main, index, targetTp) {
   if (targetTp) {
     const target = list.querySelector(`#tp-${targetTp}`);
     if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start", behavior: "instant" }); }
+  }
+  // Une seule requête pour les douze énoncés ; le TP ciblé est déjà ouvert.
+  try {
+    const response = await fetch(publicAssetUrl("atelier/GUIDE.md"), { signal: controller.signal });
+    if (!response.ok) throw new Error("Énoncés absents");
+    const guide = await response.text();
+    if (controller.signal.aborted) return;
+    for (const stage of spec.stages) {
+      const target = list.querySelector(`[data-tp-content="${stage.id}"]`);
+      const section = tpGuideSection(guide, stage.id);
+      target.replaceChildren(section ? renderMarkdown(section, { baseURL: publicAssetUrl("atelier/GUIDE.md"), titleLevel: 2 }) : h("p", { text: "Consulte le guide téléchargé pour cet énoncé." }));
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") for (const target of list.querySelectorAll("[data-tp-content]")) target.replaceChildren(h("p", {}, ["Énoncé temporairement indisponible. ", h("a", { href: publicAssetUrl("atelier/GUIDE.md"), text: "Ouvrir le guide" })]));
   }
   await loadDoc();
 }

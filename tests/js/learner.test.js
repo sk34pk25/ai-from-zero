@@ -11,6 +11,7 @@ import {
   writeLocalProgress,
 } from "../../assets/js/learner.js";
 import { validateBackup } from "../../assets/js/workspace.js";
+import { localToken, readLocalStudyRecords, writeLocalStudyRecord } from "../../assets/js/local-records.js";
 
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
@@ -80,4 +81,23 @@ test("l'import ignore les étapes inconnues et refuse une sauvegarde sans progre
   );
   assert.deepEqual(restored, { v: 1, done: ["0.1"], quizzes: {}, exercises: {} });
   assert.throws(() => progressFromBackup({ records: {} }, ["0.1"]));
+});
+
+test("notes, favoris et preuves restent dans la sauvegarde locale avec le brouillon", () => {
+  const storage = memoryStorage();
+  enableLocalLearner(storage);
+  const token = localToken(storage);
+  const study = {
+    "lesson/0.18": { note: "Une ligne de A par valeur de x", favorite: true },
+    preferences: { project: { explained: { 1: true } } },
+  };
+  for (const [key, value] of Object.entries(study)) assert.equal(writeLocalStudyRecord(storage, key, value, token), true);
+  const backup = validateBackup(localBackup({ done: [], quizzes: {}, exercises: {} }, new Date(), { "0.18": "# mon code" }, readLocalStudyRecords(storage)));
+  assert.deepEqual(backup.records["lesson/0.18"], { ...study["lesson/0.18"], exerciseCode: "# mon code" });
+  assert.deepEqual(backup.records.preferences, study.preferences);
+  forgetLocalLearner(storage);
+  enableLocalLearner(storage);
+  assert.equal(writeLocalStudyRecord(storage, "lesson/0.18", study["lesson/0.18"], token), false);
+  assert.deepEqual(readLocalStudyRecords(storage), {});
+  assert.equal(writeLocalStudyRecord(storage, "ide/secret.py", {}, localToken(storage)), false);
 });

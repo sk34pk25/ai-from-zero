@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +19,7 @@ JSON_PATH = ROOT / "data" / "curriculum.json"
 DOC_PATH = ROOT / "docs" / "CURRICULUM.md"
 GLANCE_PATH = ROOT / "data" / "glance.json"
 INDEX_PATH = ROOT / "data" / "curriculum-index.json"
-INDEX_STEP_FIELDS = ("id", "title", "tag", "minutes", "visual", "interactive", "codeFile", "codeSymbol", "tpIds")
+INDEX_STEP_FIELDS = ("id", "title", "tag", "minutes", "visual", "interactive", "codeFile", "codeSymbol", "tpIds", "activityKind")
 
 PATTERN = [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
 
@@ -736,6 +737,9 @@ def render_markdown(data: dict) -> str:
         "",
         data["meta"]["description"],
         "",
+        "## Parcours conseillé",
+        f"Le parcours du premier GPT comprend {len(data['learningPath']['coreSteps'])} leçons : niveaux 0 à 4, données en 13.3, puis méthode en 12.1 à 12.6 et 12.10 à 12.12. Il se termine par l’évaluation et le dossier du modèle personnel. Les autres leçons sont des explorations facultatives ; tous les identifiants restent accessibles.",
+        "",
         "## Sommaire",
     ]
     for level in data["levels"]:
@@ -777,12 +781,14 @@ def anchor(level: dict) -> str:
 
 def build_data() -> dict:
     teaching = json.loads((SRC / "teaching.json").read_text(encoding="utf-8"))
+    executable = {row["lessonId"] for row in json.loads((ROOT / "data/exercises.json").read_text(encoding="utf-8"))}
     by_level: dict[int, list] = {level_id: [] for level_id, *_ in LEVELS}
     order = 0
     for path in sorted(SRC.glob("*.md")):
         for fields in parse_file(path):
             level_id = int(fields["id"].split(".")[0])
             lesson = lesson_from_fields(fields, PATTERN[order % len(PATTERN)])
+            lesson["activityKind"] = "python" if lesson["id"] in executable else "practice" if lesson.get("tpIds") else "explanation"
             order += 1
             by_level[level_id].append(lesson)
     levels = []
@@ -828,6 +834,7 @@ def build_data() -> dict:
         "learningPath": {
             "coreLevels": teaching["coreLevels"],
             "afterCoreLevels": teaching["afterCoreLevels"],
+            "coreSteps": teaching["coreSteps"],
         },
     }
 
@@ -858,6 +865,31 @@ def build_index(data: dict | None = None) -> dict:
     }
 
 
+def build_glossary(data: dict | None = None) -> list[dict]:
+    data = data or build_data()
+    core = json.loads((SRC / "glossary.json").read_text(encoding="utf-8"))
+    def normalized(value):
+        return " ".join("".join(c for c in unicodedata.normalize("NFD", value.casefold()) if not unicodedata.combining(c)).split()).strip(" .")
+    aliases = {normalized(name): normalized(row["term"]) for row in core for name in [row["term"], *row.get("aliases", [])]}
+    entries = {}
+    for level in data["levels"]:
+        for lesson in level["steps"]:
+            vocab = next((s.get("text", "") for s in lesson["sections"] if s["kind"] == "vocab"), "")
+            for part in re.split(r"\.\s+(?=[A-ZÀÉÈÎÔ])", vocab):
+                at = part.find(":")
+                if not 0 < at < 65:
+                    continue
+                term, definition = part[:at].strip(), part[at+1:].strip()
+                key = aliases.get(normalized(term), normalized(term))
+                row = entries.setdefault(key, {"term": term, "definition": definition, "contexts": []})
+                context = {"lesson": lesson["id"], "definition": definition}
+                if context not in row["contexts"]: row["contexts"].append(context)
+    for row in core:
+        key = normalized(row["term"])
+        entries.setdefault(key, {"contexts": []}).update(row, common=True)
+    return sorted(entries.values(), key=lambda row: normalized(row["term"]))
+
+
 def main() -> None:
     data = build_data()
     INDEX_PATH.write_text(
@@ -871,6 +903,9 @@ def main() -> None:
         json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     DOC_PATH.write_text(render_markdown(data), encoding="utf-8")
+    glossary = build_glossary(data)
+    (ROOT / "data/glossary.json").write_text(json.dumps(glossary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "data/glossary-core.json").write_text(json.dumps([row for row in glossary if row.get("common")], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     total = sum(len(level["steps"]) for level in data["levels"])
     print(f"{total} leçons -> {JSON_PATH}")
 

@@ -2820,8 +2820,8 @@
     ]
   },
   "12.1": {
-    "phrase": "Une hypothèse utile est une phrase qu'un nombre précis peut contredire.",
-    "image": "Un pari avec la règle écrite à l'avance : quel résultat te donne tort.",
+    "phrase": "Une hypothèse annonce un changement et un résultat qui pourrait la contredire.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "changement précis + mesure + seuil d'échec",
     "trap": "« Mon modèle est meilleur » n'est pas vérifiable.",
     "steps": [
@@ -2840,8 +2840,8 @@
     ]
   },
   "12.2": {
-    "phrase": "Une variante n'a de sens que comparée à une baseline qui fait la même tâche.",
-    "image": "Chronométrer un trajet contre le bus, pas contre rester chez soi.",
+    "phrase": "Une baseline donne un point de comparaison choisi avant la variante.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "bigramme → uniforme · transformer → variante",
     "trap": "Comparer à une baseline plus faible que nécessaire flatte la variante.",
     "steps": [
@@ -2860,8 +2860,8 @@
     ]
   },
   "12.3": {
-    "phrase": "Une ablation change une seule pièce à la fois.",
-    "image": "Changer un ingrédient, goûter, remettre l'ancien.",
+    "phrase": "Une comparaison contrôlée change une seule variable à la fois.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "run_ablation : une config par expérience",
     "trap": "Changer dos, graine et taille ensemble : on ne sait plus ce qui a compté.",
     "steps": [
@@ -2880,8 +2880,8 @@
     ]
   },
   "12.4": {
-    "phrase": "Chaque métrique a une unité ; on ne mélange pas les unités.",
-    "image": "Des centimètres et des degrés ne se moyennent pas.",
+    "phrase": "Une métrique est un nombre avec une unité, des cibles et une règle de calcul.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "perplexité · forme · causalité · octets · FLOPs",
     "trap": "Trier un tableau n'est pas mesurer : les colonnes doivent venir d'un banc.",
     "steps": [
@@ -2900,8 +2900,8 @@
     ]
   },
   "12.5": {
-    "phrase": "Un banc d'essai garde les mêmes entrées et métriques pour tous les systèmes.",
-    "image": "La même piste, les mêmes chronos, plusieurs coureurs.",
+    "phrase": "Un banc d’essai fige les données et le protocole avant les mesures.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "entrées fixes + métriques fixes",
     "trap": "Changer le banc pour un seul système annule la comparaison.",
     "steps": [
@@ -2920,8 +2920,8 @@
     ]
   },
   "12.6": {
-    "phrase": "Qualité, latence, mémoire, énergie : un gain sur une colonne peut coûter ailleurs.",
-    "image": "Une voiture rapide qui vide son réservoir en dix minutes.",
+    "phrase": "Qualité, temps, mémoire et énergie décrivent des dimensions différentes.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "parameter_bytes · attention_flops · qualité",
     "trap": "Une estimation de FLOPs n'est pas une durée, et l'énergie n'est pas mesurée ici.",
     "steps": [
@@ -3000,8 +3000,8 @@
     ]
   },
   "12.10": {
-    "phrase": "Un échec mesuré est un résultat : on en cherche la cause.",
-    "image": "Un gâteau plat : vérifier la levure avant de changer de four.",
+    "phrase": "Un échec documenté aide à distinguer un bug d’une hypothèse fausse.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "fuite du futur = bug, pas créativité",
     "trap": "Cacher un test rouge abîme plus le projet qu'un modèle moyen.",
     "steps": [
@@ -3020,8 +3020,8 @@
     ]
   },
   "12.11": {
-    "phrase": "Itérer, c'est changer un seul facteur après avoir lu une mesure.",
-    "image": "Changer la levure, pas toute la recette.",
+    "phrase": "Une itération répond à une observation sur la validation, avec un seul changement.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "nouvelle config + nouvelle mesure, même banc",
     "trap": "Empiler des idées sans relire les mesures.",
     "steps": [
@@ -3040,8 +3040,8 @@
     ]
   },
   "12.12": {
-    "phrase": "Documenter la candidate pour qu'un autre puisse tout vérifier.",
-    "image": "Une fiche posée sur la maquette : à quoi elle sert, comment la refaire.",
+    "phrase": "Ton dossier relie le code personnel, les données, les mesures et tes explications.",
+    "image": "Un carnet d’expérience : question, méthode, résultat et limites.",
     "key": "hypothèse · baseline · tests · coûts · limites",
     "trap": "Oublier les limites non mesurées dans le compte rendu.",
     "steps": [

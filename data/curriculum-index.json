@@ -246,7 +246,8 @@
       2,
       3,
       4,
-      13
+      13,
+      12
     ],
     "afterCoreLevels": [
       5,
@@ -255,8 +256,95 @@
       8,
       9,
       10,
-      11,
-      12
+      11
+    ],
+    "coreSteps": [
+      "0.1",
+      "0.2",
+      "0.3",
+      "0.4",
+      "0.5",
+      "0.6",
+      "0.7",
+      "0.8",
+      "0.9",
+      "0.10",
+      "0.11",
+      "0.12",
+      "0.13",
+      "0.14",
+      "0.15",
+      "0.16",
+      "0.17",
+      "0.18",
+      "0.19",
+      "0.20",
+      "0.21",
+      "0.22",
+      "0.23",
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6",
+      "1.7",
+      "1.8",
+      "1.9",
+      "1.10",
+      "1.11",
+      "1.12",
+      "1.13",
+      "1.14",
+      "1.15",
+      "1.16",
+      "1.17",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4",
+      "2.5",
+      "2.6",
+      "2.7",
+      "2.8",
+      "2.9",
+      "2.10",
+      "2.11",
+      "3.1",
+      "3.2",
+      "3.3",
+      "3.4",
+      "3.5",
+      "3.6",
+      "3.7",
+      "3.8",
+      "3.9",
+      "3.10",
+      "3.11",
+      "4.1",
+      "4.2",
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6",
+      "4.7",
+      "4.8",
+      "4.9",
+      "4.10",
+      "4.11",
+      "4.12",
+      "4.13",
+      "4.14",
+      "13.3",
+      "12.1",
+      "12.2",
+      "12.3",
+      "12.4",
+      "12.5",
+      "12.6",
+      "12.10",
+      "12.11",
+      "12.12"
     ]
   },
   "levels": [
@@ -285,7 +373,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.2",
@@ -296,7 +385,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.3",
@@ -307,7 +397,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.4",
@@ -318,7 +409,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.5",
@@ -329,7 +421,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.6",
@@ -340,7 +433,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.7",
@@ -351,7 +445,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.8",
@@ -362,7 +457,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.9",
@@ -373,7 +469,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.10",
@@ -384,7 +481,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.11",
@@ -395,7 +493,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.12",
@@ -406,7 +505,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.13",
@@ -417,7 +517,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.14",
@@ -428,7 +529,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "0.15",
@@ -441,7 +543,8 @@
           "codeSymbol": "summarize",
           "tpIds": [
             6
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "0.16",
@@ -452,7 +555,8 @@
           "interactive": false,
           "codeFile": "model/mathutil.py",
           "codeSymbol": "softmax",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.17",
@@ -463,7 +567,8 @@
           "interactive": true,
           "codeFile": "model/attention.py",
           "codeSymbol": "scaled_dot_product_attention",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.18",
@@ -474,7 +579,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.19",
@@ -485,7 +591,8 @@
           "interactive": true,
           "codeFile": "model/mathutil.py",
           "codeSymbol": "softmax",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.20",
@@ -498,7 +605,8 @@
           "codeSymbol": "numerical_derivative",
           "tpIds": [
             4
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "0.21",
@@ -509,7 +617,8 @@
           "interactive": false,
           "codeFile": "model/autograd.py",
           "codeSymbol": "Tensor",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.22",
@@ -520,7 +629,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "summarize",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "0.23",
@@ -531,7 +641,8 @@
           "interactive": false,
           "codeFile": "model/stats.py",
           "codeSymbol": "build_report",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -560,7 +671,8 @@
           "interactive": false,
           "codeFile": "model/mlp.py",
           "codeSymbol": "train_linear_regression",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.2",
@@ -571,7 +683,8 @@
           "interactive": false,
           "codeFile": "model/train.py",
           "codeSymbol": "train_linear_classifier",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.3",
@@ -582,7 +695,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "split_sequence",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.4",
@@ -593,7 +707,8 @@
           "interactive": false,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.parameter_count",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "1.5",
@@ -604,7 +719,8 @@
           "interactive": false,
           "codeFile": "model/mlp.py",
           "codeSymbol": "neuron",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.6",
@@ -615,7 +731,8 @@
           "interactive": true,
           "codeFile": "model/mlp.py",
           "codeSymbol": "relu",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "1.7",
@@ -626,7 +743,8 @@
           "interactive": true,
           "codeFile": "model/mlp.py",
           "codeSymbol": "mlp_forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.8",
@@ -637,7 +755,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "1.9",
@@ -648,7 +767,8 @@
           "interactive": true,
           "codeFile": "model/mathutil.py",
           "codeSymbol": "cross_entropy",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "1.10",
@@ -661,7 +781,8 @@
           "codeSymbol": "cross_entropy_grad",
           "tpIds": [
             4
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "1.11",
@@ -674,7 +795,8 @@
           "codeSymbol": "Tensor.__mul__",
           "tpIds": [
             4
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "1.12",
@@ -687,7 +809,8 @@
           "codeSymbol": "Tensor.backward",
           "tpIds": [
             5
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "1.13",
@@ -698,7 +821,8 @@
           "interactive": true,
           "codeFile": "model/mlp.py",
           "codeSymbol": "train_linear_regression",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "1.14",
@@ -711,7 +835,8 @@
           "codeSymbol": "AdamW.step",
           "tpIds": [
             11
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "1.15",
@@ -725,7 +850,8 @@
           "tpIds": [
             5,
             6
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "1.16",
@@ -738,7 +864,8 @@
           "codeSymbol": "train_gpt",
           "tpIds": [
             11
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "1.17",
@@ -749,7 +876,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "corpus_loss",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -780,7 +908,8 @@
           "codeSymbol": "CharTokenizer.encode",
           "tpIds": [
             1
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "2.2",
@@ -791,7 +920,8 @@
           "interactive": false,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "CharTokenizer.encode",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "2.3",
@@ -804,7 +934,8 @@
           "codeSymbol": "CharTokenizer.encode",
           "tpIds": [
             1
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "2.4",
@@ -815,7 +946,8 @@
           "interactive": true,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "CharTokenizer.encode",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "2.5",
@@ -828,7 +960,8 @@
           "codeSymbol": "CharTokenizer.encode",
           "tpIds": [
             1
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "2.6",
@@ -839,7 +972,8 @@
           "interactive": true,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "MiniBPE",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "2.7",
@@ -850,7 +984,8 @@
           "interactive": true,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "MiniBPE.encode",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "2.8",
@@ -861,7 +996,8 @@
           "interactive": true,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "CharTokenizer.encode",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "2.9",
@@ -872,7 +1008,8 @@
           "interactive": true,
           "codeFile": "model/autograd.py",
           "codeSymbol": "embedding",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "2.10",
@@ -883,7 +1020,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "2.11",
@@ -896,7 +1034,8 @@
           "codeSymbol": "sample_batch",
           "tpIds": [
             2
-          ]
+          ],
+          "activityKind": "python"
         }
       ]
     },
@@ -927,7 +1066,8 @@
           "codeSymbol": "BigramModel.observe",
           "tpIds": [
             2
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.2",
@@ -938,7 +1078,8 @@
           "interactive": true,
           "codeFile": "model/bigram.py",
           "codeSymbol": "BigramModel.observe",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "3.3",
@@ -951,7 +1092,8 @@
           "codeSymbol": "sample_batch",
           "tpIds": [
             2
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.4",
@@ -962,7 +1104,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "3.5",
@@ -975,7 +1118,8 @@
           "codeSymbol": "softmax",
           "tpIds": [
             3
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.6",
@@ -988,7 +1132,8 @@
           "codeSymbol": "cross_entropy",
           "tpIds": [
             3
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.7",
@@ -1001,7 +1146,8 @@
           "codeSymbol": "generate",
           "tpIds": [
             12
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.8",
@@ -1012,7 +1158,8 @@
           "interactive": true,
           "codeFile": "model/tiny_lm.py",
           "codeSymbol": "train_tiny_lm",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "3.9",
@@ -1025,7 +1172,8 @@
           "codeSymbol": "main",
           "tpIds": [
             12
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "3.10",
@@ -1036,7 +1184,8 @@
           "interactive": true,
           "codeFile": "model/bigram.py",
           "codeSymbol": "BigramModel.perplexity",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "3.11",
@@ -1049,7 +1198,8 @@
           "codeSymbol": "save_checkpoint",
           "tpIds": [
             12
-          ]
+          ],
+          "activityKind": "python"
         }
       ]
     },
@@ -1078,7 +1228,8 @@
           "interactive": true,
           "codeFile": "model/attention.py",
           "codeSymbol": "scaled_dot_product_attention",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "4.2",
@@ -1091,7 +1242,8 @@
           "codeSymbol": "TinyGPT._attention",
           "tpIds": [
             7
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "4.3",
@@ -1104,7 +1256,8 @@
           "codeSymbol": "scaled_dot_product_attention",
           "tpIds": [
             7
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.4",
@@ -1117,7 +1270,8 @@
           "codeSymbol": "scaled_dot_product_attention",
           "tpIds": [
             7
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.5",
@@ -1130,7 +1284,8 @@
           "codeSymbol": "causal_mask",
           "tpIds": [
             7
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.6",
@@ -1143,7 +1298,8 @@
           "codeSymbol": "scaled_dot_product_attention",
           "tpIds": [
             7
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.7",
@@ -1156,7 +1312,8 @@
           "codeSymbol": "TinyGPT._attention",
           "tpIds": [
             8
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.8",
@@ -1169,7 +1326,8 @@
           "codeSymbol": "TinyGPT.forward",
           "tpIds": [
             9
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.9",
@@ -1182,7 +1340,8 @@
           "codeSymbol": "layernorm",
           "tpIds": [
             9
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.10",
@@ -1195,7 +1354,8 @@
           "codeSymbol": "TinyGPT._ffn",
           "tpIds": [
             9
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.11",
@@ -1208,7 +1368,8 @@
           "codeSymbol": "TinyGPT.forward",
           "tpIds": [
             9
-          ]
+          ],
+          "activityKind": "python"
         },
         {
           "id": "4.12",
@@ -1221,7 +1382,8 @@
           "codeSymbol": "TinyGPT.forward",
           "tpIds": [
             10
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "4.13",
@@ -1234,7 +1396,8 @@
           "codeSymbol": "TinyGPT.forward",
           "tpIds": [
             10
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "4.14",
@@ -1248,7 +1411,8 @@
           "tpIds": [
             10,
             12
-          ]
+          ],
+          "activityKind": "python"
         }
       ]
     },
@@ -1277,7 +1441,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.2",
@@ -1288,7 +1453,8 @@
           "interactive": true,
           "codeFile": "model/attention.py",
           "codeSymbol": "apply_rope",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.3",
@@ -1299,7 +1465,8 @@
           "interactive": true,
           "codeFile": "model/mathutil.py",
           "codeSymbol": "rmsnorm",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.4",
@@ -1310,7 +1477,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT._ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.5",
@@ -1321,7 +1489,8 @@
           "interactive": true,
           "codeFile": "model/attention.py",
           "codeSymbol": "repeat_kv",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "5.6",
@@ -1332,7 +1501,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.7",
@@ -1343,7 +1513,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "5.8",
@@ -1354,7 +1525,8 @@
           "interactive": true,
           "codeFile": "model/transformer.py",
           "codeSymbol": "TinyGPT.__init__",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "5.9",
@@ -1365,7 +1537,8 @@
           "interactive": true,
           "codeFile": "model/bench.py",
           "codeSymbol": "attention_flops",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "5.10",
@@ -1376,7 +1549,8 @@
           "interactive": true,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "train_gpt",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         }
       ]
     },
@@ -1405,7 +1579,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "parameter_bytes",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "6.2",
@@ -1416,7 +1591,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "parameter_bytes",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.3",
@@ -1427,7 +1603,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "attention_flops",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.4",
@@ -1438,7 +1615,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "attention_flops",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.5",
@@ -1449,7 +1627,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "sample_batch",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.6",
@@ -1460,7 +1639,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "parameter_bytes",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.7",
@@ -1471,7 +1651,8 @@
           "interactive": true,
           "codeFile": "model/autograd.py",
           "codeSymbol": "Tensor.zero_grad",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "6.8",
@@ -1482,7 +1663,8 @@
           "interactive": true,
           "codeFile": "model/autograd.py",
           "codeSymbol": "Tensor.backward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.9",
@@ -1493,7 +1675,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "parameter_bytes",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.10",
@@ -1504,7 +1687,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "run_ablation",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.11",
@@ -1515,7 +1699,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "train_gpt",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "6.12",
@@ -1526,7 +1711,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "quality_table",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -1555,7 +1741,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "expert_forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.2",
@@ -1566,7 +1753,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.3",
@@ -1577,7 +1765,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.4",
@@ -1588,7 +1777,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.5",
@@ -1599,7 +1789,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "7.6",
@@ -1610,7 +1801,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "load_balance_loss",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.7",
@@ -1621,7 +1813,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "load_balance_loss",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.8",
@@ -1632,7 +1825,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "7.9",
@@ -1643,7 +1837,8 @@
           "interactive": true,
           "codeFile": "model/moe.py",
           "codeSymbol": "moe_ffn",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -1672,7 +1867,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.2",
@@ -1683,7 +1879,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.3",
@@ -1694,7 +1891,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.4",
@@ -1705,7 +1903,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "sequential_affine",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "8.5",
@@ -1716,7 +1915,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "parallel_affine",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "8.6",
@@ -1727,7 +1927,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_params",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.7",
@@ -1738,7 +1939,8 @@
           "interactive": true,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone._ssm",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.8",
@@ -1749,7 +1951,8 @@
           "interactive": true,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "8.9",
@@ -1760,7 +1963,8 @@
           "interactive": true,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -1789,7 +1993,8 @@
           "interactive": false,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "patchify",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.2",
@@ -1800,7 +2005,8 @@
           "interactive": true,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "patchify",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "9.3",
@@ -1811,7 +2017,8 @@
           "interactive": true,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "project_patches",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.4",
@@ -1822,7 +2029,8 @@
           "interactive": false,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "patchify",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.5",
@@ -1833,7 +2041,8 @@
           "interactive": false,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "project_patches",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.6",
@@ -1844,7 +2053,8 @@
           "interactive": true,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "patchify",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.7",
@@ -1855,7 +2065,8 @@
           "interactive": true,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "project_patches",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.8",
@@ -1866,7 +2077,8 @@
           "interactive": false,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "9.9",
@@ -1877,7 +2089,8 @@
           "interactive": false,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "patchify",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -1906,7 +2119,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "build_context",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.2",
@@ -1917,7 +2131,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "bow_vector",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.3",
@@ -1928,7 +2143,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "retrieve",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "10.4",
@@ -1939,7 +2155,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "build_context",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.5",
@@ -1950,7 +2167,8 @@
           "interactive": true,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.6",
@@ -1961,7 +2179,8 @@
           "interactive": true,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.7",
@@ -1972,7 +2191,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "retrieve",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "10.8",
@@ -1983,7 +2203,8 @@
           "interactive": true,
           "codeFile": "model/memory.py",
           "codeSymbol": "build_context",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -2012,7 +2233,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "run_ablation",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.2",
@@ -2023,7 +2245,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "bigram_versus_uniform",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.3",
@@ -2034,7 +2257,8 @@
           "interactive": false,
           "codeFile": "model/tokenizer.py",
           "codeSymbol": "CharTokenizer",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.4",
@@ -2045,7 +2269,8 @@
           "interactive": false,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.5",
@@ -2056,7 +2281,8 @@
           "interactive": false,
           "codeFile": "model/ssm.py",
           "codeSymbol": "selective_scan",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.6",
@@ -2067,7 +2293,8 @@
           "interactive": false,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.7",
@@ -2078,7 +2305,8 @@
           "interactive": false,
           "codeFile": "model/multimodal.py",
           "codeSymbol": "project_patches",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "11.8",
@@ -2089,7 +2317,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "run_ablation",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     },
@@ -2118,7 +2347,8 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "run_ablation",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.2",
@@ -2129,18 +2359,20 @@
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "bigram_versus_uniform",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.3",
-          "title": "L'ablation",
+          "title": "L’ablation",
           "tag": "Architecture",
           "minutes": 30,
           "visual": "stack",
           "interactive": false,
           "codeFile": "model/experiment.py",
           "codeSymbol": "run_ablation",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.4",
@@ -2151,18 +2383,20 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "quality_table",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "12.5",
-          "title": "Un banc d'essai",
+          "title": "Un banc d’essai",
           "tag": "Architecture",
           "minutes": 30,
           "visual": "stack",
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "corpus_loss",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.6",
@@ -2173,7 +2407,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "parameter_bytes",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.7",
@@ -2184,7 +2419,8 @@
           "interactive": false,
           "codeFile": "model/backbone.py",
           "codeSymbol": "Backbone.forward",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.8",
@@ -2195,7 +2431,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "train_gpt",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.9",
@@ -2206,7 +2443,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "train_gpt",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.10",
@@ -2217,7 +2455,8 @@
           "interactive": false,
           "codeFile": "model/bench.py",
           "codeSymbol": "quality_table",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.11",
@@ -2228,7 +2467,8 @@
           "interactive": false,
           "codeFile": "model/gpt_train.py",
           "codeSymbol": "train_gpt",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "12.12",
@@ -2241,7 +2481,8 @@
           "codeSymbol": "save_checkpoint",
           "tpIds": [
             12
-          ]
+          ],
+          "activityKind": "python"
         }
       ]
     },
@@ -2270,7 +2511,8 @@
           "interactive": true,
           "codeFile": "model/bpe.py",
           "codeSymbol": "BPETokenizer.train",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "13.2",
@@ -2281,7 +2523,8 @@
           "interactive": true,
           "codeFile": "model/bpe.py",
           "codeSymbol": "BPETokenizer.save",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "13.3",
@@ -2294,7 +2537,8 @@
           "codeSymbol": "prepared_splits",
           "tpIds": [
             12
-          ]
+          ],
+          "activityKind": "practice"
         },
         {
           "id": "13.4",
@@ -2305,7 +2549,8 @@
           "interactive": true,
           "codeFile": "model/export_js.py",
           "codeSymbol": "export_browser",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "13.5",
@@ -2316,7 +2561,8 @@
           "interactive": false,
           "codeFile": "model/finetune.py",
           "codeSymbol": "format_pair",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "13.6",
@@ -2327,7 +2573,8 @@
           "interactive": true,
           "codeFile": "model/finetune.py",
           "codeSymbol": "example_ids",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         },
         {
           "id": "13.7",
@@ -2338,7 +2585,8 @@
           "interactive": true,
           "codeFile": "model/lora.py",
           "codeSymbol": "init_lora",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "explanation"
         },
         {
           "id": "13.8",
@@ -2349,7 +2597,8 @@
           "interactive": true,
           "codeFile": "model/finetune.py",
           "codeSymbol": "evaluate_instructions",
-          "tpIds": []
+          "tpIds": [],
+          "activityKind": "python"
         }
       ]
     }

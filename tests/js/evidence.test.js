@@ -9,10 +9,10 @@ test("le parcours actif règle la reprise et les voisins sans perdre des leçons
   const data = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url)));
   const index = indexCurriculum(data);
   const done = index.lessons.filter(({ level }) => level.id <= 4).map(({ lesson }) => lesson.id);
-  assert.equal(completionStats(index.orderedIds, done).nextId, "13.1");
-  assert.equal(neighbors(index.orderedIds, "4.14").next, "13.1");
+  assert.equal(completionStats(index.orderedIds, done).nextId, "13.3");
+  assert.equal(neighbors(index.orderedIds, "4.14").next, "13.3");
   assert.equal(index.orderedIds.length, 161);
-  assert.equal(index.coreIds.length, 84);
+  assert.equal(index.coreIds.length, 86);
   applyLearningPath(index, "all");
   assert.equal(neighbors(index.orderedIds, "4.14").next, "5.1");
   assert.equal(completionStats(index.orderedIds, done).count, done.length);

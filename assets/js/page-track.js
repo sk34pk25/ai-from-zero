@@ -50,7 +50,7 @@ export function paintTrack(main, { track, done, reports, loadReports, isCurrent 
     h("section", { class: "callout" }, [
       h("h2", { text: "Construire avec tes fonctions" }),
       h("p", {
-        text: "Tronc commun : niveaux 0, 1, 2, 3, 4 puis 13. Les cases de cette piste indiquent les leçons cochées ; la preuve de maîtrise est le projet final entraîné sur tes données, avec validation, baselines et rechargement.",
+        text: "Cette piste relie les composants du modèle de référence à leurs leçons. Pour construire le tien, suis les niveaux 0 à 4, la leçon 13.3 sur les données, puis les neuf leçons de méthode sélectionnées au niveau 12 : mesurer, comparer et livrer. La preuve de maîtrise est ton projet entraîné sur tes données, avec validation, baselines et rechargement.",
       }),
       h("a", {
         class: "button button-primary",

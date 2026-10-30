@@ -1727,6 +1727,62 @@ main[tabindex="-1"]:focus { outline: none; }
 }
 .visual-host[data-lab] .token-board button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
 
+/* Un même cahier, avec moins de chrome et des consignes à leur point d'usage. */
+.hero { grid-template-columns: minmax(0, 1fr); }
+.hero .lead { max-width: 54ch; }
+.side-reference { display:block; margin:.65rem 0; font-size:.85rem; }
+.course-progress { padding:1rem 1.1rem; }
+.course-progress .path-progress-grid { gap:.7rem; }
+.course-progress h3 { font-size:1rem; margin:.3rem 0; }
+.course-progress p { margin:.4rem 0; }
+.course-progress .muted { font-size:.85rem; }
+.glance-cards { gap:.5rem; }
+.glance-card { padding:.7rem .8rem; border-radius:10px; }
+.glance-card p { margin:.35rem 0 0; }
+.glance-label { font-size:.75rem; }
+.lesson-objectives { padding:1rem; }
+.lesson-objectives ul { margin:.55rem 0; }
+.lesson-objectives > p { margin:.5rem 0; }
+.lesson-deep-body .block-code { margin:1rem 0; }
+.lesson-deep, .lesson-deep-body, .lesson-deep-body > *, .lesson-deep-body .block-code > * { min-width:0; max-width:100%; }
+.lesson-deep-body { overflow-wrap:anywhere; }
+.lesson-deep-body pre { max-width:100%; overflow:auto; }
+.lesson-deep-body .block { padding:1rem; margin:.8rem 0; }
+.lesson-deep-body .callout { margin:.8rem 0; padding:1rem; }
+.home-catalogue { margin-top:1.5rem; }
+.home-catalogue > summary, .project-entry > h2 { font-weight:700; }
+.rendered-guide { white-space:normal; font-family:var(--sans); line-height:1.7; overflow-wrap:anywhere; }
+.rendered-guide h2,.rendered-guide h3,.rendered-guide h4 { margin:1.2rem 0 .6rem; }
+.rendered-guide pre { white-space:pre; overflow:auto; padding:.9rem; background:var(--bg); border:1px solid var(--line); border-radius:10px; max-width:100%; }
+.guide-code { min-width:0; }
+.guide-code .copy-button { margin-top:.5rem; }
+.guide-table-scroll { max-width:100%; overflow:auto; }
+.guide-table { border-collapse:collapse; min-width:30rem; font-size:.9rem; }
+.guide-table th,.guide-table td { padding:.5rem; border:1px solid var(--line); vertical-align:top; }
+.atelier-guide { white-space:normal; font-family:var(--sans); max-height:none; }
+[data-tp-guide] { margin:.8rem 0; }
+[data-tp-guide] > summary { cursor:pointer; font-weight:600; padding:.5rem 0; }
+.project-evidence { margin:1rem 0; }
+.project-evidence li { margin:.7rem 0; }
+.term-help { color:inherit; font:inherit; border:0; border-bottom:1px dotted var(--accent); background:none; padding:0 .1rem; cursor:help; text-align:inherit; }
+.term-definition { display:block; padding:.6rem .8rem; margin:.5rem 0; background:var(--accent-soft); border-left:3px solid var(--accent); font-size:.9em; }
+.term-definition[hidden] { display:none; }
+.glossary-list { display:grid; gap:1rem; margin:1rem 0; }
+.glossary-list .sheet { margin:0; }
+.glossary-list h2 { font-size:1.35rem; }
+.term-example { border-left:3px solid var(--line-strong); padding-left:.8rem; }
+@media (max-width:600px) {
+  .hero { padding-top:1.1rem; }
+  .hero .hero-actions > .button-primary { flex-basis:100%; justify-content:center; }
+  .hero .lead { font-size:1.05rem; line-height:1.65; }
+  .lesson-objectives h2 { font-size:1.3rem; }
+  .lesson-objectives ul { padding-left:1.2rem; }
+  .glance-cards { grid-template-columns:minmax(0,1fr); }
+  .glance-card { padding:.55rem .75rem; }
+  .phase-card { padding:.4rem 0; }
+  .lesson-contents button { font-size:.82rem; padding:.4rem; min-height:44px; }
+}
+
 /* Parcours guidé : des repères lisibles avant les activités. */
 .path-progress-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
 .path-progress-grid > * { min-width:0; }

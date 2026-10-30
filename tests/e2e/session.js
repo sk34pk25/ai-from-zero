@@ -28,14 +28,21 @@ function tableName(url) {
 export async function installOwner(page, { userId = OWNER_ID, tables = {}, sharedLearning = null } = {}) {
   const writes = [];
   const learning = sharedLearning || new Map((tables.learning_records||[]).map(r=>[r.key,r]));
+  // L'API simulée reste sur la boucle locale, même si une interception manque.
+  // L'auth de production exige HTTPS ; seule la CSP de cette fixture autorise ce faux serveur local.
+  await page.route(/^http:\/\/127\.0\.0\.1:4173\/(?:index\.html)?(?:\?.*)?$/, async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace("connect-src 'self'", "connect-src 'self' https://127.0.0.1:4173");
+    await route.fulfill({ response, body });
+  });
   await page.route(/\/assets\/config\.js(?:\?.*)?$/, (route) => route.fulfill({
     contentType: "text/javascript",
-    body: `export const SUPABASE_URL = "https://example.supabase.co";
+    body: `export const SUPABASE_URL = "https://127.0.0.1:4173";
 export const SUPABASE_ANON_KEY = "abcdefghijklmnopqrstuvwxyz012345";
 export const OWNER_ID = "${OWNER_ID}";
 `,
   }));
-  await page.route("https://example.supabase.co/**", async (route) => {
+  await page.route("https://127.0.0.1:4173/**", async (route) => {
     const request = route.request();
     if (request.method() === "OPTIONS") {
       await route.fulfill({ status: 204, headers: CORS });

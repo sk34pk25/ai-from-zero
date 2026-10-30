@@ -37,11 +37,24 @@ export function applyLearningPath(index, path) {
   index.levels = index.path === "core" && core.length
     ? [...index.allLevels].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
     : [...index.allLevels];
-  index.orderedIds = index.levels.flatMap((l) => l.steps.map((s) => s.id));
-  index.coreIds = index.allLevels.filter((l) => core.includes(l.id)).flatMap((l) => l.steps.map((s) => s.id));
+  index.orderedIds = index.numericIds;
+  index.coreIds = index.learningPath.coreSteps?.filter(id => index.byId.has(id))
+    ?? index.allLevels.filter((l) => core.includes(l.id)).flatMap((l) => l.steps.map((s) => s.id));
   index.explorationIds = index.orderedIds.filter((id) => !index.coreIds.includes(id));
+  if (index.path === "core") index.orderedIds = [...index.coreIds, ...index.explorationIds];
   index.activeIds = index.path === "core" && index.coreIds.length ? index.coreIds : index.orderedIds;
   return index;
+}
+
+/** Le catalogue conserve tous les identifiants ; cette vue ne montre que le groupe choisi. */
+export function pathLevels(index, core = true) {
+  const ids = new Set(core ? index.coreIds : index.explorationIds);
+  return index.levels.map(level => ({ ...level, steps: level.steps.filter(s => ids.has(s.id)) })).filter(level => level.steps.length);
+}
+
+export function lessonTiming(lesson) {
+  const words = [lesson.why, lesson.build, lesson.review, ...(lesson.sections || []).map(s => s.text || "")].filter(Boolean).join(" ").split(/\s+/).length;
+  return { reading: Math.max(1, Math.round(words / 200)), activity: Number(lesson.minutes) || 15 };
 }
 
 export function preferredLearningPath() {

@@ -4,9 +4,9 @@ Lis d'abord INSTALLATION.md. Ouvre `eleve.py` : les interfaces sont présentes, 
 
 Le projet est autonome après téléchargement : il ne dépend pas du dossier `model/`. `moteur.py` fournit des primitives de tableaux différentiables, pas un modèle de langage. Tu écris le tokenizer, le graphe scalaire d'initiation, l'attention, les blocs, le decoder et le pas AdamW. `commun.py` initialise les tableaux et lit/écrit les fichiers ; `entrainer.py` appelle TES fonctions. Tu peux remplacer ensuite le moteur de tableaux en conservant ses tests.
 
-Le tronc commun suit les niveaux **0, 1, 2, 3, 4, puis 13**. Les niveaux 5 et 6 étudient variantes et contraintes ; MoE, SSM et multimodalité sont des extensions. Les durées des pages sont des estimations de lecture/activité, pas une garantie de maîtrise. Prévois du temps pour les essais et le projet final.
+Le tronc commun suit les niveaux **0 à 4, la leçon 13.3 sur les données, puis 12.1 à 12.6 et 12.10 à 12.12 pour mesurer et livrer ton modèle**. Les niveaux 5 et 6 étudient variantes et contraintes ; MoE, SSM et multimodalité sont des extensions. Les durées des pages sont des estimations de lecture/activité, pas une garantie de maîtrise. Prévois du temps pour les essais et le projet final.
 
-Pour chaque TP : écris d'abord les formes et un exemple à la main, complète le code, lance `python verifier.py --jusqua N`, explique un cas limite. Les tests sont publics ; leur réussite ne certifie ni indépendance du code ni compréhension.
+Pour chaque TP : écris d'abord les formes et un exemple à la main, complète le code, lance `python verifier.py --tp N`, explique un cas limite. Les tests sont publics ; leur réussite ne certifie ni indépendance du code ni compréhension.
 
 Tu peux commencer certains TP avant les autres : `python verifier.py --tp 5` contrôle uniquement l’autograd scalaire au niveau 1. Les TP 1–3 utilisent les niveaux 2–3 ; `--jusqua N` reste cumulatif. Lis FONDATIONS.md avant l’autograd sur tableaux et PANNES.md pour diagnostiquer un échec. Mon espace accepte controles.json et distingue contrôles publics, explications déclarées et leçons lues.
 
@@ -14,13 +14,13 @@ Tu peux commencer certains TP avant les autres : `python verifier.py --tp 5` con
 
 Écris `vocabulaire`, `encoder`, `decoder`. Le vocabulaire est un dictionnaire de caractères distincts triés vers des entiers contigus à partir de zéro. Le décodage inverse la table et concatène, sans supprimer les espaces ni accents. Pour « abba », attends [0,1,1,0] puis le texte d'origine. Un caractère absent doit lever KeyError ; ne reconstruis pas un vocabulaire pendant encode.
 
-Contrôle : `python verifier.py --jusqua 1`. Essaie aussi une chaîne vide et un accent. Explique pourquoi modifier l'ordre des identifiants après entraînement change le sens des sorties.
+Contrôle : `python verifier.py --tp 1`. Essaie aussi une chaîne vide et un accent. Explique pourquoi modifier l'ordre des identifiants après entraînement change le sens des sorties.
 
 ## TP 2 — Entrée et cible (2.11, 3.1, 3.3)
 
 Écris `fenetres(ids,taille)` qui renvoie deux tableaux entiers (N,T). Pour [4,4,9,4] et T=2, x vaut [[4,4],[4,9]], y vaut [[4,9],[9,4]]. N = len(ids)-T : il faut une cible après la dernière entrée. Refuse T<1 et un texte trop court. Le lanceur échantillonnera ensuite des fenêtres au lieu de toutes les stocker.
 
-Contrôle : `--jusqua 2`. Dessine le décalage et explique pourquoi x=y créerait une tâche de recopie.
+Contrôle : `--tp 2`. Dessine le décalage et explique pourquoi x=y créerait une tâche de recopie.
 
 ## TP 3 — Softmax et entropie croisée (3.5, 3.6)
 
@@ -32,13 +32,13 @@ Contrôle : `--jusqua 2`. Dessine le décalage et explique pourquoi x=y créerai
 3. softmax = [0,0900 ; 0,2447 ; 0,6652] ; la somme fait bien 1.
 4. Entropie croisée = log(somme des exp) − score décalé de la cible = log(1,5032) − 0 = 0,4076, c'est-à-dire −log(0,6652).
 
-Contrôle : `--jusqua 3`. Deux logits 1000 donnent [.5,.5], l'uniforme sur V=5 donne log(5). Explique pourquoi une loss est en nats et n'est comparable entre tokenizers qu'après passage à une unité commune, comme les nats par caractère.
+Contrôle : `--tp 3`. Deux logits 1000 donnent [.5,.5], l'uniforme sur V=5 donne log(5). Explique pourquoi une loss est en nats et n'est comparable entre tokenizers qu'après passage à une unité commune, comme les nats par caractère.
 
 ## TP 4 — Différences finies (0.20, 1.10, 1.11)
 
 Écris `derivee(f,x,eps)` = [f(x+eps)-f(x-eps)]/(2eps). Pour (3x+1)² en x=1, attends 24. Pour x² en -2, attends -4. Compare quelques epsilon : trop grand modifie la pente locale, trop petit amplifie les erreurs numériques.
 
-Contrôle : `--jusqua 4`. Cette méthode est un juge ponctuel, pas l'algorithme d'apprentissage de millions de poids.
+Contrôle : `--tp 4`. Cette méthode est un juge ponctuel, pas l'algorithme d'apprentissage de millions de poids.
 
 ## TP 5 — Construire un autograd scalaire (1.12, 1.15)
 
@@ -46,7 +46,18 @@ Une classe groupe des données et des méthodes. `w=Valeur(3)` crée un objet ; 
 
 Chaque opération crée un résultat et retient ses parents. L'addition distribue le gradient de sortie aux deux parents. Le produit distribue ce gradient multiplié par la valeur de l'autre parent. Utilise `+=` car un même objet peut apparaître deux fois. backward parcourt les parents avant les enfants pour établir un ordre topologique, pose 1 sur le résultat scalaire puis exécute les règles locales en ordre inverse. Un ensemble d'identités évite de visiter deux fois le même nœud ; il ne doit pas effacer les deux contributions d'une opération.
 
-Contrôle : `--jusqua 5`. Pour w*w+w en w=3, attends 7. Pour u=x*x puis u+u en x=-2, attends -8. Recrée le graphe à chaque nouvel exemple. Dessine ces deux graphes sans lire le code.
+Exemple de contrôle à lancer après avoir complété la classe :
+
+```python
+from eleve import Valeur
+w = Valeur(3)
+z = w * w + w
+z.backward()
+assert z.data == 12
+assert w.grad == 7
+```
+
+Contrôle : `--tp 5`. Pour w*w+w en w=3, attends 7. Pour u=x*x puis u+u en x=-2, attends -8. Recrée le graphe à chaque nouvel exemple. Dessine ces deux graphes sans lire le code.
 
 ## TP 6 — Passer aux tableaux (0.15, 1.15)
 
@@ -59,7 +70,7 @@ Lis ensuite `moteur.py` : matmul propage dX=dY@Wᵀ et dW=Xᵀ@dY, en réduisant
 2. La première dimension du paramètre vaut 1 mais celle de g vaut 4 : on somme cet axe en le gardant, on obtient (1, 3) rempli de 8.
 3. Chaque coefficient du paramètre a été réutilisé 2 × 4 = 8 fois par le broadcasting : il reçoit donc 8 contributions.
 
-Contrôle : `--jusqua 6`. Explique où le gradient de deux lectures du même token s'additionne.
+Contrôle : `--tp 6`. Explique où le gradient de deux lectures du même token s'additionne.
 
 ## API des tableaux utilisée dans les TP suivants
 
@@ -74,7 +85,7 @@ Contrôle : `--jusqua 6`. Explique où le gradient de deux lectures du même tok
 - Position 1 : scores = [1×0, 1×2] / √1 = [0, 2] ; softmax ≈ [0,119 ; 0,881] ; sortie ≈ 0,119×10 + 0,881×20 = 18,81.
 - Le masque ajouté vaut [[0, −1e9], [0, 0]] : seule la case « position 0 regarde la position 1 » est bloquée.
 
-Contrôle : `--jusqua 7`. La position zéro doit rendre V à la position zéro. Modifier la dernière valeur ne doit pas changer les sorties précédentes. Le correcteur compare aussi dL/dQ à une différence finie : réussir une shape seule ne suffit pas.
+Contrôle : `--tp 7`. La position zéro doit rendre V à la position zéro. Modifier la dernière valeur ne doit pas changer les sorties précédentes. Le correcteur compare aussi dL/dQ à une différence finie : réussir une shape seule ne suffit pas.
 
 ## TP 8 — Multi-têtes (4.7)
 
@@ -84,13 +95,13 @@ Contrôle : `--jusqua 7`. La position zéro doit rendre V à la position zéro. 
 x (1, 3, 4) → @Wq → (1, 3, 4) → reshape (1, 3, 2, 2) → permute (0, 2, 1, 3) → (1, 2, 3, 2) → attention → (1, 2, 3, 2) → permute (0, 2, 1, 3) → (1, 3, 2, 2) → reshape (1, 3, 4) → @Wo → (1, 3, 4).
 Écris cette chaîne dans un commentaire au-dessus de ton code avant de le taper.
 
-Contrôle : `--jusqua 8`. Un mauvais reshape peut conserver la shape tout en mélangeant les valeurs ; vérifie une petite grille numérotée à la main. Les gradients doivent traverser les projections.
+Contrôle : `--tp 8`. Un mauvais reshape peut conserver la shape tout en mélangeant les valeurs ; vérifie une petite grille numérotée à la main. Les gradients doivent traverser les projections.
 
 ## TP 9 — Bloc pré-norme (4.8 à 4.11)
 
 Écris `bloc(x,p,prefix,heads)` : h=x+multi_tetes(LayerNorm(x)), puis y=h+GELU(LayerNorm(h)@W1)@W2. Les gains g1/g2 et biais b1/b2 sont (D,), W1=(D,4D), W2=(4D,D). Les deux résidus additionnent des valeurs, ils ne concatènent pas des listes.
 
-Contrôle : `--jusqua 9`. Si Wo et W2 valent zéro, le bloc doit être exactement l'identité. Explique pourquoi les normes sont AVANT les sous-blocs.
+Contrôle : `--tp 9`. Si Wo et W2 valent zéro, le bloc doit être exactement l'identité. Explique pourquoi les normes sont AVANT les sous-blocs.
 
 ## TP 10 — Decoder et loss (4.12 à 4.14)
 
@@ -98,7 +109,7 @@ Contrôle : `--jusqua 9`. Si Wo et W2 valent zéro, le bloc doit être exactemen
 
 **Suivre les formes.** B = 2, T = 5, D = 16, V = 30 : embedding des tokens (2, 5, 16) + embedding des positions (5, 16), qui se répète sur le batch → (2, 5, 16) → couches → LayerNorm → @tête (16, 30) → logits (2, 5, 30). Pour la loss : logits aplatis (10, 30) et cibles aplaties (10,).
 
-Contrôle : `--jusqua 10`. Vérifie toutes les positions du passé après modification du futur. Le correcteur exige des gradients non nuls dans embeddings, attention, FFN et tête, et une coordonnée d'attention conforme à la différence finie.
+Contrôle : `--tp 10`. Vérifie toutes les positions du passé après modification du futur. Le correcteur exige des gradients non nuls dans embeddings, attention, FFN et tête, et une coordonnée d'attention conforme à la différence finie.
 
 ## TP 11 — AdamW (1.14, 1.16)
 
@@ -111,7 +122,7 @@ Contrôle : `--jusqua 10`. Vérifie toutes les positions du passé après modifi
 4. Mise à jour : m̂ / (√v̂ + 1e-8) ≈ 0,5 / 0,5 = 1, donc w devient 1,998 − 0,01 = 1,988.
 Remarque : au premier pas, le déplacement vaut environ lr quelle que soit la taille du gradient. C'est pour cela que le compteur t compte.
 
-Contrôle : `--jusqua 11`. Un test sur deux pas empêche d'oublier le compteur. La boucle remet les gradients à zéro et recrée le forward avant chaque backward. Les checkpoints de l'atelier conservent les poids pour l'inférence ; ils ne promettent pas une reprise exacte AdamW. Pour ce mécanisme supplémentaire, lis les tests de reprise du laboratoire principal.
+Contrôle : `--tp 11`. Un test sur deux pas empêche d'oublier le compteur. La boucle remet les gradients à zéro et recrée le forward avant chaque backward. Les checkpoints de l'atelier conservent les poids pour l'inférence ; ils ne promettent pas une reprise exacte AdamW. Pour ce mécanisme supplémentaire, lis les tests de reprise du laboratoire principal.
 
 ## TP 12 — Génération et premier entraînement (3.7, 3.9, 3.11, 4.14)
 

@@ -1,259 +1,313 @@
-@@@
-@ID 12.1
-@TITLE Formuler une hypothèse
-@TAG Architecture
-@MINUTES 30
+@ID
+12.1
+@TITLE
+Formuler une hypothèse
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Une architecture personnelle commence par une phrase falsifiable. « Mon modèle est meilleur » ne l'est pas. « Remplacer une couche d'attention sur deux par un scan baisse le coût et garde la causalité » l'est, parce que le dépôt peut le mesurer.
+Une hypothèse annonce ce qui pourrait se produire et ce qui la contredirait. « Plus large sera mieux » est trop vague. « À budget de tokens égal, la largeur 24 réduira la perte de validation moyenne face à 16 » donne une mesure à vérifier. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Écrire une hypothèse avec une baseline
-- Choisir une mesure déjà dans le labo
-- Écarter les hypothèses du niveau 11 non outillées
-@PREREQ Le partage reproduit / non reproduit.
+- Formuler une affirmation réfutable sur la largeur du GPT
+- Fixer une mesure et une règle de comparaison avant les essais
+- Conserver les mêmes données et graines pour les deux configurations
+@PREREQ
+Un premier GPT entraîné et rechargeable, étape 4.14.
 @INTUITION
-Tu paries sur un changement précis, et tu dis à l'avance quel nombre te donnerait tort. Sans ce nombre, tu pourras toujours raconter que la maquette est prometteuse.
+Une hypothèse annonce ce qui pourrait se produire et ce qui la contredirait. « Plus large sera mieux » est trop vague. « À budget de tokens égal, la largeur 24 réduira la perte de validation moyenne face à 16 » donne une mesure à vérifier.
 @VOCAB
-Hypothèse : un changement et un effet attendu. Falsifiable : un résultat possible la contredit. Baseline : la configuration sans le changement. Effet : une différence sur une métrique nommée.
+Hypothèse : affirmation mise à l’épreuve. Réfutation : observation incompatible avec l’affirmation. Variable : réglage étudié. Budget de tokens : nombre de cibles utilisées pendant l’entraînement.
 @EXPLAIN
-Le changement que le fil rouge sait faire est le kind du Backbone : transformer, ssm, hybrid. Une hypothèse recevable est : à tailles égales, les trois kinds ont la même forme de sortie et restent causaux, et le coût d'appariement de l'attention est le seul à porter un terme en T au carré. Une hypothèse non recevable aujourd'hui : le hybrid parle mieux français. Rien ne mesure le français. run_ablation est prêt à ranger les configurations, à condition que ta fonction renvoie des métriques que tu as vraiment calculées. Le test jouet utilise loss = 1/lr seulement pour vérifier que les noms et les nombres traversent la fonction. Tu ne présenteras pas 1/lr comme une qualité de modèle.
-@LANG python
+Fixe deux largeurs compatibles avec le nombre de têtes, par exemple 16 et 24 avec deux têtes. Garde tokenizer, contexte, batch, pas, données et graines identiques. Écris le critère de sélection avant de lancer les calculs. Si le gain varie de signe entre graines ou coûte trop de mémoire pour ta machine, conserve cette observation. Le résultat concerne cette recette et ce corpus ; il ne prouve pas que tous les modèles plus larges sont meilleurs.
+@LANG
+python
 @CODE
 :::
-hypothese = {
-    "changement": "kind hybrid au lieu de transformer",
-    "baseline": "transformer",
-    "mesure": "forme, causalite, FLOPs d'attention",
-}
-print(hypothese["mesure"])
+hypothese = {"variable": "largeur", "valeurs": [16, 24],
+             "graines": [0, 1, 2], "selection": "validation",
+             "resultats": None}
+assert all(d % 2 == 0 for d in hypothese["valeurs"])
+assert hypothese["resultats"] is None  # à mesurer, pas à inventer
+print(hypothese)
 :::
 @EXPERIMENT
-La mesure tient en trois propriétés déjà testées ou calculables. Ajoute « perplexité française » et la phrase devient fausse dans ce dépôt.
+Écris le résultat qui réfuterait ton hypothèse. Puis remplace « meilleur » par une métrique, son unité et un budget. Fais relire cette phrase sans montrer de courbe.
 @EXERCISE
-Réécris « le SSM est plus intelligent » en une hypothèse falsifiable avec une métrique du dépôt. Par exemple : même forme, causalité conservée, coût linéaire en T.
+Écris une hypothèse sur la largeur de ton GPT, puis le résultat qui te ferait la rejeter. Fixe les textes, les graines et le budget avant de lancer les deux configurations.
 @BUILD
-Le fil rouge du niveau part de cette phrase. Les étapes suivantes la découpent en baseline, ablation, métriques et tableau.
+Ajoute cette hypothèse datée au DOSSIER_MODELE.md avant tes entraînements. Conserve les réglages des deux variantes et le critère qui déterminera ton choix.
 @QUESTION
-Laquelle de ces phrases est une hypothèse recevable ici ?
+Quel protocole permet de mettre ton hypothèse à l’épreuve ?
 @CORRECT
-À tailles égales, hybrid reste causal et de forme (B, T, D)
+Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût
 @WRONG
-- Hybrid comprend mieux les textes longs
-- Le SSM a gagné un benchmark public
-- La mémoire externe raisonne
+- Choisir la variante après avoir cherché son meilleur score sur test
+- Annoncer une capacité sans entraîner les poids
+- Changer les données et la largeur dans le même essai
 @EXPLANATION
-La première phrase est un assert du dépôt. Les autres demandent des mesures qui n'existent pas.
+Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Écris le résultat qui réfuterait ton hypothèse.
+
 @@@
-@ID 12.2
-@TITLE La baseline
-@TAG Architecture
-@MINUTES 30
+@ID
+12.2
+@TITLE
+La baseline
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Sans baseline, une variante n'a pas de sens. La baseline du langage, depuis le niveau 3, est le bigramme, et derrière lui la loi uniforme. La baseline du dos est le kind transformer, pas une absence de modèle.
+Une note de 2 ne dit rien sans son échelle. Pour une perte, la référence uniforme donne un point de départ sans apprentissage. Le bigramme montre ce que suffit à apprendre le token précédent ; ton GPT initial apporte le contexte plus long. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Choisir la baseline la plus simple qui marche
-- Garder le même découpage
-- Lire bigram_versus_uniform comme modèle du geste
-@PREREQ Hypothèse.
+- Calculer la perte d’une distribution uniforme
+- Distinguer uniforme, bigramme et GPT initial entraîné
+- Évaluer les références sur les mêmes cibles que la variante
+@PREREQ
+Méthode du projet personnel, étape 12.1.
 @INTUITION
-Tu chronomètres un nouveau trajet contre le bus, pas contre « rester chez toi », si la question est de te déplacer. La baseline doit faire la même tâche.
+Une note de 2 ne dit rien sans son échelle. Pour une perte, la référence uniforme donne un point de départ sans apprentissage. Le bigramme montre ce que suffit à apprendre le token précédent ; ton GPT initial apporte le contexte plus long.
 @VOCAB
-Baseline : la configuration de référence, nommée. Uniforme : la baseline du bigramme, perplexité V. Transformer : la baseline des autres kinds, parce qu'il est le dos déjà construit au niveau 4. Même découpage : la condition qui empêche de changer les données en même temps que le modèle.
+Baseline : référence de comparaison. Uniforme : même probabilité pour chaque token. Bigramme : prédiction conditionnée par le token précédent. Cible : token dont on évalue la probabilité.
 @EXPLAIN
-bigram_versus_uniform fixe le découpage avant d'entraîner, observe seulement le train, et compare à vocab_size. C'est le patron. Pour les dos, la baseline est Backbone(kind="transformer") avec les mêmes vocab_size, d_model, n_layers, block_size et seed. Changer la graine en même temps que le kind mélangerait deux causes. Le test utilise seed=3 pour les trois, justement pour ne pas offrir cette excuse. La baseline n'est pas « le meilleur papier de l'année ». Tu ne l'as pas exécutée. Elle est le système le plus simple du dépôt qui fait déjà la tâche.
-@LANG python
+Avec V tokens possibles, l’uniforme attribue 1/V à la cible : sa perte vaut log(V) nats par token. Le bigramme et le GPT sont appris sur train, puis évalués sur les mêmes fenêtres de validation, avec le même tokenizer et la même réduction. Une perte train ne remplace pas une perte validation. Le code ci-dessous calcule des distributions miniatures pour comprendre la métrique ; il ne représente pas le résultat entraîné de ton projet.
+@LANG
+python
 @CODE
 :::
-from model.experiment import bigram_versus_uniform
-print(bigram_versus_uniform([0, 1, 0, 1, 0, 1, 0, 1], 2)["uniform_perplexity"])
+import math
+vocab = 4
+perte_uniforme = math.log(vocab)
+# Distributions inventées uniquement pour vérifier la formule.
+p_cibles = [0.5, 0.25]
+perte_exemple = -sum(math.log(p) for p in p_cibles) / len(p_cibles)
+assert math.isclose(perte_uniforme, -math.log(1 / vocab))
+print(perte_uniforme, perte_exemple)
 :::
 @EXPERIMENT
-La valeur est 2, la taille du vocabulaire. C'est la baseline, pas un score à battre à tout prix sur d'autres tâches.
+Dans l’exemple, double la taille du vocabulaire. Prédis la variation de la perte uniforme avant de relancer. Puis vérifie qu’une cible jugée moins probable augmente la perte.
 @EXERCISE
-Pourquoi ne pas prendre hybrid comme baseline du transformer ? Parce que la baseline doit préexister au changement. Le transformer est construit avant le scan dans le parcours.
+Nomme les trois références de ton projet : uniforme, bigramme et GPT initial. Explique pourquoi elles doivent être évaluées sur les mêmes cibles et avec le même tokenizer.
 @BUILD
-Chaque ligne de run_ablation aura un name. L'une d'elles s'appellera baseline, et elle ne bougera pas pendant que tu changes la variante.
+Dans ton tableau de résultats, réserve trois lignes : uniforme, bigramme et GPT initial. Renseigne tokenizer, nombre de cibles et perte de validation pour chacune.
 @QUESTION
-Quelle est la baseline de perplexité du bigramme dans ce dépôt ?
+À quoi comparer la perte de ton GPT personnel ?
 @CORRECT
-La loi uniforme, dont la perplexité vaut la taille du vocabulaire
+À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction
 @WRONG
-- Un grand modèle téléchargé
-- La loss du routeur MoE
-- Zéro, si le texte est français
+- À une perplexité publiée avec un autre tokenizer sans conversion
+- Au meilleur échantillon choisi après vingt générations
+- À la perte train de données déjà mémorisées
 @EXPLANATION
-uniform_perplexity renvoie vocab_size. Aucun modèle externe n'est téléchargé.
+À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Dans l’exemple, double la taille du vocabulaire.
+
 @@@
-@ID 12.3
-@TITLE L'ablation
-@TAG Architecture
-@MINUTES 30
+@ID
+12.3
+@TITLE
+L’ablation
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Une ablation retire ou remplace une seule pièce. Si tu changes le dos, la graine et la taille en même temps, tu ne sais plus laquelle a fait bouger le nombre.
+Si tu changes à la fois la largeur et les textes, tu ne sais plus à quoi attribuer un gain. Deux recettes qui ne diffèrent que par la largeur rendent l’explication plus précise ; elles peuvent cependant demander des coûts différents. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Changer un seul facteur
-- Nommer chaque configuration
-- Lire run_ablation
-@PREREQ Baseline.
+- Isoler le réglage qui diffère entre deux expériences
+- Apparier les graines et le budget de tokens
+- Distinguer budget identique et coût de calcul identique
+@PREREQ
+Méthode du projet personnel, étape 12.2.
 @INTUITION
-Tu remplaces un ingrédient, tu goûtes, tu remets l'ancien avant d'en changer un autre. Goûter trois changements d'un coup ne t'apprend pas la recette.
+Si tu changes à la fois la largeur et les textes, tu ne sais plus à quoi attribuer un gain. Deux recettes qui ne diffèrent que par la largeur rendent l’explication plus précise ; elles peuvent cependant demander des coûts différents.
 @VOCAB
-Ablation : un écart d'un seul facteur par rapport à la baseline. Facteur : kind, d_model, n_layers, ou un autre argument explicite. Configuration : le dictionnaire passé à run_ablation, avec un name.
+Ablation : retrait contrôlé d’un composant. Comparaison contrôlée : modification d’une variable annoncée. Graines appariées : même liste de graines entre recettes. Facteur confondant : autre différence pouvant expliquer le résultat.
 @EXPLAIN
-run_ablation exige un name et copie la configuration avant d'appeler la fonction, pour que la fonction ne puisse pas réécrire la liste d'origine par effet de bord. Le test envoie baseline à lr 0,1 et variante à lr 0,2, et vérifie l'ordre des noms ainsi que la baisse de la loss jouet. Dans le fil rouge réel, le facteur intéressant est kind. Une ablation propre lance transformer, puis ssm, puis hybrid, en figeant le reste. Ajouter en même temps un changement de n_layers demande une quatrième ligne, pas un mélange dans la troisième. Les métriques renvoyées doivent être calculées, pas choisies pour que l'histoire tienne.
-@LANG python
+Une ablation retire un composant pour estimer son apport. Une variation de largeur est une comparaison contrôlée proche de ce raisonnement, sans retrait de composant. Fixe les mêmes graines pour apparier les essais, puis calcule les différences de validation pour chaque paire. Un même nombre de tokens vus ne signifie ni mêmes paramètres, ni mêmes FLOPs, ni même durée. Note ces différences dans le rapport au lieu de qualifier les budgets de parfaitement équivalents.
+@LANG
+python
 @CODE
 :::
-from model.experiment import run_ablation
-lignes = run_ablation(
-    [{"name": "baseline", "kind": "transformer"}, {"name": "variante", "kind": "ssm"}],
-    lambda config: {"kind": config["kind"], "couches": 2},
-)
-print(lignes[1]["name"], lignes[1]["kind"])
+base = {"largeur": 16, "contexte": 16, "batch": 4, "pas": 240}
+variante = {**base, "largeur": 24}
+differences = {k for k in base if base[k] != variante[k]}
+assert differences == {"largeur"}
+assert base["contexte"] * base["batch"] * base["pas"] == 15360
+print(differences)
 :::
 @EXPERIMENT
-La deuxième ligne s'appelle variante et porte kind ssm. La fonction n'a pas entraîné de modèle : elle montre seulement que le facteur traverse.
+Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer. Explique quelles comparaisons de coût restent nécessaires même après avoir rétabli le contexte.
 @EXERCISE
-Tu veux aussi tester n_layers=4. Combien de lignes minimum pour ne pas confondre les causes ? Trois : baseline, kind seul, profondeur seule. Une quatrième si tu veux le croisement.
+Construis deux lignes d’expérience qui diffèrent seulement par la largeur. Indique ce qui reste fixe et pourquoi paramètres, temps et mémoire peuvent tout de même changer.
 @BUILD
-Le fil rouge enregistre les ablations par run_ablation. Le tableau du niveau 6 pourra trier les lignes une fois qu'elles auront qualité, secondes et RAM.
+Archive les deux configurations complètes, les graines et les tokens vus. Une ligne de tableau par run permet de retrouver aussi un essai qui contredit ton attente.
 @QUESTION
-Pourquoi run_ablation copie-t-il chaque configuration avant l'appel ?
+Quelle comparaison permet d’attribuer un effet à la largeur ?
 @CORRECT
-Pour qu'une fonction ne modifie pas la liste des expériences par effet de bord
+Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût
 @WRONG
-- Pour entraîner le réseau
-- Pour mélanger les graines
-- Pour supprimer la baseline
+- Modifier simultanément les données et la profondeur
+- Supprimer les essais qui donnent de mauvais résultats
+- Comparer un entraînement complet à un simple forward initialisé
 @EXPLANATION
-dict(config) isole la ligne. Le test, lui, vérifie que les noms ressortent dans l'ordre.
+Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer.
+
 @@@
-@ID 12.4
-@TITLE Les métriques
-@TAG Architecture
-@MINUTES 30
+@ID
+12.4
+@TITLE
+Les métriques
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Une métrique sans unité est un slogan. Le dépôt en a quelques-unes, précises : perplexité, forme, causalité, octets, FLOPs, score de retrieval. Les mélanger dans une note unique les détruit.
+Mesurer une distance en pas ne suffit pas si les deux personnes n’ont pas la même foulée. Une perte par token dépend elle aussi de la découpe. Le même texte peut demander quatre tokens dans un modèle et dix dans un autre. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Associer une unité à chaque nombre
-- Refuser une note unique
-- Choisir la métrique qui répond à l'hypothèse
-@PREREQ Ablation.
+- Calculer cross-entropy et perplexité sans confondre leurs unités
+- Vérifier le dénominateur et le nombre de cibles
+- Expliquer pourquoi deux tokenizers empêchent une comparaison directe par token
+@PREREQ
+Méthode du projet personnel, étape 12.3.
 @INTUITION
-Des centimètres et des degrés ne se moyennent pas. Une perplexité et un temps non plus. Tu les poses côte à côte, avec leur nom.
+Mesurer une distance en pas ne suffit pas si les deux personnes n’ont pas la même foulée. Une perte par token dépend elle aussi de la découpe. Le même texte peut demander quatre tokens dans un modèle et dix dans un autre.
 @VOCAB
-Perplexité : l'effectif du hasard équivalent, sans unité de « qualité morale ». Forme : un tuple d'entiers. Causalité : un booléen de test. Octet : l'unité de parameter_bytes. FLOP : l'opération comptée par attention_flops, une multiplication-addition vaut 2.
+Cross-entropy : surprise moyenne des cibles. Nat : unité issue du logarithme naturel. Perplexité : exponentielle de cette moyenne. Réduction : règle qui transforme les pertes individuelles en une valeur.
 @EXPLAIN
-L'hypothèse de l'étape 12.1 ne se mesure pas en perplexité française. Elle se mesure par un succès de forme, un succès de causalité, et un entier de FLOPs. La perplexité reste la métrique du bigramme, sur une queue. Le score de retrieve est un cosinus, pas une note de raisonnement. quality_table exige trois colonnes déjà calculées — quality, seconds, ram_bytes — et trie par qualité décroissante puis temps puis RAM. Il ne calcule pas ces colonnes. Si tu y mets des perplexités, documente que « quality » est alors l'opposé de la perplexité, parce que le tri prend la plus grande quality comme meilleure. Oublier ce signe classerait le pire modèle en premier.
-@LANG python
+La cross-entropy moyenne est la somme des log-probabilités négatives divisée par le nombre de cibles évaluées. Avec le logarithme naturel, son unité est le nat par token. La perplexité est exp(perte) : une perte plus faible donne une perplexité plus faible. Pour des tokenizers différents, une unité commune comme les nats par caractère exige de conserver la log-probabilité totale et un dénominateur commun sur le même texte, en précisant les cibles, la normalisation et les caractères inconnus. La perplexité ne mesure pas directement la vérité des phrases.
+@LANG
+python
 @CODE
 :::
-from model.bench import quality_table
-lignes = quality_table([
-    {"name": "a", "quality": 1.0, "seconds": 2.0, "ram_bytes": 100},
-    {"name": "b", "quality": 1.0, "seconds": 1.0, "ram_bytes": 100},
-])
-print([ligne["name"] for ligne in lignes])
+import math
+# Deux cibles fictives : contrôle de la formule, pas score entraîné.
+nll = [-math.log(0.5), -math.log(0.25)]
+loss = sum(nll) / len(nll)
+perplexite = math.exp(loss)
+assert math.isclose(perplexite, math.sqrt(8))
+print({"nats_par_token": loss, "perplexite": perplexite, "cibles": len(nll)})
 :::
 @EXPERIMENT
-À qualité égale, b passe devant a parce qu'il est plus court. Le test du dépôt couvre ce tri.
+Remplace la probabilité 0.25 par 0.125. Prédis le sens du changement de perplexité, puis vérifie. Explique pourquoi comparer ce score à une loss train serait trompeur.
 @EXERCISE
-Tu veux classer des perplexités, où plus petit est meilleur. Que mets-tu dans quality ? L'opposé de la perplexité, et tu l'écris à côté du tableau.
+Classe deux pertes de validation obtenues sur les mêmes cibles, puis explique pourquoi cette comparaison serait insuffisante avec deux tokenizers différents. Conserve les unités dans ton tableau.
 @BUILD
-Le fil rouge n'invente pas de métrique composite. Chaque étape du parcours a déjà la sienne, et le tableau ne fait que les ranger.
+Dans le dossier, ajoute l’unité, le split et le nombre de cibles à chaque score. Si tu compares des tokenizers, décris explicitement la conversion et la couverture du texte.
 @QUESTION
-Que fait quality_table des nombres qu'on lui donne ?
+Quand peut-on comparer directement deux pertes par token ?
 @CORRECT
-Il les trie, il ne les mesure pas
+Quand tokenizer, données évaluées, cibles et réduction sont les mêmes
 @WRONG
-- Il entraîne un Transformer
-- Il convertit la perplexité en français
-- Il prouve la causalité
+- Dès que le second modèle a plus de paramètres
+- Quand les deux nombres sont affichés avec trois décimales
+- Toujours, même avec une tokenisation différente
 @EXPLANATION
-La fonction exige des colonnes déjà remplies. Le sens de quality — plus grand, meilleur — doit être documenté par toi.
+Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. Remplace la probabilité 0.25 par 0.125.
+
 @@@
-@ID 12.5
-@TITLE Un banc d'essai
-@TAG Architecture
-@MINUTES 30
+@ID
+12.5
+@TITLE
+Un banc d’essai
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Un benchmark est un banc fixe : mêmes entrées, mêmes métriques, plusieurs systèmes. Changer le banc en même temps que le système annule la comparaison. Le tien doit tenir sur une machine modeste, puisque c'est le sujet du niveau 6.
+Changer le nom d’un fichier ne change pas son contenu. Deux copies du même texte dans train et test permettraient au modèle d’être évalué sur des phrases déjà vues ; cela déforme la question que l’on voulait lui poser. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Fixer les entrées avant les modèles
-- Réutiliser les tests comme banc minimal
-- Éviter un classement public non rejoué
-@PREREQ Métriques.
+- Réserver les documents avant l’entraînement
+- Repérer des doublons après normalisation Unicode
+- Conserver provenance, groupes et empreintes dans un manifeste
+@PREREQ
+Méthode du projet personnel, étape 12.4.
 @INTUITION
-La même piste, les mêmes chronomètres, plusieurs coureurs. Changer la piste pour le deuxième coureur ne donne pas un record.
+Changer le nom d’un fichier ne change pas son contenu. Deux copies du même texte dans train et test permettraient au modèle d’être évalué sur des phrases déjà vues ; cela déforme la question que l’on voulait lui poser.
 @VOCAB
-Banc : le couple entrées + métriques. Entrée fixe : le idx du test, ou le corpus du bigramme. Classement public : un jeu externe, non exécuté ici. Machine modeste : le CPU qui lance pytest, sans GPU requis.
+Manifeste : inventaire des sources et des splits. Empreinte : condensat du contenu. Groupe documentaire : textes à garder dans le même split. Fuite : information réservée utilisée pour apprendre ou choisir.
 @EXPLAIN
-Le banc minimal du dos est celui du test : un batch d'identifiants [[1, 2, 3, 4]], vocabulaire 8, d_model 8, deux couches, block_size 6, graine 3, puis une copie où le dernier token devient 7. La métrique est la forme et l'égalité de la position 0. Le banc du bigramme est une liste d'identifiants, un vocabulaire, et deux perplexités. Le banc du retrieval est trois phrases et une requête. Aucun de ces bancs n'est un classement international. Les citer comme tels serait faux. Les citer comme bancs locaux, rejouables par pytest, est exact. Si tu ajoutes un texte plus long, tu crées un nouveau banc et tu relances toutes les lignes, y compris la baseline.
-@LANG python
+Découpe les données par documents ou groupes documentaires avant d’entraîner tokenizer et poids. Normalise de façon annoncée, déduplique, puis conserve sources, droits d’usage et empreintes. Le script preparer.py réserve train, validation et test et enregistre le manifeste. Une empreinte identique révèle une copie exacte normalisée ; une empreinte différente ne garantit pas l’absence de paraphrases ou d’extraits communs. Vérifie aussi ces recouvrements et décide à l’avance ce que ta mesure prétend généraliser.
+@LANG
+python
 @CODE
 :::
-import numpy as np
-idx = np.array([[1, 2, 3, 4]])
-change = idx.copy()
-change[0, -1] = 7
-print(idx.tolist(), change.tolist())
+import hashlib, unicodedata
+def empreinte(texte):
+    normalise = unicodedata.normalize("NFC", texte.replace("\r\n", "\n"))
+    return hashlib.sha256(normalise.encode("utf-8")).hexdigest()
+assert empreinte("café\n") == empreinte("cafe\u0301\r\n")
+assert empreinte("chat") != empreinte("chien")
+print(empreinte("chat"))
 :::
 @EXPERIMENT
-Les deux suites ne diffèrent qu'au dernier token. C'est l'entrée du test de causalité, pas un corpus de français.
+Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente. Vérifie les empreintes, puis explique pourquoi des extraits partagés demandent encore une relecture.
 @EXERCISE
-Tu changes d_model pour un essai. Que dois-tu relancer ? Toutes les configurations, baseline comprise, sur ce nouveau banc.
+Prépare un manifeste train, validation et test avec sources, empreintes et groupes documentaires. Explique pourquoi deux fichiers de noms différents peuvent encore contenir la même information.
 @BUILD
-Le fil rouge publie ses bancs comme des tests, pas comme un tableau de leaders. Le README doit donner la commande pytest, pas un rang.
+Prépare le corpus avec preparer.py dans un nouveau dossier. Joins son manifeste au projet et garde le test réservé jusqu’à la recette finale.
 @QUESTION
-Qu'est-ce qui rend ces bancs défendables dans un portfolio ?
+Comment préparer les documents du banc personnel ?
 @CORRECT
-Ils sont petits, fixés, et rejoués par les tests du dépôt
+Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance
 @WRONG
-- Ils viennent d'un classement public
-- Ils mesurent la compréhension du français
-- Ils nécessitent un GPU
+- Tirer une nouvelle validation jusqu’à obtenir le score voulu
+- Mettre le même livre dans train et test en changeant son nom
+- Ajuster le tokenizer sur tout le corpus réservé
 @EXPLANATION
-pytest relance les mêmes entrées. Aucun téléchargement de benchmark n'est nécessaire.
+Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente.
+
 @@@
-@ID 12.6
-@TITLE Qualité, latence, mémoire, énergie
-@TAG Architecture
-@MINUTES 35
+@ID
+12.6
+@TITLE
+Qualité, latence, mémoire, énergie
+@TAG
+Architecture
+@MINUTES
+35
 @WHY
-Un modèle qui gagne sur une colonne peut perdre sur les autres. Le niveau 6 a préparé le tableau. Ici tu l'utilises pour l'architecture, et tu n'inventes pas une colonne énergie que tu ne mesures pas.
+Un modèle peut produire un meilleur score tout en dépassant la mémoire de ta machine. Il faut donc plusieurs colonnes pour décrire le compromis. Chacune répond à une question et porte une unité différente. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Remplir quality, seconds, ram_bytes sans tricher
-- Distinguer une estimation d'octets et une mesure de temps
-- Laisser l'énergie vide si elle n'est pas mesurée
-@PREREQ Banc d'essai et bench.py.
+- Mesurer une durée avec une horloge adaptée
+- Séparer perte, latence, débit, mémoire et énergie
+- Indiquer une mesure absente sans lui donner une valeur fictive
+@PREREQ
+Méthode du projet personnel, étape 12.5.
 @INTUITION
-Une voiture plus rapide qui consomme le réservoir en dix minutes n'a pas « gagné » tant que tu n'as pas dit le critère. Tu montres les colonnes et tu laisses le critère explicite.
+Un modèle peut produire un meilleur score tout en dépassant la mémoire de ta machine. Il faut donc plusieurs colonnes pour décrire le compromis. Chacune répond à une question et porte une unité différente.
 @VOCAB
-Qualité : la colonne que tu as définie, plus grand veut dire meilleur dans le tri. Latence : seconds, un temps mesuré, pas un FLOP. RAM : ram_bytes, souvent une estimation via parameter_bytes. Énergie : absente, faute de capteur dans le dépôt.
+Latence : attente avant un résultat. Débit : quantité produite par unité de temps. Pic mémoire : maximum observé pendant le calcul. Énergie : intégrale d’une puissance sur une durée, en joules.
 @EXPLAIN
-parameter_bytes(n, dtype, optimizer) estime des octets, y compris les états Adam si tu passes optimizer="adam". Ce n'est pas une lecture de la RAM du processus. attention_flops estime un volume, pas une durée : la durée dépend de la machine. Si tu mets des FLOPs dans seconds, le nom de colonne ment. Le tri de quality_table départage d'abord par qualité, puis par temps, puis par RAM. L'énergie n'a pas de fonction. Un joule imaginaire n'entre pas dans le tableau. Tu peux écrire « énergie non mesurée » dans le README. Pour les trois kinds, une comparaison honnête sur ce dépôt est : même nombre de couches, qualité de langage non mesurée, causalité oui, et un terme quadratique présent seulement quand la couche est une attention. Le hybrid a donc moins de couches d'attention que le transformer à n_layers égal, pas « moins d'énergie ».
-@LANG python
+Note la perte de validation, la durée d’entraînement en secondes et les paramètres. Pour la génération, distingue latence avant le premier token et débit des suivants. La mémoire des poids n’est pas la mémoire maximale du processus : gradients, états d’optimiseur et activations s’ajoutent. Les FLOPs décrivent un compte d’opérations, pas une mesure de joules. Mesurer l’énergie demande une puissance observée au cours du temps et un périmètre annoncé. Le mini-calcul ci-dessous mesure uniquement sa durée locale ; il ne donne pas la performance du GPT.
+@LANG
+python
 @CODE
 :::
-from model.bench import parameter_bytes, attention_flops
-print(parameter_bytes(1000, "fp32", "adam"))
-print(attention_flops(32, 8, 2))
+from time import perf_counter
+debut = perf_counter()
+controle = sum(i * i for i in range(1000))
+secondes = perf_counter() - debut
+rapport = {"duree_s": secondes, "energie_J": None, "controle": controle}
+assert secondes >= 0 and rapport["energie_J"] is None
+print(rapport)
 :::
 @EXPERIMENT
-Adam ajoute 8 octets par paramètre aux 4 octets du fp32, donc 12 000 octets pour 1 000 paramètres. Les FLOPs sont un entier, pas des secondes.
+Répète ce mini-calcul plusieurs fois. Observe les variations de durée et distingue cet effet du résultat arithmétique. Écris les mesures nécessaires avant de convertir une puissance en énergie.
 @EXERCISE
-Pourquoi ne pas remplir seconds avec attention_flops ? Parce que l'unité n'est pas le temps. Le nom de la colonne deviendrait faux.
+Écris une ligne de rapport avec perte, durée et mémoire, chacune avec son unité. Si tu ne disposes pas d’une mesure d’énergie, marque-la Non mesurée plutôt que de la déduire des FLOPs.
 @BUILD
-Le tableau du fil rouge ne contient que des colonnes que bench.py sait trier, avec des unités écrites à côté. L'énergie reste hors tableau.
+Dans chaque run, conserve matériel, version Python, durée et paramètres. Marque « Non mesurée » pour une mémoire ou une énergie que tu n’as pas réellement observée.
 @QUESTION
-Quelle colonne n'as-tu pas le droit de remplir avec un nombre inventé ?
+Que mettre dans une colonne d’énergie non mesurée ?
 @CORRECT
-L'énergie, parce que le dépôt ne la mesure pas
+Non mesurée, avec la méthode nécessaire pour la mesurer expliquée
 @WRONG
-- La forme de sortie, parce qu'elle est testée
-- Le nombre d'octets estimé par parameter_bytes
-- Le nom de la configuration
+- Le nombre de FLOPs comme s’il s’agissait de joules
+- Zéro pour donner une valeur à toutes les cases
+- Le temps de génération utilisé comme une puissance électrique
 @EXPLANATION
-Une estimation d'octets est étiquetée comme estimation. Un joule sans capteur n'est pas une estimation, c'est une invention.
+Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. Répète ce mini-calcul plusieurs fois.
+
 @@@
 @ID 12.7
 @TITLE La modularité
@@ -396,136 +450,159 @@ model/gpt_train.py
 train_gpt
 
 @@@
-@ID 12.10
-@TITLE Analyser un échec
-@TAG Architecture
-@MINUTES 30
+@ID
+12.10
+@TITLE
+Analyser un échec
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-Un test rouge, ou une métrique pire que la baseline, est un résultat. Le cacher casse le portfolio plus sûrement qu'un modèle moyen. Analyser, c'est relier l'échec à une cause que tu peux nommer.
+Une bonne note obtenue en voyant la réponse n’est pas une preuve d’apprentissage. Un masque causal incorrect peut produire cette illusion : la loss baisse parce que le calcul a accès à une information qui devrait rester cachée. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Traiter une baisse comme une donnée
-- Séparer bug et hypothèse fausse
-- Relire la causalité avant la qualité
-@PREREQ Entraînement limité.
+- Séparer une erreur du programme d’une faiblesse du modèle
+- Tester la causalité sur deux contextes au même préfixe
+- Refaire les mesures invalidées après correction d’un bug
+@PREREQ
+Un protocole et des métriques fixés, étapes 12.3 et 12.6.
 @INTUITION
-Le gâteau est plat. Avant de changer de four, tu vérifies que tu as mis la levure. Le bug d'abord, l'hypothèse ensuite, le récit jamais en premier.
+Une bonne note obtenue en voyant la réponse n’est pas une preuve d’apprentissage. Un masque causal incorrect peut produire cette illusion : la loss baisse parce que le calcul a accès à une information qui devrait rester cachée.
 @VOCAB
-Échec : une métrique pire, ou un assert faux. Bug : le code ne fait pas ce que le commentaire dit. Hypothèse fausse : le code fait ce qui est écrit, et l'effet attendu n'arrive pas. Cause nommable : un facteur de l'ablation.
+Diagnostic : test d’une cause possible. Invariant : propriété attendue malgré une modification précise. Causalité : absence de dépendance au futur. Symptôme : observation à expliquer avant de modifier la recette.
 @EXPLAIN
-Si la position 0 change quand tu modifies le dernier token, c'est un bug de masque ou de scan, pas « une architecture créative ». Le test est là pour l'attraper. Si la forme est bonne, la causalité aussi, et qu'un jour une perplexité de hybrid est pire que celle du transformer sur un banc que tu auras ajouté, c'est peut-être l'hypothèse qui tombe : l'alternance ne suffit pas. Tu le notes dans la ligne, tu ne retires pas la ligne. quality_table mettra la meilleure quality en haut, et la baseline restera visible. Un échec d'outillage — énergie vide, français non mesuré — se documente comme limite, pas comme un zéro inventé qui ferait chuter la ligne.
-@LANG python
+Avant de commenter un gain, vérifie les indices des cibles, la causalité, les gradients et le rechargement. Pour la causalité, construis deux séquences identiques jusqu’à une position et différentes ensuite. Les logits de leur préfixe doivent rester égaux à poids et mode déterministes. Le court exemple ci-dessous illustre une dépendance limitée au préfixe ; applique ensuite ce principe au vrai decoder avec les contrôles du TP 8. Si le code fuit le futur, corrige puis refais les runs concernés : une ancienne courbe ne reste pas valide après la correction.
+@LANG
+python
 @CODE
 :::
-from model.bench import quality_table
-lignes = quality_table([
-    {"name": "baseline", "quality": 0.8, "seconds": 1.0, "ram_bytes": 10},
-    {"name": "variante", "quality": 0.5, "seconds": 1.0, "ram_bytes": 10},
-])
-print(lignes[0]["name"], lignes[1]["name"])
+def prefixe_causal(tokens, position):
+    return sum(tokens[:position + 1])
+a, b = [1, 2, 3], [1, 2, 99]
+assert prefixe_causal(a, 1) == prefixe_causal(b, 1)
+# Le vrai TP vérifie les logits, pas cette simple somme.
+assert sum(a) != sum(b)
+print("Le suffixe change ; le préfixe causal reste identique.")
 :::
 @EXPERIMENT
-La baseline reste devant. Effacer la variante parce qu'elle est moins bonne fausserait le tableau : le tri suffit à la placer seconde.
+Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite. Retrouve ensuite le contrôle de masque dans verifier.py et explique ce qu’il compare.
 @EXERCISE
-La causalité échoue. Que fais-tu avant de conclure que « le SSM oublie trop » ? Tu corriges le bug de fuite du futur, puis tu remesures.
+Ton GPT bat la baseline mais le test de causalité échoue. Explique l’ordre des contrôles avant toute conclusion et indique ce qu’il faut refaire après correction du bug.
 @BUILD
-Le fil rouge garde les lignes perdantes. L'analyse tient dans le nom du facteur, pas dans un adjectif.
+Ajoute un échec réel au dossier : symptôme, hypothèse, test discriminant et correction. Identifie les rapports devenus invalides et refais les mesures qui dépendaient du bug.
 @QUESTION
-Un assert de causalité qui échoue indique d'abord…
+Que faire si une bonne perte accompagne une fuite du futur ?
 @CORRECT
-Un bug de fuite du futur, pas une hypothèse de qualité
+Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé
 @WRONG
-- Que la variante est plus intelligente
-- Que la perplexité uniforme vaut 1
-- Qu'il faut supprimer le test
+- Conserver uniquement la bonne perte dans le rapport
+- Présenter le bug comme une nouvelle capacité de raisonnement
+- Supprimer le contrôle de causalité pour terminer le projet
 @EXPLANATION
-La causalité est un contrat du code. La qualité vient après, sur un banc, quand le contrat tient.
+Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite.
+
 @@@
-@ID 12.11
-@TITLE Itérer une fois
-@TAG Architecture
-@MINUTES 25
+@ID
+12.11
+@TITLE
+Itérer une fois
+@TAG
+Architecture
+@MINUTES
+25
 @WHY
-Itérer, c'est changer un facteur après avoir lu une ligne, pas empiler des idées. Une itération tient dans une nouvelle configuration et une nouvelle mesure sur le même banc.
+La validation est une répétition où tu peux encore choisir ta recette. Le test est le bilan de la recette fixée. Le consulter à chaque essai finit par le transformer en un deuxième jeu de validation. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Choisir le prochain facteur d'après une colonne
-- Garder le banc fixe
-- S'arrêter quand la colonne visée ne bouge plus assez
-@PREREQ Analyse des échecs.
+- Choisir une modification à partir du diagnostic de validation
+- Conserver les essais écartés et les règles de sélection
+- Réserver le test à la mesure finale de la recette choisie
+@PREREQ
+Méthode du projet personnel, étape 12.10.
 @INTUITION
-Tu changes la quantité de levure, pas la recette, le four et la farine. Tu notes le nouveau gâteau à côté de l'ancien. Puis tu décides si une troisième fournée vaut le temps.
+La validation est une répétition où tu peux encore choisir ta recette. Le test est le bilan de la recette fixée. Le consulter à chaque essai finit par le transformer en un deuxième jeu de validation.
 @VOCAB
-Itération : une nouvelle ligne, un seul facteur modifié. Banc fixe : les mêmes entrées que la ligne précédente. Gain : la différence sur la colonne que l'hypothèse visait. Arrêt : quand le gain est nul ou que tu sors de ce que le dépôt sait mesurer.
+Itération : nouvelle expérience issue d’un résultat. Sélection : choix d’une recette sur validation. Test final : mesure après fixation de la recette. Suradaptation : ajustement excessif aux données utilisées pour choisir.
 @EXPLAIN
-Suppose que transformer et hybrid ont la même forme et la même causalité. La colonne qui peut encore bouger, dans ce dépôt, est le coût d'attention : hybrid exécute moins de couches attn. Une itération recevable est de passer n_layers de 2 à 4 en le figeant pour les deux kinds, et de recalculer les FLOPs d'attention, pas d'ajouter un agent. Une itération non recevable est d'annoncer un gain de français. Le critère d'arrêt est simple : si la seule colonne mesurable ne distingue plus tes choix, tu documentes l'égalité et tu t'arrêtes. Continuer à empiler des kinds ne crée pas une information que le banc ne voit pas.
-@LANG python
+Après le premier résultat, propose une modification justifiée : largeur, taux d’apprentissage ou qualité des données, une variable à la fois. Applique le même protocole aux recettes comparées et conserve tous les runs. Une validation utilisée très souvent peut aussi être suradaptée : documente le nombre d’essais. Sélectionne la recette, fige code et configurations, puis déclenche la mesure finale sur le test réservé. Si ce bilan inspire une nouvelle modification, considère-la comme une nouvelle expérience et réserve de nouvelles données pour une future conclusion indépendante.
+@LANG
+python
 @CODE
 :::
-from model.bench import attention_flops
-print("2 couches attn", attention_flops(32, 8, 2))
-print("1 couche attn", attention_flops(32, 8, 1))
+candidats = [
+    {"nom": "initial", "validation": 2.4},
+    {"nom": "variante", "validation": 2.3},
+]  # Nombres fictifs pour montrer la sélection.
+choix = min(candidats, key=lambda run: run["validation"])
+bilan = {"recette": choix["nom"], "test": None}
+assert bilan["recette"] == "variante" and bilan["test"] is None
+print(bilan)
 :::
 @EXPERIMENT
-Passer d'un transformer à deux couches à un hybrid qui n'en garde qu'une divise ce terme par deux, à T et D égaux. C'est un gain de coût, pas de qualité.
+Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu. Explique pourquoi un score test favorable ne doit pas servir à la sélectionner.
 @EXERCISE
-Quelle itération refuses-tu même si elle sonne bien ? Ajouter un temps interne non codé pour « améliorer le raisonnement ».
+Décris une seule modification après ton premier résultat de validation. Explique quel contrôle tu relances et pourquoi consulter le test ne doit pas servir à choisir la nouvelle recette.
 @BUILD
-Le fil rouge s'autorise une itération seulement quand elle ajoute une ligne sur le même banc. Le README comptera ces lignes, pas les idées écartées.
+Écris la modification retenue et son motif dans le dossier. Date le choix de la recette avant le test final et garde les configurations des essais abandonnés.
 @QUESTION
-Quand t'arrêtes-tu d'itérer sur les kinds ?
+Sur quoi choisir la nouvelle configuration avant le test final ?
 @CORRECT
-Quand le banc ne distingue plus les choix sur les colonnes que tu sais mesurer
+Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale
 @WRONG
-- Quand le README est assez long
-- Quand un article annonce mieux
-- Après exactement dix modèles
+- Sur le test réservé à chaque nouvel essai
+- Sur la phrase la plus jolie parmi de nombreux tirages
+- Sur un gain annoncé sans code ni entraînement
 @EXPLANATION
-Une itération sans nouvelle mesure sur le banc fixe ne change pas ce que tu sais. L'arrêt fait partie du résultat.
+Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu.
+
 @@@
-@ID 12.12
-@TITLE Documenter la candidate
-@TAG Architecture
-@MINUTES 30
+@ID
+12.12
+@TITLE
+Documenter la candidate
+@TAG
+Architecture
+@MINUTES
+30
 @WHY
-La dernière étape du parcours est un texte que quelqu'un d'autre peut vérifier. Il dit l'hypothèse, la baseline, les tests verts, les colonnes, et les limites. Il ne dit pas qu'un article a été reproduit.
+Un dossier utile permet à une autre personne de refaire ton expérience et de comprendre ce que tu as appris. Une jolie génération isolée ne donne ni la recette, ni la provenance du texte, ni l’explication de ton programme. Cette étape produit un élément vérifiable de ton dossier de modèle.
 @OBJECTIVES
-- Écrire la fiche de la candidate
-- Pointer vers pytest et les modules
-- Fermer le parcours sur des faits
-@PREREQ Itération.
+- Assembler un dossier reproductible avec ses limites
+- Distinguer contrôles publics, aide consultée et autonomie
+- Reconstruire et expliquer une brique sur un exemple nouveau
+@PREREQ
+Méthode du projet personnel, étape 12.11.
 @INTUITION
-Tu laisses sur la maquette une fiche : à quoi elle sert, comment la refaire, ce qu'elle ne porte pas. Un visiteur pressé lit la fiche avant d'admirer les pièces.
+Un dossier utile permet à une autre personne de refaire ton expérience et de comprendre ce que tu as appris. Une jolie génération isolée ne donne ni la recette, ni la provenance du texte, ni l’explication de ton programme.
 @VOCAB
-Fiche : un court texte de README ou de modèle. Commande : pytest, qui rejoue les bancs. Limite : entraînement du dos absent, énergie absente, scores d'articles absents. Candidate : le dos interchangeable.
+Reproductibilité : possibilité de refaire la recette documentée. Provenance : origine des données et du code. Limite : conclusion non justifiée par l’expérience. Autonomie : capacité observée à refaire et expliquer sur un cas nouveau.
 @EXPLAIN
-Le projet final obligatoire est un modèle que tu peux reconstruire et entraîner dans un nouveau dossier. Remets ton code, les tests, le corpus et sa provenance, le tokenizer fixé sur train, les courbes, les baselines et le checkpoint. Ajoute une génération à invites et graines fixées avant le tirage, puis une variation contrôlée. Le correcteur automatique vérifie des propriétés techniques et la présence des mesures ; la qualité de tes explications et l'indépendance des données doivent aussi être relues. La fiche résume hypothèse, protocole, résultat et limites. Une variation perdante reste un résultat valable si tu la mesures et l'expliques. Le dos hybride non entraîné, l'énergie non mesurée et le dialogue non évalué restent des limites explicites. Cocher une leçon n'est pas une certification de maîtrise.
-@LANG python
+Complète DOSSIER_MODELE.md avec le code personnel, les données autorisées et réservées, le tokenizer, les configurations, les contrôles et les métriques. Joins un checkpoint rechargeable, une commande de reproduction et un échec analysé. Annonce les aides utilisées : exécuter correction.py vérifie la référence mais ne montre pas que tu as conçu eleve.py. La grille /20 distingue ces preuves. Termine par une explication du flux des tenseurs et la reconstruction d’une petite brique sur des valeurs nouvelles, sans regarder la solution. Les limites d’un petit corpus et des contrôles publics font partie du résultat.
+@LANG
+python
 @CODE
 :::
-fiche = [
-    "hypothese : kind interchangeable",
-    "baseline : transformer et uniforme",
-    "preuve : pytest",
-    "cout : octets et FLOPs",
-    "limites : dos non entraine, energie non mesuree",
-]
-print(len(fiche))
+requises = {"donnees", "config", "baselines", "rechargement", "limites"}
+fiche = {"config": {"largeur": 16}, "limites": ["petit corpus"]}
+manquantes = sorted(requises - set(fiche))
+assert manquantes == ["baselines", "donnees", "rechargement"]
+print(manquantes)  # Présence des rubriques, pas validation de leurs preuves.
 :::
 @EXPERIMENT
-Cinq lignes, aucune ne cite un score d'article. Si tu en ajoutes une sixième, elle doit pointer vers un test ou rester dans les limites.
+Donne seulement le dossier et les commandes à une autre personne. Note ce qui lui manque pour reproduire. Puis explique une multiplication matricielle et un gradient avec de nouveaux nombres.
 @EXERCISE
-Dans un dossier distinct, complète le projet final décrit dans atelier/PROJET_FINAL.md. Livre code, rapport, données réservées, checkpoint rechargé et variation contrôlée. Fais relire tes explications sans ouvrir le corrigé : les preuves techniques seules ne suffisent pas à démontrer l'autonomie.
+Complète DOSSIER_MODELE.md avec ton code personnel, tes données réservées, les baselines, une variation contrôlée et les limites. Prépare une explication et une reconstruction sur un cas nouveau sans ouvrir le corrigé.
 @BUILD
-La piste se termine par l'épreuve finale de l'atelier. Les critères et commandes sont dans atelier/PROJET_FINAL.md. Les extensions MoE, SSM et multimodalité sont facultatives après ce premier modèle entraîné.
+Remets ton dossier, le code, le checkpoint et les rapports. Utilise la grille du projet final avec une relecture réelle ; conserve à part déclarations, contrôles et autonomie observée.
 @QUESTION
-Que doit contenir la fiche pour que le parcours soit réussi ?
+Quelle remise permet d’examiner le modèle et ton autonomie ?
 @CORRECT
-L'hypothèse, la baseline, les tests, les unités de coût, et les limites non mesurées
+Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau
 @WRONG
-- Un classement public
-- La promesse d'un modèle entraîné de bout en bout
-- Une énergie en joules
+- Un compteur de leçons cochées sans code personnel
+- Une capture du meilleur texte sans la recette
+- Le corrigé exécuté présenté comme une construction sans aide
 @EXPLANATION
-Le contrat de sortie demande d'expliquer, de retrouver dans model/, de lancer le test, de dire le coût, et de comparer à une baseline. La fiche est ce contrat en cinq lignes.
+Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Donne seulement le dossier et les commandes à une autre personne.
 @CODEFILE
 model/gpt_train.py
 @SYMBOL

@@ -11,18 +11,19 @@ import { validateBackup } from "./workspace.js";
 export { LOCAL_FLAG_KEY, LOCAL_PROGRESS_KEY, LOCAL_REVIEW_KEY,
   localLearnerEnabled, enableLocalLearner, forgetLocalLearner,
   readLocalProgress, writeLocalProgress } from "./local-records.js";
-import { browserStorage, readLocalProgress, readLocalDrafts } from "./local-records.js";
+import { browserStorage, readLocalProgress, readLocalDrafts, readLocalStudyRecords } from "./local-records.js";
 const STEP_ID = /^\d+\.\d+$/;
 
-export function localBackup(progress, now = new Date(), drafts = {}) {
+export function localBackup(progress, now = new Date(), drafts = {}, study = {}) {
   return {
     format: "ai-from-zero",
     version: 1,
     createdAt: now.toISOString(),
     records: {
+      ...study,
       ...Object.fromEntries(Object.entries(drafts)
         .filter(([id, code]) => STEP_ID.test(id) && typeof code === "string" && code.length <= 100000)
-        .map(([id, code]) => ["lesson/" + id, { exerciseCode: code }])),
+        .map(([id, code]) => ["lesson/" + id, { ...study["lesson/" + id], exerciseCode: code }])),
       progress: {
         v: 1,
         done: [...(progress?.done || [])].filter((id) => STEP_ID.test(id)),
@@ -99,7 +100,7 @@ export function localPanel(ctx) {
         h("p", { class: "eyebrow", text: "Sans compte" }),
         h("h2", { id: "local-title", text: "Garder ta progression" }),
         h("p", {
-          text: "Par défaut, le site n'écrit rien chez toi. Si tu le demandes, tes étapes cochées, tes quiz, tes résultats et tes brouillons d'exercices restent dans ce navigateur, sans rien envoyer. Tu pourras les exporter ou les effacer à tout moment.",
+          text: "Par défaut, le site n'écrit rien chez toi. Si tu le demandes, tes étapes cochées, quiz, résultats, brouillons, notes, favoris et preuves de construction restent dans ce navigateur, sans rien envoyer. Tu pourras les exporter ou les effacer à tout moment.",
         }),
         localOptInButton(ctx.enable),
       ],
@@ -114,7 +115,7 @@ export function localPanel(ctx) {
       if (!file) return;
       try {
         const backup = validateBackup(JSON.parse(await file.text()));
-        ctx.importProgress(progressFromBackup(backup, ctx.orderedIds), draftsFromBackup(backup, ctx.orderedIds));
+        ctx.importProgress(progressFromBackup(backup, ctx.orderedIds), draftsFromBackup(backup, ctx.orderedIds), backup.records);
       } catch {
         ctx.importProgress(null);
       }
@@ -138,7 +139,7 @@ export function localPanel(ctx) {
             onClick: () =>
               downloadJson(
                 `ai-from-zero-progression-${new Date().toISOString().slice(0, 10)}.json`,
-                localBackup(readLocalProgress(browserStorage()), new Date(), readLocalDrafts(browserStorage())),
+                localBackup(readLocalProgress(browserStorage()), new Date(), readLocalDrafts(browserStorage()), readLocalStudyRecords(browserStorage())),
               ),
           },
           "Exporter",

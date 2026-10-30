@@ -1371,62 +1371,62 @@
   },
   "12.1": {
     "hints": [
-      "Remplace intelligent par une quantité observable et un protocole.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense »."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Passer de largeur 16 à 24, à données et nombre de tokens vus identiques, peut réduire la perte de validation. Il faut aussi mesurer les paramètres et le coût."
     ],
-    "solution": "Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense ». Mesure réellement ces durées à D, batch et machine constants. Une formule de complexité n'est pas encore une mesure de temps.",
+    "solution": "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Passer de largeur 16 à 24, à données et nombre de tokens vus identiques, peut réduire la perte de validation. Il faut aussi mesurer les paramètres et le coût.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Remplace intelligent par une quantité observable et un protocole."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.2": {
     "hints": [
-      "La baseline doit être un point de comparaison défini à l'avance.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Une référence uniforme attribue la même probabilité à chaque token. Le bigramme apprend sur train. Le GPT de référence est entraîné avec une recette fixée avant la variante."
     ],
-    "solution": "Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride. Choisir l'hybride après avoir regardé ses résultats rendrait la référence opportuniste. Une autre baseline reste possible si tu la justifies avant l'essai et conserves le même protocole.",
+    "solution": "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Une référence uniforme attribue la même probabilité à chaque token. Le bigramme apprend sur train. Le GPT de référence est entraîné avec une recette fixée avant la variante.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : La baseline doit être un point de comparaison défini à l'avance."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.3": {
     "hints": [
-      "Change une cause par ligne pour lire son effet.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Une comparaison contrôlée modifie une seule variable. Pour largeur 16 contre 24, conserver textes, tokenizer, contexte, batch, pas et graines apparie les expériences."
     ],
-    "solution": "Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches. Ajoute une quatrième ligne autre kind à quatre couches pour mesurer l'interaction. Une seule ligne qui change kind et profondeur ne permet pas d'attribuer le résultat.",
+    "solution": "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Une comparaison contrôlée modifie une seule variable. Pour largeur 16 contre 24, conserver textes, tokenizer, contexte, batch, pas et graines apparie les expériences.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Change une cause par ligne pour lire son effet."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.4": {
     "hints": [
-      "quality_table trie la qualité du plus grand au plus petit.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "La cross-entropy moyenne est en nats par token. La perplexité est son exponentielle. Entre tokenizers, utiliser une unité commune comme les nats par caractère et préciser les cibles retenues."
     ],
-    "solution": "Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe. Une perplexité 10 donne -10 et doit passer avant une perplexité 20 donnant -20. Conserve aussi la valeur originale pour faciliter la lecture.",
+    "solution": "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. La cross-entropy moyenne est en nats par token. La perplexité est son exponentielle. Entre tokenizers, utiliser une unité commune comme les nats par caractère et préciser les cibles retenues.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : quality_table trie la qualité du plus grand au plus petit."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.5": {
     "hints": [
-      "Le banc doit rester commun aux configurations comparées.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Changer d_model modifie paramètres, calcul et mémoire."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Un banc réunit des données gelées, une recette, des métriques et un protocole de sélection. Réserver des documents entiers avant entraînement et examiner les doublons évite de récompenser la simple mémorisation."
     ],
-    "solution": "Changer d_model modifie paramètres, calcul et mémoire. Relance toutes les configurations, y compris la baseline, avec cette nouvelle largeur et le même protocole. Un ancien score de baseline à une autre largeur n'isole plus l'effet du kind.",
+    "solution": "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Un banc réunit des données gelées, une recette, des métriques et un protocole de sélection. Réserver des documents entiers avant entraînement et examiner les doublons évite de récompenser la simple mémorisation.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Le banc doit rester commun aux configurations comparées."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.6": {
     "hints": [
-      "Vérifie l'unité derrière chaque colonne.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. attention_flops compte des opérations estimées, pas des secondes."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "La qualité prédictive, la durée, les octets et l’énergie sont des mesures différentes. Les FLOPs estiment un calcul ; ils ne donnent pas automatiquement des secondes ni des joules sur ton ordinateur."
     ],
-    "solution": "attention_flops compte des opérations estimées, pas des secondes. Remplis seconds avec un chronométrage et documente échauffement, répétitions et synchronisation. L'énergie demanderait une mesure dédiée ; elle ne se déduit pas automatiquement des FLOPs.",
+    "solution": "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. La qualité prédictive, la durée, les octets et l’énergie sont des mesures différentes. Les FLOPs estiment un calcul ; ils ne donnent pas automatiquement des secondes ni des joules sur ton ordinateur.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Vérifie l'unité derrière chaque colonne."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.7": {
@@ -1461,32 +1461,32 @@
   },
   "12.10": {
     "hints": [
-      "Une fuite de futur invalide la comparaison de qualité.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Une perte plus basse peut cacher une fuite de données ou de futur. Vérifier d’abord les contrats : entrées et cibles décalées, masque causal, gradients, splits et rechargement. Une hypothèse fausse reste un résultat à conserver."
     ],
-    "solution": "Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future. Relance les tests de causalité, puis les mesures avec le même protocole. Une baisse de loss obtenue grâce à une fuite n'est pas une amélioration du SSM.",
+    "solution": "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Une perte plus basse peut cacher une fuite de données ou de futur. Vérifier d’abord les contrats : entrées et cibles décalées, masque causal, gradients, splits et rechargement. Une hypothèse fausse reste un résultat à conserver.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Une fuite de futur invalide la comparaison de qualité."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.11": {
     "hints": [
-      "Une itération doit correspondre à un changement exécutable et mesurable.",
-      "Écris les valeurs ou les étapes intermédiaires avant de conclure. Refuse l'ajout d'un temps interne seulement décrit dans le texte."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Une itération doit répondre à une observation sur train et validation. Choisir la configuration sur validation, documenter le changement et garder un budget fixé. Le test final réservé ne doit pas devenir un réglage supplémentaire."
     ],
-    "solution": "Refuse l'ajout d'un temps interne seulement décrit dans le texte. Choisis plutôt une modification implémentée, un test qui la couvre et un budget fixe. Fais une seule itération, conserve baseline et résultat, puis explique ce que tu as observé sans inventer une capacité.",
+    "solution": "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Une itération doit répondre à une observation sur train et validation. Choisir la configuration sur validation, documenter le changement et garder un budget fixé. Le test final réservé ne doit pas devenir un réglage supplémentaire.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Une itération doit correspondre à un changement exécutable et mesurable."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "12.12": {
     "hints": [
-      "Écris d'abord le contrat de forme ou le protocole attendu.",
-      "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
+      "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+      "Le dossier final relie code, données, tokenizer, recette, contrôles, checkpoint et interprétation. Une autre personne doit pouvoir refaire le petit entraînement et obtenir les mêmes logits après rechargement."
     ],
-    "solution": "Le dossier final réunit le code de tes composants, les documents séparés, le tokenizer, la configuration, les courbes, les baselines et les logits après rechargement. Ajoute une variation contrôlée et explique les résultats, y compris négatifs. Un rapport automatique vérifie des propriétés ; la compréhension doit aussi être démontrée sans le corrigé.",
+    "solution": "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Le dossier final relie code, données, tokenizer, recette, contrôles, checkpoint et interprétation. Une autre personne doit pouvoir refaire le petit entraînement et obtenir les mêmes logits après rechargement.",
     "pitfalls": [
-      "Ne confonds pas le résultat attendu avec sa vérification : Associe chaque affirmation à une preuve ou retire-la."
+      "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
     ]
   },
   "13.1": {

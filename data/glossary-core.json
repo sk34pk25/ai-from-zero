@@ -1,0 +1,329 @@
+[
+  {
+    "term": "Ablation",
+    "definition": "Expérience contrôlée qui retire une brique pour examiner son apport, en maintenant le reste du protocole.",
+    "contexts": [
+      {
+        "lesson": "5.10",
+        "definition": "retirer ou remplacer une pièce pour mesurer son effet"
+      },
+      {
+        "lesson": "12.3",
+        "definition": "retrait contrôlé d’un composant"
+      }
+    ],
+    "english": "ablation",
+    "aliases": [],
+    "example": "Retirer les embeddings de position puis refaire le même entraînement et la même évaluation.",
+    "common": true
+  },
+  {
+    "term": "Baseline",
+    "definition": "Système ou configuration choisi comme référence avant d’évaluer une variante, avec le même protocole.",
+    "contexts": [
+      {
+        "lesson": "3.2",
+        "definition": "le modèle simple contre lequel on se compare."
+      },
+      {
+        "lesson": "5.10",
+        "definition": "la configuration de référence (positions absolues, LayerNorm, GELU)"
+      },
+      {
+        "lesson": "11.1",
+        "definition": "le système simple auquel on se compare"
+      },
+      {
+        "lesson": "12.2",
+        "definition": "référence de comparaison"
+      }
+    ],
+    "english": "baseline",
+    "aliases": [
+      "Référence de comparaison"
+    ],
+    "example": "Comparer le GPT au bigramme et à l’uniforme sur les mêmes cibles.",
+    "common": true
+  },
+  {
+    "term": "Batch",
+    "definition": "Petit ensemble d’exemples traités lors d’un même calcul. Pour des séquences de tokens, sa forme est souvent [B,T].",
+    "contexts": [
+      {
+        "lesson": "1.16",
+        "definition": "le paquet d'exemples du pas"
+      },
+      {
+        "lesson": "2.11",
+        "definition": "l'axe B"
+      },
+      {
+        "lesson": "6.5",
+        "definition": "le nombre d'exemples du pas"
+      }
+    ],
+    "english": "batch",
+    "aliases": [
+      "Mini-batch"
+    ],
+    "example": "B=2 et T=4 : deux séquences de quatre tokens.",
+    "common": true
+  },
+  {
+    "contexts": [],
+    "term": "Broadcasting",
+    "english": "broadcasting",
+    "aliases": [
+      "Diffusion"
+    ],
+    "definition": "Réutilisation de valeurs sur des axes compatibles d’un tableau. Le backward somme les contributions correspondant à ces réutilisations.",
+    "example": "Ajouter un biais [3] à deux lignes [2,3] utilise chaque biais deux fois.",
+    "common": true
+  },
+  {
+    "term": "Checkpoint",
+    "definition": "Sauvegarde des poids, de la configuration et du tokenizer. Une reprise exacte d’entraînement exige aussi les états d’optimiseur et du hasard.",
+    "contexts": [
+      {
+        "lesson": "3.11",
+        "definition": "un fichier d'état. state dict : les tableaux nommés"
+      }
+    ],
+    "english": "checkpoint",
+    "aliases": [],
+    "example": "Vérifier les mêmes logits avant et après rechargement, pas seulement la présence du fichier.",
+    "common": true
+  },
+  {
+    "term": "Embedding",
+    "definition": "Vecteur associé à un identifiant. Dans le modèle entraînable, les lignes de cette table sont des paramètres appris.",
+    "contexts": [
+      {
+        "lesson": "2.9",
+        "definition": "le vecteur d'un token"
+      }
+    ],
+    "english": "embedding",
+    "aliases": [
+      "Embeddings"
+    ],
+    "example": "Une table [V,D] de V=30 et D=16 contient 480 paramètres.",
+    "common": true
+  },
+  {
+    "term": "Entropie croisée",
+    "definition": "Pour une cible, moins le logarithme de la probabilité attribuée à cette cible. La moyenne précise les cibles comptées et le dénominateur.",
+    "contexts": [
+      {
+        "lesson": "3.6",
+        "definition": "-log(p_cible) pour une cible one-hot"
+      },
+      {
+        "lesson": "12.4",
+        "definition": "surprise moyenne des cibles"
+      }
+    ],
+    "english": "cross-entropy",
+    "aliases": [
+      "Cross-entropy"
+    ],
+    "example": "Si la cible a une probabilité 1/2, sa perte vaut ln(2), environ 0,693 nat.",
+    "common": true
+  },
+  {
+    "term": "Gradient",
+    "definition": "Ensemble des dérivées de la loss par rapport aux paramètres. Il indique leur sensibilité locale ; l’optimiseur s’en sert pour les mettre à jour.",
+    "contexts": [
+      {
+        "lesson": "0.20",
+        "definition": "le vecteur des dérivées quand il y a plusieurs paramètres."
+      },
+      {
+        "lesson": "1.10",
+        "definition": "le vecteur de ces dérivées"
+      },
+      {
+        "lesson": "3.6",
+        "definition": "(softmax(logits) - one_hot) / N pour la moyenne."
+      }
+    ],
+    "english": "gradient",
+    "aliases": [
+      "Gradients"
+    ],
+    "example": "Pour L=(w−3)², dL/dw=2(w−3). En w=1, le gradient vaut −4.",
+    "common": true
+  },
+  {
+    "term": "Logits",
+    "definition": "Scores réels produits avant softmax. Ce ne sont pas encore des probabilités.",
+    "contexts": [
+      {
+        "lesson": "3.4",
+        "definition": "score brut, non normalisé"
+      }
+    ],
+    "english": "logits",
+    "aliases": [
+      "Logit"
+    ],
+    "example": "Les logits [0,0] donnent les probabilités [0,5 ; 0,5] après softmax.",
+    "common": true
+  },
+  {
+    "contexts": [],
+    "term": "Loss",
+    "english": "loss",
+    "aliases": [
+      "Fonction de coût"
+    ],
+    "definition": "Nombre défini par une règle qui compare les prédictions aux cibles. Sa baisse sur train ne garantit pas une meilleure généralisation.",
+    "example": "La perte quadratique de la prédiction 5 face à la cible 7 vaut (5−7)²=4.",
+    "common": true
+  },
+  {
+    "term": "Masque causal",
+    "definition": "Règle qui interdit à une position d’utiliser des tokens futurs pendant la prédiction du suivant.",
+    "contexts": [
+      {
+        "lesson": "4.5",
+        "definition": "les cases j ≤ i restent ouvertes. -1e9 : un score assez petit pour que softmax le traite comme nul."
+      }
+    ],
+    "english": "causal mask",
+    "aliases": [
+      "Masque triangulaire inférieur"
+    ],
+    "example": "À la position 1, les positions 0 et 1 sont visibles ; la position 2 est masquée avant softmax.",
+    "common": true
+  },
+  {
+    "term": "Perplexité",
+    "definition": "Exponentielle de l’entropie croisée moyenne exprimée avec le logarithme naturel. Elle dépend du tokenizer et des données évaluées.",
+    "contexts": [
+      {
+        "lesson": "3.10",
+        "definition": "exp de la cross-entropy moyenne naturelle"
+      },
+      {
+        "lesson": "12.4",
+        "definition": "exponentielle de cette moyenne"
+      }
+    ],
+    "english": "perplexity",
+    "aliases": [],
+    "example": "Pour une distribution uniforme sur V tokens, elle vaut V.",
+    "common": true
+  },
+  {
+    "term": "Rétropropagation",
+    "definition": "Application de la règle de chaîne dans l’ordre inverse du graphe de calcul pour obtenir les gradients. Les chemins partagés s’additionnent.",
+    "contexts": [
+      {
+        "lesson": "1.12",
+        "definition": "la passe arrière"
+      }
+    ],
+    "english": "backpropagation",
+    "aliases": [
+      "Backward",
+      "Backpropagation"
+    ],
+    "example": "Pour y=w*w+w et w=3, le gradient de w vaut 7.",
+    "common": true
+  },
+  {
+    "term": "Softmax",
+    "definition": "Transforme les scores d’une ligne en probabilités positives dont la somme vaut un. Soustraire le maximum avant exponentiation stabilise le calcul.",
+    "contexts": [
+      {
+        "lesson": "3.5",
+        "definition": "exp(z_i) / somme exp(z_j)"
+      }
+    ],
+    "english": "softmax",
+    "aliases": [],
+    "example": "Deux scores identiques donnent chacun une probabilité de 1/2.",
+    "common": true
+  },
+  {
+    "term": "Tenseur",
+    "definition": "Tableau à plusieurs axes. Le Tensor du cours ajoute un suivi des opérations et de leurs gradients ; un tableau n’enregistre pas nécessairement un graphe.",
+    "contexts": [
+      {
+        "lesson": "1.15",
+        "definition": "tableau à N dimensions. requires_grad : demande le suivi des dérivées. .grad : le gradient accumulé. zero_grad : remet ces cases à zéro"
+      }
+    ],
+    "english": "tensor",
+    "aliases": [
+      "Tenseurs"
+    ],
+    "example": "[B,T,D]=[2,4,8] contient 64 valeurs.",
+    "common": true
+  },
+  {
+    "contexts": [],
+    "term": "Test réservé",
+    "english": "held-out test",
+    "aliases": [],
+    "definition": "Jeu conservé à part jusqu’à la mesure finale après sélection. Réutiliser son score pour régler le modèle le transforme en validation.",
+    "example": "Après changement de recette choisi grâce au test, préparer un nouveau test indépendant.",
+    "common": true
+  },
+  {
+    "term": "Token",
+    "definition": "Unité de la segmentation d’un texte, représentée par un identifiant entier. Ce peut être un caractère, un octet ou une unité issue de fusions.",
+    "contexts": [
+      {
+        "lesson": "11.3",
+        "definition": "l'unité du tokenizer actuel, ici souvent un caractère"
+      }
+    ],
+    "english": "token",
+    "aliases": [
+      "Tokens"
+    ],
+    "example": "Un tokenizer caractère peut encoder « abba » par [0,1,1,0].",
+    "common": true
+  },
+  {
+    "contexts": [],
+    "term": "Tokenizer",
+    "english": "tokenizer",
+    "aliases": [
+      "Tokeniseur"
+    ],
+    "definition": "Règle et vocabulaire qui encodent le texte en identifiants et permettent son décodage. Les identifiants doivent rester stables après entraînement.",
+    "example": "Le même vocabulaire doit être rechargé avec le checkpoint du modèle.",
+    "common": true
+  },
+  {
+    "term": "Train",
+    "definition": "Données utilisées pour ajuster les paramètres. Une mesure sur ces données décrit aussi la mémorisation et ne suffit pas à évaluer la généralisation.",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "données utilisées pour modifier les paramètres"
+      }
+    ],
+    "english": "training data",
+    "aliases": [],
+    "example": "Le tokenizer est appris sur train ; les documents de validation et de test restent réservés.",
+    "common": true
+  },
+  {
+    "term": "Validation",
+    "definition": "Données réservées servant à choisir une configuration ou un checkpoint. Elles ne servent pas à mettre à jour les poids.",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "données pour choisir un réglage, comme le pas d'apprentissage"
+      }
+    ],
+    "english": "validation",
+    "aliases": [],
+    "example": "Choisir la largeur sur validation, puis évaluer le choix sur un test encore réservé.",
+    "common": true
+  }
+]
