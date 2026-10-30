@@ -98,3 +98,15 @@ export function readLocalDraft(storage, id) { return readLocalDrafts(storage)[id
 export function writeLocalDraft(storage, id, code, token) {
   return typeof code === "string" && code.length <= 100000 && put(storage, "draft", id, code, token);
 }
+
+export function readLocalReading(storage) {
+  const token = localToken(storage);
+  if (!token) return {};
+  const row = readJson(storage, LOCAL_PREFIX + token + "/reading", {});
+  return row && STEP.test(row.id) && Number.isFinite(row.y) && row.y >= 0 ? row : {};
+}
+
+export function writeLocalReading(storage, row, token) {
+  if (!token || token !== localToken(storage) || !STEP.test(row.id) || !Number.isFinite(row.y) || row.y < 0) return false;
+  return writeJson(storage, LOCAL_PREFIX + token + "/reading", { id: row.id, y: row.y, at: row.at });
+}

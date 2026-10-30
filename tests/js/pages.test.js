@@ -66,7 +66,7 @@ test("Mon modèle allume les briques acquises et signale la sélection", () => {
   });
   const text = main.text();
   assert.match(text, /Architecture évolutive/);
-  assert.match(text, /Acquis/);
-  assert.match(text, /Cette brique est débloquée/);
+  assert.match(text, /Leçon cochée/);
+  assert.match(text, /La leçon est cochée/);
   assert.equal(picked, null);
 });

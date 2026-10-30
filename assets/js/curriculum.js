@@ -39,6 +39,8 @@ export function applyLearningPath(index, path) {
     : [...index.allLevels];
   index.orderedIds = index.levels.flatMap((l) => l.steps.map((s) => s.id));
   index.coreIds = index.allLevels.filter((l) => core.includes(l.id)).flatMap((l) => l.steps.map((s) => s.id));
+  index.explorationIds = index.orderedIds.filter((id) => !index.coreIds.includes(id));
+  index.activeIds = index.path === "core" && index.coreIds.length ? index.coreIds : index.orderedIds;
   return index;
 }
 

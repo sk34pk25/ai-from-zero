@@ -18,7 +18,7 @@ test('matrices : une cellule et ses facteurs répondent au clic et au clavier', 
 
 test('backprop : la ligne active suit les valeurs et un neurone bloqué reçoit zéro', async ({page}) => {
   const host=await open(page,'1.12');
-  for(let i=0;i<5;i++) await host.getByRole('button',{name:'Étape suivante',exact:true}).click();
+  for(let i=0;i<5;i++) await host.getByRole('button',{name:'Calcul suivant',exact:true}).click();
   await expect(host.locator('.lab-code [aria-current="step"]')).toContainText('dw = dy');
   await expect(host.locator('.lab-stage')).toContainText('6 × 1 × 3 = 18');
   await setRange(host.getByLabel('Poids w du neurone'),-1);
@@ -40,9 +40,9 @@ test('ReLU en zéro utilise la convention du moteur et le point de divergence re
 test('attention : vrais scores, futur masqué, softmax et mélange des valeurs', async ({page}) => {
   const host=await open(page,'4.5');
   await expect(host.locator('.lab-stage')).toContainText('−∞');
-  await host.getByRole('button',{name:'Étape suivante',exact:true}).click();
+  await host.getByRole('button',{name:'Calcul suivant',exact:true}).click();
   await expect(host.locator('.lab-stage')).toContainText('0.330'); await expect(host.locator('.lab-stage')).toContainText('0.670');
-  await host.getByRole('button',{name:'Étape suivante',exact:true}).click();
+  await host.getByRole('button',{name:'Calcul suivant',exact:true}).click();
   await expect(host.locator('.lab-stage')).toContainText('0.660'); await expect(host.locator('.lab-stage')).toContainText('1.340');
   await host.getByText('À toi de prédire',{exact:true}).click(); await host.getByLabel('Pour « chat », quel poids reçoit le futur « dort » ?').fill('0');
   await host.getByRole('button',{name:'Vérifier la prédiction',exact:true}).click(); await expect(host.locator('.lab-feedback')).toHaveAttribute('data-correct','true');
@@ -77,7 +77,7 @@ test('RoPE, GQA, cache, scan, patches, LoRA et masque SFT changent le calcul vis
 });
 
 test('courbe publiée : unités, légende, tirets et valeurs exactes accessibles', async ({page}) => {
-  await page.goto('/#/construire'); const host=page.locator('[data-run-host]');
+  await page.goto('/#/construire'); await page.locator('.published-results > summary').click(); const host=page.locator('[data-run-host]');
   await expect(host).toContainText('Perte (nats / token)'); await expect(host).toContainText('Train, bleu, trait continu'); await expect(host).toContainText('Validation, vert, tirets');
   await expect(host.locator('polyline.is-val')).toHaveAttribute('stroke-dasharray','6 4');
   await setRange(host.getByLabel('Pas réel à inspecter'),1); await expect(host).toContainText('validation = non mesurée à ce pas');
@@ -93,6 +93,7 @@ for(const [width,height] of [[320,568],[390,844],[768,1024],[1440,900]]) test(`l
     await expect(host).not.toHaveClass(/visual-live/);
     if(id==='4.5') {
       if(width<1200) { await host.getByRole('button',{name:'Code de l’étape',exact:true}).click(); await expect(host.locator('.lab-code')).toBeVisible(); await host.getByRole('button',{name:'Calcul et schéma',exact:true}).click(); }
+      await page.getByRole('button',{name:'Observer et manipuler',exact:true}).click();
       const first=await host.locator('.lab-stage').boundingBox(); expect(first.y).toBeLessThan(width<600 ? 850 : 950);
       const axe=await new AxeBuilder({page}).analyze(); expect(axe.violations,JSON.stringify(axe.violations)).toEqual([]);
     }
@@ -116,5 +117,5 @@ test('échantillonnage, modalités et protocoles illustrent des mécanismes dist
 test('Mon modèle ouvre le trajet numérique sans exiger un compte', async ({page}) => {
   await page.goto('/#/modele'); await page.getByRole('button',{name:'Ouvrir le trajet numérique',exact:true}).click();
   const host=page.locator('[data-architecture-lab]'); await expect(host.locator('.lab-stage')).toContainText('T=3, D=2, V=3');
-  await host.getByRole('button',{name:'Étape suivante',exact:true}).click(); await expect(host.locator('.lab-code [aria-current="step"]')).toContainText('context =');
+  await host.getByRole('button',{name:'Calcul suivant',exact:true}).click(); await expect(host.locator('.lab-code [aria-current="step"]')).toContainText('context =');
 });

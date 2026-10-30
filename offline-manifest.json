@@ -1,5 +1,5 @@
 {
-  "version": "d73f45faddd0",
+  "version": "c4f03c980aa7",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -21,6 +21,7 @@
     "assets/js/auth.js",
     "assets/js/bpe.js",
     "assets/js/cache-bust.js",
+    "assets/js/course-guide.js",
     "assets/js/curriculum.js",
     "assets/js/dom.js",
     "assets/js/evidence.js",

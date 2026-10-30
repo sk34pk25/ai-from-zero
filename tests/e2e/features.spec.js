@@ -20,7 +20,7 @@ test("le visiteur reste en lecture seule", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Se connecter" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeVisible();
   await page.goto("/#/lecon/1.6");
-  await expect(page.locator(".lock-note")).toContainText("Réservé au propriétaire");
+  await expect(page.locator(".lock-note")).toContainText("suivi sur cet appareil");
   await expect(page.locator("[data-choice='0']")).toBeDisabled();
   await expect(page.getByRole("button", { name: "Ouvrir dans l'IDE" })).toHaveCount(0);
   await page.getByRole("button", { name: "Activer le thème clair" }).click();
@@ -106,7 +106,7 @@ test("le catalogue, le playground, une adresse supprimée et une figure passent 
   await page.goto('/#/lecon/0.1');
   const program = page.locator('[data-lab="program"]');
   await expect(program.locator('.lab-stage')).toContainText('texte chargé');
-  await program.getByRole('button', { name: 'Étape suivante', exact: true }).click();
+  await program.getByRole('button', { name: 'Calcul suivant', exact: true }).click();
   await expect(program.locator('.lab-stage')).toContainText('texte + IDs');
 });
 

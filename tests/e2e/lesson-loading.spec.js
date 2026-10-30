@@ -80,10 +80,12 @@ test("le mode guidé précède le quiz et la révision conserve le brouillon", a
     .compareDocumentPosition(document.querySelector(".quiz")) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   const code = page.getByRole("textbox", { name: "Code de l'exercice" });
   await code.fill("# mode de lecture sans perte de saisie\n");
+  await page.locator(".lesson-display > summary").click();
   await page.getByRole("button", { name: "Révision visuelle", exact: true }).click();
   await expect(deep).not.toHaveAttribute("open");
   await expect(code).toHaveValue("# mode de lecture sans perte de saisie\n");
   await page.reload();
+  await page.locator(".lesson-display > summary").click();
   await expect(page.getByRole("button", { name: "Révision visuelle", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(deep).not.toHaveAttribute("open");
   await page.getByRole("button", { name: "Cours guidé", exact: true }).click();

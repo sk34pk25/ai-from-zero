@@ -53,8 +53,8 @@ export function lab(host, { kind, title, source, steps, render, initial = 0 }) {
   const count = note('');
   count.setAttribute('role', 'status');
   let index = initial;
-  const prev = action('Étape précédente', () => { index--; paint(); });
-  const next = action('Étape suivante', () => { index++; paint(); });
+  const prev = action('Calcul précédent', () => { index--; paint(); });
+  const next = action('Calcul suivant', () => { index++; paint(); });
   const tabs = h('div', { class: 'lab-tabs', role: 'group', 'aria-label': 'Vue du laboratoire' });
   for (const [view, label] of [['calculation', 'Calcul et schéma'], ['code', 'Code de l’étape']]) tabs.append(action(label, () => {
     host.dataset.view = view;

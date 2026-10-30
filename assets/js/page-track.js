@@ -62,6 +62,13 @@ export function paintTrack(main, { track, done, reports, loadReports, isCurrent 
       class: "lead",
       text: `${stages.length} étapes, d'un dossier vide jusqu'à un petit GPT entraîné par rétropropagation. Tu lis la leçon, tu ouvres le fichier cité, tu lances le code. Les cases cochées du cours allument la piste.`,
     }),
+    h("p", {
+      class: "track-progress",
+      text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.`,
+    }),
+    list,
+    h("details", { class: "published-results" }, [
+      h("summary", { text: "Voir un résultat publié : entraînement et dialogue de démonstration" }),
     h(
       "section",
       { class: "callout callout-build", "aria-labelledby": "run-title" },
@@ -88,11 +95,7 @@ export function paintTrack(main, { track, done, reports, loadReports, isCurrent 
         chatHost,
       ],
     ),
-    h("p", {
-      class: "track-progress",
-      text: `${doneCount} / ${stages.length} étapes de la piste déjà cochées.`,
-    }),
-    list,
+    ]),
     h("section", { class: "callout callout-build" }, [
       h("h2", { text: "Lancer l'entraînement" }),
       h("p", {

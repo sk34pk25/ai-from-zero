@@ -1726,3 +1726,38 @@ main[tabindex="-1"]:focus { outline: none; }
   .lab-chart { min-width: 340px; }
 }
 .visual-host[data-lab] .token-board button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+
+/* Parcours guidé : des repères lisibles avant les activités. */
+.path-progress-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.path-progress-grid > * { min-width:0; }
+.path-progress-grid progress { width:100%; }
+.phase-card { border-top:1px solid var(--line); padding:.8rem 0; }
+.phase-card summary, .lesson-display > summary, .atelier-resources > summary, .published-results > summary, .nav-explorations > summary { cursor:pointer; font-weight:700; padding:.65rem .2rem; }
+.lesson-objectives { margin-top:1.2rem; }
+.lesson-objectives h2 { margin-top:0; }
+.lesson-contents { display:flex; flex-wrap:wrap; gap:.4rem; margin:1rem 0; }
+.lesson-contents p { flex-basis:100%; margin:0; }
+.lesson-contents button { min-height:44px; padding:.5rem .7rem; }
+.lesson-display { margin:1rem 0; border-block:1px solid var(--line); }
+.lesson-practice > * + *, [data-practice-tools] > * + * { margin-top:1.5rem; }
+.lesson-actions { flex-wrap:wrap; }
+.lesson-actions > * { min-width:0; max-width:100%; }
+.lesson-actions a { white-space:normal; }
+.tp-navigation { display:flex; flex-wrap:wrap; gap:.6rem 1rem; }
+.tp-navigation h2, .tp-navigation p { flex-basis:100%; }
+.tp-navigation a { min-height:44px; padding:.4rem 0; }
+.atelier-resources, .published-results { margin-top:1.5rem; }
+.nav-explorations { margin-top:.8rem; }
+.nav-explorations summary { font-size:.85rem; }
+/* Les graphiques et matrices défilent dans leur cadre, sans élargir la page. */
+.visual-host, .visual-host > *, .lab-layout > *, .lab-stage > *, .lab-matrices > *, .lab-predict > * { min-width:0; max-width:100%; }
+.lab-chart-wrap { width:100%; }
+.lab-table-scroll { min-width:0; }
+.lab-title, .lab-caption, .lab-source { overflow-wrap:anywhere; }
+@media (max-width:600px) {
+  .panel-head { flex-wrap:wrap; align-items:start; gap:.6rem; }
+  .panel-head > * { min-width:0; }
+  .panel-head .legend { flex:1 0 100%; white-space:normal; }
+  .path-progress-grid { grid-template-columns:minmax(0,1fr); }
+  .lesson-contents button { flex:1 1 8rem; }
+}
