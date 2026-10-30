@@ -170,23 +170,20 @@ test("chaque famille de visuel interactif répond", async ({ page }) => {
     await page.goto(`/#/lecon/${lesson.id}`);
     const host = page.locator("[data-visual-host]");
     await expect(host).toBeVisible();
-    const before = (await host.locator(".visual-readout").count())
-      ? await host.locator(".visual-readout").innerText()
-      : await host.locator("li").first().innerText();
-    if (lesson.visual === "descent") await host.getByRole("button", { name: "Un pas" }).click();
-    else if (lesson.visual === "loss") await host.getByRole("button", { name: "Un pas d'entraînement" }).click();
-    else if (lesson.visual === "transformer") await host.getByRole("button", { name: "Étape suivante" }).click();
-    else if (lesson.visual === "patches") await host.getByRole("button", { name: "Rappeler l'ordre" }).click();
-    else if (lesson.visual === "attention") await host.getByRole("button", { name: "ici" }).click();
-    else if (lesson.visual === "embed") await host.getByRole("button", { name: "code" }).click();
-    else if (lesson.visual === "bigram") await host.getByRole("button", { name: "b", exact: true }).click();
-    else if (lesson.visual === "moe") await host.getByRole("button").first().click();
-    else if (lesson.visual === "tokenize") await host.getByLabel("Texte à découper").fill("bonjour");
-    else if (lesson.visual === "retrieve") await host.getByLabel("Question à comparer aux documents").fill("tokenizer");
-    else if (lesson.visual === "bpe") await host.getByRole("button", { name: "Fusionner" }).click();
-    else await host.locator("input[type=range]").press("ArrowRight");
-    if (lesson.visual === "retrieve") await expect(host.locator("li").first()).toContainText("tokenizer");
-    else await expect(host.locator(".visual-readout")).not.toHaveText(before);
+    const before = await host.innerText();
+    if (await host.locator('.lab-controls').count()) {
+      const next = host.getByRole('button', { name: 'Étape suivante', exact: true });
+      if (await next.count()) await next.click();
+      else if (await host.getByRole('button', { name: 'Un pas', exact: true }).count()) await host.getByRole('button', { name: 'Un pas', exact: true }).click();
+      else await host.getByRole('button', { name: 'Fusionner', exact: true }).click();
+    } else if (lesson.visual === 'embed') await host.getByRole('button', { name: 'code', exact: true }).click();
+    else if (lesson.visual === 'bigram') await host.getByRole('button', { name: 'b', exact: true }).click();
+    else if (lesson.visual === 'tokenize') await host.getByLabel('Texte à découper').fill('bonjour');
+    else if (lesson.visual === 'retrieve') await host.getByLabel('Question à comparer aux documents').fill('tokenizer');
+    else if (lesson.visual === 'patches') await host.getByLabel('Patch à extraire').press('ArrowRight');
+    else await host.locator('input[type=range]').first().press('ArrowRight');
+    if (lesson.visual === 'retrieve') await expect(host.locator('li').first()).toContainText('tokenizer');
+    else await expect(host).not.toHaveText(before);
   }
   expect([...seen].sort()).toEqual(
     ["attention", "bigram", "bpe", "descent", "embed", "lora", "loss", "moe", "patches", "relu", "retrieve", "scan", "softmax", "tokenize", "transformer"].sort(),

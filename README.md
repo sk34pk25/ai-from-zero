@@ -201,3 +201,7 @@ Un plan peut repartir des poids et de l’historique SFT d’un checkpoint avec 
 
 
 Le second [banc littéraire](atelier/BANC_FR.md) compare réellement baseline et RoPE sur 21 extraits de sept livres, avec auteurs principaux réservés et trois graines appariées. Le [rapport](data/benchmark_modern_run.json) conserve les résultats, coûts et limites. Le [protocole de relecture](atelier/RELECTURE.md) prépare des essais avec de vrais débutants et appareils : les cases restent à remplir après observation.
+
+### Apprendre visuellement
+
+Les leçons proposent des calculs inspectables, des matrices sélectionnables, des graphes de gradients et une attention causale numérique. Avance à ton rythme, relie chaque étape à son code NumPy, puis vérifie ta prédiction. Voir [le guide de l’apprentissage visuel](docs/APPRENTISSAGE_VISUEL.md).
