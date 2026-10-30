@@ -16,7 +16,7 @@ def test_rls_covers_every_owner_table():
     for table in tables:
         assert f"alter table public.{table} enable row level security;" in SCHEMA
         assert f"create policy {table}_owner on public.{table}" in SCHEMA
-        assert f"revoke all on table public.{table} from anon, public;" in SCHEMA
+        assert f"revoke all on table public.{table} from anon, public, authenticated;" in SCHEMA
         assert f"grant select, insert, update, delete on table public.{table} to authenticated;" in SCHEMA
 
 

@@ -19,7 +19,8 @@ def load_balance_loss(probs: np.ndarray, choices: np.ndarray) -> float:
     """Perte auxiliaire de type Switch : E * somme(f_i * P_i).
 
     Elle vaut environ 1 quand le routeur est uniforme, et E quand il s'effondre
-    sur un seul expert avec une probabilité proche de 1.
+    sur un seul expert avec une probabilité proche de 1. La référence uniforme
+    n'est pas une borne inférieure générale : f et P peuvent être différents.
     """
     probs = np.asarray(probs, dtype=np.float64)
     tokens, experts = probs.shape

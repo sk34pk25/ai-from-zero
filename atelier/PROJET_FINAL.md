@@ -1,5 +1,7 @@
 # Épreuve finale : mon modèle, mes preuves
 
+Utilise DOSSIER_MODELE.md comme modèle de remise : provenance, budget fixé à l'avance, comparaison contrôlée, test réservé, cas nouveau et grille de relecture y sont prêts à remplir.
+
 Le but est de construire et entraîner un petit GPT, puis d'expliquer ses résultats. Le projet est réalisable en NumPy sur CPU. Ni MoE, ni modèle multimodal, ni assistant général ne sont exigés pour ce premier objectif.
 
 ## Livrables

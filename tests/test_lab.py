@@ -201,6 +201,17 @@ def test_moe_routes_and_balance():
     assert tight["dropped"] > 0
 
 
+def test_switch_uniform_reference_is_not_a_universal_lower_bound():
+    probabilities = np.array([[0.51, 0.49], [0.51, 0.49], [0.01, 0.99]])
+    choices = probabilities.argmax(axis=1)
+    assert choices.tolist() == [0, 0, 1]
+    fractions = np.array([2 / 3, 1 / 3])
+    expected = 2 * np.dot(fractions, probabilities.mean(axis=0))
+    assert load_balance_loss(probabilities, choices) == pytest.approx(expected)
+    assert expected == pytest.approx(0.8955555555555556)
+    assert expected < 1
+
+
 def test_ssm_matches_scan_and_is_causal():
     signal = np.array([[1.0, 0.0], [0.0, 1.0], [0.5, -0.5]])
     output = selective_scan(

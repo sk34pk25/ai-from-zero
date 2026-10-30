@@ -2,7 +2,8 @@
 
 Le graphe couvre le decoder standard : embeddings de tokens et de positions,
 plusieurs blocs (LayerNorm, attention causale multi-têtes, MLP GELU, résidus)
-et une tête de langage. RMSNorm est également entraînable. RoPE, SwiGLU et GQA restent des forwards.
+et une tête de langage. RMSNorm, RoPE, SwiGLU, GQA et les poids partagés sont
+également entraînables, avec gradients contrôlés contre PyTorch en CI.
 """
 
 from __future__ import annotations

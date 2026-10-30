@@ -1,4 +1,5 @@
 import { ASSET_VERSION } from "./version.js";
+import { publicAssetUrl } from "./public-url.js";
 import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
 import {
@@ -63,6 +64,7 @@ import { modifierLabel } from "./text.js";
 import { mountVisual } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
+const LESSON_MODE_KEY = "afz-lesson-mode";
 
 const state = {
   booting: true,
@@ -77,6 +79,9 @@ const state = {
   owner: false,
   local: false,
   lessonsReady: false,
+  glancesStatus: "idle",
+  lessonMode: "guided",
+  pendingFocus: null,
   localSnapshot: null,
   localToken: null,
   quizzes: {},
@@ -115,6 +120,7 @@ function refreshLocalMode() {
 document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
   bindChrome();
+  state.lessonMode = readJson(safeStorage(), LESSON_MODE_KEY, "guided") === "review" ? "review" : "guided";
   applyTheme(
     resolveTheme(
       (() => {
@@ -232,11 +238,7 @@ function bindChrome() {
 
 async function boot() {
   try {
-    const response = await fetch(
-      new URL("data/curriculum-index.json", document.baseURI),
-    );
-    if (!response.ok) throw new Error(String(response.status));
-    const data = await response.json();
+    const data = await fetchLessonJson("data/curriculum-index.json");
     state.index = indexCurriculum(data, preferredLearningPath());
     state.selectedPart = state.index.architecture[0]?.id ?? null;
     onAuth(() => {
@@ -268,8 +270,9 @@ async function boot() {
     els.main.replaceChildren(
       h("h1", { text: "Parcours indisponible" }),
       h("p", {
-        text: "Le fichier data/curriculum.json n'a pas pu être chargé. Ouvre le site avec un serveur local, par exemple : python3 -m http.server.",
+        text: "L’index du cours n’a pas pu être chargé. Vérifie la connexion puis réessaie. Pour une copie locale, utilise un serveur comme python3 -m http.server.",
       }),
+      h("button", { type: "button", class: "button button-primary", onClick: () => location.reload() }, "Réessayer"),
     );
   }
 }
@@ -285,6 +288,52 @@ async function loadJsonReport(path) {
 }
 
 let lessonsPromise = null;
+let glancesPromise = null;
+
+async function fetchLessonJson(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(publicAssetUrl(path), { signal: controller.signal });
+    if (!response.ok) throw new Error(String(response.status));
+    return await response.json();
+  } finally { clearTimeout(timer); }
+}
+
+function usableGlance(value) {
+  return value && ["phrase", "image", "key", "trap"].every(key => typeof value[key] === "string" && value[key].trim())
+    && Array.isArray(value.steps) && value.steps.length === 3
+    && value.steps.every(step => step && typeof step.title === "string" && typeof step.text === "string");
+}
+
+/** Les résumés sont facultatifs : ils ne retardent jamais l'accès au cours. */
+function ensureGlances() {
+  if (!glancesPromise) {
+    state.glancesStatus = "loading";
+    const retry = els.main?.querySelector("[data-glance-retry]");
+    if (retry) {
+      retry.setAttribute("aria-disabled", "true");
+      els.main.querySelector("[data-glance-status]").textContent = "Le résumé visuel se charge. Le cours complet reste disponible.";
+    }
+    glancesPromise = fetchLessonJson("data/glance.json")
+      .then(glances => {
+        if (!glances || typeof glances !== "object" || Array.isArray(glances)) throw new Error("Résumés invalides");
+        for (const [id, value] of Object.entries(glances)) {
+          const item = state.index?.byId.get(id);
+          if (item && usableGlance(value)) item.lesson.glance = value;
+        }
+        state.glancesStatus = "ready";
+        refreshLessonOverview();
+      })
+      .catch(error => {
+        state.glancesStatus = "error";
+        glancesPromise = null;
+        refreshLessonOverview();
+        throw error;
+      });
+  }
+  return glancesPromise;
+}
 
 // Le contenu des leçons ne sert qu'aux leçons, à la recherche et au glossaire : demandé à l'approche d'un lien de leçon.
 for (const type of ["pointerover", "focusin", "touchstart"])
@@ -297,22 +346,16 @@ for (const type of ["pointerover", "focusin", "touchstart"])
     { passive: true },
   );
 
-/** Complète l'index léger avec le texte des leçons et leurs résumés visuels. Une erreur réseau permet de réessayer. */
+/** Seul le curriculum est indispensable. Les deux téléchargements peuvent être retentés séparément. */
 function ensureLessons() {
+  ensureGlances().catch(() => {});
   if (!lessonsPromise)
-    lessonsPromise = Promise.all(
-      ["data/curriculum.json", "data/glance.json"].map((path) =>
-        fetch(new URL(path, document.baseURI)).then((response) => {
-          if (!response.ok) throw new Error(String(response.status));
-          return response.json();
-        }),
-      ),
-    )
-      .then(([full, glances]) => {
+    lessonsPromise = fetchLessonJson("data/curriculum.json")
+      .then(full => {
         for (const level of full.levels)
           for (const step of level.steps) {
             const item = state.index?.byId.get(step.id);
-            if (item) Object.assign(item.lesson, step, { glance: glances[step.id] });
+            if (item) Object.assign(item.lesson, step);
           }
         state.lessonsReady = true;
       })
@@ -325,7 +368,7 @@ function ensureLessons() {
 
 /** Affiche un message d'attente, puis repeint la page quand le contenu des leçons est là. */
 function waitForLessons(ticket, label) {
-  els.main.replaceChildren(h("p", { class: "lead", text: label }));
+  els.main.replaceChildren(h("p", { class: "lead", role: "status", text: label }));
   ensureLessons()
     .then(() => {
       if (ticket === state.pageTicket) render({ scroll: "keep" });
@@ -334,8 +377,13 @@ function waitForLessons(ticket, label) {
       if (ticket !== state.pageTicket) return;
       els.main.replaceChildren(
         h("h1", { text: "Contenu indisponible" }),
-        h("p", { text: "Le texte des leçons n'a pas pu être chargé. Vérifie la connexion puis recharge la page." }),
+        h("p", { text: "Le texte des leçons n'a pas pu être chargé. Vérifie la connexion puis réessaie." }),
+        h("button", { type: "button", class: "button button-primary", onClick: event => {
+          state.pendingFocus = { routeKey: state.lastRouteKey, origin: event.currentTarget };
+          render({ scroll: "keep" });
+        } }, "Réessayer le cours"),
       );
+      focusNavigationHeading();
     });
 }
 
@@ -744,6 +792,8 @@ function render({ scroll }) {
   const routeChanged = routeKey !== state.lastRouteKey;
   const firstPaint = state.lastRouteKey === "";
   if (routeChanged) {
+    state.pendingFocus = scroll === "top" && !firstPaint
+      ? { routeKey, origin: document.activeElement } : null;
     state.quizChoice = null;
     state.hintCount = 0;
     state.solutionOpen = false;
@@ -762,14 +812,9 @@ function render({ scroll }) {
   paintMain(route, ticket);
   if (scroll === "top") { if (!firstPaint) window.scrollTo(0, 0); }
   else window.scrollTo(0, y);
-  if (scroll === "top") {
-    const heading = els.main.querySelector("h1");
-    if (heading && routeChanged && !firstPaint) {
-      if (!heading.hasAttribute("tabindex"))
-        heading.setAttribute("tabindex", "-1");
-      heading.focus({ preventScroll: true });
-    }
-  } else if (state.quizChoice != null) {
+  const pendingNavigation = Boolean(state.pendingFocus);
+  const focused = focusNavigationHeading();
+  if (!focused && !pendingNavigation && scroll !== "top" && state.quizChoice != null && !editingFieldActive() && els.dialog.hidden) {
     els.main
       .querySelector(`[data-choice="${state.quizChoice}"]`)
       ?.focus({ preventScroll: true });
@@ -782,6 +827,19 @@ function render({ scroll }) {
       block: "start",
     });
   }
+}
+
+/** Une navigation différée ne doit ni perdre son annonce, ni interrompre une nouvelle saisie. */
+function focusNavigationHeading() {
+  const pending = state.pendingFocus;
+  const heading = els.main.querySelector("h1");
+  if (!pending || pending.routeKey !== state.lastRouteKey || !heading) return false;
+  state.pendingFocus = null;
+  const active = document.activeElement;
+  if (editingFieldActive() || !els.dialog.hidden || (active !== document.body && active !== pending.origin)) return false;
+  heading.setAttribute("tabindex", "-1");
+  heading.focus({ preventScroll: true });
+  return true;
 }
 
 function updateAccountLink() {
@@ -1341,6 +1399,88 @@ function glanceCards(glance) {
   ]);
 }
 
+function lessonModeControl() {
+  return h("div", { class: "lesson-mode", role: "group", "aria-label": "Mode de lecture" }, [
+    h("p", { class: "eyebrow", text: "Mode de lecture" }),
+    h("div", { class: "lesson-mode-actions" }, [
+      ["guided", "Cours guidé"], ["review", "Révision visuelle"],
+    ].map(([mode, label]) => h("button", {
+      type: "button", class: "button button-secondary", "data-lesson-mode": mode,
+      "aria-pressed": String(state.lessonMode === mode), "aria-controls": "lesson-explanation",
+      onClick: () => {
+        state.lessonMode = mode;
+        if (!writeJson(safeStorage(), LESSON_MODE_KEY, mode)) toast("Ce choix reste valable ici ; le navigateur refuse de le mémoriser.");
+        for (const button of els.main.querySelectorAll("[data-lesson-mode]"))
+          button.setAttribute("aria-pressed", String(button.dataset.lessonMode === mode));
+        els.main.querySelector(".lesson-deep").open = mode === "guided";
+      },
+    }, label))),
+    h("p", { class: "muted", text: "Première lecture : comprends l’explication avant le quiz. Pour réviser, replie-la et retrouve les repères visuels." }),
+  ]);
+}
+
+function glanceIntro(lesson) {
+  if (lesson.glance) return [h("p", { class: "lead glance-phrase", text: lesson.glance.phrase })];
+  const loading = state.glancesStatus === "loading";
+  return [
+    h("p", { class: "muted", role: "status", "data-glance-status": "true", text: loading
+      ? "Le résumé visuel se charge. Le cours complet est déjà disponible ci-dessous."
+      : "Le résumé visuel est indisponible. Le cours complet et son code restent disponibles ci-dessous." }),
+    h("button", { type: "button", class: "button button-secondary", "data-glance-retry": "true",
+      "aria-disabled": String(loading), onClick: () => {
+        if (state.glancesStatus === "loading") return;
+        glancesPromise = null;
+        ensureGlances().catch(() => {});
+      },
+    }, "Réessayer le résumé visuel"),
+  ];
+}
+
+function glanceExtras(lesson) {
+  if (!lesson.glance) return [];
+  const nodes = [];
+  if (!STEP_FIGURES.has(lesson.visual || "flow"))
+    nodes.push(h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
+      h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
+      stepsDiagram(lesson.glance.steps),
+    ]));
+  nodes.push(glanceCards(lesson.glance));
+  return nodes;
+}
+
+function lessonOverview(lesson) {
+  const stepFigure = STEP_FIGURES.has(lesson.visual || "flow");
+  return h("div", { class: "lesson-overview", "data-lesson-overview": "true" }, [
+    h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),
+    h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
+      h("figcaption", { text: stepFigure ? "Les repères de l'étape." : lesson.visualCaption || "" }),
+      h("div", { class: "visual-host", "data-visual-host": "true" }),
+    ]),
+    h("div", { "data-glance-extra": "true" }, glanceExtras(lesson)),
+  ]);
+}
+
+/** Un résumé arrivé plus tard ne recrée ni le quiz, ni le brouillon, ni un schéma interactif. */
+function refreshLessonOverview() {
+  const article = els.main?.querySelector("[data-lesson-id]");
+  const lesson = state.index?.byId.get(article?.dataset.lessonId)?.lesson;
+  const overview = article?.querySelector("[data-lesson-overview]");
+  if (!lesson || !overview) return;
+  const retryFocused = document.activeElement?.matches("[data-glance-retry]");
+  overview.querySelector("[data-glance-intro]").replaceChildren(...glanceIntro(lesson));
+  overview.querySelector("[data-glance-extra]").replaceChildren(...glanceExtras(lesson));
+  if (STEP_FIGURES.has(lesson.visual || "flow")) {
+    const host = overview.querySelector("[data-visual-host]");
+    host.replaceChildren();
+    mountVisual(host, lesson);
+  }
+  if (retryFocused) {
+    const target = overview.querySelector(".glance-phrase, [data-glance-retry]");
+    if (!target.matches("button")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }
+}
+
 function readingMinutes(lesson) {
   const words = [lesson.why, lesson.build, lesson.review, ...lesson.sections.map((s) => s.text || ""), ...(lesson.takeaways || []), ...(lesson.pitfalls || [])]
     .join(" ")
@@ -1349,23 +1489,11 @@ function readingMinutes(lesson) {
 }
 
 function lessonBody(lesson, grade, done, around) {
-  const glance = lesson.glance;
-  const stepFigure = STEP_FIGURES.has(lesson.visual || "flow");
   const nodes = [
-    h("p", { class: "lead glance-phrase", text: glance.phrase }),
-    h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
-      h("figcaption", { text: stepFigure ? "L'étape en trois gestes." : lesson.visualCaption || "" }),
-      h("div", { class: "visual-host", "data-visual-host": "true" }),
-    ]),
+    lessonModeControl(),
+    lessonOverview(lesson),
+    lessonDeep(lesson),
   ];
-  if (!stepFigure)
-    nodes.push(
-      h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
-        h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
-        stepsDiagram(glance.steps),
-      ]),
-    );
-  nodes.push(glanceCards(glance));
   for (const section of lesson.sections) if (section.kind === "code") nodes.push(codeBlock(section));
   nodes.push(
     quizBlock(lesson, grade),
@@ -1403,7 +1531,6 @@ function lessonBody(lesson, grade, done, around) {
         paragraphs(lesson.solution || ""),
       ),
     ]),
-    lessonDeep(lesson),
     h("div", { class: "lesson-actions" }, [
       around.prev
         ? h(
@@ -1444,7 +1571,7 @@ function lessonBody(lesson, grade, done, around) {
   return nodes;
 }
 
-/** Le texte complet de l'étape, replié : il reste là pour qui veut creuser, sans encombrer la page. */
+/** Les fondations précèdent le code et l'évaluation ; la révision permet de les replier. */
 function lessonDeep(lesson) {
   const body = [h("p", { text: lesson.why })];
   for (const section of lesson.sections) {
@@ -1493,11 +1620,11 @@ function lessonDeep(lesson) {
       h("p", { text: lesson.review || "" }),
     ]),
   );
-  return h("details", { class: "lesson-deep" }, [
-    h("summary", {}, [
-      h("span", { class: "lesson-deep-title", text: "Pour aller plus loin" }),
-      h("span", { class: "lesson-deep-meta", text: `explication complète · environ ${readingMinutes(lesson)} min de lecture` }),
-    ]),
+  return h("details", { id: "lesson-explanation", class: "lesson-deep", open: state.lessonMode === "guided" }, [
+    h("summary", {}, h("h2", { class: "lesson-deep-heading" }, [
+      h("span", { class: "lesson-deep-title", text: "Comprendre l’explication complète" }),
+      h("span", { class: "lesson-deep-meta", "aria-hidden": "true", text: `environ ${readingMinutes(lesson)} min de lecture` }),
+    ])),
     h("div", { class: "lesson-deep-body" }, body),
   ]);
 }
@@ -1541,7 +1668,7 @@ function codeBlock(section) {
     },
     state.owner ? "Ouvrir dans l'IDE" : "Réservé au propriétaire",
   );
-  const pre = h("pre");
+  const pre = h("pre", { tabindex: "0", role: "region", "aria-label": `Code ${section.lang || "texte"} à lire et faire défiler` });
   pre.append(
     h("code", { class: `language-${section.lang || "text"}`, text: code }),
   );

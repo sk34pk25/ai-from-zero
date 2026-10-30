@@ -46,3 +46,7 @@ Noter OS, navigateur, version du site et date. Suivre aussi docs/DEVICE_CHECKLIS
 Tester deux onglets : terminer deux leçons différentes, décocher, fermer et rouvrir ; effacer dans un onglet et vérifier l'autre. Vérifier que le stockage refusé laisse lire le cours. Exporter avant d'effacer si l'on veut conserver ses données.
 
 Les TP locaux nécessitent Python/NumPy sur un environnement approprié. La lecture sur tablette ne rend pas les commandes système disponibles.
+
+## Observer la nouvelle lecture
+
+Partir du mode guidé d’un navigateur neuf. Observer si la personne comprend les fondations avant de répondre, puis lui faire expliquer la différence avec la révision visuelle. Relire aussi DOSSIER_MODELE.md rempli sur un corpus nouveau. Aucun résultat de terrain n’est prérempli.

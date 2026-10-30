@@ -18,3 +18,11 @@ La CI couvre Chromium, Firefox et WebKit avec plusieurs fenêtres. WebKit automa
 6. Tester une invite courte du playground, l’arrêt du calcul et un changement de modèle. Conserver les performances propres à l’appareil ; ne pas les comparer à un run serveur comme s’il s’agissait de la même mesure.
 
 Conserver la version du site et du navigateur avec chaque retour. Un appareil ancien sans les fonctions nécessaires peut rester limité ; vérifier sa version plutôt que promettre une compatibilité universelle.
+
+## Compléments après la présentation visuelle
+
+- Au premier chargement lent, le titre de la leçon reçoit le focus, sauf si une autre interaction a commencé.
+- Le mode guidé ouvre les explications avant le code et le quiz. Révision visuelle/rechargement/retour au mode guidé conservent un brouillon.
+- Les blocs de code défilants se parcourent au clavier.
+- Bloquer uniquement glance.json laisse le cours lisible ; la reprise conserve les réponses et la saisie.
+- Vérifier DOSSIER_MODELE.md dans le ZIP et l’interface Atelier.
