@@ -780,6 +780,14 @@ def anchor(level: dict) -> str:
     return raw
 
 
+def runtime_fingerprint() -> str:
+    digest = hashlib.sha256()
+    for path in ("assets/js/pyworker.js", "assets/js/pybridge.js"):
+        digest.update(path.encode())
+        digest.update((ROOT / path).read_bytes())
+    return digest.hexdigest()
+
+
 def build_exercises() -> list[dict]:
     """Le contrat inclut le contrôle, le point de départ et les dépendances Python."""
     rows = json.loads((SRC / "exercises.json").read_text(encoding="utf-8"))
@@ -796,7 +804,7 @@ def build_exercises() -> list[dict]:
             if not re.fullmatch(r"model/[a-zA-Z0-9_/.-]+\.py", path) or ".." in path:
                 raise ValueError(f"Dépendance invalide : {path}")
             dependencies[path] = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
-        contract = {"schema": 2, "exercise": row, "dependencies": dependencies}
+        contract = {"schema": 2, "exercise": row, "dependencies": dependencies, "runtime": runtime_fingerprint()}
         row["validatorVersion"] = hashlib.sha256(json.dumps(contract, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     return rows
 
@@ -804,7 +812,7 @@ def build_exercises() -> list[dict]:
 def build_transfer_tasks() -> dict:
     rows = json.loads((SRC / "transfer-tasks.json").read_text(encoding="utf-8"))
     for row in rows:
-        row["validatorVersion"] = hashlib.sha256(json.dumps(row, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        row["validatorVersion"] = hashlib.sha256(json.dumps({"task": row, "runtime": runtime_fingerprint()}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     return {"format": "afz-transfer-tasks-v1", "version": hashlib.sha256(json.dumps(rows, sort_keys=True, ensure_ascii=False).encode()).hexdigest(), "tasks": rows}
 
 

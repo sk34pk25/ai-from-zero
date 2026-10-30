@@ -95,6 +95,8 @@ test("les preuves démarrent vides, enregistrent les aides, exportent et reprenn
   await page.getByLabel("Diagnostic et contre-exemple").fill("Le carré après la moyenne annule +2 et −2.");
   await page.getByLabel("Explication sur le cas nouveau").fill("La moyenne des deux carrés vaut 4.");
   await page.getByRole("button", { name: "Demander un indice", exact: true }).click();
+  await expect(page.getByRole("checkbox", { name: "indice", exact: true })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "indice", exact: true })).toBeDisabled();
   await page.getByRole("button", { name: "Contrôler le cas nouveau" }).click();
   await expect(page.locator("[data-transfer-result]")).toContainText("contrôle passé");
   await page.getByLabel("Code du cas nouveau").fill("pass");
@@ -123,6 +125,7 @@ for (const width of [320, 768, 1440]) test(`les épreuves restent lisibles et ac
   await page.setViewportSize({ width, height: 900 });
   await page.goto("/#/preuves");
   await page.getByRole("button", { name: "Démarrer une tentative" }).click();
+  expect((await new AxeBuilder({ page }).include("main").analyze()).violations).toEqual([]);
   await page.getByRole("button", { name: "Terminer et garder cette tentative" }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   const result = await new AxeBuilder({ page }).include("main").analyze();
@@ -140,4 +143,20 @@ test("une panne Python ne devient pas un échec de code et la reprise produit le
   await panel.getByRole("button",{name:"Lancer le contrôle"}).click();
   await expect(page.locator("[data-exercise-summary]")).toHaveText("contrôle passé");
   await expect(panel.locator(".exercise-history li")).toHaveCount(1);
+});
+
+
+test("une ancienne épreuve importée reste archivée et demande une nouvelle tentative", async ({ page }) => {
+  await page.goto("/#/preuves");
+  const old={format:"afz-comprehension-v1",attempts:[{id:"old-version",taskId:"fondations-A",taskVersion:"c".repeat(64),siteVersion:"ancienne",alias:"",device:"",code:"pass",diagnosis:"",explanation:"",events:[{type:"start",at:1000}],assistance:[],checks:[]}]};
+  await page.getByLabel("Dossier de compréhension à importer").setInputFiles({name:"ancienne.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(old))});
+  await page.getByRole("button",{name:/fondations-A.*importée/}).click();
+  await expect(page.getByText("L’épreuve a évolué depuis cette tentative.",{exact:false})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Contrôler le cas nouveau"})).toBeDisabled();
+  await expect(page.getByLabel("Code du cas nouveau")).toHaveAttribute("readonly","");
+  await page.getByRole("button",{name:"Terminer et garder cette tentative"}).click();
+  await expect(page.getByLabel("Type de relecture")).toHaveCount(0);
+  await page.getByRole("button",{name:"Démarrer une tentative"}).click();
+  await expect(page.getByRole("button",{name:"Contrôler le cas nouveau"})).toBeEnabled();
+  await expect(page.getByLabel("Code du cas nouveau")).toHaveValue(tasks[0].starter);
 });

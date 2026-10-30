@@ -47,7 +47,7 @@ def summarize(reports: list[dict], catalog: dict) -> dict:
         if not isinstance(review,dict):raise ValueError('Relecture invalide')
         snapshot = json.dumps([code,row.get('diagnosis',''),row.get('explanation','')],ensure_ascii=False,separators=(',',':'))
         scores = review.get('scores',[])
-        valid = finished and review.get('contentHash') == fingerprint(snapshot) and len(scores)==3 and all(type(score) is int and 0<=score<=2 for score in scores) and isinstance(review.get('evidence'),str) and bool(review['evidence'].strip())
+        valid = finished and row.get('taskVersion') == task['validatorVersion'] and review.get('contentHash') == fingerprint(snapshot) and len(scores)==3 and all(type(score) is int and 0<=score<=2 for score in scores) and isinstance(review.get('evidence'),str) and bool(review['evidence'].strip())
         if not valid:stats['stale_reviews'] += 1;continue
         if review.get('type') == 'self':stats['self_reviews'] += 1
         elif review.get('type') == 'observer' and str(review.get('by','')).strip():

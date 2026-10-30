@@ -5,7 +5,7 @@
     "starter": "message = \"À compléter\"\nnombre = 0\nprint(message, nombre)\n",
     "solution": "message = \"construire un petit modèle\"\nnombre = 42\nprint(message, nombre)\n",
     "check": "assert message==\"construire un petit modèle\"; assert nombre==42 and isinstance(nombre,int)\nassert isinstance(message,str) and not isinstance(nombre,bool)\n",
-    "validatorVersion": "b82ca25c39174b0710dc012921361972c863a8eb58f8e6db04189d0a5471e6aa"
+    "validatorVersion": "fe89ec1e0c86359a34b89a4759e8802efbc67850f055f5f9218b099e02795042"
   },
   {
     "lessonId": "0.7",
@@ -13,7 +13,7 @@
     "starter": "def categorie(n):\n    # À compléter\n    pass\n",
     "solution": "def categorie(n):\n    return 'léger' if n < 1_000_000 else ('moyen' if n <= 10_000_000 else 'lourd')\n",
     "check": "assert categorie(999999)=='léger'; assert categorie(1000000)=='moyen'; assert categorie(10000000)=='moyen'; assert categorie(10000001)=='lourd'\nassert categorie(0)=='léger'; assert categorie(5_000_000)=='moyen'; assert categorie(20_000_000)=='lourd'\n",
-    "validatorVersion": "335bd32720e3c7012b7f785196f4de93cdfbf9bb689b04281796cbff5420bee3"
+    "validatorVersion": "f4a669a41fe691c93b4871e9b786f4559df8d6fc9fb913b7ad822e156aa568a1"
   },
   {
     "lessonId": "0.8",
@@ -21,7 +21,7 @@
     "starter": "def carres(n):\n    # À compléter\n    pass\n",
     "solution": "def carres(n):\n    return [i*i for i in range(n)]\n",
     "check": "assert carres(5)==[0,1,4,9,16]; assert carres(0)==[]\nassert carres(1)==[0]; assert carres(3)==[0,1,4]\n",
-    "validatorVersion": "0502ffb815a2d7cad09cc6ed7c5123504e77369386f8360086182508c3d1b858"
+    "validatorVersion": "bcbafbb413f07f099fe793a2563a81c6362f5a7ca1c06c63df44b4e0e30deb09"
   },
   {
     "lessonId": "0.9",
@@ -29,7 +29,7 @@
     "starter": "def ajoute(a,b):\n    # À compléter\n    pass\n",
     "solution": "def ajoute(a,b):\n    return a+b\n",
     "check": "assert ajoute(2,5)==7; assert ajoute(-1,1)==0\nassert ajoute(0,-8)==-8; assert ajoute(2.5,1.25)==3.75\n",
-    "validatorVersion": "8b60158a051fb6237cb21a9598338f1cdd5819391ecb3f6387b1b18c749c9157"
+    "validatorVersion": "206ac00c70dad7c1747e0562e9229f492912dba496c8166007ac471c6ac13724"
   },
   {
     "lessonId": "0.10",
@@ -37,7 +37,7 @@
     "starter": "def get_dim(config):\n    # À compléter\n    pass\n",
     "solution": "def get_dim(config):\n    return config['dim']\n",
     "check": "assert get_dim({'dim':16})==16; assert get_dim({'dim':3})==3\nassert get_dim({'dim':0,'layers':9})==0; assert get_dim({'dim':64,'heads':4})==64\n",
-    "validatorVersion": "75e804bcfd38851d88688674f3c0a0d7dacb5ede3f436197de5a0acbed96be84"
+    "validatorVersion": "50dee34a7b49de62ee244b8806cc6c92e0f904378552481d9b8b6e79aaf94178"
   },
   {
     "lessonId": "0.15",
@@ -45,7 +45,7 @@
     "starter": "import numpy as np\n\ndef ajouter_biais(x, b):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef ajouter_biais(x,b):\n    return np.asarray(x)+np.asarray(b)\n",
     "check": "np.testing.assert_array_equal(ajouter_biais([[1,2,3],[4,5,6]],[10,20,30]),[[11,22,33],[14,25,36]])\nnp.testing.assert_array_equal(ajouter_biais([[0,-2,5],[3,4,-1]],[-1,0,2]),[[-1,-2,7],[2,4,1]])\n",
-    "validatorVersion": "0c93da3d98a85e0ffa8f84b638d52c1a1601134b498bcf434ef52302e38c7972"
+    "validatorVersion": "019d997f03382daf9e7179093d925130bc5dad899dbe311cf80f079aef488b0f"
   },
   {
     "lessonId": "0.16",
@@ -53,7 +53,7 @@
     "starter": "def carre(x):\n    # À compléter\n    pass\n",
     "solution": "def carre(x):\n    return x*x\n",
     "check": "assert carre(-3)==9; assert carre(0)==0; assert carre(2.5)==6.25\nassert carre(-.5)==.25; assert carre(1)==1\n",
-    "validatorVersion": "e966ffbe1c6e9d6484ab0d4d6ecad535fe94de64dab00c8b0556050dac6168b9"
+    "validatorVersion": "d6f94dd10d83735c550648a7ded882bcaf2bee6ed5101566445d68a95144c507"
   },
   {
     "lessonId": "0.17",
@@ -61,7 +61,7 @@
     "starter": "def scalaire(a,b):\n    # À compléter\n    pass\n",
     "solution": "def scalaire(a,b):\n    return sum(x*y for x,y in zip(a,b,strict=True))\n",
     "check": "assert scalaire([2,1],[3,4])==10; assert scalaire([1,-1],[2,2])==0\nassert scalaire([0,3,-2],[9,-1,4])==-11; assert scalaire([],[])==0\n",
-    "validatorVersion": "302091a66c909b14256f8be939155e393d397b151b3526661ee916fd8a70816e"
+    "validatorVersion": "0bb7ae1057742ccdc1f6ba8a4fe9465cbcec1382c1e95d6756bda0bff1d12916"
   },
   {
     "lessonId": "0.18",
@@ -69,7 +69,7 @@
     "starter": "def matvec(a,x):\n    # À compléter\n    pass\n",
     "solution": "def matvec(a,x):\n    return [sum(v*w for v,w in zip(row,x,strict=True)) for row in a]\n",
     "check": "assert matvec([[2,0],[0,3]],[4,5])==[8,15]; assert matvec([[1,2]],[3,4])==[11]\nassert matvec([[1,-2,0],[0,3,4]],[-1,2,3])==[-5,18]; assert matvec([[0]],[8])==[0]\n",
-    "validatorVersion": "301c8c89dd38e87d3f0de9f83ba44fdd64ff1a2c8f05c9ec65641da5e8b33219"
+    "validatorVersion": "93a7ad2f1afcdd31b66c19ba93150b1aaddb1bd71424c36bdf9b2f82de6b0354"
   },
   {
     "lessonId": "0.19",
@@ -77,7 +77,7 @@
     "starter": "def distribution(p):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def distribution(p):\n    return bool(p) and all(v>=0 for v in p) and abs(sum(p)-1)<1e-6\n",
     "check": "assert distribution([.1,.2,.7]); assert not distribution([-.1,1.1]); assert not distribution([]); assert not distribution([.5,.6])\nassert distribution([1]); assert distribution([0,.5,.5]); assert not distribution([0,0]); assert not distribution([float(\"nan\"),1])\n",
-    "validatorVersion": "ac1d18d089afb7c68464c21189e9b4ccf8f506e74c8a8c4454e2d2b141164fe0"
+    "validatorVersion": "7a8143355b326ff75e2d6edc32dbe6784549e6140a907f676fd1ec576ec62abc"
   },
   {
     "lessonId": "0.20",
@@ -85,7 +85,7 @@
     "starter": "def derivee(f, x, eps=1e-05):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def derivee(f,x,eps=1e-5):\n    return (f(x+eps)-f(x-eps))/(2*eps)\n",
     "check": "assert abs(derivee(lambda x:x*x,4)-8)<1e-6; assert abs(derivee(lambda x:3*x+1,-2)-3)<1e-6\nassert abs(derivee(lambda x:x**3,-2)-12)<1e-5; assert abs(derivee(lambda x:7,5))<1e-8\n",
-    "validatorVersion": "1875599b8b484ada7e3e4de76f9212f8b67bd1b3a8a04d46ab56e4ad5f5e1f1a"
+    "validatorVersion": "2f6e119b0f7d82ed104ed87a535ef9dc08a18167ecfd1d4b7e29ab88d7dca702"
   },
   {
     "lessonId": "0.21",
@@ -93,7 +93,7 @@
     "starter": "class Point:\n    def __init__(self, x, y):\n        pass  # range x et y dans self\n\n    def distance_origine(self):\n        return 0.0  # racine de x² + y²\n\np = Point(3, 4)\nprint(p.distance_origine())\n",
     "solution": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n    def distance_origine(self):\n        return (self.x ** 2 + self.y ** 2) ** 0.5\n\np = Point(3, 4)\nprint(p.distance_origine())\n",
     "check": "assert Point(3, 4).distance_origine() == 5.0; a = Point(1, 1); b = Point(1, 1); assert a is not b and a.x == b.x and a.y == b.y; assert Point(0, -2).distance_origine() == 2.0\nassert Point(-6,8).distance_origine()==10; assert Point(0,0).distance_origine()==0\n",
-    "validatorVersion": "a4266d5feab3aaf51a9398f237234b516e81a825fa9f4639bc2d89a37cbca64c"
+    "validatorVersion": "3a9b85731cdff4cdd642d64c91109beedb3d013996a221a33feaba7d88e526de"
   },
   {
     "lessonId": "0.22",
@@ -101,7 +101,7 @@
     "starter": "def maximum(valeurs):\n    meilleur = 0  # attention : est-ce un bon départ ?\n    for v in valeurs:\n        if v > meilleur:\n            meilleur = v\n    return meilleur\n\nprint(maximum([3, 9, 2]))\n",
     "solution": "def maximum(valeurs):\n    if len(valeurs) == 0:\n        raise ValueError(\"liste vide\")\n    meilleur = valeurs[0]\n    for v in valeurs[1:]:\n        if v > meilleur:\n            meilleur = v\n    return meilleur\n\nprint(maximum([3, 9, 2]))\n",
     "check": "assert maximum([3, 9, 2]) == 9; assert maximum([-5, -1]) == -1; assert maximum([4]) == 4\ntry:\n    maximum([])\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('une liste vide doit lever ValueError')\nassert maximum([-8,-2,-9])==-2; assert maximum([2,2,-1])==2\n",
-    "validatorVersion": "4560a903b1340cffd404d46060afd7371b4dc6289944c4e2f3e2cee9c828a0ee"
+    "validatorVersion": "cacea91aae1fdf2cc4b9c1285b70b03ad496bc827a32a7b7479472ad8b923a81"
   },
   {
     "lessonId": "0.23",
@@ -109,7 +109,7 @@
     "starter": "class Carnet:\n    def __init__(self, distances):\n        self.distances = list(distances)\n\n    def moyenne(self):\n        if not self.distances:\n            raise ValueError(\"carnet vide\")\n        return sum(self.distances) / len(self.distances)\n\n    def au_dessus(self, seuil):\n        return []  # à compléter\n\nprint(Carnet([12, 7.5, 20]).au_dessus(10))\n",
     "solution": "class Carnet:\n    def __init__(self, distances):\n        self.distances = list(distances)\n\n    def moyenne(self):\n        if not self.distances:\n            raise ValueError(\"carnet vide\")\n        return sum(self.distances) / len(self.distances)\n\n    def au_dessus(self, seuil):\n        return [d for d in self.distances if d > seuil]\n\nprint(Carnet([12, 7.5, 20]).au_dessus(10))\n",
     "check": "c = Carnet([12, 7.5, 20, 10]); assert c.au_dessus(10) == [12, 20]; assert c.distances == [12, 7.5, 20, 10]; assert Carnet([]).au_dessus(0) == []\ntry:\n    Carnet([]).moyenne()\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('un carnet vide doit lever ValueError')\nc=Carnet([-2,0,2,2]); assert c.au_dessus(0)==[2,2]; assert c.au_dessus(2)==[]; assert c.moyenne()==.5\n",
-    "validatorVersion": "96d299cc0fbe9ad49c46762bdd1595138539c6fad7b2c79dc4071e94ad2297cc"
+    "validatorVersion": "54dd62121a72b9da97d4ec3635b2ea2ad2e332465380b1731b364daf0998c997"
   },
   {
     "lessonId": "1.4",
@@ -117,7 +117,7 @@
     "starter": "def prediction(x,w,b):\n    # À compléter\n    pass\n",
     "solution": "def prediction(x,w,b):\n    return w*x+b\n",
     "check": "assert prediction(3,2,1)==7; assert prediction(3,1,4)==7\nassert prediction(2,3,4)==10; assert prediction(0,-5,2)==2; assert prediction(-2,3,-1)==-7; assert prediction(.5,4,-3)==-1\n",
-    "validatorVersion": "a78ad09ae996ff29b7c54912227b2f468aa7e3b5886a746569ffae79504c88ac"
+    "validatorVersion": "c5fd62b0f0516b8705b98711c11b7365100421642eaf567ad335fe1ae19f55b8"
   },
   {
     "lessonId": "1.6",
@@ -125,7 +125,7 @@
     "starter": "def relu(x):\n    # À compléter\n    pass\n",
     "solution": "def relu(x):\n    return max(0,x)\n",
     "check": "assert relu(-2)==0; assert relu(0)==0; assert relu(3)==3\nassert relu(-.25)==0; assert relu(.25)==.25\n",
-    "validatorVersion": "3109065352e632a9624c2ecad083e7e9befbc1da40675cba447f555341ea90cb"
+    "validatorVersion": "06c3f0d03f6b8dcc65f3304f9ae741a2d748a221a56d1fbeb8f14a40c054dd19"
   },
   {
     "lessonId": "1.9",
@@ -133,7 +133,7 @@
     "starter": "def mse(pred,cible):\n    # À compléter\n    pass\n",
     "solution": "def mse(pred,cible):\n    return sum((p-y)**2 for p,y in zip(pred,cible,strict=True))/len(pred)\n",
     "check": "assert mse([10,0],[6,0])==8; assert mse([2,4],[2,4])==0\nassert mse([1,-1],[0,0])==1; assert mse([2,4,6],[1,2,3])==14/3\n",
-    "validatorVersion": "c8cf74cffd80050f6f847446f00b1eebea2349d6ee14f38e2585144b24a5af8e"
+    "validatorVersion": "934ec52f10802b6c2de412c76f014c2e7dd26f03478651f68713b9bfd160c0b1"
   },
   {
     "lessonId": "1.10",
@@ -141,7 +141,7 @@
     "starter": "def maj(w,gradient,lr):\n    # À compléter\n    pass\n",
     "solution": "def maj(w,gradient,lr):\n    return w-lr*gradient\n",
     "check": "assert abs(maj(3,-4,.1)-3.4)<1e-10; assert maj(3,0,.1)==3\nassert abs(maj(-2,3,.2)+2.6)<1e-10; assert maj(7,100,0)==7\n",
-    "validatorVersion": "3089a417b774d4e18d091bfa0435fa51d0c59d7183ce30bf12a943ff13afb7a5"
+    "validatorVersion": "23bc0d5b6df1eb9a5434a54b431c975afa76eb91d466cfcda1d20edeb79e2d5a"
   },
   {
     "lessonId": "1.11",
@@ -149,7 +149,7 @@
     "starter": "def derivee(x):\n    # À compléter\n    pass\n",
     "solution": "def derivee(x):\n    return 6*(3*x+1)\n",
     "check": "assert derivee(1)==24; assert derivee(0)==6\nassert derivee(-1)==-12; assert abs(derivee(-1/3))<1e-10\n",
-    "validatorVersion": "bc6230d4b379438c608576ed5e5571f89a9d5ab9c50d73620ca044e9a94c1d16"
+    "validatorVersion": "6d7f9eafc1c2f4e7f896c95ea00eee9ef892ccd0e0b4f1ce8868bc8906fa59b5"
   },
   {
     "lessonId": "1.12",
@@ -157,7 +157,7 @@
     "starter": "def gradient_partage(w):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def gradient_partage(w):\n    return w+w+1\n",
     "check": "assert gradient_partage(3)==7; assert gradient_partage(-2)==-3\nassert gradient_partage(0)==1; assert gradient_partage(.5)==2\n",
-    "validatorVersion": "91f7520f0ae22b3e97645ff23e9259df4aa97602e32b2fda0f863418ca4cfe5d"
+    "validatorVersion": "37a3eea225b9eb4a399bd645d1303ecd29557183e9c168f81c6c614111e7498d"
   },
   {
     "lessonId": "1.13",
@@ -165,7 +165,7 @@
     "starter": "def apprendre(w, lr, n):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def apprendre(w,lr,n):\n    for _ in range(n):\n        w-=lr*2*(w-3)\n    return w\n",
     "check": "assert abs(apprendre(0,.5,2)-3)<1e-10; assert abs(apprendre(0,.1,40)-3)<.001\nassert apprendre(-4,.1,0)==-4; assert abs(apprendre(5,.1,1)-4.6)<1e-10\n",
-    "validatorVersion": "02d476053eedcb638d7121ace1bac7763c72ab39062dacf664d4fbf73b50c1e1"
+    "validatorVersion": "ff15a0612142eaf384f42f13b3fcd1e39fc1cddb623535eda0d56c5b3ecdfa21"
   },
   {
     "lessonId": "1.15",
@@ -173,7 +173,7 @@
     "starter": "import numpy as np\n\ndef gradient_biais(g):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef gradient_biais(g):\n    return np.asarray(g).sum(axis=(0,1))\n",
     "check": "np.testing.assert_array_equal(gradient_biais(np.ones((2,4,3))),[8,8,8])\nnp.testing.assert_array_equal(gradient_biais(np.arange(18).reshape(2,3,3)),[45,51,57])\n",
-    "validatorVersion": "49997f7b4cbb0a455db423851f6857ba2ac8a5801cf719001553a643eb64649f"
+    "validatorVersion": "7835fa32af4bd0195017ced1b30e5357ae9c5286e7bb5c8fa84f41d2cadf2981"
   },
   {
     "lessonId": "1.16",
@@ -181,7 +181,7 @@
     "starter": "def pas_regression(w, x, y, lr):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def pas_regression(w,x,y,lr):\n    pred=w*x\n    loss=(pred-y)**2\n    grad=2*(pred-y)*x\n    return w-lr*grad,loss\n",
     "check": "assert pas_regression(1,2,6,.1)==(2.6,16); assert pas_regression(3,2,6,.1)==(3,0)\nassert pas_regression(2,0,3,.1)==(2,9); w,l=pas_regression(-1,-2,0,.25); assert w==1 and l==4\n",
-    "validatorVersion": "f7c49c41555d21ed396cdcd205f913c2bdb5a153f6fe4d56b74afb2e1ef008f3"
+    "validatorVersion": "da4a0068d83f64c1dd436864f079d23433d85dcfc878bf97269301d060443349"
   },
   {
     "lessonId": "1.17",
@@ -189,7 +189,7 @@
     "starter": "def surapprentissage(train, val):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def surapprentissage(train,val):\n    return len(train)>1 and len(train)==len(val) and train[-1]<train[0] and val[-1]>val[0]\n",
     "check": "assert surapprentissage([2,1],[2,3]); assert not surapprentissage([2,1],[2,1]); assert not surapprentissage([1],[2])\nassert not surapprentissage([],[]); assert not surapprentissage([1,2],[2,3]); assert not surapprentissage([2,1],[2])\n",
-    "validatorVersion": "1462819790c516a1376a69b4d9c11a08a4d34e9256d55b239186bd371cc2a69c"
+    "validatorVersion": "119f9047b4c000e7002265a9edc192dd3d3d0af99311700ac5d2e9d663c56df7"
   },
   {
     "lessonId": "2.4",
@@ -197,7 +197,7 @@
     "starter": "def vocabulaire(texte):\n    # À compléter\n    pass\n",
     "solution": "def vocabulaire(texte):\n    return {c:i for i,c in enumerate(sorted(set(texte)))}\n",
     "check": "assert vocabulaire('abba')=={'a':0,'b':1}; assert vocabulaire(' ba')=={' ':0,'a':1,'b':2}\nassert vocabulaire('')=={}; assert vocabulaire('ééa')=={'a':0,'é':1}\n",
-    "validatorVersion": "a8b0516ffcad83cec93975ecd3a3b330aabbbbeeade833151c1426d2c241a571"
+    "validatorVersion": "ef874f8a890ce0b52f07d1a2a3b1eb947ebabe53380d5efb1669655935d41ef1"
   },
   {
     "lessonId": "2.5",
@@ -205,7 +205,7 @@
     "starter": "def encoder(texte,vocab):\n    # À compléter\n    pass\n",
     "solution": "def encoder(texte,vocab):\n    return [vocab[c] for c in texte]\n",
     "check": "assert encoder('abba',{'a':0,'b':1})==[0,1,1,0]; assert encoder('',{'a':0})==[]\nassert encoder('é a',{'a':7,' ':2,'é':9})==[9,2,7]\n",
-    "validatorVersion": "40445705d3a99dd272b78b692ad6bbabe47df953e1d77d204a1652ef291a8161"
+    "validatorVersion": "4a32863689309da59709d20e4d165a8eca21ae543fb6f7dcdd7b05e35b3a4464"
   },
   {
     "lessonId": "2.9",
@@ -213,7 +213,7 @@
     "starter": "def parametres(v,d):\n    # À compléter\n    pass\n",
     "solution": "def parametres(v,d):\n    return v*d\n",
     "check": "assert parametres(1000,64)==64000; assert parametres(2,3)==6\nassert parametres(3,5)==15; assert parametres(17,0)==0\n",
-    "validatorVersion": "32d74b15ca6233958ec4eddcae7d6203f85a0a010e6004f2f1a3749a577f5ed2"
+    "validatorVersion": "19e16b6ba9e8c041105aecd22ee9e771bef8f93054df0b0eb22b139a90267a49"
   },
   {
     "lessonId": "2.11",
@@ -221,7 +221,7 @@
     "starter": "def batches(ids, t):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def batches(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t)]\n",
     "check": "assert batches([1,2,3,4],2)==[([1,2],[2,3]),([2,3],[3,4])]; assert batches([1],2)==[]\nassert batches([8,3,6],1)==[([8],[3]),([3],[6])]; assert batches([1,2],2)==[]\n",
-    "validatorVersion": "9533fe715e976acb3d798422caf3f2f872ba35bedbc485f445be327d7f12749a"
+    "validatorVersion": "553b74873b3306c16be248319ec8451a9d5c299ba46944ca95ce08edb74ad55e"
   },
   {
     "lessonId": "3.1",
@@ -229,7 +229,7 @@
     "starter": "def paires(ids):\n    # À compléter\n    pass\n",
     "solution": "def paires(ids):\n    return list(zip(ids[:-1],ids[1:]))\n",
     "check": "assert paires([5,5,8,5])==[(5,5),(5,8),(8,5)]; assert paires([1])==[]\nassert paires([])==[]; assert paires([2,0])==[(2,0)]\n",
-    "validatorVersion": "27511cb5c8fffda4067f7e4c1fbd4eeb44a708e024a931bf98ee3caecdab3cc5"
+    "validatorVersion": "6459591e3f9fc933acd8c16c71927a310919dc96435cbb5b460169405b563292"
   },
   {
     "lessonId": "3.3",
@@ -237,7 +237,7 @@
     "starter": "def fenetres(ids,t):\n    # À compléter\n    pass\n",
     "solution": "def fenetres(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t)]\n",
     "check": "assert fenetres([4,4,9,4],2)==[([4,4],[4,9]),([4,9],[9,4])]\nassert fenetres([2,8,1],1)==[([2],[8]),([8],[1])]; assert fenetres([2],3)==[]\n",
-    "validatorVersion": "1e235cc86113d95fd365e5d74f8d61bf823a01a3486373eb675f80618b907598"
+    "validatorVersion": "5fdde43b9e12c011967df24f1e16db56c6bff987368ae8cce2ca607e932cf3a4"
   },
   {
     "lessonId": "3.5",
@@ -245,7 +245,7 @@
     "starter": "def softmax(xs):\n    # À compléter\n    pass\n",
     "solution": "def softmax(xs):\n    import math; m=max(xs); e=[math.exp(x-m) for x in xs]; return [v/sum(e) for v in e]\n",
     "check": "assert softmax([1000,1000])==[.5,.5]; assert abs(sum(softmax([1,2,3]))-1)<1e-10\nimport math\np=softmax([0,math.log(3)]); assert abs(p[0]-.25)<1e-10; assert abs(p[1]-.75)<1e-10\nassert all(abs(a-b)<1e-10 for a,b in zip(p,softmax([100,100+math.log(3)])))\n",
-    "validatorVersion": "a26262fe226eed59ecb575c897a555bb364bacf3263f70d3a71e0e716d16dd23"
+    "validatorVersion": "4635940d3df79362d530ee6000ef27d5cd65adb5c2ecf2d06ec58fcf962561b8"
   },
   {
     "lessonId": "3.6",
@@ -253,7 +253,7 @@
     "starter": "def perte(p):\n    # À compléter\n    pass\n",
     "solution": "def perte(p):\n    import math; return -math.log(p)\n",
     "check": "assert abs(perte(.5)-.69314718056)<1e-9; assert perte(.9)<perte(.5)\nassert perte(1)==0; assert abs(perte(.25)-2*perte(.5))<1e-10\n",
-    "validatorVersion": "0068aab034a9005bbc2bff10838cc196574c42991ec210587176b8bad6eae1f3"
+    "validatorVersion": "ebbd564b140fc0f51fd7a128326d1a5fd5ab90a81102859f2e6655b3127f0a78"
   },
   {
     "lessonId": "3.7",
@@ -261,7 +261,7 @@
     "starter": "def topk(scores,k):\n    # À compléter\n    pass\n",
     "solution": "def topk(scores,k):\n    return sorted(range(len(scores)),key=lambda i:-scores[i])[:k]\n",
     "check": "assert topk([1,3,2,0],2)==[1,2]; assert topk([9,1],1)==[0]\nassert topk([-3,-1,-2],2)==[1,2]; assert topk([1,1,0],2)==[0,1]; assert topk([4,2],0)==[]\n",
-    "validatorVersion": "1f648e6c1b8336aad6df7279d4046918d60a67a5948787b5e283e28c46ee5879"
+    "validatorVersion": "0e9c27b1475776614e625df9b24b7b8480d98bf95a23c68edd3568063102721a"
   },
   {
     "lessonId": "3.8",
@@ -269,7 +269,7 @@
     "starter": "import numpy as np\n\ndef pas_logits(z, cible, lr):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef pas_logits(z,cible,lr):\n    z=np.array(z,dtype=float)\n    e=np.exp(z-z.max());g=e/e.sum();g[cible]-=1\n    return z-lr*g\n",
     "check": "z=pas_logits([0,0],1,.2); np.testing.assert_allclose(z,[-.1,.1]); assert pas_logits([1,0],0,.1)[0]>1\nnp.testing.assert_allclose(pas_logits([0,0,0],0,.3),[.2,-.1,-.1]); np.testing.assert_allclose(pas_logits([2,1],1,0),[2,1])\n",
-    "validatorVersion": "73e86beb9f4258243779a95b230a8c9180d1e8c8dfcf8d18a27ce2cb7e14700c"
+    "validatorVersion": "47da4fb152355584129bdf2decb64c7f9da28829a68092ab950fa353bbd164a7"
   },
   {
     "lessonId": "3.9",
@@ -277,7 +277,7 @@
     "starter": "def contexte(ids,t):\n    # À compléter\n    pass\n",
     "solution": "def contexte(ids,t):\n    return ids[-t:]\n",
     "check": "assert contexte([4,4,7,1,9],3)==[7,1,9]; assert contexte([1],3)==[1]\nassert contexte([8,3,2,1],1)==[1]; assert contexte([],2)==[]\n",
-    "validatorVersion": "6c79d5cc0589d6cba7187247079d273777f50149c402520c950b7709a81d9521"
+    "validatorVersion": "828cf6bf494b6a46b3da53861d8d35f91f65cef4e420ebb88791b7c0f1f7fce5"
   },
   {
     "lessonId": "3.11",
@@ -285,7 +285,7 @@
     "starter": "import io\nimport numpy as np\n\ndef roundtrip(x):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import io\nimport numpy as np\ndef roundtrip(x):\n    b=io.BytesIO(); np.save(b,np.asarray(x)); b.seek(0)\n    return np.load(b,allow_pickle=False)\n",
     "check": "np.testing.assert_array_equal(roundtrip([[1.,2.],[3.,4.]]),[[1,2],[3,4]])\nx=np.array([[-2,0,7]],dtype=np.int32); y=roundtrip(x); np.testing.assert_array_equal(y,x); assert y.dtype==x.dtype; y[0,0]=99; assert x[0,0]==-2\n",
-    "validatorVersion": "132fbfa63ecab5955e65ae19c14645e875993518d9f1c9988901e3389752e9f4"
+    "validatorVersion": "385c7975119579dd7f1c04dcfe49a035cf0bdbc24ad804fab3e8bd24ad2a4bde"
   },
   {
     "lessonId": "4.3",
@@ -293,7 +293,7 @@
     "starter": "def scores(q,k):\n    # À compléter\n    pass\n",
     "solution": "def scores(q,k):\n    return [[sum(a*b for a,b in zip(x,y,strict=True)) for y in k] for x in q]\n",
     "check": "assert scores([[2],[0]],[[3],[4]])==[[6,8],[0,0]]\nassert scores([[1,2],[-1,0]],[[3,4],[0,2],[2,-1]])==[[11,4,0],[-3,0,-2]]\n",
-    "validatorVersion": "36a7417f3de0d4704f85566581c20865ba9f14b5de26ecbeefa8179264363623"
+    "validatorVersion": "7263f6235f3b9472b02b5b91f4f7cda08bc69955cf7f377d61adf10f0cfeb72a"
   },
   {
     "lessonId": "4.4",
@@ -301,7 +301,7 @@
     "starter": "import numpy as np\n\ndef attention(q, k, v):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef attention(q,k,v):\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T/q.shape[-1]**.5\n    z=np.where(np.tril(np.ones(z.shape,dtype=bool)),z,-1e9)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
     "check": "q=np.eye(2); a=attention(q,q,[[2.,3.],[9.,8.]]); b=attention(q,q,[[2.,3.],[99.,88.]]); np.testing.assert_allclose(a[0],[2,3]); np.testing.assert_allclose(a[0],b[0]); assert a.shape==(2,2)\nnp.testing.assert_allclose(attention([[0],[0],[0]],[[0],[0],[0]],[[2.],[4.],[9.]]),[[2.],[3.],[5.]],atol=1e-8)\nnp.testing.assert_allclose(a[1],[(2+9*np.exp(1/np.sqrt(2)))/(1+np.exp(1/np.sqrt(2))),(3+8*np.exp(1/np.sqrt(2)))/(1+np.exp(1/np.sqrt(2)))])\n",
-    "validatorVersion": "a2c9199d9771b526fb9399b1f61b4d61e6ff31cb4cbd28602b3308e77562f6b2"
+    "validatorVersion": "84d1bcbc1f9ba210b45854cfb83d56b52d5f6f745bdae84e2ab4c06395081748"
   },
   {
     "lessonId": "4.5",
@@ -309,7 +309,7 @@
     "starter": "def masque(t):\n    # À compléter\n    pass\n",
     "solution": "def masque(t):\n    return [[j<=i for j in range(t)] for i in range(t)]\n",
     "check": "assert masque(2)==[[True,False],[True,True]]; assert masque(1)==[[True]]\nassert masque(0)==[]; assert masque(3)==[[True,False,False],[True,True,False],[True,True,True]]\n",
-    "validatorVersion": "321e0722669f6ccde1c2d38dfa5987d791ebad3ff0aae0885dcaccfdb94596f0"
+    "validatorVersion": "44eaedc7d1e38b501764883ade847a88e5fb35e19b69a2b3b4352c0d00ffd03a"
   },
   {
     "lessonId": "4.6",
@@ -317,7 +317,7 @@
     "starter": "def echelle(d):\n    # À compléter\n    pass\n",
     "solution": "def echelle(d):\n    import math; return math.sqrt(d)\n",
     "check": "assert echelle(64)==8; assert echelle(1)==1\nassert echelle(9)==3; assert abs(echelle(2)**2-2)<1e-10\n",
-    "validatorVersion": "8a155ea0a50e325ca35f01639c044d96cca5f11dbc751066d9ae31559ee7f2ee"
+    "validatorVersion": "5bf5fccb993f412a3f0f50428baf60b3448e65a41560bb93e77d870468fbe7af"
   },
   {
     "lessonId": "4.7",
@@ -325,7 +325,7 @@
     "starter": "import numpy as np\n\ndef tetes(x, h):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef tetes(x,h):\n    x=np.asarray(x);b,t,d=x.shape\n    if d%h: raise ValueError(\"dimension\")\n    return x.reshape(b,t,h,d//h).transpose(0,2,1,3)\n",
     "check": "x=np.arange(24).reshape(2,3,4); y=tetes(x,2); assert y.shape==(2,2,3,2); np.testing.assert_array_equal(y[1,1,2],x[1,2,2:])\nnp.testing.assert_array_equal(tetes(np.arange(24).reshape(2,3,4),1),np.arange(24).reshape(2,1,3,4))\ntry: tetes(np.zeros((1,2,3)),2)\nexcept ValueError: pass\nelse: raise AssertionError(\"D doit être divisible par H\")\n",
-    "validatorVersion": "eccbff746d270b082b757ebdd02d58edd5849ee67a2338e70cac119401cad2ed"
+    "validatorVersion": "8d93558ca3be947e9c86cee8601255343fbb853e97808748cb1bf94e533f7f9c"
   },
   {
     "lessonId": "4.8",
@@ -333,7 +333,7 @@
     "starter": "def residu(x,correction):\n    # À compléter\n    pass\n",
     "solution": "def residu(x,correction):\n    return [a+b for a,b in zip(x,correction,strict=True)]\n",
     "check": "assert residu([1,2],[0,0])==[1,2]; assert residu([1,2],[2,-1])==[3,1]\nassert residu([-2,0,3],[1,4,-3])==[-1,4,0]; assert residu([],[])==[]\n",
-    "validatorVersion": "12fd9e6c84515669acfd601ccb56053e645279a9adfaf3a98effd03eaa3e36c5"
+    "validatorVersion": "bdcf850367eb1148286353bd8f4bb0893834bbf116b7360067c5adcb5c6650ac"
   },
   {
     "lessonId": "4.9",
@@ -341,7 +341,7 @@
     "starter": "import numpy as np\n\ndef normaliser(x, eps=1e-05):\n    raise NotImplementedError('À compléter')\n",
     "solution": "import numpy as np\ndef normaliser(x,eps=1e-5):\n    x=np.asarray(x,dtype=float)\n    return (x-x.mean(-1,keepdims=True))/np.sqrt(x.var(-1,keepdims=True)+eps)\n",
     "check": "y=normaliser([[1,3],[20,20]]); np.testing.assert_allclose(y[0],[-1,1],atol=1e-4); np.testing.assert_array_equal(y[1],[0,0])\nnp.testing.assert_allclose(normaliser([[[1,3],[20,20]],[[4,8],[0,0]]]).mean(-1),np.zeros((2,2)),atol=1e-10)\nnp.testing.assert_allclose(normaliser([[5,7]]),normaliser([[1,3]]))\n",
-    "validatorVersion": "82933c13320ce341b7805ee8dc53b266f11cada60bec22a2cfbbe8fb71b2541d"
+    "validatorVersion": "45c723b709803bf9b99a56374e102ddf8147371b3840bad75bdefb2719e6b6bc"
   },
   {
     "lessonId": "4.10",
@@ -349,7 +349,7 @@
     "starter": "def poids_ffn(d):\n    # À compléter\n    pass\n",
     "solution": "def poids_ffn(d):\n    return 8*d*d\n",
     "check": "assert poids_ffn(32)==8192; assert poids_ffn(1)==8\nassert poids_ffn(3)==72; assert poids_ffn(0)==0\n",
-    "validatorVersion": "4651dc2a71e2cc2eaa1c127eda4e93bff6b1e52b73fdf7fd58c2931f10f2dd3c"
+    "validatorVersion": "292d089a10314bd7979c8346bd7cc46ee275ef5e499f51c27b7cb4df6e977a73"
   },
   {
     "lessonId": "4.11",
@@ -357,7 +357,7 @@
     "starter": "def bloc(x, attention, ffn, norm):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def bloc(x,attention,ffn,norm):\n    h=x+attention(norm(x))\n    return h+ffn(norm(h))\n",
     "check": "assert bloc(2,lambda x:x*3,lambda x:x*2,lambda x:x)==24; assert bloc(7,lambda x:0,lambda x:0,lambda x:x)==7\nassert bloc(2,lambda x:x,lambda x:x*x,lambda x:x/2)==5.25\n",
-    "validatorVersion": "9debfc4707682d4202c39e6967a6dfce165cc1d305b72f68980ebb8f5fed4885"
+    "validatorVersion": "6c6508f10bce3995614768a978696846519ec8c66113afe0d91578463e06c013"
   },
   {
     "lessonId": "4.14",
@@ -369,7 +369,7 @@
       "model/__init__.py",
       "model/autograd.py"
     ],
-    "validatorVersion": "6f39e762d8094c6b3cd4f66a737e5a61d7a3810ded19a680053b4190590eb693"
+    "validatorVersion": "28262fab3699f5e163b0b455eb367c4125a539853b5fa5ff41a204c333e82044"
   },
   {
     "lessonId": "5.5",
@@ -377,7 +377,7 @@
     "starter": "def groupe(heads,kv):\n    # À compléter\n    pass\n",
     "solution": "def groupe(heads,kv):\n    return heads//kv\n",
     "check": "assert groupe(8,2)==4; assert groupe(8,8)==1\nassert groupe(12,3)==4; assert groupe(6,1)==6\n",
-    "validatorVersion": "21ef2bfe4a2ec1d3695507579db031318c4bb6901620e12c30be83f06cd620d3"
+    "validatorVersion": "610d59b6c70678cf82727b65710064e8946621370ad6b235e7f0d1a8ddc23d23"
   },
   {
     "lessonId": "5.7",
@@ -385,7 +385,7 @@
     "starter": "def economie(v,d,octets):\n    # À compléter\n    pass\n",
     "solution": "def economie(v,d,octets):\n    return v*d*octets\n",
     "check": "assert economie(32000,256,4)==32768000; assert economie(2,3,2)==12\nassert economie(7,5,1)==35; assert economie(3,0,4)==0\n",
-    "validatorVersion": "0a051fda0bc48bbafb88f30bf7465e0b6491f10062e9cda1a3175050c7fc572b"
+    "validatorVersion": "d41bac013f20e003e06a72b254f9e73ad005853ec2d4fb6c0eefb2d9c3618934"
   },
   {
     "lessonId": "5.9",
@@ -393,7 +393,7 @@
     "starter": "def cache(couches, t, kv, d):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def cache(couches,t,kv,d):\n    return 2*couches*t*kv*d\n",
     "check": "assert cache(2,10,2,4)==320; assert cache(2,20,2,4)==2*cache(2,10,2,4)\nassert cache(3,5,2,7)==420; assert cache(2,0,2,4)==0\n",
-    "validatorVersion": "273312de6853794cf82941bd90bb425c5d517029700c09e21eedbf6e16e849d6"
+    "validatorVersion": "da8fd414defda918163893c77309dca0d9d5be9c24505952e2e45905137329f4"
   },
   {
     "lessonId": "6.1",
@@ -401,7 +401,7 @@
     "starter": "def poids(n,octets):\n    # À compléter\n    pass\n",
     "solution": "def poids(n,octets):\n    return n*octets\n",
     "check": "assert poids(7_000_000_000,2)==14_000_000_000; assert poids(3,4)==12\nassert poids(100,1)==100; assert poids(0,4)==0\n",
-    "validatorVersion": "9406a9742c6a35cfeae056bb22fbe7a79e5f9575068e44c2f03d13a82df5fae5"
+    "validatorVersion": "ad41a8f56234a21654173ebce7b2092797b8db3dd074d9f1c7a07b9e036fe7a9"
   },
   {
     "lessonId": "6.7",
@@ -409,7 +409,7 @@
     "starter": "def moyenne_grad(gradients):\n    # À compléter\n    pass\n",
     "solution": "def moyenne_grad(gradients):\n    return sum(gradients)/len(gradients)\n",
     "check": "assert moyenne_grad([1]*8)==1; assert moyenne_grad([-1,1])==0\nassert moyenne_grad([2,4,9])==5; assert moyenne_grad([-3])==-3\n",
-    "validatorVersion": "a58c9158f12be9cf5c75859da33ae97503d6014af30555662265fffad2699ddc"
+    "validatorVersion": "308b4138d0b1e7bb327fd45701c8138a21afd9a77841b03b7dc83717924da56a"
   },
   {
     "lessonId": "6.12",
@@ -417,7 +417,7 @@
     "starter": "def classer(lignes):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def classer(lignes):\n    return sorted(lignes,key=lambda r:(-r[\"quality\"],r[\"seconds\"],r[\"ram_bytes\"]))\n",
     "check": "rows=[{\"name\":\"a\",\"quality\":1,\"seconds\":2,\"ram_bytes\":10},{\"name\":\"b\",\"quality\":1,\"seconds\":1,\"ram_bytes\":20}]; assert [r[\"name\"] for r in classer(rows)]==[\"b\",\"a\"]; assert rows[0][\"name\"]==\"a\"\nrows=[{\"name\":\"a\",\"quality\":2,\"seconds\":3,\"ram_bytes\":20},{\"name\":\"b\",\"quality\":1,\"seconds\":1,\"ram_bytes\":1},{\"name\":\"c\",\"quality\":2,\"seconds\":3,\"ram_bytes\":10}]; assert [r[\"name\"] for r in classer(rows)]==[\"c\",\"a\",\"b\"]; assert classer([])==[]\n",
-    "validatorVersion": "d8992d03893e862dc170f67bfcc8e6d5872df359bec98a05bec1ba4026612570"
+    "validatorVersion": "cce0a301bb3252a2c53142eaddbc368a09033130fdc361f12819da3f4f55d5a4"
   },
   {
     "lessonId": "7.5",
@@ -425,7 +425,7 @@
     "starter": "def capacite(tokens,experts,facteur):\n    # À compléter\n    pass\n",
     "solution": "def capacite(tokens,experts,facteur):\n    import math; return math.ceil(facteur*tokens/experts)\n",
     "check": "assert capacite(128,8,1.25)==20; assert capacite(1,8,1.25)==1\nassert capacite(9,4,1)==3; assert capacite(0,4,1.25)==0\n",
-    "validatorVersion": "48b941051136053a2d76b8013187ff81d117f81355c04110ee37f7611bbcbe65"
+    "validatorVersion": "fc4026214ee76a44b97d852e38f8f5ad2bf07bd286e1e102d5cee1ad8e751a52"
   },
   {
     "lessonId": "7.9",
@@ -433,7 +433,7 @@
     "starter": "def budgets(e, k, poids_expert):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def budgets(e,k,poids_expert):\n    if not 1<=k<=e:raise ValueError(\"k\")\n    return e*poids_expert,k*poids_expert\n",
     "check": "assert budgets(8,2,100)==(800,200); assert budgets(4,1,10)==(40,10)\nassert budgets(3,3,7)==(21,21)\ntry: budgets(3,4,7)\nexcept ValueError: pass\nelse: raise AssertionError(\"k hors limites\")\n",
-    "validatorVersion": "ae9d5b859db4af2dfbc31421e8d8244284f2da8961a99f9e1d6b84ab8767ea0d"
+    "validatorVersion": "8d216587d2ba23a39d47d1e06b617254e19e89fb5e2f6c8da9b18436430c2bf1"
   },
   {
     "lessonId": "8.4",
@@ -441,7 +441,7 @@
     "starter": "def recurrence(xs):\n    # À compléter\n    pass\n",
     "solution": "def recurrence(xs):\n    h=0; out=[]\n    for x in xs: h=.5*h+x; out.append(h)\n    return out\n",
     "check": "assert recurrence([1,2,3])==[1,2.5,4.25]; assert recurrence([])==[]\nassert recurrence([-2,0,1])==[-2,-1,.5]\n",
-    "validatorVersion": "547ab3312754ba379e91b79e3555a8dbfa8345a80c53e54a0377282fb070c2ad"
+    "validatorVersion": "9820f7a7c5b67fa8896736e6c8b4106ee3eab629996e337b18af6d279d24b43d"
   },
   {
     "lessonId": "8.5",
@@ -449,7 +449,7 @@
     "starter": "def composer(a1,b1,a2,b2):\n    # À compléter\n    pass\n",
     "solution": "def composer(a1,b1,a2,b2):\n    return a2*a1,a2*b1+b2\n",
     "check": "assert composer(2,3,4,5)==(8,17); assert composer(1,0,3,2)==(3,2)\nassert composer(2,3,0,5)==(0,5); assert composer(0,3,2,-1)==(0,5)\n",
-    "validatorVersion": "86eb1f7ed41ec63853ec0ee917323effd871e6be75e027fc2863778ea02a6d88"
+    "validatorVersion": "57dec587f7d9ae22dc39f779a6e2b3837f08c62e730c1b45d1f7ca2fa819e33e"
   },
   {
     "lessonId": "8.9",
@@ -457,7 +457,7 @@
     "starter": "def modes(n):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def modes(n):\n    return [\"attn\" if i%2==0 else \"ssm\" for i in range(n)]\n",
     "check": "assert modes(5)==[\"attn\",\"ssm\",\"attn\",\"ssm\",\"attn\"]; assert modes(0)==[]\nassert modes(1)==[\"attn\"]; assert modes(2)==[\"attn\",\"ssm\"]\n",
-    "validatorVersion": "04a22ada682cbf901e9016a0e43c15840fc1e8e3fb61fffb41f456ca9ddf4031"
+    "validatorVersion": "88c990643fb38b364017ad62fa148d98899715d13bc2fc4c05691ae84dd8abe6"
   },
   {
     "lessonId": "9.2",
@@ -465,7 +465,7 @@
     "starter": "def patches(h,w,c,p):\n    # À compléter\n    pass\n",
     "solution": "def patches(h,w,c,p):\n    return (h//p)*(w//p),p*p*c\n",
     "check": "assert patches(8,8,3,4)==(4,48); assert patches(4,4,1,2)==(4,4)\nassert patches(8,12,1,4)==(6,16); assert patches(4,8,3,2)==(8,12)\n",
-    "validatorVersion": "c1eaf81153f144fa92d197463993677c0c22c824afab33b0d9d6f53900ce4ffc"
+    "validatorVersion": "f7080426dec513f1b9ea24192aee4523d2a686806ec5f1937daaa5433f0f785f"
   },
   {
     "lessonId": "9.9",
@@ -473,7 +473,7 @@
     "starter": "def mse_image(a, b):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def mse_image(a,b):\n    if len(a)!=len(b) or not a:raise ValueError(\"tailles\")\n    return sum((x-y)**2 for x,y in zip(a,b))/len(a)\n",
     "check": "assert mse_image([0,2],[0,0])==2; assert mse_image([1,2],[1,2])==0\nassert mse_image([-1,1],[0,0])==1\nfor a,b in [([],[]),([1],[1,2])]:\n try: mse_image(a,b)\n except ValueError: pass\n else: raise AssertionError(\"tailles invalides\")\n",
-    "validatorVersion": "faad63d251bf4a24824837c39638aed90fe5759d10c58d88123370830b3bc83d"
+    "validatorVersion": "8f14fdaa97b41cf4a2bea1e4b0c48f2158a38414adcf9cc4e95e5cb9fa98465a"
   },
   {
     "lessonId": "10.3",
@@ -481,7 +481,7 @@
     "starter": "def classer(scores):\n    # À compléter\n    pass\n",
     "solution": "def classer(scores):\n    return sorted(range(len(scores)),key=lambda i:(-scores[i],i))\n",
     "check": "assert classer([.5,.8,.8])==[1,2,0]; assert classer([0,0])==[0,1]\nassert classer([-2,-1,-3])==[1,0,2]; assert classer([])==[]\n",
-    "validatorVersion": "6fd9c5a817d151fbba02f715433de0bf60ad0641592666c4d3c1d704a846023b"
+    "validatorVersion": "b27c28635f91c1ba43ee52e8a1f8126356dec2381c9ce716a46d35ed50add5a8"
   },
   {
     "lessonId": "10.8",
@@ -489,7 +489,7 @@
     "starter": "def exactitude(pred, cibles):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def exactitude(pred,cibles):\n    if not pred or len(pred)!=len(cibles):raise ValueError(\"tailles\")\n    return sum(p==c for p,c in zip(pred,cibles))/len(pred)\n",
     "check": "assert exactitude([1,2,0],[1,2,3])==2/3; assert exactitude([1],[2])==0\nassert exactitude([3,2],[3,2])==1\nfor a,b in [([],[]),([1],[1,2])]:\n try: exactitude(a,b)\n except ValueError: pass\n else: raise AssertionError(\"tailles invalides\")\n",
-    "validatorVersion": "19fda9c9c5424bdf816fcae96bfd04576666e2134223808cf28ae4f6881c9521"
+    "validatorVersion": "f8999a46e390605fdf8dc92352e15fe2e18d14a776a58c398ebc504b8a7d8b1d"
   },
   {
     "lessonId": "11.8",
@@ -497,7 +497,7 @@
     "starter": "def statut(forme, loss_validation):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def statut(forme,loss_validation):\n    if loss_validation is not None:return \"mesure linguistique\"\n    return \"test technique\" if forme else \"non reproduit\"\n",
     "check": "assert statut(True,None)==\"test technique\"; assert statut(False,None)==\"non reproduit\"; assert statut(True,2.3)==\"mesure linguistique\"\nassert statut(False,0)==\"mesure linguistique\"; assert statut(True,0)==\"mesure linguistique\"\n",
-    "validatorVersion": "3d4c064e7d5b2cfc3af7ba40f5b53c4fe4f5f21499170fc9b807c470bdb25fcc"
+    "validatorVersion": "c9611756b3d501a34822f97ffa9d9e4f6a46729c88ccee6b485f1ee10f959aa7"
   },
   {
     "lessonId": "12.4",
@@ -505,7 +505,7 @@
     "starter": "import math\n\ndef perplexite(loss):\n    raise NotImplementedError(\"À compléter\")\n",
     "solution": "import math\n\ndef perplexite(loss):\n    return math.exp(loss)\n",
     "check": "assert math.isclose(perplexite(0),1); assert math.isclose(perplexite(math.log(4)),4); assert perplexite(1)<perplexite(2)\nassert math.isclose(perplexite(math.log(7)),7); assert math.isclose(perplexite(.5)**2,perplexite(1))\n",
-    "validatorVersion": "4b7e999eace0fb539f6a96cc00aa1e92f0059752fe683b47ee33300df5d3b564"
+    "validatorVersion": "516b03ccc1504b7b64a3f444ee1a4bb577f84486c1d6bc1d63fb8bf5a48c72ea"
   },
   {
     "lessonId": "12.12",
@@ -513,7 +513,7 @@
     "starter": "def pieces_manquantes(rapport):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def pieces_manquantes(rapport):\n    requises={\"donnees\",\"config\",\"baselines\",\"rechargement\",\"limites\"}\n    return sorted(requises-set(rapport))\n",
     "check": "assert pieces_manquantes({\"config\":{}})==[\"baselines\",\"donnees\",\"limites\",\"rechargement\"]; assert pieces_manquantes(dict.fromkeys([\"donnees\",\"config\",\"baselines\",\"rechargement\",\"limites\"]))==[]\nassert pieces_manquantes({})==[\"baselines\",\"config\",\"donnees\",\"limites\",\"rechargement\"]; assert pieces_manquantes({\"donnees\":{},\"baselines\":{}})==[\"config\",\"limites\",\"rechargement\"]\n",
-    "validatorVersion": "a76fb31082d6fd7435820425c97cb0d639d532baafc98dd1f702054761c45c70"
+    "validatorVersion": "062d6a3fa68cda2f73084affa4982c895fd91462d638e8677d08ab037883c78c"
   },
   {
     "lessonId": "13.6",
@@ -521,7 +521,7 @@
     "starter": "def masque_reponse(n_prompt,n_total):\n    # À compléter\n    pass\n",
     "solution": "def masque_reponse(n_prompt,n_total):\n    return [i+1>=n_prompt for i in range(n_total-1)]\n",
     "check": "assert masque_reponse(3,5)==[False,False,True,True]\nassert masque_reponse(1,4)==[True,True,True]; assert masque_reponse(4,4)==[False,False,False]; assert masque_reponse(1,1)==[]\n",
-    "validatorVersion": "e0ebb4f75c45b12984772090e353cb0cd6d719612bdcdf8ddfcce79581f50320"
+    "validatorVersion": "ddc12c3fc4cf10c5722d502ff03188a823ced90860c06bb5fda0100f2f372e71"
   },
   {
     "lessonId": "13.8",
@@ -529,6 +529,6 @@
     "starter": "def arreter(texte):\n    raise NotImplementedError('À compléter')\n",
     "solution": "def arreter(texte):\n    return texte.split(\"\\n\",1)[0]\n",
     "check": "assert arreter(\"bonjour\\nsuite\")==\"bonjour\"; assert arreter(\"salut\")==\"salut\"\nassert arreter(\"a\\nb\\nc\")==\"a\"; assert arreter(\"\\na\")==\"\"; assert arreter(\"\")==\"\"\n",
-    "validatorVersion": "bc51518b331f4ea599e5126ad317b162cdab70f00a6e56abe958a15cc0ef65eb"
+    "validatorVersion": "1ec215eed7b5ccad684d8ef2d8cd72f05f678f214a703d41f505b2dbed1232bc"
   }
 ]

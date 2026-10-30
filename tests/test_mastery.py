@@ -22,7 +22,7 @@ def test_generated_contracts_and_capabilities_match_their_sources():
     for row in EXERCISES.values():
         contract = copy.deepcopy(row); version = contract.pop('validatorVersion')
         dependencies = {path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in contract.get('files',[])}
-        def digest(value):return hashlib.sha256(json.dumps({'schema':2,'exercise':value,'dependencies':dependencies},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+        def digest(value):return hashlib.sha256(json.dumps({'schema':2,'exercise':value,'dependencies':dependencies,'runtime':builder.runtime_fingerprint()},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
         assert digest(contract) == version
         contract['check'] += '\nassert False\n'
         assert digest(contract) != version
@@ -72,7 +72,7 @@ def test_observation_summary_does_not_turn_technical_success_into_human_evidence
     spec = importlib.util.spec_from_file_location('observations', ROOT/'scripts/summarize_observations.py')
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     task = TASKS[0]
-    row = {'id':'sample','taskId':task['id'],'alias':'eleve-01','siteVersion':'test','code':task['solution'],'diagnosis':'Carré après moyenne','explanation':'Les erreurs opposées ne doivent pas s’annuler.','events':[{'type':'start','at':1000},{'type':'finish','at':2000}], 'assistance':[], 'checks':[{'ok':True,'codeHash':module.fingerprint(task['solution']),'validatorVersion':task['validatorVersion'],'checkedAt':1800,'assistance':[]}]}
+    row = {'id':'sample','taskId':task['id'],'alias':'eleve-01','siteVersion':'test','taskVersion':task['validatorVersion'],'code':task['solution'],'diagnosis':'Carré après moyenne','explanation':'Les erreurs opposées ne doivent pas s’annuler.','events':[{'type':'start','at':1000},{'type':'finish','at':2000}], 'assistance':[], 'checks':[{'ok':True,'codeHash':module.fingerprint(task['solution']),'validatorVersion':task['validatorVersion'],'checkedAt':1800,'assistance':[]}]}
     catalog = json.loads((ROOT/'data/transfer-tasks.json').read_text())
     report = lambda value: {'format':'afz-comprehension-v1','attempts':[value]}
     stats = lambda value: module.summarize([report(value)],catalog)['stages'][0]

@@ -52,7 +52,7 @@ export async function paintAssessment(main) {
   const live = row => ["start", "resume"].includes(row.events.at(-1)?.type);
   const repaintHistory = () => {
     const rows = read().attempts;
-    history.replaceChildren(h("h2", { text: "Tentatives conservées" }), h("p", { text: rows.length ? `${rows.length} tentative(s). Résultats et relectures sont déclaratifs ; les fichiers importés restent identifiés.` : "Aucune tentative réalisée. Aucun résultat humain n’est prérempli." }), ...rows.slice().reverse().map(row => h("button", { type: "button", class: "assessment-history-link", onClick: () => {
+    history.replaceChildren(h("h2", { text: "Tentatives conservées" }), h("p", { text: rows.length ? `${rows.length} tentative(s). Résultats et relectures sont déclaratifs ; les fichiers importés restent identifiés.` : "Aucune tentative réalisée. Aucun résultat humain n’est prérempli." }), ...rows.slice().reverse().map(row => h("button", { type: "button", class: "button button-secondary assessment-history-link", onClick: () => {
       if (running) return;
       const selected = catalog.tasks.find(task => task.id === row.taskId);
       pick.value = selected.stage; variant.value = selected.variant; selectedId = row.id; paint();
@@ -88,7 +88,8 @@ export async function paintAssessment(main) {
     workspace.replaceChildren();
     pick.disabled = variant.disabled = start.disabled = running;
     if (!row) { workspace.append(h("p", { text: "Démarre une tentative pour écrire ton programme et chronométrer le travail. Tu peux interrompre l’essai sans le réussir." })); repaintHistory(); return; }
-    const locked = ended(row) || !live(row);
+    const outdated = row.taskVersion !== value.validatorVersion;
+    const locked = ended(row) || !live(row) || outdated;
     const code = h("textarea", { class: "ide-fallback", rows: 12, maxlength: 100000, "aria-label": "Code du cas nouveau", readonly: locked }); code.value = row.code;
     const diagnosis = h("textarea", { rows: 4, maxlength: 20000, "aria-label": "Diagnostic et contre-exemple", readonly: locked }); diagnosis.value = row.diagnosis;
     const explanation = h("textarea", { rows: 5, maxlength: 20000, "aria-label": "Explication sur le cas nouveau", readonly: locked }); explanation.value = row.explanation;
@@ -142,11 +143,12 @@ export async function paintAssessment(main) {
     };
     workspace.append(h("h2", { text: "Ma tentative" }), clock, h("label", {}, ["Programme reconstruit et corrigé", code]), h("label", {}, ["Défaut, hypothèse et contre-exemple", diagnosis]), h("label", {}, ["Prédiction, résultat observé et limite", explanation]), assistance, reveal("indice", value.hint), reveal("corrigé", value.solution), run,
       h("button", { type: "button", disabled: locked, onClick: () => { ticket++; if (running) stopWorker(); running = false; pick.disabled = variant.disabled = start.disabled = false; run.disabled = false; validity.textContent = "Contrôle arrêté ; code conservé."; } }, "Arrêter Python"), validity);
+    if (outdated) workspace.prepend(h("p", { role: "status", text: "L’épreuve a évolué depuis cette tentative. Ton travail archivé reste consultable ; termine cette ancienne tentative puis démarre un nouvel essai pour utiliser le contrôle actuel." }));
     if (!ended(row)) workspace.append(
       h("button", { type: "button", onClick: () => transition(live(current()) ? "pause" : "resume") }, live(row) ? "Mettre en pause" : "Reprendre le chronomètre"),
       h("button", { type: "button", onClick: () => transition("finish") }, "Terminer et garder cette tentative"),
       h("button", { type: "button", onClick: () => transition("abandon") }, "Conserver un abandon"));
-    else workspace.append(reviewForm(row, update, status));
+    else if (!outdated) workspace.append(reviewForm(row, update, status));
     if (row.checks.length) workspace.append(h("details", {}, [h("summary", { text: "Historique des contrôles et aides" }), h("ol", {}, row.checks.map(check => h("li", { text: `${new Date(check.checkedAt).toLocaleString("fr")} · ${check.ok ? "réussi" : "échoué"} · code ${check.codeHash.slice(0, 8)} · aides : ${check.assistance.join(", ") || "aucune déclarée"}` })))]));
     if (row.origin === "imported") workspace.append(h("p", { text: "Tentative importée : ces déclarations n’ont pas été observées par le site." }));
     void refresh(); repaintHistory();

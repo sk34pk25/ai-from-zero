@@ -1,6 +1,6 @@
 {
   "format": "afz-transfer-tasks-v1",
-  "version": "c699ff9eaaec106c55ac1c4a8ab3d6042fa9604985556a97cbbfbf7bef551d6d",
+  "version": "b8aeca7c3da2972d02ea6ae33ab1014394fa75353dfaf5dd8e6831e5fc545230",
   "tasks": [
     {
       "id": "fondations-A",
@@ -19,7 +19,7 @@
       "check": "assert affine(-2,3,4)==-2; assert affine(0,7,-1)==-1\nassert mse([2,-2],[0,0])==4; assert mse([3,1],[1,1])==2\n",
       "explain": "Calcule à la main affine(-3,2,1), puis explique pourquoi les erreurs +2 et −2 donnent une MSE de 4.",
       "hint": "Le carré s’applique à chaque écart avant la moyenne. Un poids nul ne supprime pas le biais.",
-      "validatorVersion": "2d8510aa203072bba1b7649937cd19fadeb6e0c06b3279746f2015d2a3047634"
+      "validatorVersion": "116d0c8105886dc4f0485e1e1ab7d54870e253d22bf43197c4c0bc1a3baaedd4"
     },
     {
       "id": "fondations-B",
@@ -38,7 +38,7 @@
       "check": "assert affine(.5,-4,3)==1; assert affine(2,3,-4)==2\nassert mse([3,-3],[0,0])==9; assert mse([1,5],[1,1])==8\n",
       "explain": "Calcule à la main affine(4,-2,3), puis explique pourquoi les erreurs +3 et −3 donnent une MSE de 9.",
       "hint": "Le carré s’applique à chaque écart avant la moyenne. Un poids nul ne supprime pas le biais.",
-      "validatorVersion": "8af3e2e5f9fd9f03f19869b6be6b50c9de7a4a303b437d21fdc54503b408a803"
+      "validatorVersion": "87dfe700dcd88a2a0b5bfe31782c7e580f0d25a4ca4e1bd81e29e500081224a1"
     },
     {
       "id": "tokens-A",
@@ -56,7 +56,7 @@
       "check": "assert encoder('é a',{'é':8,' ':2,'a':5})==[8,2,5]; assert encoder('',{})==[]\nassert fenetres([8,2,5,8],2)==[([8,2],[2,5]),([2,5],[5,8])]; assert fenetres([8],2)==[]\n",
       "explain": "Écris x et y pour les indices [6,1,7,2] avec T=2. Pourquoi y=x ferait-il apprendre une autre tâche ?",
       "hint": "La table est fixée. À la position i, la cible vient de i+1, avec autant de cibles que d’entrées.",
-      "validatorVersion": "ea6009a3831b0a1ca42b464e9bde1da9f8689687d97c595926a9da609d726fbe"
+      "validatorVersion": "c9f4ac7b7586b86f8cb2ab71d8ce5e5dfd0576167542919aacc5ba7fea08259f"
     },
     {
       "id": "tokens-B",
@@ -74,7 +74,7 @@
       "check": "assert encoder('b🙂b',{'b':4,'🙂':9})==[4,9,4]; assert encoder('',{})==[]\nassert fenetres([4,9,4],1)==[([4],[9]),([9],[4])]; assert fenetres([4,9],2)==[]\n",
       "explain": "Écris x et y pour [3,0,5,3,2] avec T=3. Pourquoi un identifiant plus grand ne signifie-t-il pas un token plus important ?",
       "hint": "La table est fixée. À la position i, la cible vient de i+1, avec autant de cibles que d’entrées.",
-      "validatorVersion": "cf5c050797ada7aab37fa0b24ab70ecc8178b0bb9f518e40680e05d5a65dfafe"
+      "validatorVersion": "ff71c697c48fe631c530396943bbc1f75ba096e5af5a98eb1f7fd10599bce21f"
     },
     {
       "id": "probabilites-A",
@@ -92,7 +92,7 @@
       "check": "import math\np=softmax([1000,1000+math.log(3)]); assert abs(p[0]-.25)<1e-10; assert abs(p[1]-.75)<1e-10\nassert abs(perte(.25)-math.log(4))<1e-10; assert perte(1)==0\n",
       "explain": "La cible a une probabilité 1/4. Donne sa perte en nats et sa perplexité. Pourquoi ajouter 100 à tous les logits ne change-t-il pas softmax ?",
       "hint": "Soustraire une constante commune aux scores conserve leurs rapports exponentiels. La perplexité est exp(loss).",
-      "validatorVersion": "b3fc97ffd96dded768554abda71e569ea7298d54f9e0ba415cd3f579c46a7a33"
+      "validatorVersion": "6a6545e40dab7ae4867a16e8121bf2230034d8c5278916ac979ebfad1ae289db"
     },
     {
       "id": "probabilites-B",
@@ -110,7 +110,7 @@
       "check": "import math\np=softmax([-1000,-1000+math.log(4)]); assert abs(p[0]-.2)<1e-10; assert abs(p[1]-.8)<1e-10\nassert abs(perte(.2)-math.log(5))<1e-10; assert perte(1)==0\n",
       "explain": "La cible a une probabilité 1/5. Donne sa perte en nats et sa perplexité. Pourquoi soustraire le maximum évite-t-il un débordement ?",
       "hint": "Soustraire une constante commune aux scores conserve leurs rapports exponentiels. La perplexité est exp(loss).",
-      "validatorVersion": "ebfb97b6831031c196432fe5c15917ab9ffe7a7f4a00a70142c029e78ecb815a"
+      "validatorVersion": "d82018c0326e10f23de84e85640f64d475ddd6ab74e255d93a0b9ee8aad3265c"
     },
     {
       "id": "attention-A",
@@ -129,7 +129,7 @@
       "check": "import numpy as np\nassert masque(3)==[[True,False,False],[True,True,False],[True,True,True]]\na=attention([[0,0,0,0],[2,0,0,0]],[[0,0,0,0],[2,0,0,0]],[[2.],[10.]])\nnp.testing.assert_allclose(a,[[2.],[(2+10*np.exp(2))/(1+np.exp(2))]])\n",
       "explain": "Pour des scores bruts [0,4] avec d_k=4, calcule les scores réduits et les poids. Si une valeur future change, quelle sortie passée doit rester identique ?",
       "hint": "La forme et la causalité ne détectent pas une échelle manquante. Contrôle une valeur indépendante en plus du masque.",
-      "validatorVersion": "34ee320331a2eafb4f402cc4a20f88e24632b94283d1c292845926893374e41f"
+      "validatorVersion": "b4956e6a2ea365d379e30bf18096cc3b5170d68668db55257e6e117d399a99a3"
     },
     {
       "id": "attention-B",
@@ -148,7 +148,7 @@
       "check": "import numpy as np\nassert masque(2)==[[True,False],[True,True]]\na=attention([[0,0,0,0],[4,0,0,0]],[[0,0,0,0],[1,0,0,0]],[[1.],[6.]])\nnp.testing.assert_allclose(a,[[1.],[(1+6*np.exp(2))/(1+np.exp(2))]])\n",
       "explain": "Pour [0,6] avec d_k=9, calcule les scores réduits et les poids. Une attention sans échelle peut être causale : pourquoi un test de causalité seul ne suffit-il pas ?",
       "hint": "La forme et la causalité ne détectent pas une échelle manquante. Contrôle une valeur indépendante en plus du masque.",
-      "validatorVersion": "2dff440b4e6822079793dad67bc94180fa8adb520657c447437117b9af68c532"
+      "validatorVersion": "38044a07a4c7096313123693f0dbbce336d22c2edf6eaee1f819d91f69adaeb1"
     },
     {
       "id": "evaluation-A",
@@ -168,7 +168,7 @@
       "check": "assert fuites(['doc-a','doc-b','doc-a'],['doc-c','doc-b'])==['doc-b']; assert fuites([],['a'])==[]\na=deltas([{'seed':0,'loss':3.},{'seed':1,'loss':2.}], [{'seed':1,'loss':2.5},{'seed':0,'loss':2.}]); assert a==[-1.,.5]\n",
       "explain": "Sur ton propre checkpoint rechargé, choisis un texte nouveau sans l’utiliser pour choisir les poids. Donne provenance, tokenizer, commande, logits avant/après rechargement et une erreur du modèle. Des deltas [-0,02 ; +0,01 ; -0,01] suffisent-ils à affirmer un gain général ?",
       "hint": "L’identité documentaire et la graine sont des clés d’appariement. Une preuve de modèle demande aussi un checkpoint, des données réservées et une explication vérifiable.",
-      "validatorVersion": "2a8cb29640625bcc4ccfeca5297aef5d8a26266dcc51d5f247f252d2dc3bbe70"
+      "validatorVersion": "6039c6382ac1911c26d577252e0d9554185e727b05cf6409e76de54c335c8610"
     },
     {
       "id": "evaluation-B",
@@ -188,7 +188,7 @@
       "check": "assert fuites(['famille-2','famille-1'],['famille-1','famille-2','famille-3'])==['famille-1','famille-2']\na=deltas([{'seed':2,'loss':4.},{'seed':7,'loss':3.}], [{'seed':7,'loss':2.5},{'seed':2,'loss':4.5}]); assert a==[.5,-.5]\n",
       "explain": "Sur ton propre modèle, prédis ce qui change si le prompt est permuté, puis exécute et confronte à la prédiction. Cite checkpoint, commande, sortie, limite et aides utilisées. Pourquoi ne faut-il pas choisir le meilleur modèle après avoir observé le test final ?",
       "hint": "L’identité documentaire et la graine sont des clés d’appariement. Une preuve de modèle demande aussi un checkpoint, des données réservées et une explication vérifiable.",
-      "validatorVersion": "857d1c6813c370f26c178828a34c0448180f553d985726f4f73bc739837fecf0"
+      "validatorVersion": "f168b3904f1d98891997f4423249ea63be174a1d0e0a82373479920da200a8ec"
     }
   ]
 }

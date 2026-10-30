@@ -172,6 +172,8 @@ function stamp() {
     "data/glance.json",
     "data/glossary.json",
     "data/glossary-core.json",
+    "data/transfer-tasks.json",
+    "data/capabilities.json",
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
   ];
   const course = [
