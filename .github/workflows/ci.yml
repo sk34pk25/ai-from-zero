@@ -99,7 +99,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js tests/e2e/local.spec.js tests/e2e/reliability.spec.js tests/e2e/lesson-loading.spec.js
+      - run: npx playwright test tests/e2e/responsive.spec.js tests/e2e/workspace.spec.js tests/e2e/atelier.spec.js tests/e2e/local.spec.js tests/e2e/reliability.spec.js tests/e2e/lesson-loading.spec.js tests/e2e/visual-learning.spec.js
         env:
           PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
       - name: Python et NumPy réels

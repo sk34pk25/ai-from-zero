@@ -98,15 +98,15 @@ test("le catalogue, le playground, l'à propos et une figure passent axe", async
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
   await page.goto("/#/lecon/2.5");
-  await expect(page.locator("[data-manipulator='2.5']")).toBeVisible();
-  const before = await page.locator("[data-manipulator='2.5'] .manip-readout").innerText();
-  await page.locator("[data-manipulator='2.5']").getByRole("button", { name: "Avancer le jeton" }).click();
-  await expect(page.locator("[data-manipulator='2.5'] .manip-readout")).not.toHaveText(before);
-  await page.goto("/#/lecon/0.1");
-  const load = page.locator("[data-manipulator='0.1'] input[type=range]");
-  const loadBefore = await page.locator("[data-manipulator='0.1'] .manip-readout").innerText();
-  await load.press("ArrowRight");
-  await expect(page.locator("[data-manipulator='0.1'] .manip-readout")).not.toHaveText(loadBefore);
+  const tokenizer = page.locator('[data-lab="tokenizer"]');
+  await tokenizer.getByLabel('Texte à découper').fill('chat chat');
+  await expect(tokenizer).toContainText('Le vocabulaire reste fixe');
+  await expect(tokenizer.locator('.visual-readout').last()).toContainText('Décodage : « chat chat »');
+  await page.goto('/#/lecon/0.1');
+  const program = page.locator('[data-lab="program"]');
+  await expect(program.locator('.lab-stage')).toContainText('texte chargé');
+  await program.getByRole('button', { name: 'Étape suivante', exact: true }).click();
+  await expect(program.locator('.lab-stage')).toContainText('texte + IDs');
 });
 
 test("le propriétaire ouvre l'IDE, importe le modèle, entraîne et s'arrête", async ({ page }) => {

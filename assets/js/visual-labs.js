@@ -9,7 +9,7 @@ function mountMatrix(host, lesson) {
   const a = [[1, 2], [3, 4]], b = [[2, 0], [1, 3]];
   const edit = h('input', { type: 'number', min: '-9', max: '9', value: '1', 'aria-label': 'Valeur A ligne 0 colonne 0' });
   const scale = slider('Batch à inspecter', 0, 1, 0);
-  const isTensor = ['0.15', '1.15', '2.11'].includes(lesson.id);
+  const isTensor = ['0.15', '1.15', '2.11', '6.5'].includes(lesson.id);
   host.append(isTensor ? scale.field : h('label', {}, ['Modifier A[0, 0]', edit]));
   const view = lab(host, { kind: isTensor ? 'tensor' : 'matrix', title: isTensor ? 'Une tranche du tenseur [B, T, D]' : 'Ligne × colonne : fabriquer une cellule', source: 'model/attention.py', steps: [
     { title: 'Repérer les formes', code: 'A.shape, B.shape  # (2, 2), (2, 2)' },
@@ -21,12 +21,30 @@ function mountMatrix(host, lesson) {
     stage.append(note(isTensor ? `Tenseur [2, 2, 2] : B = batch, T = position, D = coordonnée. Tranche B=${batch} affichée ; W est partagée entre les batches.` : 'Choisis une cellule de C. Les repères « ligne » et « colonne » accompagnent la couleur.'),
       h('div', { class: 'lab-matrices' }, [matrix(isTensor ? `X[${batch}] · ligne ${row}` : `A · ligne ${row}`, aa, { selected: i => i === row }),
         matrix(`B · colonne ${col}`, b, { selected: (_, j) => j === col }),
-        matrix('C = A @ B', c, { selected: (i, j) => i === row && j === col, onCell: (i, j) => { row = i; col = j; view.repaint(); } })]),
+        matrix('C = A @ B', c, { selected: (i, j) => i === row && j === col, onCell: (i, j) => { row = i; col = j; view.repaint(); host.querySelector('.lab-matrices > :last-child button[aria-pressed="true"]')?.focus({ preventScroll: true }); } })]),
       note(`${step === 0 ? 'Cellule choisie' : 'Calcul actif'} C[${row}, ${col}] = ${aa[row].map((n, k) => `${n} × ${b[k][col]}`).join(' + ')} = ${products.join(' + ')} = ${fmt(c[row][col])}.`));
   } });
   edit.addEventListener('input', () => { const n = Number(edit.value); if (edit.value !== '' && Number.isFinite(n)) { a[0][0] = Math.max(-9, Math.min(9, n)); view.repaint(); } });
   scale.input.addEventListener('input', view.repaint);
   prediction(host, { question: 'Avec A et B affichées, combien vaut C[0, 0] ?', answer: () => matmul(isTensor ? a.map(r => r.map(n => n + Number(scale.input.value) * 4)) : a, b)[0][0], explanation: () => `Prends la ligne 0 de A et la colonne 0 de B, puis additionne leurs produits.` });
+}
+
+function neuronDiagram(t, step) {
+  const canvas = svg('svg', { viewBox: '0 0 320 266', class: 'visual-svg lab-graph', role: 'img', 'aria-label': `Graphe : produit ${fmt(t.product)}, somme ${fmt(t.z)}, ReLU ${fmt(t.y)}, perte ${fmt(t.loss)}. Les gradients remontent les flèches en pointillés.` });
+  const nodes = [
+    [12, 36, 'w × x', `${fmt(t.w)} × 3 = ${fmt(t.product)}`, 0],
+    [178, 36, '+ biais', `${fmt(t.product)} + 1 = ${fmt(t.z)}`, 1],
+    [178, 168, 'ReLU', `y = ${fmt(t.y)}`, 2],
+    [12, 168, '(y − cible)²', `L = ${fmt(t.loss)}`, 3],
+  ];
+  canvas.append(svg('path', { d: 'M142 71H171M164 66L171 71L164 76M243 110V162M238 155L243 162L248 155M178 203H149M156 198L149 203L156 208', fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }));
+  if (step >= 4) canvas.append(svg('path', { d: 'M78 158V129H162V22H243M236 17L243 22L236 27', fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2, 'stroke-dasharray': '5 4' }));
+  for (const [x,y,label,value,index] of nodes) {
+    canvas.append(svg('rect', { x, y, width: 130, height: 72, rx: 10, fill: step === index ? 'var(--accent-soft)' : 'var(--bg)', stroke: step === index ? 'var(--accent)' : 'var(--line-strong)', 'stroke-width': step === index ? 3 : 1 }));
+    for (const [txt,dy] of [[label,25],[value,50]]) { const text = svg('text', { x:x+65, y:y+dy, 'text-anchor':'middle', fill:'currentColor' }); text.textContent=txt; canvas.append(text); }
+  }
+  const legend=svg('text',{x:12,y:256,fill:'currentColor'}); legend.textContent=step>=4 ? `Retour : ∂L/∂y=${fmt(t.dy)} ; ∂L/∂w=${fmt(t.dw)}` : '→ valeurs du forward · pointillés : retour'; canvas.append(legend);
+  return canvas;
 }
 
 function mountGraph(host, lesson) {
@@ -37,11 +55,7 @@ function mountGraph(host, lesson) {
   const backward = ['1.10', '1.11', '1.12', '1.15'].includes(lesson.id);
   const view = lab(host, { kind: 'backprop', title: backward ? 'Le gradient remonte le graphe' : 'Un neurone, du poids à la perte', source: 'model/autograd.py', steps: names.map((title, i) => ({ title, code: codes[i] })), render(stage, step) {
     const t = graphTrace(Number(weight.input.value));
-    stage.append(cards([
-      { label: 'w × x', value: `${fmt(t.w)} × 3 = ${fmt(t.product)}`, active: step === 0 },
-      { label: '+ biais', value: `${fmt(t.product)} + 1 = ${fmt(t.z)}`, active: step === 1 },
-      { label: 'ReLU', value: `y = ${fmt(t.y)}`, active: step === 2 },
-      { label: 'Erreur au carré', value: `(${fmt(t.y)} − 4)² = ${fmt(t.loss)}`, active: step === 3 },
+    stage.append(neuronDiagram(t, step), cards([
       { label: '∂L/∂y', value: fmt(t.dy), active: step === 4, detail: '2 × (y − cible)' },
       { label: '∂L/∂w', value: `${fmt(t.dy)} × ${t.z > 0 ? 1 : 0} × 3 = ${fmt(t.dw)}`, active: step === 5, detail: 'gradient amont × dérivée locale × entrée' },
     ]), note(`Forward : x=3, b=1, cible=4. Backward : ∂L/∂b=${fmt(t.db)}, ∂L/∂x=${fmt(t.dx)}. À z=0, le code choisit une dérivée ReLU nulle.`));
@@ -83,7 +97,7 @@ function mountAttentionLab(host, lesson) {
 }
 
 function mountResidual(host) {
-  const x = [[1, 2], [3, 4]], branch = attentionTrace().output.slice(0, 2);
+  const x = ATTENTION_X.slice(0, 2), branch = attentionTrace().output.slice(0, 2);
   lab(host, { kind: 'residual', title: 'Le résidu ajoute deux tableaux de même forme', source: 'model/transformer.py', steps: [
     { title: 'Conserver l’entrée', code: 'residual = hidden' }, { title: 'Calculer la branche', code: 'branch = attention(norm(hidden))' }, { title: 'Additionner cellule par cellule', code: 'hidden = residual + branch' },
   ], render(stage, step) {
@@ -115,7 +129,7 @@ function mountDescentLab(host) {
     host.dataset.x = String(x);
   };
   host.dataset.lab = 'descent';
-  host.append(h('h2', { class: 'lab-title', text: 'Voir les pas, y compris la divergence' }), rate.field, h('div', { class: 'lab-controls' }, [action('Un pas', () => { const next = descentStep(history.at(-1), Number(rate.input.value)); if (Number.isFinite(next) && Math.abs(next) < 1e6) history.push(next); else status.textContent = 'Arrêt de l’exemple : amplitude supérieure à un million. Rejoue avec un pas plus petit.'; paint(); }), action('Étape précédente', () => { if (history.length > 1) history.pop(); paint(); }), action('Rejouer', () => { history = [2.2]; paint(); })]), plot, status);
+  host.append(h('h2', { class: 'lab-title', text: 'Voir les pas, y compris la divergence' }), rate.field, h('div', { class: 'lab-controls' }, [action('Un pas', () => { const next = descentStep(history.at(-1), Number(rate.input.value)); if (Number.isFinite(next) && Math.abs(next) < 1e6) { history.push(next); paint(); } else status.textContent = 'Arrêt de l’exemple : amplitude supérieure à un million. Rejoue avec un pas plus petit.'; }), action('Étape précédente', () => { if (history.length > 1) history.pop(); paint(); }), action('Rejouer', () => { history = [2.2]; paint(); })]), plot, status);
   rate.input.addEventListener('input', paint); paint();
 }
 
@@ -262,16 +276,18 @@ function mountTying(host) {
 
 function mountMoeLab(host, lesson) {
   const k = slider('Experts actifs par token (top-k)', 1, 3, lesson.id === '7.2' ? 3 : 1), capacity = slider('Facteur de capacité', .5, 3, 1.25, .25);
+  const bias = slider('Biais du routeur vers E0', -2, 2, 0, .1);
   const stage = h('div'), status = note('');
   const paint = () => {
-    const result = routeExperts(MOE_SCORES, Number(k.input.value), Number(capacity.input.value));
-    stage.replaceChildren(matrix('Scores du routeur', MOE_SCORES, { colNames: ['E0', 'E1', 'E2'] }),
+    const scores = MOE_SCORES.map(row => row.map((n, j) => n + (j === 0 ? Number(bias.input.value) : 0)));
+    const result = routeExperts(scores, Number(k.input.value), Number(capacity.input.value));
+    stage.replaceChildren(matrix('Scores du routeur', scores, { colNames: ['E0', 'E1', 'E2'] }),
       h('ol', { class: 'lab-routes' }, result.routes.map((routes, t) => h('li', {}, [h('strong', { text: `Token ${t}` }), ...routes.map(r => h('span', { class: r.accepted ? 'route-ok' : 'route-drop', text: ` → E${r.expert} · poids ${fmt(r.gate)} · ${r.accepted ? 'calculé' : 'rejeté : capacité'}` }))]))),
       cards(result.used.map((n, e) => ({ label: `Expert E${e}`, value: `${n} / ${result.capacity} places`, detail: 'poids en mémoire, même si inactif' }))));
     status.textContent = `Top-k=${k.input.value} : ${k.input.value} expert(s) sélectionné(s) pour chaque token ; ${sum(result.used)} route(s) calculée(s), ${result.dropped} rejetée(s). Capacité=ceil(${capacity.input.value}×3/3)=${result.capacity} par expert, comme model/moe.py (elle ne croît pas avec k). Les gates sont normalisées avant les rejets, sans renormalisation après rejet. Auxiliaire E·Σ(f·P)=${fmt(result.aux)} : 1 est une référence uniforme, pas une borne inférieure.`;
     host.dataset.topK = k.input.value; host.dataset.dropped = String(result.dropped);
   };
-  host.dataset.lab = 'moe'; host.append(h('h2', { class: 'lab-title', text: 'Routeur → experts → capacité réellement disponible' }), k.field, capacity.field, stage, status); k.input.addEventListener('input', paint); capacity.input.addEventListener('input', paint); paint();
+  host.dataset.lab = 'moe'; host.append(h('h2', { class: 'lab-title', text: 'Routeur → experts → capacité réellement disponible' }), k.field, capacity.field, bias.field, stage, status); k.input.addEventListener('input', paint); capacity.input.addEventListener('input', paint); bias.input.addEventListener('input', paint); paint();
   prediction(host, { question: 'Avec E=3 et k=2, combien de routes sont sélectionnées pour 3 tokens, avant capacité ?', answer: 6, tolerance: 0, explanation: 'Chaque token choisit 2 experts, soit 3×2=6 routes ; certaines peuvent ensuite être rejetées.' });
 }
 
@@ -394,19 +410,43 @@ function mountFfn(host) {
   } });
 }
 
+function mountAccumulation(host) {
+  const steps = [
+    { title: 'Remettre le gradient à zéro', code: 'grad = 0.' },
+    { title: 'Premier micro-lot, pondéré', code: 'grad += (2 / 4) * grad_microbatch_1' },
+    { title: 'Deuxième micro-lot, pondéré', code: 'grad += (2 / 4) * grad_microbatch_2' },
+    { title: 'Une seule mise à jour', code: 'w -= learning_rate * grad' },
+  ];
+  lab(host, { kind: 'accumulation', title: 'Accumuler les gradients avant de modifier le poids', source: 'model/gpt_train.py', steps, render(stage, step) {
+    stage.append(cards([{label:'Micro-lot 1 : 2 exemples',value:'gradient moyen = 2',detail:'contribution pondérée : 1'},{label:'Micro-lot 2 : 2 exemples',value:'gradient moyen = 6',detail:'contribution pondérée : 3'},{label:'Gradient accumulé',value:[0,1,4,4][step],active:true},{label:'Poids w, taux=0.1',value:step===3?'1 − 0.1×4 = 0.6':'1, inchangé avant step()'}]),note('Chaque backward s’ajoute au gradient. Pondérer par le nombre de cibles de chaque micro-lot quand les tailles diffèrent ; diviser seulement par le nombre de micro-lots convient aux tailles égales. Un seul optimizer.step() après l’accumulation.'));
+  } });
+}
+function mountCheckpointing(host) {
+  const store = h('input', {type:'checkbox','aria-label':'Activer le checkpointing des activations'}), stage=h('div'), status=note('');
+  const paint=()=>{
+    stage.replaceChildren(cards([{label:'Entrée du bloc',value:'conservée'},{label:'Intermédiaire A',value:store.checked?'recalculé au backward':'conservé en mémoire'},{label:'Intermédiaire B',value:store.checked?'recalculé au backward':'conservé en mémoire'},{label:'Sortie du bloc',value:'conservée'}]));
+    status.textContent=store.checked?'Économie d’activations stockées, calcul supplémentaire au backward. Les poids et le résultat mathématique ne changent pas. Le forward rejoué doit conserver le même hasard (dropout) pour retrouver les gradients. Schéma conceptuel, sans benchmark de temps.':'Sans checkpointing : garder les activations nécessaires au backward. Ce mécanisme est différent d’une sauvegarde des poids sur disque.';
+  };
+  host.dataset.lab='checkpointing';host.append(h('h2',{class:'lab-title',text:'Échanger de la mémoire contre du recalcul'}),h('label',{},[store,'Recalculer les intermédiaires au retour']),stage,status);store.addEventListener('change',paint);paint();
+}
+
+import { mountSampling, mountRetrieval, mountAdaptive, mountModalities, mountPrecision } from './visual-systems.js';
 import { foundationIds, mountFoundation, mountExperiment, mountHybrid, mountSplit, mountOverfit } from './visual-foundations.js';
 const SPECIAL = {
   '0.15': mountMatrix, '0.18': mountMatrix, '1.15': mountGraph, '2.11': mountMatrix,
   '1.5': mountGraph, '1.7': mountGraph, '1.8': mountGraph, '1.10': mountGraph, '1.11': mountGraph, '1.12': mountGraph,
   '1.3': mountSplit, '1.17': mountOverfit, '2.2': mountSplit, '13.3': mountSplit,
   '2.1': mountTokenizerLab, '2.3': mountTokenizerLab, '2.6': mountBpeLab, '2.7': mountBpeLab,
+  '3.7': mountSampling, '3.9': mountSampling,
   '4.8': mountResidual, '4.9': mountNorm, '4.10': mountFfn,
   '5.1': mountRope, '5.2': mountRope, '5.3': mountNorm, '5.4': mountGate, '5.5': mountGqa, '5.6': mountCache, '5.7': mountTying, '5.8': mountInitialization, '5.9': mountCost, '5.10': mountExperiment,
-  '6.1': mountCost, '6.2': mountCost, '6.3': mountCost, '6.5': mountMatrix, '6.9': mountQuantization,
+  '6.1': mountPrecision, '6.2': mountPrecision, '6.6': mountPrecision, '6.3': mountCost, '6.5': mountMatrix, '6.9': mountQuantization, '6.7': mountAccumulation, '6.8': mountCheckpointing,
+  '9.1': mountModalities, '9.4': mountModalities, '9.5': mountModalities, '9.8': mountModalities, '9.9': mountModalities,
+  '10.5': mountAdaptive, '10.6': mountAdaptive, '10.7': mountAdaptive, '10.8': mountAdaptive,
   '8.9': mountHybrid, '12.7': mountHybrid, '12.8': mountHybrid,
   '13.5': mountSft, '13.6': mountSft,
 };
-const FAMILIES = { embed: mountVectors, tokenize: mountTokenizerLab, bpe: mountBpeLab, descent: mountDescentLab, relu: mountReluLab, loss: mountLossLab, attention: mountAttentionLab, transformer: mountArchitectureLab, moe: mountMoeLab, scan: mountScanLab, patches: mountPatchesLab, lora: mountLoraLab };
+const FAMILIES = { retrieve: mountRetrieval, embed: mountVectors, tokenize: mountTokenizerLab, bpe: mountBpeLab, descent: mountDescentLab, relu: mountReluLab, loss: mountLossLab, attention: mountAttentionLab, transformer: mountArchitectureLab, moe: mountMoeLab, scan: mountScanLab, patches: mountPatchesLab, lora: mountLoraLab };
 export function hasVisualLab(lesson) {
   return foundationIds.has(lesson.id) || Boolean(SPECIAL[lesson.id] || FAMILIES[lesson.visual]) || lesson.id.startsWith('11.') || lesson.id.startsWith('12.');
 }

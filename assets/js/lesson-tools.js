@@ -154,7 +154,12 @@ function debugPanel(spec, owner) {
   const line = h("p", { class: "manip-readout", text: "" });
   const locals = h("div", { class: "debug-locals" });
   const code = h("pre");
-  code.append(h("code", { text: spec.code }));
+  code.className = "debug-code";
+  const codeLines = spec.code.split("\n").map((text, i) => h("code", { text: `${i+1}  ${text}\n`, "data-debug-line": i+1 }));
+  code.append(...codeLines);
+  let playback = null;
+  const pause = () => { window.clearInterval(playback); playback = null; };
+  onLeave(pause);
   let snaps = [];
   let index = 0;
   function show() {
@@ -164,6 +169,11 @@ function debugPanel(spec, owner) {
       return;
     }
     line.textContent = `Ligne ${snap.line}, pas ${index + 1} / ${snaps.length}.`;
+    for (const el of codeLines) {
+      const active = Number(el.dataset.debugLine) === Number(snap.line);
+      el.classList.toggle("is-active", active);
+      if (active) el.setAttribute("aria-current", "step"); else el.removeAttribute("aria-current");
+    }
     locals.replaceChildren();
     for (const [name, value] of Object.entries(snap.locals || {})) {
       locals.append(localView(name, value));
@@ -176,6 +186,7 @@ function debugPanel(spec, owner) {
       class: "button button-primary",
       disabled: !owner,
       onClick: async () => {
+        pause();
         status.textContent = "Trace…";
         const result = await request({
           type: "debug",
@@ -201,6 +212,7 @@ function debugPanel(spec, owner) {
       class: "button button-secondary",
       disabled: !owner,
       onClick: () => {
+        pause();
         if (index < snaps.length - 1) {
           index += 1;
           show();
@@ -209,25 +221,16 @@ function debugPanel(spec, owner) {
     },
     "Pas suivant",
   );
-  const play = h(
-    "button",
-    {
-      type: "button",
-      class: "button button-secondary",
-      disabled: !owner,
-      onClick: () => {
-        const timer = window.setInterval(() => {
-          if (index >= snaps.length - 1) window.clearInterval(timer);
-          else {
-            index += 1;
-            show();
-          }
-        }, 400);
-        onLeave(() => window.clearInterval(timer));
-      },
-    },
-    "Continuer",
-  );
+  const speed = h("select", { "aria-label": "Vitesse du pas à pas" }, [800, 400, 200].map(ms => h("option", { value: ms, text: `${ms} ms par étape` })));
+  const previous = h("button", { type: "button", disabled: !owner, onClick: () => { pause(); index = Math.max(0, index - 1); show(); } }, "Pas précédent");
+  const play = h("button", { type: "button", disabled: !owner, onClick: () => {
+    pause();
+    playback = window.setInterval(() => {
+      if (index >= snaps.length - 1) pause();
+      else { index++; show(); }
+    }, Number(speed.value));
+  } }, "Continuer");
+  const pauseButton = h("button", { type: "button", disabled: !owner, onClick: pause }, "Pause");
   const reset = h(
     "button",
     {
@@ -235,6 +238,7 @@ function debugPanel(spec, owner) {
       class: "button button-secondary",
       disabled: !owner,
       onClick: () => {
+        pause();
         index = 0;
         show();
         stopWorker();
@@ -246,7 +250,7 @@ function debugPanel(spec, owner) {
     h("h2", { text: "Pas à pas" }),
     h("p", { text: spec.caption }),
     code,
-    h("div", { class: "hero-actions" }, [start, next, play, reset]),
+    h("div", { class: "hero-actions" }, [start, previous, next, play, pauseButton, reset, speed]),
     line,
     locals,
     status,
@@ -259,7 +263,8 @@ function localView(name, value) {
     block.append(
       h("p", { class: "muted", text: `forme ${value.shape.join(" × ")}` }),
     );
-    const grid = h("div", { class: "heat-grid" });
+    const columns = Math.max(1, Math.min(value.shape.at(-1) || 1, 8));
+    const grid = h("div", { class: "heat-grid", style: `grid-template-columns:repeat(${columns},minmax(3rem,1fr));overflow:auto;max-width:100%` });
     for (const item of value.preview || []) {
       const cell = h("span", {
         class: "heat-cell",

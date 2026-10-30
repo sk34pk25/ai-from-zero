@@ -1,5 +1,5 @@
 {
-  "version": "e2cbcf81b886",
+  "version": "b2f71c447746",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -61,6 +61,7 @@
     "assets/js/visual-foundations.js",
     "assets/js/visual-labs.js",
     "assets/js/visual-math.js",
+    "assets/js/visual-systems.js",
     "assets/js/visual-ui.js",
     "assets/js/visuals.js",
     "assets/js/workspace.js",

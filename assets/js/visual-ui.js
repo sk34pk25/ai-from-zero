@@ -14,6 +14,7 @@ export function svg(name, attrs = {}, children = []) {
   return node;
 }
 export function matrix(label, values, { selected = () => false, onCell, rowNames, colNames } = {}) {
+  if (!values.length) return note(`${label} : aucune valeur disponible.`);
   const table = h('table', { class: 'lab-matrix' }, [h('caption', { text: `${label} · [${values.length}, ${values[0].length}]` })]);
   const head = h('tr', {}, [h('th', { scope: 'col', text: 'r / c' }), ...values[0].map((_, j) => h('th', { scope: 'col', text: colNames?.[j] ?? j }))]);
   table.append(h('thead', {}, head));

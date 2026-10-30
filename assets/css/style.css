@@ -1712,3 +1712,10 @@ main[tabindex="-1"]:focus { outline: none; }
   .lab-tabs, .lab-controls, .lab-predict { display: none; }
   .lab-matrix, .lab-nodes { break-inside: avoid; }
 }
+.debug-code code { display: block; border-left: 3px solid transparent; padding: .2rem .4rem; }
+.debug-code .is-active { border-left-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.debug-var { min-width: 0; }
+/* Un titre de bloc long doit se replier, y compris sur un écran de 320 px. */
+.code-head { flex-wrap: wrap; }
+.code-head h2 { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+.lab-graph text { font-size: 14px; font-family: var(--sans, sans-serif); }

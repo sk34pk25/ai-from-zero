@@ -23,7 +23,7 @@ export function attentionTrace(x = ATTENTION_X, causal = true) {
 }
 export function graphTrace(w = 2, x = 3, b = 1, target = 4) {
   const product = w * x, z = product + b, y = Math.max(0, z), loss = (y - target) ** 2;
-  const dy = 2 * (y - target), dz = dy * (z > 0 ? 1 : 0);
+  const dy = 2 * (y - target), dz = z > 0 ? dy : 0;
   return { w, x, b, target, product, z, y, loss, dy, dz, dw: dz * x, dx: dz * w, db: dz };
 }
 export function normalize(values, rms = false, eps = 1e-5) {
