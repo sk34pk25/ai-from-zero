@@ -34,11 +34,11 @@ L'interface du fil rouge est forward(tokens) -> logits. TinyGPT.forward la réal
 @QUESTION
 La cible d'un pas next-token est…
 @CORRECT
-L'identifiant du token qui suit le contexte
+L’identifiant du prochain token après le contexte fourni
 @WRONG
-- Une phrase déjà traduite en français
-- Le learning rate
-- La norme du vecteur d'embedding
+- Le dernier token déjà dans le contexte
+- Le premier token de tout le corpus
+- Le token au score actuellement maximal
 @EXPLANATION
 On supervise un entier du vocabulaire. La phrase lisible n'existe qu'après décodage.
 @@@
@@ -77,11 +77,11 @@ model/bigram.py est cette brique, débloquée ici. python -m model l'entraîne s
 @QUESTION
 Un bigramme prédit le token suivant à partir de…
 @CORRECT
-Uniquement le token courant
+Un seul token : le token courant
 @WRONG
-- Toute la phrase, comme l'attention
-- La loss de validation seule
-- Le nom du fichier
+- Tous les tokens de la fenêtre
+- Les deux prochains tokens inconnus
+- La moyenne des embeddings du document
 @EXPLANATION
 La ligne de la matrice ne dépend que de l'identifiant présent. C'est sa force (simplicité) et sa limite (pas de contexte long).
 @@@
@@ -120,11 +120,11 @@ GPTConfig.block_size est ce plafond. Le forward lève ValueError au-delà. Le te
 @QUESTION
 block_size désigne quelle limite de contexte ?
 @CORRECT
-La longueur maximale de contexte que le modèle accepte
+Le nombre maximal de tokens que la fenêtre peut contenir
 @WRONG
-- La taille du disque
-- Le nombre de commits
-- La valeur de la loss
+- Le nombre de séquences par batch
+- La largeur des vecteurs cachés
+- Le nombre de blocs d’attention
 @EXPLANATION
 C'est un hyperparamètre de longueur. Il borne la fenêtre, il ne mesure pas l'erreur.
 @@@
@@ -161,11 +161,11 @@ TinyGPT.forward renvoie ces logits. Le test d'égalité entre deux modèles de m
 @QUESTION
 Un logit, avant le softmax, désigne quoi ?
 @CORRECT
-Un score brut, avant conversion en probabilité
+Un score numérique non normalisé
 @WRONG
-- Une probabilité déjà entre 0 et 1
-- Un identifiant de token
-- Un octet UTF-8
+- Une probabilité déjà normalisée
+- La classe forcément choisie
+- Une perte moyenne sur le vocabulaire
 @EXPLANATION
 Le logit est libre de signe et d'échelle. La probabilité viendra de softmax.
 @@@
@@ -203,11 +203,11 @@ softmax est dans model/mathutil.py et sert au bigramme échantillonné, à la lo
 @QUESTION
 Après softmax, la somme des sorties sur l'axe du vocabulaire vaut…
 @CORRECT
-1, aux erreurs d'arrondi près
+1 à la précision numérique du calcul
 @WRONG
-- 0
-- Le plus grand logit
-- La taille du batch
+- 0, car les logits sont centrés
+- La taille du vocabulaire V
+- Le maximum des logits d’entrée
 @EXPLANATION
 La division par la somme des exponentielles fabrique une distribution. La somme vaut donc 1.
 @@@
@@ -245,11 +245,11 @@ La tête linéaire de model/train.py est entraînée avec ce gradient. Le test t
 @QUESTION
 La cross-entropy augmente quand…
 @CORRECT
-Le modèle donne peu de probabilité au token cible
+La probabilité attribuée à la cible baisse
 @WRONG
-- Le modèle est certain et juste
-- Le vocabulaire est affiché
-- Le batch est un carré
+- La probabilité de la cible augmente
+- Les logits reçoivent tous la même constante
+- La température est forcément nulle
 @EXPLANATION
 -log(p) est grand quand p est petit. Une cible bien prédite rapproche la loss de zéro.
 @@@
@@ -288,11 +288,11 @@ BigramModel.generate et generate du Transformer passent par sample_logits. La te
 @QUESTION
 Une température qui tend vers 0 rend la génération…
 @CORRECT
-De plus en plus proche du choix glouton, le token au score maximal
+Proche du choix au score maximal
 @WRONG
-- Uniforme sur tout le vocabulaire
-- Indépendante des logits
-- Impossible, parce que softmax interdit l'argmax
+- Proche d’un tirage uniforme sur le vocabulaire
+- Plus attentive aux tokens de faible score
+- Plus sensible à la longueur du texte qu’aux logits
 @EXPLANATION
 Les écarts de logits sont amplifiés. À la limite, seule la case maximale garde de la masse. Le code traite 0 comme l'argmax exact.
 @@@
@@ -312,7 +312,7 @@ On montre une fenêtre, le modèle donne des scores, la loss punit le score du b
 @VOCAB
 Pas d'entraînement : une mise à jour. Tête linéaire : la dernière matrice, des vecteurs vers les logits. Features gelées : des vecteurs qu'on ne modifie pas pendant ce pas.
 @EXPLAIN
-Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. RMSNorm dispose aussi d’un backward entraînable dans le laboratoire. RoPE, SwiGLU, GQA et le dos hybride restent des forwards exploratoires. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation.
+Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. RMSNorm, RoPE, SwiGLU, GQA et le partage des poids disposent d’un backward entraînable dans le GPT NumPy ; le benchmark moderne les compare à réglages contrôlés. Le dos hybride attention/SSM/MoE reste un forward exploratoire, sans entraînement de bout en bout. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation.
 @LANG python
 @CODE
 :::
@@ -332,11 +332,11 @@ Entraîne d'abord le petit modèle de model/tiny_lm.py, puis ouvre train_gpt pou
 @QUESTION
 Entre un bigramme par comptage et une tête linéaire, qu'est-ce qui change dans l'entraînement ?
 @CORRECT
-La façon d'ajuster le modèle : comptes d'un côté, gradient de l'autre
+La méthode d’ajustement : comptes d’un côté, gradients de l’autre
 @WRONG
-- La définition de la cible, qui ne serait plus le token suivant
-- L'obligation d'utiliser un GPU
-- Le sens de lecture, de droite à gauche
+- Tokenisation contre génération
+- Validation contre sauvegarde des poids
+- Probabilités contre absence de cibles
 @EXPLANATION
 La tâche reste next-token. Seul l'estimateur change. Le bigramme compte, la tête suit un gradient.
 @CODEFILE
@@ -382,11 +382,11 @@ model/bigram.py et model/transformer.py exposent tous deux une génération. pyt
 @QUESTION
 Après avoir choisi un token, la génération…
 @CORRECT
-Le réinjecte dans le contexte pour prédire le suivant
+Réinjecte le token dans le contexte courant
 @WRONG
-- Efface le contexte et recommence au hasard
-- Modifie les poids du modèle
-- Écrit directement des octets sans identifiants
+- Remplace tous les tokens du contexte
+- Réentraîne tous les poids sur ce token
+- Repart toujours du prompt initial sans la suite
 @EXPLANATION
 Le token choisi devient une entrée. Les poids ne bougent pas pendant la génération : ce n'est pas un pas d'entraînement.
 @@@
@@ -425,9 +425,9 @@ La perplexité d'un modèle uniforme sur V tokens vaut…
 @CORRECT
 V, la taille du vocabulaire
 @WRONG
-- 0
-- 1
-- V au carré
+- log(V), la perte en nats
+- 1/V, la probabilité de la cible
+- 0, car le modèle n’a rien appris
 @EXPLANATION
 La loss uniforme vaut log(V), et exp(log(V)) = V. C'est la baseline à battre.
 @@@
@@ -478,11 +478,11 @@ Le fil rouge de fin de niveau 3 est reproductible sans fichier de poids : graine
 @QUESTION
 Pourquoi sauver le vocabulaire avec les poids ?
 @CORRECT
-Parce que les identifiants n'ont de sens que pour la table qui les a créés
+Conserver la correspondance entre indices et unités
 @WRONG
-- Parce que le vocabulaire remplace la config
-- Parce que Git ne peut pas versionner de code
-- Parce que la perplexité est un fichier
+- Permettre de changer librement tous les indices
+- Éviter d’enregistrer les poids appris
+- Reconstituer le corpus complet depuis les embeddings
 @EXPLANATION
 Un entier 4 désigne des caractères différents selon la table. Les poids appris pour une table sont illisibles avec une autre.
 @CODEFILE

@@ -1,5 +1,5 @@
 {
-  "version": "1b7f5bd65d64",
+  "version": "14c5b80790fa",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -19,6 +19,7 @@
     "assets/css/fonts.css",
     "assets/css/style.css",
     "assets/js/app.js",
+    "assets/js/assessment.js",
     "assets/js/auth-return.js",
     "assets/js/auth.js",
     "assets/js/bpe.js",
@@ -27,6 +28,7 @@
     "assets/js/curriculum.js",
     "assets/js/dom.js",
     "assets/js/evidence.js",
+    "assets/js/exercise-result.js",
     "assets/js/glossary.js",
     "assets/js/gpt.js",
     "assets/js/inference-worker.js",
@@ -37,6 +39,7 @@
     "assets/js/manipulators.js",
     "assets/js/markdown.js",
     "assets/js/offline.js",
+    "assets/js/page-assessment.js",
     "assets/js/page-atelier.js",
     "assets/js/page-connexion.js",
     "assets/js/page-donnees.js",

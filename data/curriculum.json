@@ -87,10 +87,10 @@
           "quiz": {
             "question": "L'entraînement s'arrête parce que le modèle « ne tient pas en mémoire », alors que le disque a encore de la place. Quel composant est saturé ?",
             "choices": [
-              "La RAM ou la VRAM, mémoire de travail du calcul",
-              "Le clavier, qui ne transmet plus les caractères",
-              "Uniquement le stockage, parce que les poids sont des fichiers",
-              "Le câble réseau, parce qu'un modèle exige Internet en permanence"
+              "La RAM ou la VRAM, où se trouvent les données du calcul",
+              "Le disque qui conserve les checkpoints",
+              "Le cache Git qui conserve les commits",
+              "Le réseau qui télécharge les dépendances"
             ],
             "answer": 0,
             "explanation": "Les poids utilisés pour calculer et les résultats intermédiaires doivent être dans la mémoire de travail. Le stockage conserve les fichiers, il ne remplace pas la RAM au moment du calcul."
@@ -162,10 +162,10 @@
           "quiz": {
             "question": "Depuis le dossier ai-lab, quel chemin relatif désigne le fichier notes/machine.txt ?",
             "choices": [
-              "/notes/machine.txt, qui part de la racine du système",
+              "ai-lab/notes/machine.txt",
               "notes/machine.txt",
-              "machine.txt, qui désigne un fichier directement dans ai-lab",
-              "RAM/machine.txt, qui mélange matériel et fichiers"
+              "../notes/machine.txt",
+              "machine.txt/notes"
             ],
             "answer": 1,
             "explanation": "Un chemin relatif se lit depuis le dossier courant. notes/machine.txt descend dans notes puis nomme le fichier. Le slash initial en ferait un chemin absolu."
@@ -237,10 +237,10 @@
           "quiz": {
             "question": "Quelle commande change le dossier courant ?",
             "choices": [
-              "ls, qui affiche le contenu sans se déplacer",
-              "pwd, qui affiche seulement où tu es",
-              "cd, qui change le dossier courant",
-              "print, qui n'est pas une commande du terminal"
+              "pwd, pour choisir un dossier",
+              "ls, pour entrer dans un dossier",
+              "cd, pour changer le dossier courant",
+              "mkdir, pour entrer dans un dossier existant"
             ],
             "answer": 2,
             "explanation": "cd signifie change directory. ls regarde, pwd situe, cd déplace le « ici » des commandes suivantes."
@@ -312,10 +312,10 @@
           "quiz": {
             "question": "À quoi sert l'interpréteur Python ?",
             "choices": [
-              "À augmenter la quantité de RAM disponible",
-              "À créer un modèle déjà entraîné",
-              "À remplacer le dossier du projet",
-              "À lire et exécuter les instructions écrites en Python"
+              "Installer automatiquement les dépendances",
+              "Traduire le français en code Python",
+              "Transformer chaque programme en fichier de données",
+              "Lire puis exécuter les instructions du programme Python"
             ],
             "answer": 3,
             "explanation": "L'interpréteur est le programme qui exécute le texte Python. Il ne devine pas un modèle et ne modifie pas le matériel."
@@ -387,10 +387,10 @@
           "quiz": {
             "question": "Que fait print en Python ?",
             "choices": [
-              "Il entraîne un réseau de neurones",
-              "Il affiche une valeur puis passe à la ligne",
-              "Il enregistre automatiquement un fichier",
-              "Il réserve de la VRAM"
+              "Renvoyer une valeur à la fonction appelante",
+              "Afficher une valeur et un saut de ligne",
+              "Enregistrer une valeur dans un fichier",
+              "Convertir une valeur en entier"
             ],
             "answer": 1,
             "explanation": "print n'apprend rien et n'écrit pas un fichier. Il envoie une représentation de la valeur vers la sortie du terminal."
@@ -462,10 +462,10 @@
           "quiz": {
             "question": "Dans n_layers = 4, que représente n_layers ?",
             "choices": [
-              "Une fonction qui crée quatre couches",
-              "Une erreur de syntaxe obligatoire",
-              "Le nom d'une variable qui désigne l'entier 4",
-              "Le nom d'un fichier"
+              "Une chaîne qui contient le chiffre 4",
+              "Une comparaison entre un nom et un entier",
+              "Un nom associé à l’entier 4",
+              "Une fonction appelée quatre fois"
             ],
             "answer": 2,
             "explanation": "Le nom est à gauche du =, la valeur à droite. n_layers désigne donc l'entier 4 tant qu'on ne le réaffecte pas."
@@ -537,10 +537,10 @@
           "quiz": {
             "question": "Avec loss = 1.0, que vaut l'expression loss < 1.0 ?",
             "choices": [
-              "True, parce que 1.0 est le seuil",
-              "1.0, parce qu'une comparaison renvoie le nombre",
-              "Une erreur, parce qu'on ne peut pas comparer un float",
-              "False, car 1.0 n'est pas strictement inférieur à 1.0"
+              "True, car le seuil est atteint",
+              "1.0, car la valeur est conservée",
+              "Une erreur, car les flottants ne se comparent pas",
+              "False, car les valeurs sont égales"
             ],
             "answer": 3,
             "explanation": "L'opérateur < est strict. 1.0 n'est pas inférieur à 1.0, donc l'expression vaut False et le bloc if est sauté."
@@ -612,10 +612,10 @@
           "quiz": {
             "question": "Combien de tours exécute range(4) ?",
             "choices": [
-              "4 tours, pour les valeurs 0, 1, 2 et 3",
-              "3 tours, parce qu'on commence à 1",
-              "5 tours, parce que la borne est incluse",
-              "Un nombre aléatoire de tours"
+              "4 tours : 0, 1, 2, 3",
+              "5 tours : 0, 1, 2, 3, 4",
+              "4 tours : 1, 2, 3, 4",
+              "3 tours : 1, 2, 3"
             ],
             "answer": 0,
             "explanation": "range(4) s'arrête avant 4. Les valeurs sont 0, 1, 2 et 3, donc quatre tours."
@@ -687,10 +687,10 @@
           "quiz": {
             "question": "À quoi sert return dans une fonction Python ?",
             "choices": [
-              "À répéter la fonction indéfiniment",
-              "À afficher obligatoirement du texte",
-              "À renvoyer une valeur à l'appelant et quitter la fonction",
-              "À enregistrer un fichier sur le disque"
+              "Afficher une valeur puis poursuivre la fonction",
+              "Revenir au début de la boucle courante",
+              "Renvoyer une valeur et quitter la fonction",
+              "Enregistrer la valeur dans une variable globale"
             ],
             "answer": 2,
             "explanation": "return transmet une valeur. L'affichage est un autre geste, print, qui ne remplace pas la valeur renvoyée."
@@ -773,10 +773,10 @@
           "quiz": {
             "question": "Quel est l'index du premier élément d'une liste Python ?",
             "choices": [
-              "1, comme dans le comptage quotidien",
-              "-1, qui désigne en réalité le dernier élément",
-              "La longueur de la liste",
-              "0, le premier index d'une liste Python"
+              "1, pour le premier élément",
+              "-1, pour le premier élément",
+              "La longueur de la liste, pour son premier élément",
+              "0, pour le premier élément"
             ],
             "answer": 3,
             "explanation": "Les index commencent à 0. -1 est autorisé, mais il pointe vers le dernier élément, pas vers le premier."
@@ -848,10 +848,10 @@
           "quiz": {
             "question": "Un module Python est principalement…",
             "choices": [
-              "Un fichier de code que l'on peut importer",
-              "Une barrette de RAM",
-              "Un modèle déjà entraîné",
-              "Une commande du terminal comme cd"
+              "Un fichier de code dont les définitions sont importables",
+              "Une fonction toujours exécutée à l’import",
+              "Un environnement de dépendances isolé",
+              "Un tableau regroupant plusieurs variables"
             ],
             "answer": 0,
             "explanation": "Le module est l'unité de code réutilisable. L'import le charge pour utiliser ses fonctions sans les recopier."
@@ -923,10 +923,10 @@
           "quiz": {
             "question": "Quel réflexe est le plus utile devant une traceback ?",
             "choices": [
-              "Modifier dix lignes au hasard avant de relire",
-              "Lire le type, le message et la ligne, puis tester une seule hypothèse",
-              "Réinstaller le système d'exploitation",
-              "Ignorer la dernière ligne et ne lire que la première"
+              "Changer toutes les lignes citées ensemble",
+              "Lire l’erreur, puis tester une hypothèse",
+              "Supprimer l’assertion qui interrompt le calcul",
+              "Relancer sans regarder le message"
             ],
             "answer": 1,
             "explanation": "La dernière ligne porte le type utile. Une seule modification à la fois garde la cause identifiable."
@@ -998,10 +998,10 @@
           "quiz": {
             "question": "À quoi sert principalement un commit ?",
             "choices": [
-              "À exécuter Python",
-              "À augmenter la VRAM",
-              "À publier le site sans historique",
-              "À enregistrer un état cohérent du projet avec un message"
+              "Envoyer automatiquement le projet sur GitHub",
+              "Installer les versions de dépendances utilisées",
+              "Revenir automatiquement à la version précédente",
+              "Enregistrer un état du projet"
             ],
             "answer": 3,
             "explanation": "Le commit fige un ensemble de fichiers. L'exécution et la publication sont d'autres commandes, lancées plus tard, parfois à partir de cet état."
@@ -1073,10 +1073,10 @@
           "quiz": {
             "question": "Pourquoi isoler les dépendances dans un environnement virtuel ?",
             "choices": [
-              "Pour que les versions du projet ne cassent pas les autres projets",
-              "Pour accélérer la connexion Internet",
-              "Pour entraîner un modèle sans données",
-              "Pour remplacer Git"
+              "Éviter que les versions d’un projet affectent les autres",
+              "Réserver davantage de RAM au programme",
+              "Partager les mêmes paquets entre tous les projets",
+              "Enregistrer les données d’entraînement dans Git"
             ],
             "answer": 0,
             "explanation": "L'environnement virtuel sépare les paquets. Il n'augmente pas la carte réseau et ne versionne pas le code : c'est le rôle de Git."
@@ -1155,10 +1155,10 @@
           "quiz": {
             "question": "Que décrit l'attribut shape d'un tableau NumPy ?",
             "choices": [
-              "Le nom de la variable",
-              "Les dimensions du tableau, par exemple (2, 3)",
-              "La couleur d'un pixel",
-              "Le message de la dernière erreur"
+              "Le nombre d’octets de chaque valeur",
+              "Les dimensions de chaque axe, comme deux lignes et trois colonnes",
+              "La somme des valeurs du tableau",
+              "Le nombre de valeurs strictement positives"
             ],
             "answer": 1,
             "explanation": "shape est un tuple d'entiers. Il dit comment les nombres sont rangés, pas comment la variable s'appelle."
@@ -1230,10 +1230,10 @@
           "quiz": {
             "question": "Quelle affirmation décrit le mieux exp et log ?",
             "choices": [
-              "exp transforme toujours un nombre en probabilité déjà normalisée",
-              "log n'est défini que pour les entiers négatifs",
-              "Ce sont presque des fonctions inverses : log(exp(x)) revient à x",
-              "Les deux servent uniquement à tracer des dossiers"
+              "exp(x) retrouve log(x), pour tout réel",
+              "log(x) est défini pour tout réel",
+              "log(exp(x)) retrouve x, aux arrondis près",
+              "exp(x) change de signe quand x devient négatif"
             ],
             "answer": 2,
             "explanation": "exp et log s'annulent l'un l'autre sur leur domaine. exp seul ne somme pas à 1 : il faut encore diviser, c'est le travail de softmax."
@@ -1305,10 +1305,10 @@
           "quiz": {
             "question": "Combien de composantes a le vecteur [4, 7, 2] ?",
             "choices": [
-              "3, le nombre de composantes du vecteur",
-              "2, parce qu'on ignore le dernier nombre",
-              "13, la somme des composantes",
-              "4, parce qu'on compte à partir de 1 et qu'on ajoute une case"
+              "3 composantes",
+              "2 composantes",
+              "4 composantes",
+              "13 composantes"
             ],
             "answer": 0,
             "explanation": "La dimension est le nombre de composantes, ici trois. La somme est une autre quantité, pas la dimension."
@@ -1391,10 +1391,10 @@
           "quiz": {
             "question": "Quelle est la shape de la matrice [[1, 2, 3], [4, 5, 6]] ?",
             "choices": [
-              "(3, 2) : trois lignes et deux colonnes",
-              "(2, 3) : deux lignes et trois colonnes",
-              "(6,) : six nombres sur un seul axe",
-              "(2, 2), parce qu'une matrice est toujours carrée"
+              "(3, 2), colonnes puis lignes",
+              "(2, 3), lignes puis colonnes",
+              "(6,), car il y a six nombres",
+              "(2, 2), car il y a deux listes"
             ],
             "answer": 1,
             "explanation": "On compte d'abord les lignes, puis les colonnes. Il y a deux listes internes de trois nombres, donc (2, 3)."
@@ -1466,10 +1466,10 @@
           "quiz": {
             "question": "Une distribution de probabilités discrète valide, c'est…",
             "choices": [
-              "N'importe quels scores, y compris négatifs",
-              "Une seule valeur toujours égale à 100",
-              "Des nombres positifs ou nuls qui somment à 1",
-              "La shape d'une matrice"
+              "Des valeurs toutes inférieures à 1, quelle que soit leur somme",
+              "Des scores quelconques dont la somme vaut 0",
+              "Des valeurs non négatives de somme 1",
+              "Des valeurs positives de somme égale à la taille du vocabulaire"
             ],
             "answer": 2,
             "explanation": "Chaque issue reçoit une masse entre 0 et 1, et la masse totale vaut 1. Les logits ne respectent pas encore cette contrainte."
@@ -1543,10 +1543,10 @@
           "quiz": {
             "question": "Une dérivée positive de la loss par rapport à un poids indique surtout que…",
             "choices": [
-              "Le poids doit forcément être mis à zéro",
-              "Le disque est plein",
-              "La dérivée est une probabilité",
-              "Augmenter un peu ce poids augmente la loss"
+              "Une petite hausse du poids diminue la loss",
+              "Le poids doit forcément être positif",
+              "La loss est forcément supérieure à zéro",
+              "Une petite hausse du poids augmente la loss"
             ],
             "answer": 3,
             "explanation": "Le signe positif veut dire « ça monte ». La descente de gradient ira donc dans l'autre sens. La dérivée n'est pas bornée entre 0 et 1."
@@ -1619,10 +1619,10 @@
           "quiz": {
             "question": "Après a = Compteur(5) puis b = a et b.ajouter(1), que vaut a.valeur ?",
             "choices": [
-              "6, car a et b désignent le même objet",
-              "5, car b est une copie indépendante de a",
-              "1, car ajouter remplace la valeur par le pas",
-              "Une erreur, car a n'a pas de méthode ajouter"
+              "6, car les noms partagent le même objet",
+              "5, car l’affectation crée une copie de l’objet",
+              "1, car ajouter remplace la valeur de départ",
+              "Une erreur, car deux noms ne peuvent viser le même objet"
             ],
             "answer": 0,
             "explanation": "L'affectation b = a colle une seconde étiquette sur le même objet. La méthode modifie self.valeur de cet objet, visible par les deux noms. Pour une copie, il faut construire un nouvel objet."
@@ -1695,10 +1695,10 @@
           "quiz": {
             "question": "pytest affiche « assert 7.5 == 5 » pour assert moyenne([2, 4, 9]) == 5. Que faut-il faire ?",
             "choices": [
-              "Remplacer 5 par 7.5 dans le test pour qu'il passe",
-              "Relire la fonction : elle a produit 7.5 alors que le calcul à la main donne 5",
-              "Supprimer le test, il est trop strict",
-              "Relancer pytest jusqu'à ce que le résultat change"
+              "Remplacer l’attendu par 7.5 pour faire passer le test",
+              "Vérifier la fonction : le résultat attendu est 5",
+              "Arrondir 7.5 en entier avant l’assertion",
+              "Retirer 9 de la liste sans vérifier la spécification"
             ],
             "answer": 1,
             "explanation": "La valeur de droite a été calculée à la main, indépendamment du code. Le test signale que le code s'en écarte ; modifier l'attente effacerait justement la preuve. Un calcul déterministe redonnera 7.5 à chaque relance."
@@ -1771,10 +1771,10 @@
           "quiz": {
             "question": "Pourquoi arrondir la moyenne à 4 décimales dans le rapport ?",
             "choices": [
-              "Pour rendre le calcul de la moyenne plus exact",
-              "Parce que json.dumps refuse les nombres à virgule",
-              "Pour que le rapport soit stable et lisible d'une exécution à l'autre",
-              "Pour que le test passe même si la moyenne est fausse"
+              "Rendre la moyenne mathématiquement plus précise",
+              "Modifier les données avant leur moyenne",
+              "Stabiliser la représentation du rapport",
+              "Garantir que tous les rapports ont la même moyenne"
             ],
             "answer": 2,
             "explanation": "L'arrondi ne rend pas le calcul plus juste : il fixe la forme du résultat écrit, pour qu'il se relise et se compare facilement. Le test, lui, garde une valeur attendue calculée à la main."
@@ -1864,10 +1864,10 @@
           "quiz": {
             "question": "Que modifie principalement un entraînement supervisé ?",
             "choices": [
-              "Le texte du cours",
-              "Les paramètres du modèle, pour réduire l'erreur mesurée",
-              "La quantité de RAM soudée sur la carte mère",
-              "Le nom des fichiers sources"
+              "Les cibles de validation pour réduire l’erreur",
+              "Les valeurs des paramètres internes du modèle",
+              "Le découpage du jeu de test à chaque pas",
+              "Les instructions du programme à chaque exemple"
             ],
             "answer": 1,
             "explanation": "L'entraînement ajuste des nombres internes. Le code qui décrit la forme du modèle reste le tien, et le matériel ne change pas."
@@ -1939,10 +1939,10 @@
           "quiz": {
             "question": "Dans une prédiction de prix, le prix observé est en général…",
             "choices": [
-              "Une feature comme les autres, sans précaution",
-              "L'optimiseur",
-              "Le label, c'est-à-dire la cible",
-              "La shape du tableau"
+              "Une feature disponible à la prédiction",
+              "Le poids ajusté par l’optimiseur",
+              "Le label : la réponse connue pendant l’apprentissage",
+              "L’identifiant de la ligne de données"
             ],
             "answer": 2,
             "explanation": "Le prix est ce qu'on demande au modèle de retrouver. Le mettre aussi dans les entrées fuite la réponse."
@@ -2019,10 +2019,10 @@
           "quiz": {
             "question": "Quel ensemble sert à la mesure finale, une fois les choix faits ?",
             "choices": [
-              "Le train, parce qu'il est le plus gros",
-              "La validation, qui sert à choisir les réglages",
-              "Les trois en même temps, pendant chaque mise à jour",
-              "Le test, tenu à l'écart jusqu'à la mesure finale"
+              "Le train utilisé à chaque pas",
+              "La validation utilisée pour régler le modèle",
+              "Le corpus complet utilisé sans découpage",
+              "Le test, réservé à la mesure finale"
             ],
             "answer": 3,
             "explanation": "Le test reste de côté jusqu'à la fin. La validation guide les choix. Le train modifie les paramètres."
@@ -2094,10 +2094,10 @@
           "quiz": {
             "question": "Lequel de ces choix est en général appris, et non fixé par toi ?",
             "choices": [
-              "Le poids w",
-              "Le learning rate",
-              "Le nombre d'époques",
-              "Le nom du fichier de sortie"
+              "La valeur numérique du poids w",
+              "La formule w*x+b",
+              "Le nombre de pas décidé avant l’essai",
+              "Le choix de la fonction de perte"
             ],
             "answer": 0,
             "explanation": "w est un paramètre. Le pas, le nombre de tours et les noms de fichiers sont des choix humains, des hyperparamètres ou de simples réglages."
@@ -2169,10 +2169,10 @@
           "quiz": {
             "question": "Dans cet exemple, qu'est-ce qui pourra être appris plus tard ?",
             "choices": [
-              "Les noms des variables x1 et x2",
-              "La fonction print",
-              "Les poids et le biais",
-              "L'ordre des lignes du fichier"
+              "Les valeurs des entrées du lot",
+              "Le nombre de colonnes du fichier",
+              "Les poids et le biais du neurone, pendant l’entraînement",
+              "La formule de la fonction d’activation"
             ],
             "answer": 2,
             "explanation": "x est une donnée. w et b sont les paramètres. print ne fait qu'afficher le calcul."
@@ -2244,10 +2244,10 @@
           "quiz": {
             "question": "Que vaut ReLU(-3) sur un nombre réel ?",
             "choices": [
-              "-3, parce que ReLU ne change rien",
-              "3, parce que ReLU prend la valeur absolue",
-              "1, parce que ReLU renvoie toujours une probabilité",
-              "0, parce que ReLU annule les valeurs négatives"
+              "-3, l’entrée est conservée",
+              "3, la valeur absolue est prise",
+              "1, la sortie est une probabilité",
+              "0, la partie négative est annulée"
             ],
             "answer": 3,
             "explanation": "ReLU met à zéro tout ce qui est négatif et laisse passer le reste. Ce n'est ni une valeur absolue ni une probabilité."
@@ -2319,10 +2319,10 @@
           "quiz": {
             "question": "Empiler deux couches linéaires sans activation au milieu équivaut surtout à…",
             "choices": [
-              "Une seule couche linéaire",
-              "Un tokenizer",
-              "Une garantie de meilleure généralisation",
-              "Une distribution de probabilités"
+              "Une seule transformation linéaire",
+              "Une transformation forcément non linéaire",
+              "Deux fois plus de classes séparables",
+              "Une normalisation automatique des entrées"
             ],
             "answer": 0,
             "explanation": "Le produit de deux matrices est une matrice. L'activation est ce qui empêche de tout fusionner."
@@ -2394,10 +2394,10 @@
           "quiz": {
             "question": "Le forward sert d'abord à…",
             "choices": [
-              "Installer Python",
-              "Produire une sortie à partir des entrées et des paramètres actuels",
-              "Modifier les poids",
-              "Créer le découpage train/test"
+              "Calculer les gradients depuis la loss",
+              "Calculer une sortie avec les poids actuels",
+              "Modifier les paramètres avec un optimiseur",
+              "Choisir le meilleur checkpoint sur le test"
             ],
             "answer": 1,
             "explanation": "Le forward calcule. La mise à jour des poids est un autre temps, après la mesure de l'erreur."
@@ -2469,10 +2469,10 @@
           "quiz": {
             "question": "Pourquoi mettre l'écart au carré dans cette loss ?",
             "choices": [
-              "Pour obtenir une probabilité",
-              "Pour tokeniser le texte",
-              "Pour augmenter volontairement l'erreur",
-              "Pour que les écarts positifs et négatifs ne s'annulent pas, et pour pénaliser les gros écarts"
+              "Conserver le signe pour savoir quel poids modifier",
+              "Rendre chaque erreur indépendante de son amplitude",
+              "Garantir une loss plus petite que l’erreur absolue",
+              "Éviter l’annulation et amplifier les grands écarts"
             ],
             "answer": 3,
             "explanation": "Le carré est positif. Deux erreurs de signes opposés ne se compensent plus, et une grande erreur pèse plus que deux petites."
@@ -2546,10 +2546,10 @@
           "quiz": {
             "question": "Si le gradient d'un poids est positif, la descente de gradient…",
             "choices": [
-              "Soustrait une quantité positive : le poids diminue",
-              "Augmente toujours le poids",
-              "Supprime le poids du fichier",
-              "Transforme le gradient en probabilité"
+              "Diminue ce poids si le pas est positif",
+              "Augmente ce poids si le pas est positif",
+              "Remplace ce poids par le gradient",
+              "Laisse ce poids fixe jusqu’au prochain epoch"
             ],
             "answer": 0,
             "explanation": "La règle est w := w - lr * gradient. Un gradient positif fait donc diminuer w, ce qui est le sens où la loss locale redescend."
@@ -2623,10 +2623,10 @@
           "quiz": {
             "question": "La règle de chaîne sert à dériver…",
             "choices": [
-              "Uniquement des fichiers texte",
-              "Une fonction composée, en multipliant les dérivées des étapes",
-              "Une probabilité déjà normalisée, sans calcul",
-              "Le nombre de commits Git"
+              "Une somme, via le produit de ses termes",
+              "Une composée, via les dérivées des étapes",
+              "Un produit, via la somme de ses facteurs",
+              "Une constante, via la dérivée de sa valeur"
             ],
             "answer": 1,
             "explanation": "Dès qu'une sortie dépend d'une suite d'opérations, la sensibilité totale est le produit des sensibilités locales."
@@ -2705,10 +2705,10 @@
           "quiz": {
             "question": "Le backward calcule surtout…",
             "choices": [
-              "De nouveaux labels",
-              "Un dossier de données",
-              "Les gradients des paramètres à partir de la loss",
-              "La tokenization du texte"
+              "Les prochaines cibles à partir des logits",
+              "Les nouveaux poids sans utiliser d’optimiseur",
+              "Les gradients de la loss vers les paramètres",
+              "Les probabilités à partir des scores bruts"
             ],
             "answer": 2,
             "explanation": "La passe arrière ne crée pas de données. Elle attribue à chaque paramètre sa part de responsabilité dans la loss."
@@ -2785,10 +2785,10 @@
           "quiz": {
             "question": "Le learning rate contrôle…",
             "choices": [
-              "La taille des mises à jour des paramètres",
-              "La taille du vocabulaire",
-              "Le nombre de fichiers du dépôt",
-              "Le signe de la loss, qui deviendrait négatif"
+              "L’amplitude des mises à jour appliquées aux paramètres",
+              "Le nombre de paramètres du réseau",
+              "La taille du vocabulaire après tokenisation",
+              "La proportion de validation dans le corpus"
             ],
             "answer": 0,
             "explanation": "Le pas multiplie le gradient. Il ne change ni le vocabulaire ni le sens mathématique de la loss."
@@ -2862,10 +2862,10 @@
           "quiz": {
             "question": "Un optimiseur décide comment…",
             "choices": [
-              "Découper le texte en tokens",
-              "Transformer les gradients en mises à jour de paramètres",
-              "Choisir le label à la place des données",
-              "Remplacer la fonction de loss"
+              "Convertir les logits en probabilités",
+              "Convertir les gradients en mises à jour",
+              "Remplacer la loss par une exactitude",
+              "Choisir les cibles du prochain lot"
             ],
             "answer": 1,
             "explanation": "L'optimiseur reçoit des gradients. La loss les a produits, le tokenizer n'a rien à voir avec ce choix."
@@ -2923,7 +2923,7 @@
               "code": "import numpy as np\nfrom model.autograd import Tensor, embedding\nW = Tensor(np.array([[1., 2.], [3., 4.]]))\nembedding(W, np.array([0, 0, 1])).sum().backward()\nnp.testing.assert_array_equal(W.grad, [[2., 2.], [1., 1.]])\nprint(W.grad)"
             }
           ],
-          "exercise": "Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie les trois contributions, puis explique pourquoi on somme au lieu de garder (2,3).",
+          "exercise": "Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie, pour chacune des trois composantes du biais, les deux contributions, puis explique pourquoi on somme au lieu de garder (2,3).",
           "build": "Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 contrôle la réduction du gradient de broadcasting. Le complément numérique ci-dessous vérifie les lectures répétées d’un embedding ; les TP 7 et 10 vérifient aussi des dérivées par différences finies.",
           "visual": "flow",
           "visualCaption": "Une entrée, une transformation, une sortie. La forme se lit à chaque flèche.",
@@ -2951,10 +2951,10 @@
           "quiz": {
             "question": "requires_grad=True indique surtout que…",
             "choices": [
-              "Le tenseur doit être enregistré sur le disque",
-              "Le calcul doit obligatoirement utiliser un GPU",
-              "On veut que les opérations sur ce tenseur puissent produire un gradient",
-              "Le tenseur est un label"
+              "Mettre les gradients à zéro immédiatement",
+              "Appliquer automatiquement un pas SGD",
+              "Le suivi du gradient des opérations du tenseur",
+              "Forcer les données du tenseur à être positives"
             ],
             "answer": 2,
             "explanation": "Ce drapeau active le suivi du graphe. Il ne choisit pas le matériel et ne sauvegarde rien tout seul."
@@ -3028,10 +3028,10 @@
           "quiz": {
             "question": "Pourquoi remettre les gradients à zéro avant chaque backward ?",
             "choices": [
-              "Pour effacer les données d'entraînement",
-              "Pour arrêter Python",
-              "Pour changer le vocabulaire",
-              "Parce que les gradients s'accumulent sinon d'un pas sur l'autre"
+              "Le backward réutiliserait les anciennes données",
+              "L’optimiseur remettrait sinon les poids à zéro",
+              "La loss serait recalculée sur la validation",
+              "Sans remise à zéro, chaque backward ajoute aux gradients existants"
             ],
             "answer": 3,
             "explanation": "L'accumulation est utile seulement quand on la demande, par exemple pour simuler un plus gros batch. Par défaut, un pas doit voir uniquement son propre gradient."
@@ -3103,10 +3103,10 @@
           "quiz": {
             "question": "Le surapprentissage apparaît typiquement quand…",
             "choices": [
-              "Les deux losses baissent ensemble",
-              "La loss de train est bonne et la loss de validation est mauvaise",
-              "Python vient de démarrer",
-              "Le tokenizer possède moins de dix symboles"
+              "Train et validation baissent ensemble",
+              "Train devient bon, validation reste mauvaise",
+              "Train et validation restent élevés ensemble",
+              "Les paramètres restent identiques après le backward"
             ],
             "answer": 1,
             "explanation": "L'écart train/validation est le symptôme. Une baisse conjointe est plutôt le signe que le modèle apprend encore quelque chose de transférable."
@@ -3198,10 +3198,10 @@
           "quiz": {
             "question": "Unicode sert d'abord à quoi, dans ce cours ?",
             "choices": [
-              "Entraîner le modèle",
-              "Calculer un gradient",
-              "Attribuer un numéro à chaque caractère, indépendamment de l'encodage en octets",
-              "Compresser la VRAM"
+              "Compresser les caractères en tokens BPE",
+              "Imposer un octet par caractère",
+              "Attribuer des points de code aux caractères, avant l’encodage en octets",
+              "Donner un embedding à chaque mot"
             ],
             "answer": 2,
             "explanation": "Unicode catalogue les caractères. L'encodage, le tokenizer et l'entraînement sont des couches suivantes."
@@ -3273,10 +3273,10 @@
           "quiz": {
             "question": "Un corpus, dans ce parcours, désigne quoi ?",
             "choices": [
-              "L'optimiseur",
-              "La matrice de poids",
-              "Le learning rate",
-              "L'ensemble de textes dont le modèle estimera des régularités"
+              "La table des identifiants de tokens",
+              "Le fichier contenant les poids appris",
+              "La seule partie réservée à la validation",
+              "Les textes réunis pour l’apprentissage"
             ],
             "answer": 3,
             "explanation": "Le corpus est la donnée. Les poids et l'optimiseur viennent après, pour en extraire un modèle."
@@ -3355,10 +3355,10 @@
           "quiz": {
             "question": "UTF-8 produit quoi à partir d'un texte ?",
             "choices": [
-              "Une suite d'octets qui représente les caractères",
-              "Des gradients",
-              "Des poids de réseau",
-              "Une loss déjà normalisée"
+              "Des octets qui représentent le texte",
+              "Une suite d’embeddings entraînés",
+              "Une liste de mots séparés par espaces",
+              "Une distribution sur le vocabulaire"
             ],
             "answer": 0,
             "explanation": "L'encodage traduit le texte en octets. Il ne calcule ni loss ni paramètre."
@@ -3430,10 +3430,10 @@
           "quiz": {
             "question": "Le vocabulaire associe des unités à…",
             "choices": [
-              "Des adresses GPU",
-              "Des valeurs de loss",
-              "Des identifiants entiers stables",
-              "Des learning rates"
+              "Des fréquences recalculées à chaque appel",
+              "Des vecteurs différents à chaque lecture",
+              "Des entiers fixes qui servent à retrouver ces mêmes unités",
+              "Des probabilités de prochain token"
             ],
             "answer": 2,
             "explanation": "Chaque unité reçoit un entier. Cet entier indexera une ligne d'embedding et une case de logit."
@@ -3507,10 +3507,10 @@
           "quiz": {
             "question": "Pourquoi ce tokenizer renvoie-t-il des entiers ?",
             "choices": [
-              "Pour accélérer le disque",
-              "Pour remplacer la loss",
-              "Pour créer une image",
-              "Parce que le modèle ne calcule pas sur des caractères, mais sur des indices"
+              "Chaque entier encode directement le sens du token",
+              "Les indices sont déjà les probabilités prédites",
+              "La taille des entiers remplace les positions",
+              "Les entiers indexent les unités du vocabulaire"
             ],
             "answer": 3,
             "explanation": "Les entiers indexeront des vecteurs. Le texte humain s'arrête à cette frontière."
@@ -3582,10 +3582,10 @@
           "quiz": {
             "question": "BPE fusionne surtout quel genre de paires ?",
             "choices": [
-              "Des paires d'unités fréquentes et adjacentes",
-              "Des couches du réseau",
-              "Des gradients de même signe",
-              "Des fichiers du dépôt"
+              "Les unités fréquentes et adjacentes",
+              "Les caractères les plus éloignés du texte",
+              "Les mots les plus longs, quelle que soit leur fréquence",
+              "Les unités dont les embeddings sont les plus proches"
             ],
             "answer": 0,
             "explanation": "L'algorithme ne regarde que les suites dans le corpus. Il ne connaît ni les poids ni les dossiers."
@@ -3664,10 +3664,10 @@
           "quiz": {
             "question": "Une fusion BPE modifie quoi dans le vocabulaire ?",
             "choices": [
-              "La quantité de RAM physique",
-              "La segmentation : plusieurs unités deviennent une seule, de façon réversible",
-              "La loss, directement, sans entraînement",
-              "Le nombre de cœurs du CPU"
+              "L’ordre des caractères dans le texte",
+              "Une segmentation différente et réversible",
+              "Le sens sémantique des embeddings",
+              "La normalisation des probabilités de sortie"
             ],
             "answer": 1,
             "explanation": "La fusion change la suite d'identifiants. Elle reste décodable. Elle ne touche ni au matériel ni à la loss."
@@ -3739,10 +3739,10 @@
           "quiz": {
             "question": "Un identifiant de token est…",
             "choices": [
-              "Une probabilité",
-              "Un gradient",
-              "Une longueur en octets",
-              "Un entier qui désigne une unité du vocabulaire"
+              "Une mesure numérique de similarité",
+              "Le nombre d’occurrences dans le corpus",
+              "Une position absolue dans le document",
+              "Un index entier du vocabulaire fixé"
             ],
             "answer": 3,
             "explanation": "L'identifiant indexe le vocabulaire. La probabilité et le gradient sont d'autres nombres, produits plus tard par le modèle."
@@ -3814,10 +3814,10 @@
           "quiz": {
             "question": "Un embedding transforme un identifiant en…",
             "choices": [
-              "Un vecteur de dimension fixe",
-              "Un fichier",
-              "Une boucle for",
-              "Une probabilité déjà sommée à 1"
+              "Une ligne de la table d’embeddings, de dimension fixée",
+              "Une probabilité scalaire entre 0 et 1",
+              "Un vecteur de longueur égale au texte",
+              "Une liste de caractères de même longueur"
             ],
             "answer": 0,
             "explanation": "La lecture de table remplace l'entier par D nombres. La probabilité n'apparaît qu'après les logits et softmax."
@@ -3889,10 +3889,10 @@
           "quiz": {
             "question": "L'information de position sert à…",
             "choices": [
-              "Remplacer la loss",
-              "Distinguer l'ordre des tokens dans la séquence",
-              "Mesurer l'espace disque",
-              "Numéroter les commits"
+              "Classer les tokens par fréquence",
+              "La place des tokens dans une séquence",
+              "Garantir la causalité sans masque",
+              "Identifier le document d’origine de chaque token"
             ],
             "answer": 1,
             "explanation": "Sans position, l'ordre n'est pas représenté. La loss et le disque sont d'autres sujets."
@@ -3966,10 +3966,10 @@
           "quiz": {
             "question": "Dans un tableau d'identifiants de forme (2, 3), que vaut la première dimension ?",
             "choices": [
-              "3, la longueur de chaque séquence",
-              "6, le nombre total de tokens",
-              "2, le nombre de séquences du batch",
-              "1, parce qu'on compte toujours à partir de 1"
+              "3 séquences dans le batch",
+              "6 séquences dans le batch",
+              "2 séquences dans le batch",
+              "2 tokens dans chaque séquence"
             ],
             "answer": 2,
             "explanation": "La convention du laboratoire est (batch, temps). Le 2 est le batch, le 3 est la longueur."
@@ -4061,10 +4061,10 @@
           "quiz": {
             "question": "La cible d'un pas next-token est…",
             "choices": [
-              "L'identifiant du token qui suit le contexte",
-              "Une phrase déjà traduite en français",
-              "Le learning rate",
-              "La norme du vecteur d'embedding"
+              "L’identifiant du prochain token après le contexte fourni",
+              "Le dernier token déjà dans le contexte",
+              "Le premier token de tout le corpus",
+              "Le token au score actuellement maximal"
             ],
             "answer": 0,
             "explanation": "On supervise un entier du vocabulaire. La phrase lisible n'existe qu'après décodage."
@@ -4136,10 +4136,10 @@
           "quiz": {
             "question": "Un bigramme prédit le token suivant à partir de…",
             "choices": [
-              "Toute la phrase, comme l'attention",
-              "Uniquement le token courant",
-              "La loss de validation seule",
-              "Le nom du fichier"
+              "Tous les tokens de la fenêtre",
+              "Un seul token : le token courant",
+              "Les deux prochains tokens inconnus",
+              "La moyenne des embeddings du document"
             ],
             "answer": 1,
             "explanation": "La ligne de la matrice ne dépend que de l'identifiant présent. C'est sa force (simplicité) et sa limite (pas de contexte long)."
@@ -4213,10 +4213,10 @@
           "quiz": {
             "question": "block_size désigne quelle limite de contexte ?",
             "choices": [
-              "La taille du disque",
-              "Le nombre de commits",
-              "La longueur maximale de contexte que le modèle accepte",
-              "La valeur de la loss"
+              "Le nombre de séquences par batch",
+              "La largeur des vecteurs cachés",
+              "Le nombre maximal de tokens que la fenêtre peut contenir",
+              "Le nombre de blocs d’attention"
             ],
             "answer": 2,
             "explanation": "C'est un hyperparamètre de longueur. Il borne la fenêtre, il ne mesure pas l'erreur."
@@ -4288,10 +4288,10 @@
           "quiz": {
             "question": "Un logit, avant le softmax, désigne quoi ?",
             "choices": [
-              "Une probabilité déjà entre 0 et 1",
-              "Un identifiant de token",
-              "Un octet UTF-8",
-              "Un score brut, avant conversion en probabilité"
+              "Une probabilité déjà normalisée",
+              "La classe forcément choisie",
+              "Une perte moyenne sur le vocabulaire",
+              "Un score numérique non normalisé"
             ],
             "answer": 3,
             "explanation": "Le logit est libre de signe et d'échelle. La probabilité viendra de softmax."
@@ -4365,10 +4365,10 @@
           "quiz": {
             "question": "Après softmax, la somme des sorties sur l'axe du vocabulaire vaut…",
             "choices": [
-              "0",
-              "1, aux erreurs d'arrondi près",
-              "Le plus grand logit",
-              "La taille du batch"
+              "0, car les logits sont centrés",
+              "1 à la précision numérique du calcul",
+              "La taille du vocabulaire V",
+              "Le maximum des logits d’entrée"
             ],
             "answer": 1,
             "explanation": "La division par la somme des exponentielles fabrique une distribution. La somme vaut donc 1."
@@ -4453,10 +4453,10 @@
           "quiz": {
             "question": "La cross-entropy augmente quand…",
             "choices": [
-              "Le modèle est certain et juste",
-              "Le vocabulaire est affiché",
-              "Le modèle donne peu de probabilité au token cible",
-              "Le batch est un carré"
+              "La probabilité de la cible augmente",
+              "Les logits reçoivent tous la même constante",
+              "La probabilité attribuée à la cible baisse",
+              "La température est forcément nulle"
             ],
             "answer": 2,
             "explanation": "-log(p) est grand quand p est petit. Une cible bien prédite rapproche la loss de zéro."
@@ -4530,10 +4530,10 @@
           "quiz": {
             "question": "Une température qui tend vers 0 rend la génération…",
             "choices": [
-              "Uniforme sur tout le vocabulaire",
-              "Indépendante des logits",
-              "Impossible, parce que softmax interdit l'argmax",
-              "De plus en plus proche du choix glouton, le token au score maximal"
+              "Proche d’un tirage uniforme sur le vocabulaire",
+              "Plus attentive aux tokens de faible score",
+              "Plus sensible à la longueur du texte qu’aux logits",
+              "Proche du choix au score maximal"
             ],
             "answer": 3,
             "explanation": "Les écarts de logits sont amplifiés. À la limite, seule la case maximale garde de la masse. Le code traite 0 comme l'argmax exact."
@@ -4566,7 +4566,7 @@
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. RMSNorm dispose aussi d’un backward entraînable dans le laboratoire. RoPE, SwiGLU, GQA et le dos hybride restent des forwards exploratoires. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation."
+              "text": "Le bigramme observe des transitions ; son apprentissage est un comptage. train_tiny_lm entraîne ensuite un réseau miniature par notre autograd NumPy. Le GPT complet de model/gpt_train.py emploie le même principe : embeddings, plusieurs blocs d'attention multi-têtes et FFN, loss next-token, backward, AdamW. Les poids de l'attention et des embeddings changent réellement ; ce n'est pas seulement une tête linéaire entraînée. RMSNorm, RoPE, SwiGLU, GQA et le partage des poids disposent d’un backward entraînable dans le GPT NumPy ; le benchmark moderne les compare à réglages contrôlés. Le dos hybride attention/SSM/MoE reste un forward exploratoire, sans entraînement de bout en bout. Dans un premier TP, entraîne un tout petit problème pour vérifier le gradient et la baisse de loss ; dans une deuxième expérience, réserve des documents avant de construire le tokenizer. Une baisse sur le petit lot de débogage ne démontre pas une généralisation."
             },
             {
               "kind": "code",
@@ -4605,10 +4605,10 @@
           "quiz": {
             "question": "Entre un bigramme par comptage et une tête linéaire, qu'est-ce qui change dans l'entraînement ?",
             "choices": [
-              "La façon d'ajuster le modèle : comptes d'un côté, gradient de l'autre",
-              "La définition de la cible, qui ne serait plus le token suivant",
-              "L'obligation d'utiliser un GPU",
-              "Le sens de lecture, de droite à gauche"
+              "La méthode d’ajustement : comptes d’un côté, gradients de l’autre",
+              "Tokenisation contre génération",
+              "Validation contre sauvegarde des poids",
+              "Probabilités contre absence de cibles"
             ],
             "answer": 0,
             "explanation": "La tâche reste next-token. Seul l'estimateur change. Le bigramme compte, la tête suit un gradient."
@@ -4682,10 +4682,10 @@
           "quiz": {
             "question": "Après avoir choisi un token, la génération…",
             "choices": [
-              "Efface le contexte et recommence au hasard",
-              "Modifie les poids du modèle",
-              "Le réinjecte dans le contexte pour prédire le suivant",
-              "Écrit directement des octets sans identifiants"
+              "Remplace tous les tokens du contexte",
+              "Réentraîne tous les poids sur ce token",
+              "Réinjecte le token dans le contexte courant",
+              "Repart toujours du prompt initial sans la suite"
             ],
             "answer": 2,
             "explanation": "Le token choisi devient une entrée. Les poids ne bougent pas pendant la génération : ce n'est pas un pas d'entraînement."
@@ -4757,9 +4757,9 @@
           "quiz": {
             "question": "La perplexité d'un modèle uniforme sur V tokens vaut…",
             "choices": [
-              "0",
-              "1",
-              "V au carré",
+              "log(V), la perte en nats",
+              "1/V, la probabilité de la cible",
+              "0, car le modèle n’a rien appris",
               "V, la taille du vocabulaire"
             ],
             "answer": 3,
@@ -4834,10 +4834,10 @@
           "quiz": {
             "question": "Pourquoi sauver le vocabulaire avec les poids ?",
             "choices": [
-              "Parce que les identifiants n'ont de sens que pour la table qui les a créés",
-              "Parce que le vocabulaire remplace la config",
-              "Parce que Git ne peut pas versionner de code",
-              "Parce que la perplexité est un fichier"
+              "Conserver la correspondance entre indices et unités",
+              "Permettre de changer librement tous les indices",
+              "Éviter d’enregistrer les poids appris",
+              "Reconstituer le corpus complet depuis les embeddings"
             ],
             "answer": 0,
             "explanation": "Un entier 4 désigne des caractères différents selon la table. Les poids appris pour une table sont illisibles avec une autre."
@@ -4927,10 +4927,10 @@
           "quiz": {
             "question": "L'attention est introduite pour…",
             "choices": [
-              "Remplacer le tokenizer",
-              "Pondérer le passé selon le contenu, plutôt que de tout moyenner ou de ne garder que le voisin",
-              "Augmenter la taille du disque",
-              "Supprimer la fonction de loss"
+              "Moyenner uniformément toutes les positions",
+              "Pondérer le passé selon le contenu",
+              "Ne conserver que le dernier token",
+              "Remplacer le vocabulaire par des mots entiers"
             ],
             "answer": 1,
             "explanation": "Elle choisit quelles positions du contexte mélangent leurs vecteurs. Le tokenizer et la loss restent en place."
@@ -5004,10 +5004,10 @@
           "quiz": {
             "question": "La valeur V, dans l'attention, est…",
             "choices": [
-              "Le learning rate",
-              "Le token cible",
-              "La température",
-              "Le contenu que l'on mélange une fois les poids décidés"
+              "La question utilisée pour comparer les positions",
+              "Le score normalisé entre deux tokens",
+              "Le masque qui interdit le futur",
+              "Le vecteur de contenu à combiner selon les poids d’attention"
             ],
             "answer": 3,
             "explanation": "Q et K servent à décider les poids. V est ce qui est ensuite sommé. Le learning rate n'entre pas dans ce calcul."
@@ -5081,10 +5081,10 @@
           "quiz": {
             "question": "La case (i, j) des scores compare…",
             "choices": [
-              "La requête de la position i et la clé de la position j",
-              "Deux cibles d'entraînement",
-              "La loss et le learning rate",
-              "Deux lignes du fichier README"
+              "Q de i avec K de j",
+              "V de i avec V de j",
+              "K de i avec Q de j",
+              "Le token cible de i avec le logit de j"
             ],
             "answer": 0,
             "explanation": "L'axe des lignes est celui des requêtes, l'axe des colonnes celui des clés. La valeur n'entre pas encore."
@@ -5158,10 +5158,10 @@
           "quiz": {
             "question": "Dans la self-attention, Q, K et V viennent…",
             "choices": [
-              "De trois fichiers différents imposés",
-              "De la même séquence, via trois projections",
-              "Du label uniquement",
-              "Du learning rate"
+              "De trois textes indépendants obligatoirement",
+              "D’une séquence, par trois projections",
+              "D’une même matrice sans projection",
+              "Du softmax, appliqué avant les scores"
             ],
             "answer": 1,
             "explanation": "« Self » veut dire même séquence. Les trois projections restent des matrices différentes."
@@ -5235,10 +5235,10 @@
           "quiz": {
             "question": "Le masque causal empêche une position de…",
             "choices": [
-              "Lire son propre token",
-              "Utiliser une loss",
-              "Lire les tokens situés dans le futur",
-              "Avoir un embedding"
+              "Accéder au token courant",
+              "Lire les tokens les plus anciens",
+              "Accéder aux tokens futurs",
+              "Utiliser plusieurs têtes d’attention"
             ],
             "answer": 2,
             "explanation": "Le présent et le passé restent visibles. Le futur est fermé, sinon la cible fuite dans l'entrée."
@@ -5324,10 +5324,10 @@
           "quiz": {
             "question": "On divise les scores par sqrt(d_k) pour…",
             "choices": [
-              "Empêcher softmax de devenir trop piqué quand la dimension augmente",
-              "Faire sommer les logits à 1",
-              "Remplacer le masque causal",
-              "Réduire le nombre de paramètres"
+              "Éviter que la dimension des clés rende le softmax trop piqué",
+              "Forcer les scores à sommer à un",
+              "Remplacer le masque causal triangulaire",
+              "Rendre les clés indépendantes des requêtes"
             ],
             "answer": 0,
             "explanation": "L'échelle ne change pas le nombre de poids et ne fabrique pas à elle seule une distribution. Elle calme les scores avant softmax."
@@ -5401,10 +5401,10 @@
           "quiz": {
             "question": "d_k, la dimension d'une tête, vaut…",
             "choices": [
-              "Toujours 64, quel que soit le modèle",
-              "d_model divisé par le nombre de têtes",
-              "Le nombre de tokens",
-              "La perplexité"
+              "d_model × nombre de têtes",
+              "d_model / nombre de têtes",
+              "T / nombre de têtes",
+              "La taille du vocabulaire divisée par T"
             ],
             "answer": 1,
             "explanation": "Les têtes se partagent la dimension du modèle. d_k est ce quotient, et il doit tomber juste."
@@ -5478,10 +5478,10 @@
           "quiz": {
             "question": "Si le sous-bloc renvoie zéro, la sortie résiduelle vaut…",
             "choices": [
-              "Zéro",
-              "Le masque causal",
-              "L'entrée, inchangée",
-              "Une distribution uniforme"
+              "Un vecteur nul",
+              "L’entrée normalisée",
+              "L’entrée, car le résidu lui ajoute la sortie nulle du sous-bloc",
+              "Le double de l’entrée"
             ],
             "answer": 2,
             "explanation": "x + 0 = x. Le chemin direct laisse passer l'entrée quand la correction est nulle : c'est l'intérêt du résidu."
@@ -5555,10 +5555,10 @@
           "quiz": {
             "question": "LayerNorm normalise surtout…",
             "choices": [
-              "Tout le batch avec une seule moyenne",
-              "Les identifiants de tokens",
-              "La loss, pour la forcer entre 0 et 1",
-              "Chaque vecteur sur sa dernière dimension, indépendamment du batch"
+              "Chaque feature sur tout le batch",
+              "Tous les tokens d’une séquence ensemble",
+              "Toutes les valeurs du batch d’un seul coup",
+              "Le dernier axe de chaque token séparément"
             ],
             "answer": 3,
             "explanation": "La moyenne et la variance sont celles du vecteur courant. Le batch n'entre pas dans ce calcul."
@@ -5632,10 +5632,10 @@
           "quiz": {
             "question": "Le FFN d'un Transformer mélange-t-il les positions entre elles ?",
             "choices": [
-              "Oui, comme l'attention",
-              "Non : il transforme chaque position séparément, avec les mêmes poids",
-              "Oui, mais seulement le futur",
-              "Non, parce qu'il n'a pas de paramètres"
+              "Oui, par une moyenne des positions voisines",
+              "Non, il agit position par position",
+              "Oui, par un masque triangulaire interne",
+              "Non, car il ne possède aucun poids appris"
             ],
             "answer": 1,
             "explanation": "Le mélange temporel est le travail de l'attention. Le FFN est une fonction identique appliquée à chaque vecteur."
@@ -5709,10 +5709,10 @@
           "quiz": {
             "question": "Dans le pre-norm du laboratoire, la normalisation est appliquée…",
             "choices": [
-              "Après toute l'entraînement, une seule fois",
-              "À la place du masque causal",
-              "Avant l'attention et avant le FFN, et le résidu ajoute à l'entrée non normalisée",
-              "Uniquement sur les labels"
+              "Après chaque addition résiduelle",
+              "Uniquement après le dernier bloc",
+              "Avant chaque sous-bloc, résidu sur l’entrée",
+              "Sur l’entrée résiduelle au lieu du sous-bloc"
             ],
             "answer": 2,
             "explanation": "Chaque sous-bloc voit une entrée normalisée, et le chemin résiduel garde la version précédente."
@@ -5786,10 +5786,10 @@
           "quiz": {
             "question": "Empiler les blocs sans changer D ni T multiplie surtout le coût par…",
             "choices": [
-              "Le carré du nombre de blocs, comme l'attention en T",
-              "Zéro, parce que les poids sont partagés automatiquement",
-              "La taille du vocabulaire uniquement",
-              "Le nombre de blocs, de façon à peu près linéaire"
+              "Le carré du nombre de blocs",
+              "La racine du nombre de blocs",
+              "La taille du vocabulaire au carré",
+              "Le nombre de blocs"
             ],
             "answer": 3,
             "explanation": "Chaque bloc ajoute ses matrices. L'attention reste quadratique en T à l'intérieur de chaque bloc, mais la profondeur elle-même entre linéairement."
@@ -5863,10 +5863,10 @@
           "quiz": {
             "question": "Un modèle decoder-only pour le langage…",
             "choices": [
-              "Utilise uniquement des blocs causaux pour prédire la suite",
-              "A besoin d'un encodeur qui a lu le futur",
-              "Ne produit pas de logits",
-              "Remplace le tokenizer par une image"
+              "Prédit la suite par des blocs causaux",
+              "Lit tout le texte futur avant de prédire",
+              "Exige un encodeur séparé pour chaque prompt",
+              "Prédit seulement une classe pour le document entier"
             ],
             "answer": 0,
             "explanation": "Le décodeur causal suffit pour continuer une séquence. L'encodeur n'est pas dans ce schéma."
@@ -5946,10 +5946,10 @@
           "quiz": {
             "question": "Quelles briques l'entraînement du GPT standard met-il à jour ?",
             "choices": [
-              "Seulement la tête linéaire finale",
-              "Seulement le tokenizer",
+              "Seulement la matrice de sortie",
+              "Seulement les embeddings d’entrée",
               "Embeddings, attention, FFN, normes et tête de sortie",
-              "Seulement les valeurs du cache KV"
+              "Seulement les poids de l’attention"
             ],
             "answer": 2,
             "explanation": "Le graphe de logits_tensor traverse tous ces paramètres. Le backward et AdamW les mettent à jour. La génération seule, elle, ne change pas les poids."
@@ -6039,10 +6039,10 @@
           "quiz": {
             "question": "Une table de positions absolues échoue surtout quand…",
             "choices": [
-              "Le vocabulaire contient une lettre",
-              "La loss est positive",
-              "On utilise un masque causal",
-              "La séquence dépasse le nombre de places apprises"
+              "La taille du batch dépasse T",
+              "Le vocabulaire dépasse la largeur D",
+              "Les logits ont une somme différente de 1",
+              "T dépasse la table apprise"
             ],
             "answer": 3,
             "explanation": "Le masque et la loss n'ont pas besoin de cette table. C'est la place, au-delà de block_size, qui n'a pas de ligne."
@@ -6121,10 +6121,10 @@
           "quiz": {
             "question": "RoPE modifie la norme des vecteurs tournés.",
             "choices": [
-              "Non : une rotation conserve la norme",
-              "Oui, elle la multiplie par la position",
-              "Oui, elle la remplace par la loss",
-              "Non, parce que RoPE supprime les vecteurs"
+              "Non, la norme est conservée",
+              "Oui, la norme croît avec la position",
+              "Oui, chaque rotation remet la norme à 1",
+              "Non, car RoPE ne transforme pas les vecteurs"
             ],
             "answer": 0,
             "explanation": "Le test d'égalité des normes est exactement cette propriété. Si elle casse, l'implémentation n'est pas RoPE."
@@ -6203,10 +6203,10 @@
           "quiz": {
             "question": "RMSNorm, comparée à LayerNorm, …",
             "choices": [
-              "Supprime le gain appris",
-              "Remet l'échelle par la RMS et n'ôte pas la moyenne",
-              "Normalise le batch entier",
-              "Remplace le masque causal"
+              "Soustrait la moyenne puis divise par l’écart type",
+              "Normalise l’échelle par la RMS, sans soustraire la moyenne",
+              "Centre uniquement, sans remettre à l’échelle",
+              "Normalise toutes les positions ensemble"
             ],
             "answer": 1,
             "explanation": "Le centrage disparaît, le gain reste. Le masque et le batch ne sont pas le sujet de cette couche."
@@ -6278,10 +6278,10 @@
           "quiz": {
             "question": "SwiGLU ajoute surtout quoi au FFN ?",
             "choices": [
-              "Un masque causal supplémentaire",
-              "Une table de positions",
-              "Une perte d'équilibrage d'experts",
-              "Une troisième matrice qui sert de porte multipliée au signal"
+              "Une connexion résiduelle sans nouveaux poids",
+              "Un masque causal ajouté aux activations",
+              "Une moyenne des sorties de plusieurs experts",
+              "Une porte multiplicative et sa matrice"
             ],
             "answer": 3,
             "explanation": "La porte est la nouveauté. Le masque, les positions et les experts sont d'autres briques."
@@ -6353,10 +6353,10 @@
           "quiz": {
             "question": "GQA réduit surtout quelle quantité de clés ?",
             "choices": [
-              "Le nombre de têtes de clés et de valeurs, pas forcément le nombre de requêtes",
-              "La taille du vocabulaire",
-              "Le nombre de blocs, automatiquement",
-              "La précision des labels"
+              "Le nombre de têtes K et V partagées entre plusieurs requêtes",
+              "Les têtes de requêtes uniquement",
+              "Le nombre de positions dans le contexte",
+              "La largeur du vocabulaire de sortie"
             ],
             "answer": 0,
             "explanation": "Les requêtes restent nombreuses. K et V sont partagés par groupes, ce qui allège le cache."
@@ -6428,10 +6428,10 @@
           "quiz": {
             "question": "Un cache correct, comparé au forward complet, doit…",
             "choices": [
-              "Produire des logits différents, sinon il ne sert à rien",
-              "Produire les mêmes logits sur les tokens nouvellement calculés",
-              "Effacer le masque",
-              "Réentraîner les poids à chaque token"
+              "Retrouver seulement le token argmax",
+              "Retrouver les logits du calcul complet",
+              "Produire des logits nécessairement plus faibles",
+              "Modifier les poids au lieu de recalculer les clés"
             ],
             "answer": 1,
             "explanation": "Le cache est une accélération exacte. Un écart numérique est un bug de positions ou de masque."
@@ -6503,10 +6503,10 @@
           "quiz": {
             "question": "Le weight tying partage quels poids du modèle ?",
             "choices": [
-              "Les masques de toutes les couches",
-              "Le corpus et les labels de test",
-              "La table d'embedding et la matrice de la tête de sortie",
-              "Les têtes KV entre deux modèles différents"
+              "Requêtes et clés de chaque tête",
+              "Les deux matrices successives du FFN",
+              "La table des embeddings d’entrée et la projection de sortie",
+              "Les normes de tous les blocs uniquement"
             ],
             "answer": 2,
             "explanation": "Ce sont les deux matrices qui parlent le vocabulaire. Le masque et le corpus ne sont pas des poids de ce type."
@@ -6578,10 +6578,10 @@
           "quiz": {
             "question": "Deux TinyGPT de même configuration et de même graine doivent…",
             "choices": [
-              "Produire les mêmes logits sur la même entrée",
-              "Produire des textes opposés pour prouver l'aléa",
-              "Ignorer la graine dès qu'il y a un résidu",
-              "Avoir des shapes différentes"
+              "Les mêmes logits pour une même entrée",
+              "Des logits différents à chaque construction",
+              "La même loss sur tous les corpus possibles",
+              "Les mêmes logits quelle que soit l’entrée"
             ],
             "answer": 0,
             "explanation": "La graine fixe l'initialisation. À code égal, les logits coïncident. Le test same == logits est cette exigence."
@@ -6653,10 +6653,10 @@
           "quiz": {
             "question": "Doubler la longueur T multiplie le terme d'attention en T² par…",
             "choices": [
-              "2",
-              "4, parce que (2T) au carré vaut quatre fois T au carré",
-              "8",
-              "1, parce que le cache annule le coût"
+              "2, car T a doublé",
+              "4, car le terme est quadratique",
+              "8, car il y a Q, K et V",
+              "1, car le nombre de poids est fixe"
             ],
             "answer": 1,
             "explanation": "(2T)² = 4 T². Le cache n'efface pas ce produit, il évite seulement de le refaire depuis zéro sur le passé déjà connu, et encore : le nouveau token doit quand même regarder tout le passé."
@@ -6722,17 +6722,17 @@
           ],
           "hints": [
             "Garde le dictionnaire commun identique : seule la clé de variante change.",
-            "Écris un tableau avant de conclure : une ligne par graine, une colonne par configuration. Calcule l'écart entre les graines d'une même configuration, puis l'écart entre configurations."
+            "Pour chaque graine, calcule delta = loss_variante − loss_baseline. Compare la moyenne et la dispersion de ces écarts appariés, avec exactement le même protocole."
           ],
-          "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans rien changer d'autre. Note val_loss_end et parameter_count. Si l'écart moyen entre configurations dépasse nettement l'écart entre graines, écris que la variante a amélioré la validation dans ce réglage précis (corpus, taille, nombre de pas). Sinon, écris qu'aucune différence n'est mesurable ici. Dans les deux cas, précise que rien n'est démontré pour un modèle plus grand ou un autre corpus.",
+          "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans changer données, dimensions ni budget. Note val_loss_end et parameter_count. Pour chaque graine, calcule delta = loss_variante − loss_baseline ; un delta négatif favorise la variante. Rapporte la moyenne, la dispersion et les trois deltas, sans transformer trois graines en preuve générale. Si les deltas changent de signe ou restent faibles devant leur dispersion, écris que le résultat est incertain dans ce réglage. Même avec des deltas concordants, rien n’est démontré pour un autre corpus ou un modèle plus grand.",
           "review": "Sans rouvrir la page, explique « Entraîner une variante moderne et la comparer » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
           "quiz": {
             "question": "La variante gagne 0,01 nat sur une graine, mais deux graines de la baseline diffèrent déjà de 0,03 nat. Que conclure ?",
             "choices": [
-              "Une seule graine ne permet pas de conclure : comparer les différences appariées sur plusieurs graines",
-              "La variante est meilleure, puisque sa loss est plus basse",
-              "La baseline est meilleure, puisqu'elle varie davantage",
-              "Il faut garder la graine la plus favorable à la variante"
+              "Mesurer des écarts appariés sur plusieurs graines",
+              "Conclure au gain : 0,01 est strictement positif",
+              "Conclure à l’égalité : 0,03 dépasse 0,01",
+              "Choisir la meilleure graine de chaque configuration"
             ],
             "answer": 0,
             "explanation": "Il faut étudier les différences appariées : une petite différence peut être stable si les fluctuations des deux modèles sont communes. Avec une seule paire, la variabilité de cette différence reste inconnue. Choisir la graine favorable sélectionnerait le résultat voulu au lieu de le mesurer."
@@ -6822,10 +6822,10 @@
           "quiz": {
             "question": "Les états Adam ajoutent typiquement, par paramètre…",
             "choices": [
-              "Zéro, parce que l'optimiseur est gratuit",
-              "La taille du corpus",
-              "Environ 8 octets si les moyennes sont en float32",
-              "Un token de vocabulaire"
+              "4 octets pour un unique état float32",
+              "2 octets car Adam impose fp16",
+              "8 octets pour deux états float32",
+              "0 octet car les gradients remplacent les états"
             ],
             "answer": 2,
             "explanation": "m et v sont deux flottants 32 bits. Ils dominent souvent la mémoire d'entraînement, plus que les poids fp16 eux-mêmes."
@@ -6897,10 +6897,10 @@
           "quiz": {
             "question": "Un modèle qui « ne rentre pas en VRAM » manque de…",
             "choices": [
-              "Place disque, uniquement",
-              "Tokens dans le vocabulaire",
-              "Lignes dans le README",
-              "Mémoire de travail du GPU, pas forcément de stockage"
+              "Capacité du disque de sauvegarde",
+              "Mémoire du cache du navigateur",
+              "Nombre d’identifiants dans le vocabulaire",
+              "Mémoire de travail du GPU, utilisée par le calcul en cours"
             ],
             "answer": 3,
             "explanation": "La VRAM est le plan de travail. Le disque peut rester libre pendant que le GPU refuse le chargement."
@@ -6979,10 +6979,10 @@
           "quiz": {
             "question": "Le terme en T² de l'attention vient surtout de…",
             "choices": [
-              "La table d'embedding seule",
-              "Les produits entre requêtes et clés, puis entre poids et valeurs",
-              "Le tokenizer caractère",
-              "Le nombre de commits"
+              "La taille de la table d’embeddings",
+              "Les interactions entre paires de positions",
+              "Le nombre de pas de l’optimiseur",
+              "La lecture séquentielle du corpus sur disque"
             ],
             "answer": 1,
             "explanation": "QKᵀ et AV parcourent toutes les paires de positions. L'embedding, lui, est linéaire en T."
@@ -7054,10 +7054,10 @@
           "quiz": {
             "question": "Une seule mesure de temps suffit-elle à classer deux modèles ?",
             "choices": [
-              "Oui, si le chiffre a trois décimales",
-              "Oui, parce que les FLOPs sont aléatoires",
-              "Non : on garde plusieurs mesures et on se méfie du premier appel",
-              "Non, parce que le temps n'a aucun rapport avec le code"
+              "Oui, toujours retenir le tout premier appel",
+              "Oui, si les deux modèles ont la même shape",
+              "Non, plusieurs mesures après échauffement",
+              "Non, additionner tous les temps sans les rapporter"
             ],
             "answer": 2,
             "explanation": "Le temps bruit. La médiane de plusieurs essais, après chauffe, est le minimum honnête. Les FLOPs restent le complément, pas un ennemi."
@@ -7129,10 +7129,10 @@
           "quiz": {
             "question": "Doubler le batch, à architecture fixe, augmente surtout…",
             "choices": [
-              "Le nombre de paramètres, qui double aussi",
-              "La taille du vocabulaire",
-              "Uniquement le disque de sauvegarde",
-              "La mémoire des activations et le coût du pas, pas le nombre de paramètres"
+              "Nombre de poids du modèle",
+              "Largeur des vecteurs d’embedding",
+              "Taille du vocabulaire du tokenizer",
+              "Activations et calcul du pas"
             ],
             "answer": 3,
             "explanation": "Les poids ne dépendent pas du batch. Les activations et le temps du pas, si."
@@ -7204,10 +7204,10 @@
           "quiz": {
             "question": "bf16, comparé à fp16, est surtout apprécié parce que…",
             "choices": [
-              "Sa plage d'exposant est large, proche de fp32, ce qui déborde moins",
-              "Il occupe 4 octets",
-              "Il supprime le besoin d'un optimiseur",
-              "Il remplace le tokenizer"
+              "Une plage d’exposant proche de fp32",
+              "Une mantisse plus précise que celle de fp32",
+              "Une absence garantie d’erreur d’arrondi",
+              "Une division par deux du nombre de paramètres"
             ],
             "answer": 0,
             "explanation": "bf16 sacrifie de la précision fine mais garde de grandes magnitudes. fp16 est plus précis localement et déborde plus vite."
@@ -7290,10 +7290,10 @@
           "quiz": {
             "question": "L'accumulation de gradient sert à…",
             "choices": [
-              "Augmenter le nombre de paramètres",
-              "Supprimer la loss",
-              "Simuler un plus gros batch sans garder tous les exemples en mémoire",
-              "Remplacer le masque causal"
+              "Multiplier le nombre de poids sans RAM supplémentaire",
+              "Éviter tous les backward des micro-lots",
+              "Simuler un gros batch par des gradients de micro-lots normalisés",
+              "Réutiliser toujours le même exemple sans normalisation"
             ],
             "answer": 2,
             "explanation": "On additionne des pentes de petits paquets. Les poids ne deviennent pas plus nombreux."
@@ -7365,10 +7365,10 @@
           "quiz": {
             "question": "Le checkpointing d'activations échange…",
             "choices": [
-              "De la qualité contre un vocabulaire plus petit",
-              "Des poids contre des tokens",
-              "Le test contre le train",
-              "De la mémoire contre du calcul refait pendant le backward"
+              "Moins de calcul, plus de poids stockés",
+              "Plus de précision, moins de données",
+              "Moins de paramètres, plus d’exemples par corpus",
+              "Moins de mémoire, plus de recalcul"
             ],
             "answer": 3,
             "explanation": "On jette des intermédiaires et on les recalcule. Le vocabulaire n'est pas en cause."
@@ -7440,10 +7440,10 @@
           "quiz": {
             "question": "La quantification en int4 vise d'abord…",
             "choices": [
-              "À réduire la mémoire des poids à l'inférence, au prix d'une perte de précision à mesurer",
-              "À augmenter la fenêtre sans aucun coût",
-              "À remplacer l'optimiseur Adam pendant l'entraînement, gratuitement",
-              "À supprimer le besoin d'un test"
+              "Réduire la mémoire des poids",
+              "Garantir une perplexité plus faible",
+              "Réduire la taille du vocabulaire",
+              "Supprimer les activations pendant l’inférence"
             ],
             "answer": 0,
             "explanation": "On compresse les poids. La qualité se mesure après. Ce n'est ni une fenêtre magique ni un test optionnel."
@@ -7515,10 +7515,10 @@
           "quiz": {
             "question": "En distillation, l'élève apprend notamment…",
             "choices": [
-              "Les poids exacts, copiés case par case, sans entraînement",
-              "La distribution produite par un modèle professeur",
-              "Uniquement le nom du professeur",
-              "La taille du disque du professeur"
+              "Les seuls noms des couches du professeur",
+              "Les probabilités du professeur, en plus des éventuelles cibles",
+              "Les documents du test final du professeur",
+              "La mémoire RAM réservée par le professeur"
             ],
             "answer": 1,
             "explanation": "L'élève imite des sorties, pas le nom du fichier. Copier les poids est impossible si les formes diffèrent."
@@ -7590,10 +7590,10 @@
           "quiz": {
             "question": "Le GPU est particulièrement utile pour…",
             "choices": [
-              "Décider du prochain if Python token par token, uniquement",
-              "Remplacer le disque",
-              "Garantir une meilleure perplexité",
-              "De gros produits de matrices réguliers"
+              "La navigation dans des dossiers Git",
+              "Les petites branches Python exécutées une à une",
+              "Le téléchargement des corpus sur le réseau",
+              "Des produits matriciels réguliers"
             ],
             "answer": 3,
             "explanation": "Il parallélise le calcul dense. Il ne rend pas une loss meilleure par sa seule présence, et il n'enlève pas le coût des toutes petites étapes."
@@ -7641,7 +7641,7 @@
             }
           ],
           "exercise": "Propose trois lignes honnêtes pour le fil rouge : bigramme, TinyGPT absolu, TinyGPT RoPE. Quelle unique colonne changer entre les deux TinyGPT pour que la comparaison parle de RoPE ?",
-          "build": "Le tableau compare qualité, temps et RAM réellement mesurés. L'atelier mesure le GPT standard contre le bigramme. RoPE reste un forward : sa vitesse peut être mesurée, sa qualité après entraînement reste non évaluée dans ce dépôt.",
+          "build": "Le tableau compare qualité, temps et RAM réellement mesurés. L'atelier mesure le GPT standard contre le bigramme. RoPE est entraînable dans le GPT NumPy. model/benchmark_modern.py compare sa loss de validation à celle des positions absolues, sur les mêmes graines et données. Cette petite mesure ne démontre pas un gain général ; le dos hybride reste limité à ses tests de forward.",
           "visual": "bars",
           "visualCaption": "Trois colonnes, trois unités. On ne les additionne pas.",
           "interactive": false,
@@ -7660,15 +7660,15 @@
             "Garde architecture et protocole identiques sauf la position.",
             "Écris les valeurs ou les étapes intermédiaires avant de conclure. Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE."
           ],
-          "solution": "Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE. Entre les deux TinyGPT, ne change que pos, avec dimensions, données, graine et protocole identiques. Ici RoPE n'a pas le backward du decoder entraînable : une comparaison forward mesure forme, causalité et temps, pas une qualité linguistique après entraînement identique.",
+          "solution": "Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE. Entre les deux TinyGPT, ne change que pos ; conserve dimensions, corpus, tokenizer, graines et budget. RoPE possède le backward du decoder entraînable. Lance model/benchmark_modern.py et compare les deltas de loss de validation appariés par graine, avec temps et RAM réellement mesurés. Les tests de forward seuls ne constituent pas une mesure de qualité linguistique ; le dos hybride reste limité au forward.",
           "review": "Sans rouvrir la page, explique « Inférence locale et tableau » en une phrase, puis dis ce que model/bench.py en garde vraiment.",
           "quiz": {
             "question": "Pour attribuer un gain à RoPE, il faut…",
             "choices": [
-              "Ne changer que le mode de position entre les deux lignes comparées",
-              "Changer en même temps la profondeur, le vocabulaire et la graine",
-              "Trier uniquement par le nom",
-              "Mesurer la qualité sur deux corpus différents"
+              "Changer seulement le mode de position",
+              "Changer position et largeur pour garder le même temps",
+              "Choisir un corpus différent pour chaque variante",
+              "Comparer la meilleure graine de chaque configuration"
             ],
             "answer": 0,
             "explanation": "Une comparaison utile isole un facteur. Le tri n'enlève pas cette obligation."
@@ -7765,10 +7765,10 @@
           "quiz": {
             "question": "Dans ce laboratoire, un expert est…",
             "choices": [
-              "Un second tokenizer",
-              "Un FFN avec ses propres poids, appliqué à un vecteur",
-              "Un être humain qui annote les données",
-              "Le masque causal"
+              "Une copie du tokenizer du corpus",
+              "Un réseau FFN distinct possédant ses propres paramètres",
+              "Une tête d’attention sans paramètres",
+              "Un document choisi par le retrieval"
             ],
             "answer": 1,
             "explanation": "L'expert est une fonction vectorielle. Le tokenizer et le masque restent partagés, en dehors de lui."
@@ -7840,10 +7840,10 @@
           "quiz": {
             "question": "Dans un MoE top-1 à 8 experts, le calcul du FFN par token ressemble surtout à…",
             "choices": [
-              "Aux huit experts additionnés",
-              "À aucun expert",
-              "Un seul expert, pas aux huit",
-              "Au tokenizer"
+              "Le calcul des huit experts",
+              "Le calcul d’un huitième d’expert",
+              "Le calcul d’un expert",
+              "Aucun calcul FFN, puisque le routeur le remplace"
             ],
             "answer": 2,
             "explanation": "Top-1 n'active qu'un FFN pour le calcul. Les sept autres restent en mémoire mais ne transforment pas ce token."
@@ -7915,10 +7915,10 @@
           "quiz": {
             "question": "Le routeur produit quoi pour chaque expert ?",
             "choices": [
-              "Des scores, puis des probabilités, sur les experts",
-              "Les tokens du texte",
-              "La perplexité finale",
-              "Le masque causal"
+              "Des scores puis des probabilités",
+              "Un identifiant de token suivant",
+              "Les poids complets de chaque FFN",
+              "Un masque causal sur les positions"
             ],
             "answer": 0,
             "explanation": "Sa sortie est une distribution sur E experts. Elle ne décode pas le texte."
@@ -7990,10 +7990,10 @@
           "quiz": {
             "question": "Après le top-k, les portes des experts retenus…",
             "choices": [
-              "Restent les logits bruts, possiblement négatifs",
-              "Sont renormalisées pour sommer à 1 entre elles",
-              "Somment au nombre d'experts",
-              "Remplacent les embeddings"
+              "Conservent toujours leur somme avant sélection",
+              "Somment à 1 après renormalisation",
+              "Deviennent toutes exactement égales",
+              "Sont remplacées par les nombres de tokens reçus"
             ],
             "answer": 1,
             "explanation": "On refait un softmax sur le sous-ensemble. Les experts écartés ne gardent pas de probabilité résiduelle dans ce mélange."
@@ -8065,10 +8065,10 @@
           "quiz": {
             "question": "La capacité limite quoi, pour un expert ?",
             "choices": [
-              "La taille du vocabulaire",
-              "Le nombre de couches d'attention",
-              "Le nombre de tokens qu'un expert accepte",
-              "La précision des caractères Unicode"
+              "Le nombre de paramètres de son FFN",
+              "La longueur du vocabulaire partagé",
+              "Le nombre de tokens qu’il peut recevoir dans un lot",
+              "Le nombre de couches dans le routeur"
             ],
             "answer": 2,
             "explanation": "C'est un quota par expert. Le vocabulaire n'entre pas dans cette formule."
@@ -8140,10 +8140,10 @@
           "quiz": {
             "question": "La fraction f_i compte quoi, exactement ?",
             "choices": [
-              "Le nombre de paramètres de l'expert",
-              "La perplexité",
-              "La longueur du cache",
-              "La part des tokens orientés vers l'expert i"
+              "La probabilité moyenne attribuée à i",
+              "Le nombre de poids de l’expert i",
+              "La loss de langage moyenne de l’expert i",
+              "La part des tokens envoyés à i"
             ],
             "answer": 3,
             "explanation": "C'est une statistique de routage, la part des tokens envoyés à un expert, pas une taille de matrice."
@@ -8215,10 +8215,10 @@
           "quiz": {
             "question": "Lorsque f et P sont uniformes, la perte auxiliaire du laboratoire vaut…",
             "choices": [
-              "0",
-              "1, une valeur de référence et non un minimum universel",
-              "Le nombre de tokens",
-              "La perplexité du bigramme"
+              "0, car les experts sont équilibrés",
+              "1, une valeur de référence",
+              "Le nombre d’experts, sans normalisation",
+              "La capacité maximale d’un expert"
             ],
             "answer": 1,
             "explanation": "E * somme((1/E)*(1/E)) = 1. L'effondrement certain donne E, mais d'autres probabilités valides peuvent donner moins de 1, comme le montre le contre-exemple."
@@ -8290,10 +8290,10 @@
           "quiz": {
             "question": "Le parallélisme d'experts est utile si…",
             "choices": [
-              "Tous les tokens choisissent le même expert",
-              "On supprime le routeur",
-              "Les tokens se répartissent vraiment entre les experts placés sur des machines différentes",
-              "On quantifie le tokenizer"
+              "Tous les tokens vont toujours au même expert",
+              "Les experts partagent une seule machine saturée",
+              "Les tokens chargent réellement plusieurs machines porteuses d’experts",
+              "Le nombre d’experts remplace le masque causal"
             ],
             "answer": 2,
             "explanation": "Sans répartition, les machines supplémentaires stockent des poids inactifs. Le routeur reste indispensable."
@@ -8365,10 +8365,10 @@
           "quiz": {
             "question": "Remplacer le FFN par un MoE top-1 de plusieurs experts de même taille…",
             "choices": [
-              "Divise toujours la perplexité par le nombre d'experts",
-              "Supprime le besoin d'un routeur",
-              "Réduit la RAM",
-              "Augmente surtout les paramètres stockés, pas le calcul par token"
+              "Multiplie le FFN par tous les experts à chaque token",
+              "Divise tous les poids stockés par le nombre d’experts",
+              "Garantit une amélioration de la loss sans entraînement",
+              "Accroît surtout les poids stockés"
             ],
             "answer": 3,
             "explanation": "On stocke tous les experts et on en calcule un. La perplexité n'est pas un cadeau automatique, et la RAM monte."
@@ -8458,10 +8458,10 @@
           "quiz": {
             "question": "Pourquoi une récurrence coûte moins que l'attention quand T grandit ?",
             "choices": [
-              "Elle met à jour un état de taille fixe, sans comparer toutes les paires",
-              "Elle relit toute la séquence à chaque pas",
-              "Elle supprime le masque causal",
-              "Elle stocke une matrice T par T"
+              "L’état garde une taille fixe au lieu de former toutes les paires",
+              "Elle mémorise chaque paire dans un cache carré",
+              "Elle supprime tous les paramètres appris",
+              "Elle traite toujours moins de tokens que le Transformer"
             ],
             "answer": 0,
             "explanation": "Le travail par pas est proportionnel à la taille de l'état, pas au nombre de paires. La mémoire du passé est cet état, pas une matrice d'attention."
@@ -8533,10 +8533,10 @@
           "quiz": {
             "question": "Dans selective_scan, que doit valoir a pour qu'un état oubli un peu le passé ?",
             "choices": [
-              "Des composantes positives pour amplifier le passé",
-              "La même matrice que l'attention",
-              "Des composantes négatives, afin que exp(delta * a) soit inférieur à 1",
-              "Un entier de vocabulaire"
+              "a positif, donc facteur d’oubli inférieur à 1",
+              "a nul, donc oubli complet à chaque pas",
+              "a négatif, donc facteur d’oubli inférieur à 1",
+              "a égal à 1, donc état indépendant du passé"
             ],
             "answer": 2,
             "explanation": "delta est positif. Multiplié par un a négatif, l'exposant est négatif et le facteur d'oubli est dans (0, 1)."
@@ -8608,10 +8608,10 @@
           "quiz": {
             "question": "Que représente h dans le SSM de ce cours ?",
             "choices": [
-              "Le vocabulaire du tokenizer",
-              "La matrice d'attention T par T",
-              "La loss d'entraînement",
-              "La mémoire interne mise à jour à chaque pas, pas la prédiction du prochain token"
+              "La distribution finale sur les tokens",
+              "Le nombre de têtes de requêtes",
+              "Le corpus complet conservé sans compression",
+              "L’état interne mis à jour"
             ],
             "answer": 3,
             "explanation": "La prédiction, plus tard, se lit sur une tête. h est l'état du scan, une mémoire comprimée du passé."
@@ -8683,10 +8683,10 @@
           "quiz": {
             "question": "Quand un SSM peut-il être remplacé par une convolution à noyau fixe ?",
             "choices": [
-              "Quand ses coefficients ne dépendent pas de l'entrée",
-              "Quand le masque causal est retiré",
-              "Quand on ajoute un routeur MoE",
-              "Quand le vocabulaire dépasse 50 000"
+              "Quand les coefficients ne varient pas avec le contenu d’entrée",
+              "Quand les coefficients dépendent de chaque entrée",
+              "Dès que le scan conserve la causalité",
+              "Seulement quand le contexte contient un seul token"
             ],
             "answer": 0,
             "explanation": "Le noyau est la liste des puissances des coefficients. S'ils varient avec x, il n'y a plus un seul noyau à précalculer."
@@ -8758,10 +8758,10 @@
           "quiz": {
             "question": "Que garantit l'égalité parallel_affine et sequential_affine ?",
             "choices": [
-              "Que l'attention est inutile dans tous les cas",
-              "Que le regroupement des pas affines ne change pas l'état calculé",
-              "Que le modèle est entraîné",
-              "Que a doit être une matrice T par T"
+              "Les mêmes probabilités qu’un Transformer entraîné",
+              "Le même état malgré le regroupement",
+              "Une accélération garantie dans une boucle Python",
+              "L’absence d’état à transmettre entre les segments"
             ],
             "answer": 1,
             "explanation": "Les deux fonctions calculent h_t = a_t h_{t-1} + b_t. Le test fixe cette égalité, pas une qualité de langage."
@@ -8833,10 +8833,10 @@
           "quiz": {
             "question": "Qu'est-ce qui rend le scan du laboratoire sélectif ?",
             "choices": [
-              "a est une matrice d'attention",
-              "Le vocabulaire est recalculé à chaque token",
-              "Le masque causal est retiré",
-              "b, c et delta dépendent du contenu, donc le pas change avec l'entrée"
+              "Le vocabulaire est trié selon les fréquences",
+              "Le nombre d’experts change à chaque couche",
+              "Le scan choisit uniquement le dernier token",
+              "b, c et delta dépendent de l’entrée"
             ],
             "answer": 3,
             "explanation": "La sélectivité est la dépendance des coefficients à l'entrée. Le scan reste causal : on ne lit pas le futur."
@@ -8915,10 +8915,10 @@
           "quiz": {
             "question": "Que contient exactement le dos kind=\"ssm\" de ce dépôt ?",
             "choices": [
-              "Un scan sélectif résiduel, sans convolution courte ni kernel CUDA",
-              "Un Transformer complet avec RoPE",
-              "Le code officiel de Mamba, poids compris",
-              "Un routeur MoE à la place de l'état"
+              "Un scan sélectif avec résidu, sans convolution courte ni kernel CUDA",
+              "Une reproduction complète avec kernel CUDA",
+              "Une attention globale sans état récurrent",
+              "Une convolution courte suivie d’un MoE entraîné"
             ],
             "answer": 0,
             "explanation": "C'est une maquette pédagogique. La forme et la causalité sont testées, pas la parité avec un article."
@@ -8990,10 +8990,10 @@
           "quiz": {
             "question": "Quel rappel l'attention dans la fenêtre fait-elle qu'un état de taille fixe ne garantit pas ?",
             "choices": [
-              "Prédire sans aucun paramètre",
-              "Relire une position précise encore présente dans la fenêtre",
-              "Ignorer le masque causal",
-              "Réduire la RAM des poids à zéro"
+              "Conserver tout le passé exactement sans limite",
+              "Relire une position de la fenêtre",
+              "Garantir une meilleure loss sans entraînement",
+              "Accéder à des documents externes sans retrieval"
             ],
             "answer": 1,
             "explanation": "L'état comprime. L'attention, dans sa fenêtre, conserve l'accès aux vecteurs passés. Hors fenêtre, elle aussi oublie."
@@ -9065,10 +9065,10 @@
           "quiz": {
             "question": "Dans ce dépôt, que partagent transformer, ssm et hybrid ?",
             "choices": [
-              "Les mêmes poids et les mêmes sorties",
-              "Un routeur top-k commun",
-              "La forme de sortie (B, T, D) et la causalité, pas les valeurs",
-              "L'absence de résidu"
+              "Les valeurs de sortie exactement identiques",
+              "Le même nombre de paramètres pour toute configuration",
+              "Le contrat de sortie (B,T,D) et la causalité, sans égalité des valeurs",
+              "La même qualité linguistique après entraînement"
             ],
             "answer": 2,
             "explanation": "Le test fixe la forme et l'absence d'effet du futur sur la position 0. Les fonctions restent différentes."
@@ -9158,10 +9158,10 @@
           "quiz": {
             "question": "Avant d'entrer dans le dos, que doivent devenir des pixels ou des échantillons ?",
             "choices": [
-              "Une suite de vecteurs de largeur compatible avec le modèle",
-              "Une loss",
-              "Un masque causal",
-              "Un fichier README"
+              "Une séquence de vecteurs dont la largeur convient au dos choisi",
+              "Des identifiants de caractères UTF-8 obligatoires",
+              "Des probabilités de prochain mot déjà normalisées",
+              "Un unique scalaire par document multimodal"
             ],
             "answer": 0,
             "explanation": "Le dos consomme des vecteurs. La modalité d'origine doit être convertie, pas branchée comme un fichier brut."
@@ -9240,10 +9240,10 @@
           "quiz": {
             "question": "Dans le test, pourquoi le premier patch vaut [0, 1, 4, 5] et non [0, 1, 2, 3] ?",
             "choices": [
-              "Parce que le modèle est déjà entraîné",
-              "Parce qu'il prend le carré 2 par 2 en haut à gauche, pas la première ligne",
-              "Parce que les canaux sont en couleur",
-              "Parce que le scan SSM a réordonné les pixels"
+              "C’est la première ligne complète de l’image",
+              "C’est le carré supérieur gauche",
+              "Les pixels sont triés par valeur croissante",
+              "Les canaux ont été moyennés avant extraction"
             ],
             "answer": 1,
             "explanation": "arange remplit la ligne 0 avec 0,1,2,3 et la ligne 1 avec 4,5,6,7. Le carré gauche garde 0, 1, 4, 5."
@@ -9315,10 +9315,10 @@
           "quiz": {
             "question": "Que fait project_patches, et que ne fait-il pas ?",
             "choices": [
-              "Un tokenizer BPE sur les pixels",
-              "Un scan sélectif",
-              "Une couche linéaire vers D, pas un Transformer visuel complet",
-              "La loss de l'étape 1"
+              "Un encodeur visuel complet entraîné",
+              "Un décodeur qui reconstruit les pixels",
+              "Une projection linéaire vers D",
+              "Un tokenizer BPE des couleurs de l’image"
             ],
             "answer": 2,
             "explanation": "La fonction est un produit matriciel et un biais. L'attention entre patches n'est pas dans ce module."
@@ -9390,10 +9390,10 @@
           "quiz": {
             "question": "Où est calculé le spectrogramme dans ce dépôt ?",
             "choices": [
-              "Dans model/multimodal.py, fonction spectrogram",
-              "Dans le tokenizer caractère",
-              "Dans selective_scan",
-              "Nulle part : la leçon décrit l'idée, le code ne l'implémente pas"
+              "Dans le tokenizer caractère du laboratoire",
+              "Dans project_patches avant la projection",
+              "Dans le scan sélectif du dos SSM",
+              "Nulle part dans le code : le spectrogramme est seulement décrit"
             ],
             "answer": 3,
             "explanation": "multimodal.py expose patchify et project_patches. Aucun test audio n'existe, et c'est assumé."
@@ -9465,10 +9465,10 @@
           "quiz": {
             "question": "Un encodeur audio de ce cours, aujourd'hui, c'est…",
             "choices": [
-              "Une fonction testée de model/multimodal.py",
-              "Un schéma de projection décrit, sans module ni test",
-              "Le bigramme appliqué aux lettres",
-              "Le routeur MoE"
+              "Un encodeur entraîné et sauvegardé",
+              "Une idée décrite, sans module testé",
+              "Une fonction de model/multimodal.py testée",
+              "Un tokenizer audio fourni par le playground"
             ],
             "answer": 1,
             "explanation": "Le seul code multimodal testé est le découpage d'image et sa projection. L'audio reste une analogie de forme."
@@ -9540,10 +9540,10 @@
           "quiz": {
             "question": "Pourquoi ne pas créer un token par pixel et par frame ?",
             "choices": [
-              "Parce que les pixels ne sont pas des nombres",
-              "Parce que le masque causal l'interdit",
-              "Parce que T explose et le coût d'attention quadratique avec lui",
-              "Parce que NumPy ne sait pas multiplier"
+              "Le nombre de poids double à chaque pixel",
+              "Le masque causal devient mathématiquement impossible",
+              "Le nombre de positions explose, avec un coût d’attention en T²",
+              "La projection ne peut accepter de valeurs réelles"
             ],
             "answer": 2,
             "explanation": "Le patch et le tube existent pour réduire T. Le niveau 6 a déjà montré que le terme T*T devient le coût dominant."
@@ -9615,10 +9615,10 @@
           "quiz": {
             "question": "Deux suites de vecteurs de même largeur D sont-elles pour autant alignées ?",
             "choices": [
-              "Oui, dès que les formes matchent",
-              "Oui, grâce au bigramme",
-              "Non, parce que NumPy interdit la concaténation",
-              "Non : la largeur permet de les concaténer, le sens demande un entraînement que le dépôt ne fait pas"
+              "Oui, D identique garantit le même sens",
+              "Oui, une concaténation entraîne les deux encodeurs",
+              "Non, il faut seulement trier les vecteurs",
+              "Non, l’alignement doit être appris"
             ],
             "answer": 3,
             "explanation": "La concaténation sur le temps exige le même D. La proximité de sens exige une perte et des données, absentes ici."
@@ -9690,10 +9690,10 @@
           "quiz": {
             "question": "Dans une concaténation causale image puis texte, qui peut lire l'autre ?",
             "choices": [
-              "Le texte peut lire l'image passée ; l'image ne peut pas lire le texte futur",
-              "Les deux se lisent dans les deux sens",
-              "Personne ne lit personne",
-              "Seul le routeur MoE décide"
+              "Texte vers image passée seulement",
+              "Image vers texte futur seulement",
+              "Les deux sens, malgré le masque causal",
+              "Aucun sens, car les modalités restent séparées"
             ],
             "answer": 0,
             "explanation": "Le masque causal suit l'ordre de la suite. Placer une modalité avant l'autre lui donne le rôle de contexte."
@@ -9765,10 +9765,10 @@
           "quiz": {
             "question": "Quelle sortie multimodale est réellement implémentée et testée ?",
             "choices": [
-              "Un décodeur audio testé par pytest",
-              "Une vidéo générée dans model/__main__.py",
-              "Aucune : le module couvre l'entrée image jusqu'à la projection, pas une image reconstruite",
-              "Une tête qui peint des pixels dans TinyGPT"
+              "Une image reconstruite depuis le texte",
+              "Une forme d’onde produite depuis les patches",
+              "Aucune : seule l’entrée image jusqu’à sa projection est testée",
+              "Une vidéo décodée depuis le dos hybride"
             ],
             "answer": 2,
             "explanation": "Le test fixe patchify et project_patches. Revenir vers des pixels n'est pas dans le dépôt."
@@ -9858,10 +9858,10 @@
           "quiz": {
             "question": "Quelle différence fais-tu entre la fenêtre et une mémoire externe ?",
             "choices": [
-              "La fenêtre est sur disque et la mémoire est le GPU",
-              "Il n'y a aucune différence",
-              "La mémoire externe remplace le tokenizer",
-              "La fenêtre est lue par le modèle ; la mémoire externe ne contribue que par les extraits choisis"
+              "Toute mémoire externe est lue intégralement par le modèle",
+              "La fenêtre modifie les poids, la mémoire les fige",
+              "L’externe augmente automatiquement la fenêtre disponible",
+              "L’externe contribue via les extraits choisis"
             ],
             "answer": 3,
             "explanation": "Seuls les tokens du contexte entrent dans le réseau. Le reste de l'archive n'existe pour lui que si tu l'as copié."
@@ -9933,10 +9933,10 @@
           "quiz": {
             "question": "Après normalisation, que vaut le produit scalaire de deux sacs de mots ?",
             "choices": [
-              "Leur cosinus, qui vaut 1 s'ils ont les mêmes proportions de mots",
-              "La perplexité du bigramme",
-              "Le nombre de tokens BPE",
-              "La loss MoE"
+              "Le cosinus : 1 pour deux distributions proportionnelles de mots",
+              "La probabilité du prochain token",
+              "La distance euclidienne brute",
+              "Le nombre total de mots en commun"
             ],
             "answer": 0,
             "explanation": "Diviser par la norme enlève l'effet de la longueur. Le produit restant est le cosinus."
@@ -10015,10 +10015,10 @@
           "quiz": {
             "question": "Dans le test, pourquoi la requête « pente de la loss » renvoie-t-elle l'index 0 ?",
             "choices": [
-              "Parce que l'index 0 gagne toujours, même à score nul",
-              "Parce que ce document est le seul à partager ces mots, donc le seul cosinus élevé",
-              "Parce qu'un embedding entraîné rapproche gradient et pente",
-              "Parce que le routeur MoE choisit le premier expert"
+              "L’index 0 est toujours choisi en cas de recherche",
+              "Son cosinus est le plus élevé",
+              "Le modèle a entraîné ses poids sur cette question",
+              "Le document 0 est obligatoirement le plus long"
             ],
             "answer": 1,
             "explanation": "Le score est un sac de mots. Le document 0 contient « pente » et « loss ». Les autres non. L'index ne départage qu'en cas d'égalité."
@@ -10090,10 +10090,10 @@
           "quiz": {
             "question": "Comment éteins-tu la mémoire de ce laboratoire ?",
             "choices": [
-              "En mettant k à -1",
-              "En supprimant le tokenizer",
-              "En entraînant le bigramme plus longtemps",
-              "En lui passant une liste de documents vide, ce qui enlève les extraits"
+              "Fixer la température de génération à zéro",
+              "Vider les poids du modèle de langage",
+              "Diminuer le nombre de couches du dos",
+              "Fournir une liste de documents vide afin de retirer les extraits"
             ],
             "answer": 3,
             "explanation": "Sans documents, retrieve n'a rien à classer. Le prompt garde la question et perd les extraits. k négatif est refusé avant cela."
@@ -10165,10 +10165,10 @@
           "quiz": {
             "question": "Une récurrence de raisonnement, dans ce cours, désigne…",
             "choices": [
-              "Plusieurs passes dont l'entrée suivante contient un brouillon, pas le scan interne du SSM",
-              "Le produit QK dans une couche",
-              "Le lissage du bigramme",
-              "La découpe en patches"
+              "Des passes réutilisant un brouillon",
+              "Les pas internes du scan sur les mêmes tokens",
+              "Un backward supplémentaire sans nouvelle entrée",
+              "Un tri des documents par ordre alphabétique"
             ],
             "answer": 0,
             "explanation": "Le scan est intérieur à un forward. La boucle de raisonnement empile des forwards, et elle n'est pas implémentée."
@@ -10240,10 +10240,10 @@
           "quiz": {
             "question": "Que fait Backbone quand une entrée est « facile » ?",
             "choices": [
-              "Il saute le SSM",
-              "Il exécute quand même les n_layers couches prévues",
-              "Il réduit tout seul n_layers",
-              "Il vide la mémoire externe"
+              "S’arrête dès que la loss paraît faible",
+              "Exécute toutes les couches prévues",
+              "Utilise seulement la première couche",
+              "Choisit automatiquement le nombre de couches"
             ],
             "answer": 1,
             "explanation": "n_layers est un argument de construction. Rien dans forward ne regarde une confiance."
@@ -10315,10 +10315,10 @@
           "quiz": {
             "question": "Que manque-t-il au dépôt pour parler d'un agent ?",
             "choices": [
-              "Un tokenizer",
-              "Un patch de 2 pixels",
-              "Une boucle qui choisit des outils et une trace d'appels testée",
-              "Une licence MIT"
+              "Un vocabulaire de taille plus importante",
+              "Une seule fonction de recherche de documents",
+              "Une boucle de choix et d’appels d’outils, vérifiée par une trace",
+              "Un plus grand tableau de scores de retrieval"
             ],
             "answer": 2,
             "explanation": "retrieve est un outil isolé. L'agent serait la politique qui l'appelle, et elle n'existe pas ici."
@@ -10390,10 +10390,10 @@
           "quiz": {
             "question": "Quel contrôle montre qu'une mémoire externe a pu servir ?",
             "choices": [
-              "La même question avec extraits, puis sans extraits, et une différence de résultats",
-              "Une seule bonne réponse",
-              "Un forward plus profond",
-              "Un thème sombre dans l'interface"
+              "Comparer avec et sans extraits",
+              "Montrer seulement une réponse avec extraits",
+              "Compter uniquement le nombre de documents stockés",
+              "Comparer deux questions et deux modèles différents"
             ],
             "answer": 0,
             "explanation": "Sans la condition « mémoire éteinte », tu ne sais pas si l'extrait était nécessaire. Une réussite isolée ne sépare pas les causes."
@@ -10483,10 +10483,10 @@
           "quiz": {
             "question": "Que dois-tu écrire avant de citer un résultat de papier dans ton portfolio ?",
             "choices": [
-              "Le titre, qui tient lieu de preuve",
-              "Ce que tu as réellement reproduit, et ce que tu n'as pas reproduit",
-              "Un score lu dans l'abstrait, sans montage",
-              "Le nombre de paramètres du Backbone"
+              "Présenter le chiffre du papier comme celui du dépôt",
+              "Distinguer reproduit et non reproduit",
+              "Remplacer toutes les mesures par une citation",
+              "Conserver seulement les essais favorables au modèle"
             ],
             "answer": 1,
             "explanation": "Un chiffre d'article n'est pas un chiffre du dépôt. Le portfolio ne garde que les seconds, et nomme les premiers comme non reproduits."
@@ -10558,10 +10558,10 @@
           "quiz": {
             "question": "Que vaut la perplexité de la baseline uniforme ?",
             "choices": [
-              "Toujours 1",
-              "Le nombre de couches",
-              "La taille du vocabulaire",
-              "La loss MoE"
+              "Le logarithme de sa taille",
+              "L’inverse de sa taille",
+              "V, le nombre de tokens différents dans le vocabulaire",
+              "Le nombre de tokens du corpus"
             ],
             "answer": 2,
             "explanation": "Une loi uniforme sur V tokens a une perplexité V. Le code la renvoie dans uniform_perplexity."
@@ -10633,10 +10633,10 @@
           "quiz": {
             "question": "Pourquoi ce cours ne cite-t-il pas un gain chiffré pour les modèles à concepts ?",
             "choices": [
-              "Parce que l'idée est forcément fausse",
-              "Parce que le BPE est un concept",
-              "Parce que la perplexité uniforme vaut 1",
-              "Parce que le dépôt ne les implémente pas et ne les mesure pas"
+              "Le gain est forcément nul pour ces modèles",
+              "Leur perplexité n’est jamais calculable",
+              "Le nombre de concepts suffit à prédire leur qualité",
+              "Aucune implémentation ni mesure ici"
             ],
             "answer": 3,
             "explanation": "Une idée lue n'est pas un résultat du laboratoire. Le tokenizer reste au caractère et au BPE."
@@ -10708,10 +10708,10 @@
           "quiz": {
             "question": "En quoi un temps interne diffère-t-il du scan SSM du dépôt ?",
             "choices": [
-              "C'est le même code, sous un autre nom",
-              "Le scan avance avec les tokens ; le temps interne ferait des pas sans nouveau token, et il n'est pas codé",
-              "Il supprime le besoin d'une baseline",
-              "Il est testé dans test_ssm_matches_scan_and_is_causal"
+              "Un scan plus rapide sur les tokens déjà présents",
+              "Des pas sans nouveau token, non codés ici",
+              "Une nouvelle segmentation BPE du texte",
+              "Un cache KV partagé entre plusieurs couches"
             ],
             "answer": 1,
             "explanation": "Le test du scan vérifie une récurrence sur la séquence d'entrée. Aucun pas silencieux n'existe dans Backbone."
@@ -10783,10 +10783,10 @@
           "quiz": {
             "question": "Comment juger un calcul latent sans le raconter ?",
             "choices": [
-              "En lisant la norme du vecteur",
-              "En copiant le score d'un article",
-              "Par une exactitude sur des questions dont la réponse est connue, contre une baseline",
-              "En allongeant le README"
+              "La seule longueur du brouillon produit",
+              "Le nombre de paramètres du mécanisme",
+              "Comparer l’exactitude à une baseline sur des réponses connues",
+              "Une appréciation subjective sans réponses connues"
             ],
             "answer": 2,
             "explanation": "Le vecteur n'est pas une explication. Seule une mesure externe, sur un découpage fixé, dit si la variante aide."
@@ -10858,10 +10858,10 @@
           "quiz": {
             "question": "Qu'a réellement montré le test des trois dos ?",
             "choices": [
-              "Que le SSM a une perplexité plus basse",
-              "Que l'attention est obsolète",
-              "Que hybrid copie les poids du Transformer",
-              "Même forme et causalité, pas une victoire de qualité de langage"
+              "Une meilleure qualité linguistique de l’hybride",
+              "Une équivalence des poids entre les trois dos",
+              "Un entraînement de bout en bout des trois variantes",
+              "La forme et la causalité"
             ],
             "answer": 3,
             "explanation": "Le test fixe un contrat d'interface. La qualité sur un corpus n'est pas dans les asserts."
@@ -10933,10 +10933,10 @@
           "quiz": {
             "question": "Pourquoi patchify ne fait-il pas de ce dépôt un modèle multimodal natif ?",
             "choices": [
-              "Il change une forme, sans données appariées ni entraînement commun",
-              "Parce que les patches sont en couleur",
-              "Parce que le test échoue",
-              "Parce que le SSM l'interdit"
+              "Une conversion de forme ne fournit ni données appariées ni entraînement commun",
+              "Il suffit de renommer les patches en tokens",
+              "La largeur des patches doit seulement être paire",
+              "La causalité interdit tout modèle multimodal"
             ],
             "answer": 0,
             "explanation": "Le test vérifie un réordonnancement de pixels. Il ne vérifie pas qu'un mot et une image ont été appris ensemble."
@@ -10992,7 +10992,7 @@
           "codeSymbol": "run_ablation",
           "tpIds": [],
           "takeaways": [
-            "Seule la première phrase a une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt.",
+            "La comparaison du bigramme à la baseline uniforme possède une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt.",
             "Pourquoi cette étape arrive maintenant : La dernière étape du niveau est une liste négative, et c'est une livraison.",
             "Le fichier à ouvrir à côté du cours est model/experiment.py."
           ],
@@ -11008,13 +11008,13 @@
           "quiz": {
             "question": "Laquelle de ces phrases a le droit d'être dans le README comme un résultat ?",
             "choices": [
-              "Le modèle à concepts dépasse le Transformer",
+              "Le dos hybride dépasse le GPT sur tous les corpus",
               "Le temps interne améliore le raisonnement de 20 %",
-              "Le bigramme est mesuré contre une perplexité uniforme sur une queue non vue",
-              "Le multimodal natif est entraîné dans model/"
+              "Le bigramme est comparé à l’uniforme sur du non-vu",
+              "L’encodeur audio du dépôt est entraîné de bout en bout"
             ],
             "answer": 2,
-            "explanation": "Seule la première phrase a une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt."
+            "explanation": "La comparaison du bigramme à la baseline uniforme possède une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt."
           },
           "activityKind": "python"
         }
@@ -11101,10 +11101,10 @@
           "quiz": {
             "question": "Quel protocole permet de mettre ton hypothèse à l’épreuve ?",
             "choices": [
-              "Choisir la variante après avoir cherché son meilleur score sur test",
-              "Annoncer une capacité sans entraîner les poids",
-              "Changer les données et la largeur dans le même essai",
-              "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût"
+              "Choisir la largeur donnant le meilleur exemple généré",
+              "Comparer des corpus différents à budget différent",
+              "Choisir la plus grande largeur qui tient en RAM",
+              "Comparer à protocole fixé, avec coût et validation"
             ],
             "answer": 3,
             "explanation": "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Écris le résultat qui réfuterait ton hypothèse."
@@ -11176,10 +11176,10 @@
           "quiz": {
             "question": "À quoi comparer la perte de ton GPT personnel ?",
             "choices": [
-              "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction",
-              "À une perplexité publiée avec un autre tokenizer sans conversion",
-              "Au meilleur échantillon choisi après vingt générations",
-              "À la perte train de données déjà mémorisées"
+              "À des baselines sur les mêmes cibles",
+              "À toute loss par token publiée dans un article",
+              "À une baseline dont le tokenizer est différent",
+              "À la seule loss du premier lot d’entraînement"
             ],
             "answer": 0,
             "explanation": "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Dans l’exemple, double la taille du vocabulaire."
@@ -11251,10 +11251,10 @@
           "quiz": {
             "question": "Quelle comparaison permet d’attribuer un effet à la largeur ?",
             "choices": [
-              "Modifier simultanément les données et la profondeur",
-              "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût",
-              "Supprimer les essais qui donnent de mauvais résultats",
-              "Comparer un entraînement complet à un simple forward initialisé"
+              "Changer largeur et corpus pour garder la même loss",
+              "Fixer données, tokenizer et budget, varier la largeur et rapporter le coût",
+              "Choisir un budget différent après avoir vu le test",
+              "Ajuster le tokenizer séparément pour chaque largeur"
             ],
             "answer": 1,
             "explanation": "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer."
@@ -11326,10 +11326,10 @@
           "quiz": {
             "question": "Quand peut-on comparer directement deux pertes par token ?",
             "choices": [
-              "Dès que le second modèle a plus de paramètres",
-              "Quand les deux nombres sont affichés avec trois décimales",
-              "Toujours, même avec une tokenisation différente",
-              "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes"
+              "Même nombre de paramètres, quel que soit le tokenizer",
+              "Même durée d’entraînement, quels que soient les textes",
+              "Même taille de batch, quelle que soit la réduction",
+              "Même tokenizer, données, cibles et réduction"
             ],
             "answer": 3,
             "explanation": "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. Remplace la probabilité 0.25 par 0.125."
@@ -11401,10 +11401,10 @@
           "quiz": {
             "question": "Comment préparer les documents du banc personnel ?",
             "choices": [
-              "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance",
-              "Tirer une nouvelle validation jusqu’à obtenir le score voulu",
-              "Mettre le même livre dans train et test en changeant son nom",
-              "Ajuster le tokenizer sur tout le corpus réservé"
+              "Réserver les groupes et contrôler les doublons",
+              "Séparer au hasard les tokens après création des fenêtres",
+              "Entraîner le tokenizer sur tous les documents réservés",
+              "Affecter les doublons aux deux côtés pour équilibrer"
             ],
             "answer": 0,
             "explanation": "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente."
@@ -11476,10 +11476,10 @@
           "quiz": {
             "question": "Que mettre dans une colonne d’énergie non mesurée ?",
             "choices": [
-              "Le nombre de FLOPs comme s’il s’agissait de joules",
-              "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée",
-              "Zéro pour donner une valeur à toutes les cases",
-              "Le temps de génération utilisé comme une puissance électrique"
+              "Zéro, puisque le modèle est petit",
+              "Non mesurée, avec méthode proposée",
+              "Le temps en secondes rebaptisé énergie",
+              "Une estimation du papier présentée comme mesure locale"
             ],
             "answer": 1,
             "explanation": "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. Répète ce mini-calcul plusieurs fois."
@@ -11551,10 +11551,10 @@
           "quiz": {
             "question": "Quel est le contrat qui rend les trois dos interchangeables ?",
             "choices": [
-              "Ils partagent les mêmes poids",
-              "Ils ont la même perplexité",
-              "forward renvoie (B, T, D) et reste causal, pour les mêmes tailles",
-              "Ils incluent le tokenizer"
+              "Valeurs identiques pour toutes les entrées",
+              "Même loss sans entraînement des variantes",
+              "Un forward de forme (B,T,D) causal aux mêmes dimensions",
+              "Même nombre d’experts dans tous les dos"
             ],
             "answer": 2,
             "explanation": "L'appelant dépend de la forme et de la causalité. Les valeurs et les poids restent propres à chaque kind."
@@ -11626,10 +11626,10 @@
           "quiz": {
             "question": "Que revendique la candidate hybrid de ce dépôt ?",
             "choices": [
-              "Une alternance attention et scan, de forme stable et causale, sans qualité de langage mesurée",
-              "Un état de l'art en français",
-              "Un Mamba officiel plus un ViT",
-              "Un agent outillé"
+              "Alternance causale, sans qualité mesurée",
+              "Une victoire linguistique démontrée sur le GPT",
+              "Un entraînement complet des experts et du scan",
+              "Une réduction garantie de la perplexité à taille égale"
             ],
             "answer": 0,
             "explanation": "L'alternance est dans l'initialisation, la forme et la causalité sont testées. Le reste n'est pas revendiqué."
@@ -11701,10 +11701,10 @@
           "quiz": {
             "question": "Quel entraînement le dépôt ne fait-il pas ?",
             "choices": [
-              "Le comptage du bigramme",
-              "La mise à jour des poids du dos hybrid par rétropropagation",
-              "La descente sur une tête linéaire convexe",
-              "Le calcul du gradient d'entropie croisée"
+              "L’entraînement du GPT NumPy standard",
+              "Le backward entraînant le dos hybride",
+              "Le backward de RoPE dans le GPT NumPy",
+              "L’ajustement LoRA des matrices ciblées"
             ],
             "answer": 1,
             "explanation": "Ces trois derniers ont des tests. Le dos, lui, est un forward initialisé."
@@ -11776,10 +11776,10 @@
           "quiz": {
             "question": "Que faire si une bonne perte accompagne une fuite du futur ?",
             "choices": [
-              "Conserver uniquement la bonne perte dans le rapport",
-              "Présenter le bug comme une nouvelle capacité de raisonnement",
-              "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé",
-              "Supprimer le contrôle de causalité pour terminer le projet"
+              "Conserver la loss car elle est meilleure",
+              "Réduire le contexte sans vérifier les indices",
+              "Corriger la fuite puis refaire les mesures",
+              "Ne publier que les générations les plus convaincantes"
             ],
             "answer": 2,
             "explanation": "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite."
@@ -11851,10 +11851,10 @@
           "quiz": {
             "question": "Sur quoi choisir la nouvelle configuration avant le test final ?",
             "choices": [
-              "Sur le test réservé à chaque nouvel essai",
-              "Sur la phrase la plus jolie parmi de nombreux tirages",
-              "Sur un gain annoncé sans code ni entraînement",
-              "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale"
+              "Le test final, consulté après chaque essai",
+              "La meilleure génération tirée au hasard",
+              "La loss de train uniquement, sans baseline",
+              "Les résultats de validation, en conservant le test pour la fin"
             ],
             "answer": 3,
             "explanation": "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu."
@@ -11933,10 +11933,10 @@
           "quiz": {
             "question": "Quelle remise permet d’examiner le modèle et ton autonomie ?",
             "choices": [
-              "Un compteur de leçons cochées sans code personnel",
-              "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau",
-              "Une capture du meilleur texte sans la recette",
-              "Le corrigé exécuté présenté comme une construction sans aide"
+              "Une capture de la meilleure réponse générée",
+              "Un dossier reproductible et un cas nouveau expliqué",
+              "Une note de quiz seule, sans code ni checkpoint",
+              "Le checkpoint seul, sans tokenizer ni provenance"
             ],
             "answer": 1,
             "explanation": "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Donne seulement le dossier et les commandes à une autre personne."
@@ -12026,10 +12026,10 @@
           "quiz": {
             "question": "Comment le BPE du laboratoire départage-t-il deux paires de même fréquence ?",
             "choices": [
-              "Il tire au hasard une des deux paires",
-              "Il garde toujours la paire la plus à droite",
-              "Il garde la paire la plus petite dans l'ordre des morceaux",
-              "Il refuse d'entraîner tant que les fréquences diffèrent"
+              "La paire rencontrée la dernière dans le texte",
+              "La paire contenant le token le plus long",
+              "La plus petite paire dans l’ordre lexicographique des morceaux",
+              "Un nouveau tirage aléatoire à chaque exécution"
             ],
             "answer": 2,
             "explanation": "La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort."
@@ -12101,10 +12101,10 @@
           "quiz": {
             "question": "Que fait encode si un caractère n'a jamais été vu à l'entraînement du BPE ?",
             "choices": [
-              "Il remplace le caractère par zéro",
-              "Il réentraîne une fusion supplémentaire",
-              "Il ignore le caractère et continue",
-              "Il lève KeyError au lieu d'inventer un identifiant"
+              "Crée silencieusement un nouvel identifiant",
+              "Supprime toujours le caractère inconnu",
+              "Le remplace toujours par l’identifiant zéro",
+              "Lève KeyError"
             ],
             "answer": 3,
             "explanation": "Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu."
@@ -12178,10 +12178,10 @@
           "quiz": {
             "question": "Où est la liste des jeux que ce dépôt accepte de citer ?",
             "choices": [
-              "Dans data/datasets.json, vérifiée par des URL https",
-              "Dans un dossier de fichiers téléchargés et commités",
-              "Sur une page sans licence",
-              "Dans le cache du navigateur du visiteur"
+              "data/datasets.json",
+              "model/data/ids.json",
+              "curriculum_src/teaching.json",
+              "assets/js/version.js"
             ],
             "answer": 0,
             "explanation": "Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés."
@@ -12253,10 +12253,10 @@
           "quiz": {
             "question": "Pourquoi le playground recalcule-t-il les logits après l'arrondi float32 ?",
             "choices": [
-              "Pour augmenter la taille du vocabulaire",
-              "Pour entraîner un pas de plus dans le navigateur",
-              "Pour comparer le JavaScript au même point de départ que les poids servis",
-              "Pour cacher la température"
+              "Supprimer toutes les erreurs numériques du navigateur",
+              "Mesurer la qualité linguistique du checkpoint",
+              "Comparer aux poids réellement servis",
+              "Modifier les logits pour favoriser le texte attendu"
             ],
             "answer": 2,
             "explanation": "Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là."
@@ -12328,10 +12328,10 @@
           "quiz": {
             "question": "Quelle est la place de instructions_fr.json dans ce dépôt ?",
             "choices": [
-              "Une copie d'Alpaca redistribuée",
-              "Le dump de Wikipédia en français",
-              "Un jeu gated à télécharger à la main",
-              "Un petit jeu original pour le cours, pas un corpus externe"
+              "Un corpus externe de conversations sous licence inconnue",
+              "Le jeu final réservé à l’évaluation sans apprentissage",
+              "Une exportation du tokenizer BPE en production",
+              "Un petit jeu original du cours"
             ],
             "answer": 3,
             "explanation": "Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence."
@@ -12403,10 +12403,10 @@
           "quiz": {
             "question": "Quels tokens entrent dans la perte pendant l'ajustement ?",
             "choices": [
-              "Ceux dont le début est dans la réponse, pas dans la question",
-              "Tous les tokens de la ligne",
-              "Seulement le premier token de la question",
-              "Aucun : l'ajustement ne calcule pas de perte"
+              "Les tokens cibles commençant dans la réponse, après décalage",
+              "Tous les tokens du prompt et de la réponse",
+              "Les seuls tokens de la question initiale",
+              "Le dernier token du prompt uniquement"
             ],
             "answer": 0,
             "explanation": "La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière."
@@ -12485,10 +12485,10 @@
           "quiz": {
             "question": "Pourquoi la correction LoRA vaut-elle zéro au premier pas ?",
             "choices": [
-              "Parce que A est une matrice identité",
-              "Parce que B commence à zéro, donc le produit BA est nul",
-              "Parce que le rang est toujours égal à la largeur",
-              "Parce que la base est détruite"
+              "A et B sont tous deux obligatoirement nuls",
+              "B est nul, donc BA est nul",
+              "Les matrices de base ont été effacées",
+              "Le rang choisi empêche tout gradient au premier pas"
             ],
             "answer": 1,
             "explanation": "A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice."
@@ -12565,10 +12565,10 @@
           "quiz": {
             "question": "Que prouve un échantillon de dialogue sur ce petit jeu ?",
             "choices": [
-              "Que le modèle a lu tout Wikipédia",
-              "Que LoRA bat toujours l'ajustement complet",
-              "Que la licence des jeux externes n'a plus d'importance",
-              "Qu'on peut relire une suite tirée du checkpoint ajusté, pas qu'un assistant général existe"
+              "Le modèle est un assistant général fiable",
+              "Le jeu de test est inutile après un bon exemple",
+              "Le modèle répond correctement à tout dialogue nouveau",
+              "Un checkpoint ajusté peut produire une suite"
             ],
             "answer": 3,
             "explanation": "L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté."

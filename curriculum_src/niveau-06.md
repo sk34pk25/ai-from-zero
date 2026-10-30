@@ -32,11 +32,11 @@ model/bench.py est la brique « mesures » du fil rouge. Elle ne prétend pas pr
 @QUESTION
 Les états Adam ajoutent typiquement, par paramètre…
 @CORRECT
-Environ 8 octets si les moyennes sont en float32
+8 octets pour deux états float32
 @WRONG
-- Zéro, parce que l'optimiseur est gratuit
-- La taille du corpus
-- Un token de vocabulaire
+- 4 octets pour un unique état float32
+- 2 octets car Adam impose fp16
+- 0 octet car les gradients remplacent les états
 @EXPLANATION
 m et v sont deux flottants 32 bits. Ils dominent souvent la mémoire d'entraînement, plus que les poids fp16 eux-mêmes.
 @@@
@@ -73,11 +73,11 @@ Le fil rouge ne lance pas de gros GPU. Il documente le calcul pour qu'un essai p
 @QUESTION
 Un modèle qui « ne rentre pas en VRAM » manque de…
 @CORRECT
-Mémoire de travail du GPU, pas forcément de stockage
+Mémoire de travail du GPU, utilisée par le calcul en cours
 @WRONG
-- Place disque, uniquement
-- Tokens dans le vocabulaire
-- Lignes dans le README
+- Capacité du disque de sauvegarde
+- Mémoire du cache du navigateur
+- Nombre d’identifiants dans le vocabulaire
 @EXPLANATION
 La VRAM est le plan de travail. Le disque peut rester libre pendant que le GPU refuse le chargement.
 @@@
@@ -114,11 +114,11 @@ Ces deux fonctions sont le cœur chiffré du niveau 6. Elles alimenteront le tab
 @QUESTION
 Le terme en T² de l'attention vient surtout de…
 @CORRECT
-Les produits entre requêtes et clés, puis entre poids et valeurs
+Les interactions entre paires de positions
 @WRONG
-- La table d'embedding seule
-- Le tokenizer caractère
-- Le nombre de commits
+- La taille de la table d’embeddings
+- Le nombre de pas de l’optimiseur
+- La lecture séquentielle du corpus sur disque
 @EXPLANATION
 QKᵀ et AV parcourent toutes les paires de positions. L'embedding, lui, est linéaire en T.
 @@@
@@ -161,11 +161,11 @@ Le fil rouge ne ajoute pas de dépendance de profiling. La discipline — plusie
 @QUESTION
 Une seule mesure de temps suffit-elle à classer deux modèles ?
 @CORRECT
-Non : on garde plusieurs mesures et on se méfie du premier appel
+Non, plusieurs mesures après échauffement
 @WRONG
-- Oui, si le chiffre a trois décimales
-- Oui, parce que les FLOPs sont aléatoires
-- Non, parce que le temps n'a aucun rapport avec le code
+- Oui, toujours retenir le tout premier appel
+- Oui, si les deux modèles ont la même shape
+- Non, additionner tous les temps sans les rapporter
 @EXPLANATION
 Le temps bruit. La médiane de plusieurs essais, après chauffe, est le minimum honnête. Les FLOPs restent le complément, pas un ennemi.
 @@@
@@ -202,11 +202,11 @@ Les forwards du dépôt acceptent B dans la forme (B, T). Rien n'est codé en du
 @QUESTION
 Doubler le batch, à architecture fixe, augmente surtout…
 @CORRECT
-La mémoire des activations et le coût du pas, pas le nombre de paramètres
+Activations et calcul du pas
 @WRONG
-- Le nombre de paramètres, qui double aussi
-- La taille du vocabulaire
-- Uniquement le disque de sauvegarde
+- Nombre de poids du modèle
+- Largeur des vecteurs d’embedding
+- Taille du vocabulaire du tokenizer
 @EXPLANATION
 Les poids ne dépendent pas du batch. Les activations et le temps du pas, si.
 @@@
@@ -243,11 +243,11 @@ Le laboratoire calcule en float64 pour que les tests soient stables. Le tableau 
 @QUESTION
 bf16, comparé à fp16, est surtout apprécié parce que…
 @CORRECT
-Sa plage d'exposant est large, proche de fp32, ce qui déborde moins
+Une plage d’exposant proche de fp32
 @WRONG
-- Il occupe 4 octets
-- Il supprime le besoin d'un optimiseur
-- Il remplace le tokenizer
+- Une mantisse plus précise que celle de fp32
+- Une absence garantie d’erreur d’arrondi
+- Une division par deux du nombre de paramètres
 @EXPLANATION
 bf16 sacrifie de la précision fine mais garde de grandes magnitudes. fp16 est plus précis localement et déborde plus vite.
 @@@
@@ -286,11 +286,11 @@ La boucle de model/train.py met à jour à chaque appel, sans accumulation. Si t
 @QUESTION
 L'accumulation de gradient sert à…
 @CORRECT
-Simuler un plus gros batch sans garder tous les exemples en mémoire
+Simuler un gros batch par des gradients de micro-lots normalisés
 @WRONG
-- Augmenter le nombre de paramètres
-- Supprimer la loss
-- Remplacer le masque causal
+- Multiplier le nombre de poids sans RAM supplémentaire
+- Éviter tous les backward des micro-lots
+- Réutiliser toujours le même exemple sans normalisation
 @EXPLANATION
 On additionne des pentes de petits paquets. Les poids ne deviennent pas plus nombreux.
 @@@
@@ -330,11 +330,11 @@ Aucune recomputation n'est cachée dans TinyGPT. La leçon sert à lire un artic
 @QUESTION
 Le checkpointing d'activations échange…
 @CORRECT
-De la mémoire contre du calcul refait pendant le backward
+Moins de mémoire, plus de recalcul
 @WRONG
-- De la qualité contre un vocabulaire plus petit
-- Des poids contre des tokens
-- Le test contre le train
+- Moins de calcul, plus de poids stockés
+- Plus de précision, moins de données
+- Moins de paramètres, plus d’exemples par corpus
 @EXPLANATION
 On jette des intermédiaires et on les recalcule. Le vocabulaire n'est pas en cause.
 @@@
@@ -372,11 +372,11 @@ BYTES dans model/bench.py inclut int8 et int4. C'est le crochet du fil rouge : l
 @QUESTION
 La quantification en int4 vise d'abord…
 @CORRECT
-À réduire la mémoire des poids à l'inférence, au prix d'une perte de précision à mesurer
+Réduire la mémoire des poids
 @WRONG
-- À augmenter la fenêtre sans aucun coût
-- À remplacer l'optimiseur Adam pendant l'entraînement, gratuitement
-- À supprimer le besoin d'un test
+- Garantir une perplexité plus faible
+- Réduire la taille du vocabulaire
+- Supprimer les activations pendant l’inférence
 @EXPLANATION
 On compresse les poids. La qualité se mesure après. Ce n'est ni une fenêtre magique ni un test optionnel.
 @@@
@@ -413,11 +413,11 @@ Pas de second modèle distillé dans model/. Le fil rouge note l'idée et prépa
 @QUESTION
 En distillation, l'élève apprend notamment…
 @CORRECT
-La distribution produite par un modèle professeur
+Les probabilités du professeur, en plus des éventuelles cibles
 @WRONG
-- Les poids exacts, copiés case par case, sans entraînement
-- Uniquement le nom du professeur
-- La taille du disque du professeur
+- Les seuls noms des couches du professeur
+- Les documents du test final du professeur
+- La mémoire RAM réservée par le professeur
 @EXPLANATION
 L'élève imite des sorties, pas le nom du fichier. Copier les poids est impossible si les formes diffèrent.
 @@@
@@ -455,11 +455,11 @@ Aucun tensor.cuda() dans le dépôt. Le fil rouge reste exécutable sur une mach
 @QUESTION
 Le GPU est particulièrement utile pour…
 @CORRECT
-De gros produits de matrices réguliers
+Des produits matriciels réguliers
 @WRONG
-- Décider du prochain if Python token par token, uniquement
-- Remplacer le disque
-- Garantir une meilleure perplexité
+- La navigation dans des dossiers Git
+- Les petites branches Python exécutées une à une
+- Le téléchargement des corpus sur le réseau
 @EXPLANATION
 Il parallélise le calcul dense. Il ne rend pas une loss meilleure par sa seule présence, et il n'enlève pas le coût des toutes petites étapes.
 @@@
@@ -496,15 +496,15 @@ Ajoute une troisième ligne de meilleure qualité mais de RAM énorme. Le tri la
 @EXERCISE
 Propose trois lignes honnêtes pour le fil rouge : bigramme, TinyGPT absolu, TinyGPT RoPE. Quelle unique colonne changer entre les deux TinyGPT pour que la comparaison parle de RoPE ?
 @BUILD
-Le tableau compare qualité, temps et RAM réellement mesurés. L'atelier mesure le GPT standard contre le bigramme. RoPE reste un forward : sa vitesse peut être mesurée, sa qualité après entraînement reste non évaluée dans ce dépôt.
+Le tableau compare qualité, temps et RAM réellement mesurés. L'atelier mesure le GPT standard contre le bigramme. RoPE est entraînable dans le GPT NumPy. model/benchmark_modern.py compare sa loss de validation à celle des positions absolues, sur les mêmes graines et données. Cette petite mesure ne démontre pas un gain général ; le dos hybride reste limité à ses tests de forward.
 @QUESTION
 Pour attribuer un gain à RoPE, il faut…
 @CORRECT
-Ne changer que le mode de position entre les deux lignes comparées
+Changer seulement le mode de position
 @WRONG
-- Changer en même temps la profondeur, le vocabulaire et la graine
-- Trier uniquement par le nom
-- Mesurer la qualité sur deux corpus différents
+- Changer position et largeur pour garder le même temps
+- Choisir un corpus différent pour chaque variante
+- Comparer la meilleure graine de chaque configuration
 @EXPLANATION
 Une comparaison utile isole un facteur. Le tri n'enlève pas cette obligation.
 @CODEFILE

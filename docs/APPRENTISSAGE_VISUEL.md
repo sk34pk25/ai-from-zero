@@ -5,7 +5,7 @@ Les laboratoires des leçons montrent des exemples miniatures calculés en JavaS
 ## Une lecture en quatre gestes
 
 1. Regarde les formes et les valeurs du schéma.
-2. Avance avec **Étape suivante**, recule ou rejoue. La ligne NumPy active suit l’étape. Les curseurs recalculent les valeurs affichées.
+2. Avance avec **Calcul suivant**, recule ou rejoue. La ligne NumPy active suit l’étape. Les curseurs recalculent les valeurs affichées.
 3. Ouvre **À toi de prédire** lorsqu’une question est proposée. Une réponse erronée explique l’opération à revoir.
 4. Retrouve la fonction du dépôt avec **Code de référence**, puis réalise l’exercice Python du cours.
 
@@ -20,7 +20,8 @@ Sur mobile et tablette, **Calcul et schéma** et **Code de l’étape** partagen
 | Forward et backward | Graphe numérique, dérivées locales, remontée du gradient | 1.5, 1.7–1.8, 1.10–1.12 |
 | Fiabilité des calculs | Convention ReLU en zéro, divergence visible, axes ajustés | 1.6, 1.13–1.14 |
 | Texte et BPE | Unicode, octets, vocabulaire fixe, fréquences, rangs et reconstruction | 2.1, 2.3–2.8, 13.1–13.2 |
-| Probabilités et génération | Cross-entropy, perplexité, température, top-k et intervalles de tirage | 1.9, 3.6–3.10 |
+| Erreur de régression | Carré de chaque écart et moyenne du lot | 1.9 |
+| Probabilités et génération | Cross-entropy, perplexité, température, top-k et intervalles de tirage | 3.6–3.10 |
 | Attention | Q/K/V, scores, masque, probabilités et mélange des valeurs | 4.1–4.7 |
 | Bloc Transformer | Résidu, normalisation, FFN et trajet de formes | 4.8–4.14 |
 | Variantes modernes | RoPE, RMSNorm, portes, têtes groupées, cache KV, poids partagés, initialisation | 5.1–5.10 |

@@ -35,11 +35,11 @@ Crée le dossier de travail du fil rouge. Dans ce dépôt, le laboratoire vit d�
 @QUESTION
 L'entraînement s'arrête parce que le modèle « ne tient pas en mémoire », alors que le disque a encore de la place. Quel composant est saturé ?
 @CORRECT
-La RAM ou la VRAM, mémoire de travail du calcul
+La RAM ou la VRAM, où se trouvent les données du calcul
 @WRONG
-- Le clavier, qui ne transmet plus les caractères
-- Uniquement le stockage, parce que les poids sont des fichiers
-- Le câble réseau, parce qu'un modèle exige Internet en permanence
+- Le disque qui conserve les checkpoints
+- Le cache Git qui conserve les commits
+- Le réseau qui télécharge les dépendances
 @EXPLANATION
 Les poids utilisés pour calculer et les résultats intermédiaires doivent être dans la mémoire de travail. Le stockage conserve les fichiers, il ne remplace pas la RAM au moment du calcul.
 @@@
@@ -81,9 +81,9 @@ Depuis le dossier ai-lab, quel chemin relatif désigne le fichier notes/machine.
 @CORRECT
 notes/machine.txt
 @WRONG
-- /notes/machine.txt, qui part de la racine du système
-- machine.txt, qui désigne un fichier directement dans ai-lab
-- RAM/machine.txt, qui mélange matériel et fichiers
+- ai-lab/notes/machine.txt
+- ../notes/machine.txt
+- machine.txt/notes
 @EXPLANATION
 Un chemin relatif se lit depuis le dossier courant. notes/machine.txt descend dans notes puis nomme le fichier. Le slash initial en ferait un chemin absolu.
 @@@
@@ -123,11 +123,11 @@ Toutes les commandes du dépôt, y compris pytest, se lancent depuis la racine d
 @QUESTION
 Quelle commande change le dossier courant ?
 @CORRECT
-cd, qui change le dossier courant
+cd, pour changer le dossier courant
 @WRONG
-- ls, qui affiche le contenu sans se déplacer
-- pwd, qui affiche seulement où tu es
-- print, qui n'est pas une commande du terminal
+- pwd, pour choisir un dossier
+- ls, pour entrer dans un dossier
+- mkdir, pour entrer dans un dossier existant
 @EXPLANATION
 cd signifie change directory. ls regarde, pwd situe, cd déplace le « ici » des commandes suivantes.
 @@@
@@ -163,11 +163,11 @@ Note l'interpréteur qui fonctionne sur ta machine. Le fichier atelier/INSTALLAT
 @QUESTION
 À quoi sert l'interpréteur Python ?
 @CORRECT
-À lire et exécuter les instructions écrites en Python
+Lire puis exécuter les instructions du programme Python
 @WRONG
-- À augmenter la quantité de RAM disponible
-- À créer un modèle déjà entraîné
-- À remplacer le dossier du projet
+- Installer automatiquement les dépendances
+- Traduire le français en code Python
+- Transformer chaque programme en fichier de données
 @EXPLANATION
 L'interpréteur est le programme qui exécute le texte Python. Il ne devine pas un modèle et ne modifie pas le matériel.
 @CODEFILE
@@ -209,11 +209,11 @@ Ce cycle écrire-exécuter est celui de pytest à la fin du dépôt : chaque bri
 @QUESTION
 Que fait print en Python ?
 @CORRECT
-Il affiche une valeur puis passe à la ligne
+Afficher une valeur et un saut de ligne
 @WRONG
-- Il entraîne un réseau de neurones
-- Il enregistre automatiquement un fichier
-- Il réserve de la VRAM
+- Renvoyer une valeur à la fonction appelante
+- Enregistrer une valeur dans un fichier
+- Convertir une valeur en entier
 @EXPLANATION
 print n'apprend rien et n'écrit pas un fichier. Il envoie une représentation de la valeur vers la sortie du terminal.
 @CODEFILE
@@ -257,11 +257,11 @@ Les configurations du laboratoire sont des nombres et des chaînes explicites, j
 @QUESTION
 Dans n_layers = 4, que représente n_layers ?
 @CORRECT
-Le nom d'une variable qui désigne l'entier 4
+Un nom associé à l’entier 4
 @WRONG
-- Une fonction qui crée quatre couches
-- Une erreur de syntaxe obligatoire
-- Le nom d'un fichier
+- Une chaîne qui contient le chiffre 4
+- Une comparaison entre un nom et un entier
+- Une fonction appelée quatre fois
 @EXPLANATION
 Le nom est à gauche du =, la valeur à droite. n_layers désigne donc l'entier 4 tant qu'on ne le réaffecte pas.
 @@@
@@ -302,11 +302,11 @@ model/transformer.py lève ValueError quand une configuration est impossible, pa
 @QUESTION
 Avec loss = 1.0, que vaut l'expression loss < 1.0 ?
 @CORRECT
-False, car 1.0 n'est pas strictement inférieur à 1.0
+False, car les valeurs sont égales
 @WRONG
-- True, parce que 1.0 est le seuil
-- 1.0, parce qu'une comparaison renvoie le nombre
-- Une erreur, parce qu'on ne peut pas comparer un float
+- True, car le seuil est atteint
+- 1.0, car la valeur est conservée
+- Une erreur, car les flottants ne se comparent pas
 @EXPLANATION
 L'opérateur < est strict. 1.0 n'est pas inférieur à 1.0, donc l'expression vaut False et le bloc if est sauté.
 @@@
@@ -344,11 +344,11 @@ Les boucles d'entraînement de model/mlp.py et model/train.py répètent exactem
 @QUESTION
 Combien de tours exécute range(4) ?
 @CORRECT
-4 tours, pour les valeurs 0, 1, 2 et 3
+4 tours : 0, 1, 2, 3
 @WRONG
-- 3 tours, parce qu'on commence à 1
-- 5 tours, parce que la borne est incluse
-- Un nombre aléatoire de tours
+- 5 tours : 0, 1, 2, 3, 4
+- 4 tours : 1, 2, 3, 4
+- 3 tours : 1, 2, 3
 @EXPLANATION
 range(4) s'arrête avant 4. Les valeurs sont 0, 1, 2 et 3, donc quatre tours.
 @@@
@@ -387,11 +387,11 @@ Chaque fichier de model/ expose des fonctions ou des méthodes appelables par le
 @QUESTION
 À quoi sert return dans une fonction Python ?
 @CORRECT
-À renvoyer une valeur à l'appelant et quitter la fonction
+Renvoyer une valeur et quitter la fonction
 @WRONG
-- À répéter la fonction indéfiniment
-- À afficher obligatoirement du texte
-- À enregistrer un fichier sur le disque
+- Afficher une valeur puis poursuivre la fonction
+- Revenir au début de la boucle courante
+- Enregistrer la valeur dans une variable globale
 @EXPLANATION
 return transmet une valeur. L'affichage est un autre geste, print, qui ne remplace pas la valeur renvoyée.
 @@@
@@ -431,11 +431,11 @@ CharTokenizer, dans model/tokenizer.py, est un dictionnaire caractère vers iden
 @QUESTION
 Quel est l'index du premier élément d'une liste Python ?
 @CORRECT
-0, le premier index d'une liste Python
+0, pour le premier élément
 @WRONG
-- 1, comme dans le comptage quotidien
-- -1, qui désigne en réalité le dernier élément
-- La longueur de la liste
+- 1, pour le premier élément
+- -1, pour le premier élément
+- La longueur de la liste, pour son premier élément
 @EXPLANATION
 Les index commencent à 0. -1 est autorisé, mais il pointe vers le dernier élément, pas vers le premier.
 @@@
@@ -474,11 +474,11 @@ Le dépôt est déjà découpé : model/tokenizer.py, model/bigram.py, model/tra
 @QUESTION
 Un module Python est principalement…
 @CORRECT
-Un fichier de code que l'on peut importer
+Un fichier de code dont les définitions sont importables
 @WRONG
-- Une barrette de RAM
-- Un modèle déjà entraîné
-- Une commande du terminal comme cd
+- Une fonction toujours exécutée à l’import
+- Un environnement de dépendances isolé
+- Un tableau regroupant plusieurs variables
 @EXPLANATION
 Le module est l'unité de code réutilisable. L'import le charge pour utiliser ses fonctions sans les recopier.
 @@@
@@ -515,11 +515,11 @@ Les tests du dépôt sont le journal automatisé. Quand pytest échoue, la derni
 @QUESTION
 Quel réflexe est le plus utile devant une traceback ?
 @CORRECT
-Lire le type, le message et la ligne, puis tester une seule hypothèse
+Lire l’erreur, puis tester une hypothèse
 @WRONG
-- Modifier dix lignes au hasard avant de relire
-- Réinstaller le système d'exploitation
-- Ignorer la dernière ligne et ne lire que la première
+- Changer toutes les lignes citées ensemble
+- Supprimer l’assertion qui interrompt le calcul
+- Relancer sans regarder le message
 @EXPLANATION
 La dernière ligne porte le type utile. Une seule modification à la fois garde la cause identifiable.
 @@@
@@ -557,11 +557,11 @@ Le .gitignore du dépôt exclut .venv, __pycache__, node_modules et les rapports
 @QUESTION
 À quoi sert principalement un commit ?
 @CORRECT
-À enregistrer un état cohérent du projet avec un message
+Enregistrer un état du projet
 @WRONG
-- À exécuter Python
-- À augmenter la VRAM
-- À publier le site sans historique
+- Envoyer automatiquement le projet sur GitHub
+- Installer les versions de dépendances utilisées
+- Revenir automatiquement à la version précédente
 @EXPLANATION
 Le commit fige un ensemble de fichiers. L'exécution et la publication sont d'autres commandes, lancées plus tard, parfois à partir de cet état.
 @@@
@@ -599,11 +599,11 @@ requirements.txt fixe le contrat du laboratoire : numpy et pytest. Les tests de 
 @QUESTION
 Pourquoi isoler les dépendances dans un environnement virtuel ?
 @CORRECT
-Pour que les versions du projet ne cassent pas les autres projets
+Éviter que les versions d’un projet affectent les autres
 @WRONG
-- Pour accélérer la connexion Internet
-- Pour entraîner un modèle sans données
-- Pour remplacer Git
+- Réserver davantage de RAM au programme
+- Partager les mêmes paquets entre tous les projets
+- Enregistrer les données d’entraînement dans Git
 @EXPLANATION
 L'environnement virtuel sépare les paquets. Il n'augmente pas la carte réseau et ne versionne pas le code : c'est le rôle de Git.
 @@@
@@ -642,11 +642,11 @@ model/stats.py est exactement cette étape du fil rouge : lire une colonne, la c
 @QUESTION
 Que décrit l'attribut shape d'un tableau NumPy ?
 @CORRECT
-Les dimensions du tableau, par exemple (2, 3)
+Les dimensions de chaque axe, comme deux lignes et trois colonnes
 @WRONG
-- Le nom de la variable
-- La couleur d'un pixel
-- Le message de la dernière erreur
+- Le nombre d’octets de chaque valeur
+- La somme des valeurs du tableau
+- Le nombre de valeurs strictement positives
 @EXPLANATION
 shape est un tuple d'entiers. Il dit comment les nombres sont rangés, pas comment la variable s'appelle.
 @CODEFILE
@@ -690,11 +690,11 @@ model/mathutil.py contient déjà softmax, qui est un exp normalisé, et cross_e
 @QUESTION
 Quelle affirmation décrit le mieux exp et log ?
 @CORRECT
-Ce sont presque des fonctions inverses : log(exp(x)) revient à x
+log(exp(x)) retrouve x, aux arrondis près
 @WRONG
-- exp transforme toujours un nombre en probabilité déjà normalisée
-- log n'est défini que pour les entiers négatifs
-- Les deux servent uniquement à tracer des dossiers
+- exp(x) retrouve log(x), pour tout réel
+- log(x) est défini pour tout réel
+- exp(x) change de signe quand x devient négatif
 @EXPLANATION
 exp et log s'annulent l'un l'autre sur leur domaine. exp seul ne somme pas à 1 : il faut encore diviser, c'est le travail de softmax.
 @@@
@@ -734,11 +734,11 @@ model/attention.py calcule query @ key.T. Ce n'est que ce produit, appliqué à 
 @QUESTION
 Combien de composantes a le vecteur [4, 7, 2] ?
 @CORRECT
-3, le nombre de composantes du vecteur
+3 composantes
 @WRONG
-- 2, parce qu'on ignore le dernier nombre
-- 13, la somme des composantes
-- 4, parce qu'on compte à partir de 1 et qu'on ajoute une case
+- 2 composantes
+- 4 composantes
+- 13 composantes
 @EXPLANATION
 La dimension est le nombre de composantes, ici trois. La somme est une autre quantité, pas la dimension.
 @@@
@@ -778,11 +778,11 @@ Dans TinyGPT, les projections wq, wk et wv sont des matrices de formes explicite
 @QUESTION
 Quelle est la shape de la matrice [[1, 2, 3], [4, 5, 6]] ?
 @CORRECT
-(2, 3) : deux lignes et trois colonnes
+(2, 3), lignes puis colonnes
 @WRONG
-- (3, 2) : trois lignes et deux colonnes
-- (6,) : six nombres sur un seul axe
-- (2, 2), parce qu'une matrice est toujours carrée
+- (3, 2), colonnes puis lignes
+- (6,), car il y a six nombres
+- (2, 2), car il y a deux listes
 @EXPLANATION
 On compte d'abord les lignes, puis les colonnes. Il y a deux listes internes de trois nombres, donc (2, 3).
 @@@
@@ -821,11 +821,11 @@ BigramModel.probabilities divise chaque ligne de comptes par sa somme, précisé
 @QUESTION
 Une distribution de probabilités discrète valide, c'est…
 @CORRECT
-Des nombres positifs ou nuls qui somment à 1
+Des valeurs non négatives de somme 1
 @WRONG
-- N'importe quels scores, y compris négatifs
-- Une seule valeur toujours égale à 100
-- La shape d'une matrice
+- Des valeurs toutes inférieures à 1, quelle que soit leur somme
+- Des scores quelconques dont la somme vaut 0
+- Des valeurs positives de somme égale à la taille du vocabulaire
 @EXPLANATION
 Chaque issue reçoit une masse entre 0 et 1, et la masse totale vaut 1. Les logits ne respectent pas encore cette contrainte.
 @@@
@@ -866,10 +866,10 @@ model/mathutil.py fournit numerical_derivative. Le test test_derivative_matches_
 @QUESTION
 Une dérivée positive de la loss par rapport à un poids indique surtout que…
 @CORRECT
-Augmenter un peu ce poids augmente la loss
+Une petite hausse du poids augmente la loss
 @WRONG
-- Le poids doit forcément être mis à zéro
-- Le disque est plein
-- La dérivée est une probabilité
+- Une petite hausse du poids diminue la loss
+- Le poids doit forcément être positif
+- La loss est forcément supérieure à zéro
 @EXPLANATION
 Le signe positif veut dire « ça monte ». La descente de gradient ira donc dans l'autre sens. La dérivée n'est pas bornée entre 0 et 1.

@@ -1817,3 +1817,18 @@ main[tabindex="-1"]:focus { outline: none; }
   .path-progress-grid { grid-template-columns:minmax(0,1fr); }
   .lesson-contents button { flex:1 1 8rem; }
 }
+
+/* Les preuves pratiques gardent un ordre de lecture identique à toutes les tailles. */
+.assessment-selector label, .assessment-review label { display: grid; gap: .4rem; margin-block: .8rem; }
+.assessment-selector select, .assessment-selector input, .assessment-review select, .assessment-review input, .assessment-review textarea { width: 100%; min-width: 0; max-width: 100%; }
+.assessment-workspace > label { display: grid; gap: .5rem; margin-block: 1rem; }
+.assessment-workspace textarea { width: 100%; min-width: 0; }
+.assessment-workspace fieldset, .assessment-review { min-width: 0; margin-block: 1rem; }
+.assessment-workspace button, .assessment-history-link { margin: .3rem .4rem .3rem 0; }
+.assessment-history-link { display: block; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.assessment-help { max-height: 24rem; overflow: auto; }
+.exercise-history { margin-block: 1rem; }
+@media (max-width: 480px) {
+  .assessment-workspace button { width: 100%; margin-inline: 0; }
+  .assessment-review { padding-inline: .6rem; }
+}

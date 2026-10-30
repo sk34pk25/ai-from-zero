@@ -1,4 +1,5 @@
 /** Progression locale. Le schéma est versionné pour pouvoir migrer plus tard. */
+import { normalizeExerciseResult } from "./exercise-result.js";
 
 export const PROGRESS_KEY = "afz-progress";
 
@@ -27,7 +28,7 @@ export function normalizeProgress(raw) {
   if (raw?.exercises && typeof raw.exercises === "object" && !Array.isArray(raw.exercises)) {
     for (const [id, row] of Object.entries(raw.exercises)) {
       if (typeof id !== "string" || !row || typeof row.ok !== "boolean") continue;
-      exercises[id] = { ok: row.ok };
+      exercises[id] = normalizeExerciseResult(row);
     }
   }
   return { v: 1, done, quizzes, exercises };

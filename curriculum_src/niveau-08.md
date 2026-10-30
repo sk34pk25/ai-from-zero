@@ -33,11 +33,11 @@ La brique de départ du fil rouge est cette boucle. selective_scan la générali
 @QUESTION
 Pourquoi une récurrence coûte moins que l'attention quand T grandit ?
 @CORRECT
-Elle met à jour un état de taille fixe, sans comparer toutes les paires
+L’état garde une taille fixe au lieu de former toutes les paires
 @WRONG
-- Elle relit toute la séquence à chaque pas
-- Elle supprime le masque causal
-- Elle stocke une matrice T par T
+- Elle mémorise chaque paire dans un cache carré
+- Elle supprime tous les paramètres appris
+- Elle traite toujours moins de tokens que le Transformer
 @EXPLANATION
 Le travail par pas est proportionnel à la taille de l'état, pas au nombre de paires. La mémoire du passé est cet état, pas une matrice d'attention.
 @@@
@@ -76,11 +76,11 @@ Le dos SSM du fil rouge appelle ce scan dans _ssm. L'état n'est pas renvoyé pa
 @QUESTION
 Dans selective_scan, que doit valoir a pour qu'un état oubli un peu le passé ?
 @CORRECT
-Des composantes négatives, afin que exp(delta * a) soit inférieur à 1
+a négatif, donc facteur d’oubli inférieur à 1
 @WRONG
-- Des composantes positives pour amplifier le passé
-- La même matrice que l'attention
-- Un entier de vocabulaire
+- a positif, donc facteur d’oubli inférieur à 1
+- a nul, donc oubli complet à chaque pas
+- a égal à 1, donc état indépendant du passé
 @EXPLANATION
 delta est positif. Multiplié par un a négatif, l'exposant est négatif et le facteur d'oubli est dans (0, 1).
 @@@
@@ -119,11 +119,11 @@ La brique « SSM » du site s'allume à l'étape 8.7, quand ce scan est devenu s
 @QUESTION
 Que représente h dans le SSM de ce cours ?
 @CORRECT
-La mémoire interne mise à jour à chaque pas, pas la prédiction du prochain token
+L’état interne mis à jour
 @WRONG
-- Le vocabulaire du tokenizer
-- La matrice d'attention T par T
-- La loss d'entraînement
+- La distribution finale sur les tokens
+- Le nombre de têtes de requêtes
+- Le corpus complet conservé sans compression
 @EXPLANATION
 La prédiction, plus tard, se lit sur une tête. h est l'état du scan, une mémoire comprimée du passé.
 @@@
@@ -163,11 +163,11 @@ Le fil rouge garde la forme récurrente, pas une convolution CUDA. parallel_affi
 @QUESTION
 Quand un SSM peut-il être remplacé par une convolution à noyau fixe ?
 @CORRECT
-Quand ses coefficients ne dépendent pas de l'entrée
+Quand les coefficients ne varient pas avec le contenu d’entrée
 @WRONG
-- Quand le masque causal est retiré
-- Quand on ajoute un routeur MoE
-- Quand le vocabulaire dépasse 50 000
+- Quand les coefficients dépendent de chaque entrée
+- Dès que le scan conserve la causalité
+- Seulement quand le contexte contient un seul token
 @EXPLANATION
 Le noyau est la liste des puissances des coefficients. S'ils varient avec x, il n'y a plus un seul noyau à précalculer.
 @@@
@@ -207,11 +207,11 @@ Le fil rouge expose parallel_affine pour que tu puisses remplacer une boucle par
 @QUESTION
 Que garantit l'égalité parallel_affine et sequential_affine ?
 @CORRECT
-Que le regroupement des pas affines ne change pas l'état calculé
+Le même état malgré le regroupement
 @WRONG
-- Que l'attention est inutile dans tous les cas
-- Que le modèle est entraîné
-- Que a doit être une matrice T par T
+- Les mêmes probabilités qu’un Transformer entraîné
+- Une accélération garantie dans une boucle Python
+- L’absence d’état à transmettre entre les segments
 @EXPLANATION
 Les deux fonctions calculent h_t = a_t h_{t-1} + b_t. Le test fixe cette égalité, pas une qualité de langage.
 @@@
@@ -251,11 +251,11 @@ Le dos hybride et le dos SSM utilisent cette sélectivité dans _ssm. La brique 
 @QUESTION
 Qu'est-ce qui rend le scan du laboratoire sélectif ?
 @CORRECT
-b, c et delta dépendent du contenu, donc le pas change avec l'entrée
+b, c et delta dépendent de l’entrée
 @WRONG
-- a est une matrice d'attention
-- Le vocabulaire est recalculé à chaque token
-- Le masque causal est retiré
+- Le vocabulaire est trié selon les fréquences
+- Le nombre d’experts change à chaque couche
+- Le scan choisit uniquement le dernier token
 @EXPLANATION
 La sélectivité est la dépendance des coefficients à l'entrée. Le scan reste causal : on ne lit pas le futur.
 @@@
@@ -294,11 +294,11 @@ La brique « SSM » du parcours s'allume ici, à l'étape 8.7. Elle désigne ce 
 @QUESTION
 Que contient exactement le dos kind="ssm" de ce dépôt ?
 @CORRECT
-Un scan sélectif résiduel, sans convolution courte ni kernel CUDA
+Un scan sélectif avec résidu, sans convolution courte ni kernel CUDA
 @WRONG
-- Un Transformer complet avec RoPE
-- Le code officiel de Mamba, poids compris
-- Un routeur MoE à la place de l'état
+- Une reproduction complète avec kernel CUDA
+- Une attention globale sans état récurrent
+- Une convolution courte suivie d’un MoE entraîné
 @EXPLANATION
 C'est une maquette pédagogique. La forme et la causalité sont testées, pas la parité avec un article.
 @@@
@@ -335,11 +335,11 @@ Le fil rouge ne supprime pas l'attention. Il la laisse disponible comme kind="tr
 @QUESTION
 Quel rappel l'attention dans la fenêtre fait-elle qu'un état de taille fixe ne garantit pas ?
 @CORRECT
-Relire une position précise encore présente dans la fenêtre
+Relire une position de la fenêtre
 @WRONG
-- Prédire sans aucun paramètre
-- Ignorer le masque causal
-- Réduire la RAM des poids à zéro
+- Conserver tout le passé exactement sans limite
+- Garantir une meilleure loss sans entraînement
+- Accéder à des documents externes sans retrieval
 @EXPLANATION
 L'état comprime. L'attention, dans sa fenêtre, conserve l'accès aux vecteurs passés. Hors fenêtre, elle aussi oublie.
 @@@
@@ -376,10 +376,10 @@ Le projet du niveau est ce dos interchangeable. L'étape 12.8 s'appuiera dessus 
 @QUESTION
 Dans ce dépôt, que partagent transformer, ssm et hybrid ?
 @CORRECT
-La forme de sortie (B, T, D) et la causalité, pas les valeurs
+Le contrat de sortie (B,T,D) et la causalité, sans égalité des valeurs
 @WRONG
-- Les mêmes poids et les mêmes sorties
-- Un routeur top-k commun
-- L'absence de résidu
+- Les valeurs de sortie exactement identiques
+- Le même nombre de paramètres pour toute configuration
+- La même qualité linguistique après entraînement
 @EXPLANATION
 Le test fixe la forme et l'absence d'effet du futur sur la position 0. Les fonctions restent différentes.

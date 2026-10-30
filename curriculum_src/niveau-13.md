@@ -33,11 +33,11 @@ Le fil rouge de ce niveau remplace, quand c'est utile, le vocabulaire caractère
 @QUESTION
 Comment le BPE du laboratoire départage-t-il deux paires de même fréquence ?
 @CORRECT
-Il garde la paire la plus petite dans l'ordre des morceaux
+La plus petite paire dans l’ordre lexicographique des morceaux
 @WRONG
-- Il tire au hasard une des deux paires
-- Il garde toujours la paire la plus à droite
-- Il refuse d'entraîner tant que les fréquences diffèrent
+- La paire rencontrée la dernière dans le texte
+- La paire contenant le token le plus long
+- Un nouveau tirage aléatoire à chaque exécution
 @EXPLANATION
 La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort.
 @@@
@@ -82,11 +82,11 @@ Le run publié écrit model/data/bpe.json quand le BPE est retenu. Le rapport da
 @QUESTION
 Que fait encode si un caractère n'a jamais été vu à l'entraînement du BPE ?
 @CORRECT
-Il lève KeyError au lieu d'inventer un identifiant
+Lève KeyError
 @WRONG
-- Il remplace le caractère par zéro
-- Il réentraîne une fusion supplémentaire
-- Il ignore le caractère et continue
+- Crée silencieusement un nouvel identifiant
+- Supprime toujours le caractère inconnu
+- Le remplace toujours par l’identifiant zéro
 @EXPLANATION
 Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu.
 @CODEFILE
@@ -129,11 +129,11 @@ Prépare tes documents avec atelier/preparer.py, puis conserve train.txt, valida
 @QUESTION
 Où est la liste des jeux que ce dépôt accepte de citer ?
 @CORRECT
-Dans data/datasets.json, vérifiée par des URL https
+data/datasets.json
 @WRONG
-- Dans un dossier de fichiers téléchargés et commités
-- Sur une page sans licence
-- Dans le cache du navigateur du visiteur
+- model/data/ids.json
+- curriculum_src/teaching.json
+- assets/js/version.js
 @EXPLANATION
 Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés.
 @CODEFILE
@@ -184,11 +184,11 @@ Le même export existe pour le checkpoint de dialogue, data/chat_browser.json, q
 @QUESTION
 Pourquoi le playground recalcule-t-il les logits après l'arrondi float32 ?
 @CORRECT
-Pour comparer le JavaScript au même point de départ que les poids servis
+Comparer aux poids réellement servis
 @WRONG
-- Pour augmenter la taille du vocabulaire
-- Pour entraîner un pas de plus dans le navigateur
-- Pour cacher la température
+- Supprimer toutes les erreurs numériques du navigateur
+- Mesurer la qualité linguistique du checkpoint
+- Modifier les logits pour favoriser le texte attendu
 @EXPLANATION
 Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là.
 @CODEFILE
@@ -232,11 +232,11 @@ L'étape suivante masque la perte sur la question. Le plan d'entraînement peut 
 @QUESTION
 Quelle est la place de instructions_fr.json dans ce dépôt ?
 @CORRECT
-Un petit jeu original pour le cours, pas un corpus externe
+Un petit jeu original du cours
 @WRONG
-- Une copie d'Alpaca redistribuée
-- Le dump de Wikipédia en français
-- Un jeu gated à télécharger à la main
+- Un corpus externe de conversations sous licence inconnue
+- Le jeu final réservé à l’évaluation sans apprentissage
+- Une exportation du tokenizer BPE en production
 @EXPLANATION
 Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence.
 @@@
@@ -273,11 +273,11 @@ gpt_train.py --plan lit d'abord les étapes pretrain, puis une étape sft qui po
 @QUESTION
 Quels tokens entrent dans la perte pendant l'ajustement ?
 @CORRECT
-Ceux dont le début est dans la réponse, pas dans la question
+Les tokens cibles commençant dans la réponse, après décalage
 @WRONG
-- Tous les tokens de la ligne
-- Seulement le premier token de la question
-- Aucun : l'ajustement ne calcule pas de perte
+- Tous les tokens du prompt et de la réponse
+- Les seuls tokens de la question initiale
+- Le dernier token du prompt uniquement
 @EXPLANATION
 La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière.
 @CODEFILE
@@ -321,11 +321,11 @@ Le plan d'entraînement rapporte train et validation pour chaque phase SFT. Comp
 @QUESTION
 Pourquoi la correction LoRA vaut-elle zéro au premier pas ?
 @CORRECT
-Parce que B commence à zéro, donc le produit BA est nul
+B est nul, donc BA est nul
 @WRONG
-- Parce que A est une matrice identité
-- Parce que le rang est toujours égal à la largeur
-- Parce que la base est détruite
+- A et B sont tous deux obligatoirement nuls
+- Les matrices de base ont été effacées
+- Le rang choisi empêche tout gradient au premier pas
 @EXPLANATION
 A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice.
 @CODEFILE
@@ -368,11 +368,11 @@ L'épreuve finale SFT conserve des questions réservées et les limites du mono-
 @QUESTION
 Que prouve un échantillon de dialogue sur ce petit jeu ?
 @CORRECT
-Qu'on peut relire une suite tirée du checkpoint ajusté, pas qu'un assistant général existe
+Un checkpoint ajusté peut produire une suite
 @WRONG
-- Que le modèle a lu tout Wikipédia
-- Que LoRA bat toujours l'ajustement complet
-- Que la licence des jeux externes n'a plus d'importance
+- Le modèle est un assistant général fiable
+- Le jeu de test est inutile après un bon exemple
+- Le modèle répond correctement à tout dialogue nouveau
 @EXPLANATION
 L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté.
 @CODEFILE

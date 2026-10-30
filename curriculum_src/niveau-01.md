@@ -35,11 +35,11 @@ model/mlp.py entraîne justement y ≈ w x + b. Le test test_neuron_and_regressi
 @QUESTION
 Que modifie principalement un entraînement supervisé ?
 @CORRECT
-Les paramètres du modèle, pour réduire l'erreur mesurée
+Les valeurs des paramètres internes du modèle
 @WRONG
-- Le texte du cours
-- La quantité de RAM soudée sur la carte mère
-- Le nom des fichiers sources
+- Les cibles de validation pour réduire l’erreur
+- Le découpage du jeu de test à chaque pas
+- Les instructions du programme à chaque exemple
 @EXPLANATION
 L'entraînement ajuste des nombres internes. Le code qui décrit la forme du modèle reste le tien, et le matériel ne change pas.
 @@@
@@ -77,11 +77,11 @@ Les fonctions d'entraînement du laboratoire attendent des tableaux alignés : t
 @QUESTION
 Dans une prédiction de prix, le prix observé est en général…
 @CORRECT
-Le label, c'est-à-dire la cible
+Le label : la réponse connue pendant l’apprentissage
 @WRONG
-- Une feature comme les autres, sans précaution
-- L'optimiseur
-- La shape du tableau
+- Une feature disponible à la prédiction
+- Le poids ajusté par l’optimiseur
+- L’identifiant de la ligne de données
 @EXPLANATION
 Le prix est ce qu'on demande au modèle de retrouver. Le mettre aussi dans les entrées fuite la réponse.
 @@@
@@ -118,11 +118,11 @@ bigram_versus_uniform, dans model/experiment.py, apprend les comptes sur le déb
 @QUESTION
 Quel ensemble sert à la mesure finale, une fois les choix faits ?
 @CORRECT
-Le test, tenu à l'écart jusqu'à la mesure finale
+Le test, réservé à la mesure finale
 @WRONG
-- Le train, parce qu'il est le plus gros
-- La validation, qui sert à choisir les réglages
-- Les trois en même temps, pendant chaque mise à jour
+- Le train utilisé à chaque pas
+- La validation utilisée pour régler le modèle
+- Le corpus complet utilisé sans découpage
 @EXPLANATION
 Le test reste de côté jusqu'à la fin. La validation guide les choix. Le train modifie les paramètres.
 @@@
@@ -162,11 +162,11 @@ GPTConfig mélange les deux : vocab_size et d_model décrivent la forme, seed fi
 @QUESTION
 Lequel de ces choix est en général appris, et non fixé par toi ?
 @CORRECT
-Le poids w
+La valeur numérique du poids w
 @WRONG
-- Le learning rate
-- Le nombre d'époques
-- Le nom du fichier de sortie
+- La formule w*x+b
+- Le nombre de pas décidé avant l’essai
+- Le choix de la fonction de perte
 @EXPLANATION
 w est un paramètre. Le pas, le nombre de tours et les noms de fichiers sont des choix humains, des hyperparamètres ou de simples réglages.
 @@@
@@ -205,11 +205,11 @@ Cette somme pondérée est la ligne d'une multiplication matricielle. L'étape 1
 @QUESTION
 Dans cet exemple, qu'est-ce qui pourra être appris plus tard ?
 @CORRECT
-Les poids et le biais
+Les poids et le biais du neurone, pendant l’entraînement
 @WRONG
-- Les noms des variables x1 et x2
-- La fonction print
-- L'ordre des lignes du fichier
+- Les valeurs des entrées du lot
+- Le nombre de colonnes du fichier
+- La formule de la fonction d’activation
 @EXPLANATION
 x est une donnée. w et b sont les paramètres. print ne fait qu'afficher le calcul.
 @@@
@@ -247,11 +247,11 @@ relu est testée dans test_neuron_and_regression. silu et gelu vivent dans model
 @QUESTION
 Que vaut ReLU(-3) sur un nombre réel ?
 @CORRECT
-0, parce que ReLU annule les valeurs négatives
+0, la partie négative est annulée
 @WRONG
-- -3, parce que ReLU ne change rien
-- 3, parce que ReLU prend la valeur absolue
-- 1, parce que ReLU renvoie toujours une probabilité
+- -3, l’entrée est conservée
+- 3, la valeur absolue est prise
+- 1, la sortie est une probabilité
 @EXPLANATION
 ReLU met à zéro tout ce qui est négatif et laisse passer le reste. Ce n'est ni une valeur absolue ni une probabilité.
 @@@
@@ -294,11 +294,11 @@ Ce réseau est la brique « réseau » du fil rouge, débloquée à cette étape
 @QUESTION
 Empiler deux couches linéaires sans activation au milieu équivaut surtout à…
 @CORRECT
-Une seule couche linéaire
+Une seule transformation linéaire
 @WRONG
-- Un tokenizer
-- Une garantie de meilleure généralisation
-- Une distribution de probabilités
+- Une transformation forcément non linéaire
+- Deux fois plus de classes séparables
+- Une normalisation automatique des entrées
 @EXPLANATION
 Le produit de deux matrices est une matrice. L'activation est ce qui empêche de tout fusionner.
 @@@
@@ -337,11 +337,11 @@ TinyGPT.forward renvoie les logits et un cache. À cette étape, retiens seuleme
 @QUESTION
 Le forward sert d'abord à…
 @CORRECT
-Produire une sortie à partir des entrées et des paramètres actuels
+Calculer une sortie avec les poids actuels
 @WRONG
-- Installer Python
-- Modifier les poids
-- Créer le découpage train/test
+- Calculer les gradients depuis la loss
+- Modifier les paramètres avec un optimiseur
+- Choisir le meilleur checkpoint sur le test
 @EXPLANATION
 Le forward calcule. La mise à jour des poids est un autre temps, après la mesure de l'erreur.
 @@@
@@ -378,11 +378,11 @@ train_linear_regression minimise exactement cette moyenne de carrés. Son histor
 @QUESTION
 Pourquoi mettre l'écart au carré dans cette loss ?
 @CORRECT
-Pour que les écarts positifs et négatifs ne s'annulent pas, et pour pénaliser les gros écarts
+Éviter l’annulation et amplifier les grands écarts
 @WRONG
-- Pour obtenir une probabilité
-- Pour tokeniser le texte
-- Pour augmenter volontairement l'erreur
+- Conserver le signe pour savoir quel poids modifier
+- Rendre chaque erreur indépendante de son amplitude
+- Garantir une loss plus petite que l’erreur absolue
 @EXPLANATION
 Le carré est positif. Deux erreurs de signes opposés ne se compensent plus, et une grande erreur pèse plus que deux petites.
 @@@
@@ -421,11 +421,11 @@ cross_entropy_grad dans model/mathutil.py est le gradient des logits. Le test te
 @QUESTION
 Si le gradient d'un poids est positif, la descente de gradient…
 @CORRECT
-Soustrait une quantité positive : le poids diminue
+Diminue ce poids si le pas est positif
 @WRONG
-- Augmente toujours le poids
-- Supprime le poids du fichier
-- Transforme le gradient en probabilité
+- Augmente ce poids si le pas est positif
+- Remplace ce poids par le gradient
+- Laisse ce poids fixe jusqu’au prochain epoch
 @EXPLANATION
 La règle est w := w - lr * gradient. Un gradient positif fait donc diminuer w, ce qui est le sens où la loss locale redescend.
 @@@
@@ -466,11 +466,11 @@ Le graphe de TinyGPT est trop long pour être dérivé au tableau dans cette le�
 @QUESTION
 La règle de chaîne sert à dériver…
 @CORRECT
-Une fonction composée, en multipliant les dérivées des étapes
+Une composée, via les dérivées des étapes
 @WRONG
-- Uniquement des fichiers texte
-- Une probabilité déjà normalisée, sans calcul
-- Le nombre de commits Git
+- Une somme, via le produit de ses termes
+- Un produit, via la somme de ses facteurs
+- Une constante, via la dérivée de sa valeur
 @EXPLANATION
 Dès qu'une sortie dépend d'une suite d'opérations, la sensibilité totale est le produit des sensibilités locales.
 @@@
@@ -510,11 +510,11 @@ Ouvre Tensor.backward et Tensor.__mul__ dans model/autograd.py. Complète ensuit
 @QUESTION
 Le backward calcule surtout…
 @CORRECT
-Les gradients des paramètres à partir de la loss
+Les gradients de la loss vers les paramètres
 @WRONG
-- De nouveaux labels
-- Un dossier de données
-- La tokenization du texte
+- Les prochaines cibles à partir des logits
+- Les nouveaux poids sans utiliser d’optimiseur
+- Les probabilités à partir des scores bruts
 @EXPLANATION
 La passe arrière ne crée pas de données. Elle attribue à chaque paramètre sa part de responsabilité dans la loss.
 @CODEFILE
@@ -559,11 +559,11 @@ train_linear_regression utilise cette règle sur w et b. Le test choisit un lr q
 @QUESTION
 Le learning rate contrôle…
 @CORRECT
-La taille des mises à jour des paramètres
+L’amplitude des mises à jour appliquées aux paramètres
 @WRONG
-- La taille du vocabulaire
-- Le nombre de fichiers du dépôt
-- Le signe de la loss, qui deviendrait négatif
+- Le nombre de paramètres du réseau
+- La taille du vocabulaire après tokenisation
+- La proportion de validation dans le corpus
 @EXPLANATION
 Le pas multiplie le gradient. Il ne change ni le vocabulaire ni le sens mathématique de la loss.
 @@@
@@ -606,11 +606,11 @@ Le TP 11 implémente moments, correction de biais et AdamW. model/gpt_train.py e
 @QUESTION
 Un optimiseur décide comment…
 @CORRECT
-Transformer les gradients en mises à jour de paramètres
+Convertir les gradients en mises à jour
 @WRONG
-- Découper le texte en tokens
-- Choisir le label à la place des données
-- Remplacer la fonction de loss
+- Convertir les logits en probabilités
+- Remplacer la loss par une exactitude
+- Choisir les cibles du prochain lot
 @EXPLANATION
 L'optimiseur reçoit des gradients. La loss les a produits, le tokenizer n'a rien à voir avec ce choix.
 @CODEFILE
@@ -650,17 +650,17 @@ print(biais.grad)
 @EXPERIMENT
 Calcule 2*(w-3) pour w = 1 et w = 4. Les signes doivent être opposés. Si tu as PyTorch, compare à w.grad. Sinon, la valeur -4 suffit comme contrôle.
 @EXERCISE
-Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie les trois contributions, puis explique pourquoi on somme au lieu de garder (2,3).
+Deux lignes de trois valeurs utilisent le même biais. La loss est la somme de toutes les sorties : quelle shape et quelles valeurs a le gradient du biais ? Vérifie, pour chacune des trois composantes du biais, les deux contributions, puis explique pourquoi on somme au lieu de garder (2,3).
 @BUILD
 Après le moteur scalaire, lis _unbroadcast, Tensor.matmul et embedding dans model/autograd.py. Le TP 6 contrôle la réduction du gradient de broadcasting. Le complément numérique ci-dessous vérifie les lectures répétées d’un embedding ; les TP 7 et 10 vérifient aussi des dérivées par différences finies.
 @QUESTION
 requires_grad=True indique surtout que…
 @CORRECT
-On veut que les opérations sur ce tenseur puissent produire un gradient
+Le suivi du gradient des opérations du tenseur
 @WRONG
-- Le tenseur doit être enregistré sur le disque
-- Le calcul doit obligatoirement utiliser un GPU
-- Le tenseur est un label
+- Mettre les gradients à zéro immédiatement
+- Appliquer automatiquement un pas SGD
+- Forcer les données du tenseur à être positives
 @EXPLANATION
 Ce drapeau active le suivi du graphe. Il ne choisit pas le matériel et ne sauvegarde rien tout seul.
 @CODEFILE
@@ -710,11 +710,11 @@ Retrouve ces cinq gestes dans la boucle train_gpt : remise à zéro, forward, lo
 @QUESTION
 Pourquoi remettre les gradients à zéro avant chaque backward ?
 @CORRECT
-Parce que les gradients s'accumulent sinon d'un pas sur l'autre
+Sans remise à zéro, chaque backward ajoute aux gradients existants
 @WRONG
-- Pour effacer les données d'entraînement
-- Pour arrêter Python
-- Pour changer le vocabulaire
+- Le backward réutiliserait les anciennes données
+- L’optimiseur remettrait sinon les poids à zéro
+- La loss serait recalculée sur la validation
 @EXPLANATION
 L'accumulation est utile seulement quand on la demande, par exemple pour simuler un plus gros batch. Par défaut, un pas doit voir uniquement son propre gradient.
 @CODEFILE
@@ -757,10 +757,10 @@ Le fil rouge évalue le bigramme sur une fin de séquence non utilisée pour les
 @QUESTION
 Le surapprentissage apparaît typiquement quand…
 @CORRECT
-La loss de train est bonne et la loss de validation est mauvaise
+Train devient bon, validation reste mauvaise
 @WRONG
-- Les deux losses baissent ensemble
-- Python vient de démarrer
-- Le tokenizer possède moins de dix symboles
+- Train et validation baissent ensemble
+- Train et validation restent élevés ensemble
+- Les paramètres restent identiques après le backward
 @EXPLANATION
 L'écart train/validation est le symptôme. Une baisse conjointe est plutôt le signe que le modèle apprend encore quelque chose de transférable.

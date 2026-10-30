@@ -1,0 +1,62 @@
+[
+  {
+    "id": "gpt",
+    "title": "GPT NumPy standard",
+    "status": "Entraînable de bout en bout",
+    "source": "model/gpt_train.py",
+    "tests": [
+      "tests/test_pedagogy.py"
+    ],
+    "limit": "Petit modèle pédagogique ; aucun résultat à grande échelle revendiqué."
+  },
+  {
+    "id": "modern",
+    "title": "RoPE, RMSNorm, SwiGLU, GQA et poids partagés",
+    "status": "Entraînables dans le GPT NumPy",
+    "source": "model/transformer.py",
+    "tests": [
+      "tests/test_modern_training.py",
+      "tests/test_rms_training.py",
+      "tests/test_modern_benchmark.py"
+    ],
+    "limit": "Gradients et petite comparaison contrôlée ; le gain dépend du corpus, des graines et du budget."
+  },
+  {
+    "id": "hybrid",
+    "title": "Dos SSM, MoE et hybride",
+    "status": "Forwards exploratoires",
+    "source": "model/backbone.py",
+    "tests": [
+      "tests/test_lab.py"
+    ],
+    "limit": "Formes et causalité testées ; pas de backward du dos hybride ni de qualité linguistique entraînée."
+  },
+  {
+    "id": "image",
+    "title": "Patches et projection d’image",
+    "status": "Entrée image implémentée",
+    "source": "model/multimodal.py",
+    "tests": [
+      "tests/test_lab.py"
+    ],
+    "limit": "Pas d’encodeur visuel complet, de reconstruction d’image ni d’entraînement multimodal commun."
+  },
+  {
+    "id": "audio",
+    "title": "Spectrogramme et encodeur audio",
+    "status": "Idées décrites dans le cours",
+    "source": "curriculum_src/niveau-09.md",
+    "tests": [],
+    "limit": "Les illustrations ne sont pas un encodeur audio entraîné et testé."
+  },
+  {
+    "id": "retrieval",
+    "title": "Recherche de documents",
+    "status": "Recherche lexicale implémentée",
+    "source": "model/memory.py",
+    "tests": [
+      "tests/test_lab.py"
+    ],
+    "limit": "Sacs de mots et cosinus ; pas d’agent autonome ni de recherche sémantique entraînée."
+  }
+]

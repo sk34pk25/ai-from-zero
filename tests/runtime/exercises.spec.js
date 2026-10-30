@@ -59,3 +59,35 @@ test("une panne du téléchargement WASM expire et permet un redémarrage comple
   });
   expect(recovered).toMatchObject({ type: "done", text: "31" });
 });
+
+const transfer = JSON.parse(readFileSync(new URL("../../data/transfer-tasks.json", import.meta.url))).tasks;
+test("les dix variantes de transfert passent dans Python réel et un espace neuf", async ({ page }) => {
+  await page.goto("/");
+  const results = await page.evaluate(async tasks => {
+    const map = JSON.parse(document.querySelector("#afz-importmap").textContent);
+    const bridge = await import(map.scopes["./assets/js/"]["./assets/js/pybridge.js"]);
+    const rows = [];
+    for (const task of tasks) rows.push({id:task.id,...await bridge.request({type:"exercise",code:`${task.solution}\n${task.check}`})});
+    const blank = await bridge.request({type:"exercise",code:tasks.at(-1).check});
+    return {rows,blank};
+  },transfer);
+  expect(results.rows.filter(row => row.type !== "done")).toEqual([]);
+  expect(results.rows).toHaveLength(10);
+  expect(results.blank.type).toBe("error");
+  expect(results.blank.text).toContain("NameError");
+});
+
+test("une preuve réussie porte l’empreinte du code ; une édition impose un nouveau contrôle", async ({ page }) => {
+  await page.goto("/#/preuves");
+  await page.getByLabel("Palier de compréhension").selectOption("attention");
+  await page.getByLabel("Variante de l’épreuve").selectOption("B");
+  await page.getByRole("button",{name:"Démarrer une tentative"}).click();
+  await page.getByLabel("Code du cas nouveau").fill(transfer.find(row=>row.id==="attention-B").solution);
+  await page.getByRole("button",{name:"Contrôler le cas nouveau"}).click();
+  await expect(page.locator("[data-transfer-result]")).toContainText("contrôle passé");
+  await page.getByLabel("Code du cas nouveau").fill("pass");
+  await expect(page.locator("[data-transfer-result]")).toContainText("code modifié");
+  await page.getByRole("button",{name:"Contrôler le cas nouveau"}).click();
+  await expect(page.locator("[data-transfer-result]")).toContainText("à corriger");
+  await expect(page.locator("[data-transfer-result]")).toContainText("NameError");
+});
