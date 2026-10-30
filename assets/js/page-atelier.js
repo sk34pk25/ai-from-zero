@@ -206,7 +206,7 @@ export async function paintAtelier(main, index, targetTp) {
   );
   if (targetTp) {
     const target = list.querySelector(`#tp-${targetTp}`);
-    if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start" }); }
+    if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start", behavior: "instant" }); }
   }
   await loadDoc();
 }

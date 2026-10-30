@@ -1393,7 +1393,7 @@ function lessonContents() {
         const target = document.getElementById(id);
         if (!target) return;
         if (target.tagName === "DETAILS") target.open = true;
-        target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start" });
+        target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start", behavior: "instant" });
       },
     }, text)),
   ]);
