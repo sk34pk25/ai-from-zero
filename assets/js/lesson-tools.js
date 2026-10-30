@@ -58,7 +58,7 @@ export async function attachLessonTools(main, lessonId, owner) {
 async function exerciseFor(lessonId) {
   if (!exercises) {
     const response = await fetch(
-      new URL("data/exercises.json", document.baseURI),
+      publicAssetUrl("data/exercises.json"),
     );
     if (!response.ok) throw new Error("Exercices indisponibles");
     const data = await response.json();
@@ -70,7 +70,7 @@ async function exerciseFor(lessonId) {
 
 async function debugFor(lessonId) {
   if (!debugs) {
-    const response = await fetch(new URL("data/debug.json", document.baseURI));
+    const response = await fetch(publicAssetUrl("data/debug.json"));
     if (!response.ok) throw new Error("Traces indisponibles");
     const data = await response.json();
     if (!Array.isArray(data) || data.some(row => typeof row.lessonId !== "string" || typeof row.code !== "string")) throw new Error("Traces invalides");

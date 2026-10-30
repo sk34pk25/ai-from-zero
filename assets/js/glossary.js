@@ -1,5 +1,6 @@
 import { h } from "./dom.js";
 import { onLeave } from "./lifecycle.js";
+import { publicAssetUrl } from "./public-url.js";
 let glossary = null;
 export async function paintGlossaryPage(main) {
   const ticket = new AbortController(); onLeave(() => ticket.abort());
@@ -7,7 +8,7 @@ export async function paintGlossaryPage(main) {
   main.replaceChildren(h("h1", { text: "Glossaire du laboratoire" }), status);
   try {
     if (!glossary) {
-      const response = await fetch(new URL("data/glossary.json", document.baseURI), { signal: ticket.signal });
+      const response = await fetch(publicAssetUrl("data/glossary.json"), { signal: ticket.signal });
       if (!response.ok) throw new Error("Glossaire indisponible");
       const rows = await response.json();
       if (!Array.isArray(rows)) throw new Error("Glossaire invalide");

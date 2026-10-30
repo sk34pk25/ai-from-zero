@@ -1,9 +1,10 @@
 import { h } from "./dom.js";
+import { publicAssetUrl } from "./public-url.js";
 let terms = null, serial = 0;
 export async function attachTermHelp(article) {
   try {
     if (!terms) {
-      const response = await fetch(new URL("data/glossary-core.json", document.baseURI));
+      const response = await fetch(publicAssetUrl("data/glossary-core.json"));
       if (!response.ok) return;
       const rows = await response.json(); if (!Array.isArray(rows)) return; terms = rows;
     }

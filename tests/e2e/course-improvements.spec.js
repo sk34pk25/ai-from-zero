@@ -4,6 +4,16 @@ import AxeBuilder from "@axe-core/playwright";
 
 const lessons = JSON.parse(readFileSync(new URL("../../data/curriculum.json", import.meta.url))).levels.flatMap(level => level.steps);
 
+test("une ancienne réponse de catalogue sans version ne masque pas les nouvelles activités", async ({ page }) => {
+  // Simule les réponses encore présentes pour les anciennes URL dans le cache d'un visiteur.
+  await page.route(/\/data\/(?:exercises|debug|glossary|glossary-core)\.json$/, route => route.fulfill({ contentType: "application/json", body: "[]" }));
+  await page.goto("/#/lecon/4.14");
+  await expect(page.locator('[data-exercise="4.14"]')).toBeVisible();
+  await page.goto("/#/glossaire");
+  await page.getByRole("searchbox", { name: "Rechercher un terme" }).fill("backpropagation");
+  await expect(page.getByRole("heading", { name: "Rétropropagation", exact: true })).toBeVisible();
+});
+
 for (const catalog of ["exercises", "debug"]) test(`un catalogue ${catalog} indisponible peut être retenté sans dupliquer les activités`, async ({ page }) => {
   let first = true;
   await page.route(`**/data/${catalog}.json*`, route => {
