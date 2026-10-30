@@ -20,7 +20,7 @@ export function paintModel(main, { architecture, done, selectedPart, onSelect })
       [
         h("span", {
           class: "eyebrow",
-          text: unlocked ? "Acquis" : "Verrouillé",
+          text: unlocked ? "Leçon cochée" : "Leçon à parcourir",
         }),
         h("strong", { text: part.name }),
         h("span", { text: `Étape ${part.step}` }),
@@ -40,8 +40,8 @@ export function paintModel(main, { architecture, done, selectedPart, onSelect })
             "Introduit à l'étape ",
             h("a", { href: `#/lecon/${selected.step}`, text: selected.step }),
             done.has(selected.step)
-              ? ". Cette brique est débloquée."
-              : ". Termine cette étape pour la débloquer.",
+              ? ". La leçon est cochée ; vérifie la brique dans ton projet."
+              : ". Parcours cette leçon puis construis la brique dans ton projet.",
           ])
         : null,
       h("p", {
@@ -61,7 +61,7 @@ export function paintModel(main, { architecture, done, selectedPart, onSelect })
     h("h1", { text: "Architecture évolutive" }),
     h("p", {
       class: "lead",
-      text: "Les briques se débloquent quand l'étape qui les introduit est terminée. Le code correspondant est dans le dossier model/.",
+      text: "Les briques indiquent les leçons cochées, sans certifier leur maîtrise. Vérifie ton code et tes résultats dans l’atelier. Le code de référence est dans model/.",
     }),
     h("div", { class: "model-shell" }, [list, detail]),
     h("section", { class: "visual" }, [h("h2", { text: "Inspecter les calculs d’un exemple" }), h("p", { text: "Un trajet miniature avec des valeurs choisies pour lire les formes. Les briques cochées restent des repères de progression ; cet exemple ne prouve pas que ton modèle est entraîné." }), openNumeric, numeric]),

@@ -1600,7 +1600,7 @@ function lessonDeep(lesson) {
       ]),
       h("p", {}, [h("a", { href: "#/construire", text: "Ouvrir la piste « construire mon LLM »." })]),
       ...(lesson.tpIds || []).map((id) =>
-        h("p", {}, h("a", { href: "#/atelier", text: `Atelier · TP ${id} à compléter` })),
+        h("p", {}, h("a", { href: `#/atelier/tp/${id}`, text: `Atelier · TP ${id} à compléter` })),
       ),
     ]),
     h("section", { class: "callout callout-review" }, [
@@ -1768,7 +1768,7 @@ function feedbackText(lesson, grade) {
 
 function toggleLesson(id) {
   if (!tracking()) {
-    toast("Réservé au propriétaire.");
+    toast("Active le suivi sur cet appareil pour garder tes étapes.");
     return;
   }
   if (state.done.has(id)) {

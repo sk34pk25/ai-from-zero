@@ -106,7 +106,7 @@ test("le catalogue, le playground, une adresse supprimée et une figure passent 
   await page.goto('/#/lecon/0.1');
   const program = page.locator('[data-lab="program"]');
   await expect(program.locator('.lab-stage')).toContainText('texte chargé');
-  await program.getByRole('button', { name: 'Étape suivante', exact: true }).click();
+  await program.getByRole('button', { name: 'Calcul suivant', exact: true }).click();
   await expect(program.locator('.lab-stage')).toContainText('texte + IDs');
 });
 

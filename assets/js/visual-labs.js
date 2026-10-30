@@ -129,7 +129,7 @@ function mountDescentLab(host) {
     host.dataset.x = String(x);
   };
   host.dataset.lab = 'descent';
-  host.append(h('h2', { class: 'lab-title', text: 'Voir les pas, y compris la divergence' }), rate.field, h('div', { class: 'lab-controls' }, [action('Un pas', () => { const next = descentStep(history.at(-1), Number(rate.input.value)); if (Number.isFinite(next) && Math.abs(next) < 1e6) { history.push(next); paint(); } else status.textContent = 'Arrêt de l’exemple : amplitude supérieure à un million. Rejoue avec un pas plus petit.'; }), action('Étape précédente', () => { if (history.length > 1) history.pop(); paint(); }), action('Rejouer', () => { history = [2.2]; paint(); })]), plot, status);
+  host.append(h('h2', { class: 'lab-title', text: 'Voir les pas, y compris la divergence' }), rate.field, h('div', { class: 'lab-controls' }, [action('Un pas', () => { const next = descentStep(history.at(-1), Number(rate.input.value)); if (Number.isFinite(next) && Math.abs(next) < 1e6) { history.push(next); paint(); } else status.textContent = 'Arrêt de l’exemple : amplitude supérieure à un million. Rejoue avec un pas plus petit.'; }), action('Calcul précédent', () => { if (history.length > 1) history.pop(); paint(); }), action('Rejouer', () => { history = [2.2]; paint(); })]), plot, status);
   rate.input.addEventListener('input', paint); paint();
 }
 
@@ -186,7 +186,7 @@ function mountBpeLab(host) {
   };
   host.dataset.lab = 'bpe';
   host.append(h('h2', { class: 'lab-title', text: 'BPE : compter, fusionner, conserver le rang' }), note('Mini-corpus fixe : « abab ababab ». Les occurrences se comptent avant les fusions, qui ne se chevauchent pas.'), stage,
-    h('div', { class: 'lab-controls' }, [merge, action('Étape précédente', () => { if (history.length) { tokens = history.pop(); merges.pop(); paint(); } }), action('Rejouer', () => { tokens = [...corpus]; merges = []; history = []; paint(); })]), status);
+    h('div', { class: 'lab-controls' }, [merge, action('Calcul précédent', () => { if (history.length) { tokens = history.pop(); merges.pop(); paint(); } }), action('Rejouer', () => { tokens = [...corpus]; merges = []; history = []; paint(); })]), status);
   prediction(host, { question: 'Au départ, combien de fois la paire a + b apparaît-elle ?', answer: 5, tolerance: 0, explanation: 'Deux fois dans « abab », trois fois dans « ababab » : 5 occurrences.' });
   paint();
 }

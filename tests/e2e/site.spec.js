@@ -131,6 +131,7 @@ test("le menu mobile s'ouvre", async ({ page }) => {
   await expect(menu).toBeVisible();
   await menu.click();
   await expect(menu).toHaveAttribute("aria-expanded", "true");
+  await page.locator(".nav-explorations > summary").click();
   await page.locator("#course-nav a", { hasText: "Multimodal" }).click();
   await expect(page).toHaveURL(/#\/niveau\/9$/);
   await expect(page.locator(".chapter")).toHaveCount(9);
@@ -152,6 +153,7 @@ test("les indices survivent au quiz et la piste LLM s'affiche", async ({ page })
   await expect(page.locator("#solution")).toBeHidden();
   await page.goto("/#/construire");
   await expect(page.locator("h1")).toHaveText("Construire ton LLM");
+  await page.locator(".published-results > summary").click();
   await expect(page.getByRole("heading", { name: "Entraînement réel" })).toBeVisible();
   await expect(page.locator("[data-run-host]")).toContainText("Validation");
   await expect(page.locator(".track-step")).toHaveCount(curriculum.track.length);
@@ -172,7 +174,7 @@ test("chaque famille de visuel interactif répond", async ({ page }) => {
     await expect(host).toBeVisible();
     const before = await host.innerText();
     if (await host.locator('.lab-controls').count()) {
-      const next = host.getByRole('button', { name: 'Étape suivante', exact: true });
+      const next = host.getByRole('button', { name: 'Calcul suivant', exact: true });
       if (await next.count()) await next.click();
       else if (await host.getByRole('button', { name: 'Un pas', exact: true }).count()) await host.getByRole('button', { name: 'Un pas', exact: true }).click();
       else await host.getByRole('button', { name: 'Fusionner', exact: true }).click();
