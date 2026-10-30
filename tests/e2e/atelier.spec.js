@@ -23,12 +23,17 @@ test("atelier public : consignes, douze TP et archive autonome", async ({
     "relecture /20",
   );
   const [download] = await Promise.all([
+    // Le nouveau guide doit aussi être proposé dans l'interface et présent dans le ZIP.
     page.waitForEvent("download"),
     page
       .getByRole("button", { name: "Télécharger mon atelier (.zip)" })
       .click(),
   ]);
   expect(download.suggestedFilename()).toBe("mon-llm.zip");
+  await page.getByRole("button", { name: "Ouvrir le dossier final", exact: true }).click();
+  await expect(page.getByLabel("Guide de l’atelier")).toHaveValue("atelier/DOSSIER_MODELE.md");
+  await expect(page.getByLabel("Document de l’atelier")).toContainText("Mon dossier de modèle");
+  await expect(page.getByLabel("Document de l’atelier")).toContainText("Note /4 après relecture");
   const path = await download.path();
   const bytes = readFileSync(path);
   for (const name of spec.files)

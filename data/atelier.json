@@ -144,6 +144,7 @@
   ],
   "files": [
     "atelier/BANC_FR.md",
+    "atelier/DOSSIER_MODELE.md",
     "atelier/EXTENSIONS.md",
     "atelier/FONDATIONS.md",
     "atelier/GUIDE.md",
@@ -183,7 +184,8 @@
     "atelier/PANNES.md",
     "atelier/BANC_FR.md",
     "atelier/EXTENSIONS.md",
-    "atelier/RELECTURE.md"
+    "atelier/RELECTURE.md",
+    "atelier/DOSSIER_MODELE.md"
   ],
   "diagnostics": [
     {

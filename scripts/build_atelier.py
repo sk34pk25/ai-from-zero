@@ -33,6 +33,7 @@ def payload():
             "atelier/BANC_FR.md",
             "atelier/EXTENSIONS.md",
             "atelier/RELECTURE.md",
+            "atelier/DOSSIER_MODELE.md",
         ],
         "diagnostics": json.loads(
             (ROOT / "curriculum_src/diagnostics.json").read_text(encoding="utf-8")

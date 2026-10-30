@@ -268,9 +268,11 @@ Mesurer l'effondrement ne le corrige pas. Une loss auxiliaire, ajoutée à la lo
 @INTUITION
 Si le routeur est sûr et monotone, le produit f_i P_i est grand. Si les tokens et les probabilités se répartissent, le produit reste petit. On ajoute ce nombre à la loss pour que l'entraînement le diminue.
 @VOCAB
-Perte auxiliaire : un terme en plus de la loss principale. Switch : la formule E * somme(f P), dont le minimum vaut 1 quand c'est équilibré. Coefficient : le poids de ce terme, pour ne pas écraser la loss de langage.
+Perte auxiliaire : un terme en plus de la loss principale. Switch : la formule E * somme(f P), qui vaut 1 lorsque f et P sont uniformes ; c'est une référence, pas un minimum universel. Coefficient : le poids de ce terme, pour ne pas écraser la loss de langage.
 @EXPLAIN
-Quand f = P = 1/E, la somme des produits vaut 1/E et multiplier par E donne 1. Quand tout est sur un expert et que le routeur en est sûr, la loss vaut E. Le test vérifie 2 pour E=2 effondré, et 1 pour un cas équilibré. Cette loss ne remplace pas la cross-entropy : un routeur parfaitement équilibré qui prédit mal les tokens est inutile. On pondère le terme auxiliaire par un petit coefficient. Le laboratoire renvoie aux dans le dictionnaire de moe_ffn, sans l'ajouter tout seul à une loss de langue : l'appelant décide du coefficient.
+Quand f = P = 1/E, la somme des produits vaut 1/E et multiplier par E donne 1. Quand tout est sur un expert et que le routeur en est sûr, la loss vaut E. Le test vérifie 2 pour E=2 effondré, et 1 pour un cas uniforme. Attention : f vient des choix discrets, P des probabilités moyennes. Leur produit peut donner moins de 1. Avec les lignes (0.51, 0.49), (0.51, 0.49), (0.01, 0.99), l'argmax choisit les experts 0, 0, 1 et la loss vaut environ 0.8956. La référence uniforme n'est donc pas une borne inférieure générale.
+
+Cette loss ne remplace pas la cross-entropy : un routeur parfaitement équilibré qui prédit mal les tokens est inutile. On pondère le terme auxiliaire par un petit coefficient. Le laboratoire renvoie aux dans le dictionnaire de moe_ffn, sans l'ajouter tout seul à une loss de langue : l'appelant décide du coefficient.
 @LANG python
 @CODE
 :::
@@ -278,23 +280,27 @@ import numpy as np
 from model.moe import load_balance_loss
 uniforme = np.full((4, 2), 0.5)
 print(load_balance_loss(uniforme, np.array([0, 1, 0, 1])))
+probas = np.array([[0.51, 0.49], [0.51, 0.49], [0.01, 0.99]])
+aux = load_balance_loss(probas, probas.argmax(axis=1))
+print(round(aux, 4))
+assert 0 < aux < 1  # 1 n'est pas une borne inférieure générale.
 :::
 @EXPERIMENT
-Le résultat doit être proche de 1. Construis un cas effondré sur 2 experts et vérifie que tu obtiens 2.
+Les résultats sont 1 pour le cas uniforme et environ 0.8956 pour le contre-exemple. Calcule f et P de ce dernier à la main. Construis ensuite un cas effondré sur 2 experts et vérifie que tu obtiens 2.
 @EXERCISE
 Pourquoi un coefficient trop grand sur cette loss peut-il dégrader la perplexité même si les experts sont bien remplis ?
 @BUILD
 aux est la brique testée. Le fil rouge ne cache pas un coefficient magique : il est absent tant que tu ne l'écris pas dans la loss totale.
 @QUESTION
-Quand le routage est parfaitement équilibré, la perte auxiliaire du laboratoire vaut environ…
+Lorsque f et P sont uniformes, la perte auxiliaire du laboratoire vaut…
 @CORRECT
-1, le minimum quand le routage est équilibré
+1, une valeur de référence et non un minimum universel
 @WRONG
 - 0
 - Le nombre de tokens
 - La perplexité du bigramme
 @EXPLANATION
-E * somme((1/E)*(1/E)) = 1. L'effondrement monte vers E, il ne descend pas vers 0.
+E * somme((1/E)*(1/E)) = 1. L'effondrement certain donne E, mais d'autres probabilités valides peuvent donner moins de 1, comme le montre le contre-exemple.
 @@@
 @ID 7.8
 @TITLE Parallélisme des experts

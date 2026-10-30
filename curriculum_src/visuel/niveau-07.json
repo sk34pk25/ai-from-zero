@@ -44,8 +44,8 @@
   "7.7": {
     "phrase": "Une perte auxiliaire pousse le routeur à répartir les tokens.",
     "image": "Une prime pour les ateliers qui partagent le travail.",
-    "cle": "aux = E × Σ fᵢ·Pᵢ, minimum 1",
-    "piege": "Elle vaut 1 au mieux, pas 0.",
+    "cle": "aux = E × Σ fᵢ·Pᵢ ; vaut 1 si f = P uniformes",
+    "piege": "1 est une référence uniforme, pas un minimum universel.",
     "etapes": [["Mesurer", "f et P"], ["Calculer", "E × Σ f·P"], ["Ajouter", "à la loss de langage"]]
   },
   "7.8": {

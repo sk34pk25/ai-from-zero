@@ -2082,8 +2082,8 @@
   "7.7": {
     "phrase": "Une perte auxiliaire pousse le routeur à répartir les tokens.",
     "image": "Une prime pour les ateliers qui partagent le travail.",
-    "key": "aux = E × Σ fᵢ·Pᵢ, minimum 1",
-    "trap": "Elle vaut 1 au mieux, pas 0.",
+    "key": "aux = E × Σ fᵢ·Pᵢ ; vaut 1 si f = P uniformes",
+    "trap": "1 est une référence uniforme, pas un minimum universel.",
     "steps": [
       {
         "title": "Mesurer",

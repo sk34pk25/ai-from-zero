@@ -3,11 +3,12 @@ import { h } from "./dom.js";
 import { zipStore } from "./zipstore.js";
 import { onLeave } from "./lifecycle.js";
 import { pathChoice } from "./path-choice.js";
+import { publicAssetUrl } from "./public-url.js";
 
 export async function paintAtelier(main, index) {
   const controller = new AbortController();
   onLeave(() => controller.abort());
-  const response = await fetch(new URL("data/atelier.json", document.baseURI), {
+  const response = await fetch(publicAssetUrl("data/atelier.json"), {
     signal: controller.signal,
   });
   if (!response.ok) throw new Error("Atelier indisponible");
@@ -29,7 +30,7 @@ export async function paintAtelier(main, index) {
               path.includes("..")
             )
               throw new Error("Chemin invalide");
-            const r = await fetch(new URL(path, document.baseURI), {
+            const r = await fetch(publicAssetUrl(path), {
               signal: controller.signal,
             });
             if (!r.ok) throw new Error("Fichier manquant");
@@ -116,6 +117,7 @@ export async function paintAtelier(main, index) {
     "Banc français et questions réservées",
     "BPE octets, PyTorch et utilisation locale",
     "Relire avec un débutant et sur de vrais appareils",
+    "Mon dossier de modèle à remplir",
   ];
   spec.documents.forEach((path, i) =>
     selector.append(h("option", { value: path, text: names[i] })),
@@ -130,7 +132,7 @@ export async function paintAtelier(main, index) {
     const ticket = ++documentTicket;
     content.textContent = "Chargement du guide…";
     try {
-      const r = await fetch(new URL(selector.value, document.baseURI), {
+      const r = await fetch(publicAssetUrl(selector.value), {
         signal: controller.signal,
       });
       if (!r.ok) throw new Error("Guide absent");
@@ -179,6 +181,16 @@ export async function paintAtelier(main, index) {
       h("p", {
         text: "Puis niveaux 5 et 6 pour les variantes et les coûts. MoE, SSM et multimodalité sont des approfondissements. Les durées affichées sont indicatives ; ajoute le temps des TP et du projet.",
       }),
+    ]),
+    h("section", { class: "sheet" }, [
+      h("h2", { text: "Préparer mon projet final" }),
+      h("p", { text: "Sur un nouveau corpus, conserve les preuves de ton code, compare deux configurations sur validation, puis mesure le modèle retenu sur un test réservé." }),
+      h("p", { text: "Un dossier prêt à remplir t'aide à expliquer tes résultats et tes limites. La grille /20 demande une relecture de ton code et de tes explications ; elle n'est pas une note automatique." }),
+      h("button", { type: "button", class: "button button-secondary", onClick: () => {
+        selector.value = "atelier/DOSSIER_MODELE.md";
+        loadDoc();
+        selector.focus();
+      } }, "Ouvrir le dossier final"),
     ]),
     doc,
     diagnostics,

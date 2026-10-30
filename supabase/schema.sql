@@ -13,6 +13,9 @@
 -- la protection réelle. Un anonyme, ou un autre utilisateur authentifié,
 -- ne lit ni n'écrit ces tables. Aucun secret n'est stocké dans ce fichier.
 
+-- Une table future créée par le rôle courant demande ses GRANT et politiques explicites.
+alter default privileges in schema public revoke all on tables from anon, authenticated, public;
+
 create or replace function public.is_owner()
 returns boolean
 language sql
@@ -81,11 +84,11 @@ drop policy if exists training_plans_owner on public.training_plans;
 create policy training_plans_owner on public.training_plans
   for all using (public.is_owner()) with check (public.is_owner());
 
-revoke all on table public.ide_files from anon, public;
-revoke all on table public.progress from anon, public;
-revoke all on table public.quiz_results from anon, public;
-revoke all on table public.training_runs from anon, public;
-revoke all on table public.training_plans from anon, public;
+revoke all on table public.ide_files from anon, public, authenticated;
+revoke all on table public.progress from anon, public, authenticated;
+revoke all on table public.quiz_results from anon, public, authenticated;
+revoke all on table public.training_runs from anon, public, authenticated;
+revoke all on table public.training_plans from anon, public, authenticated;
 
 grant select, insert, update, delete on table public.ide_files to authenticated;
 grant select, insert, update, delete on table public.progress to authenticated;

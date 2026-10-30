@@ -90,3 +90,13 @@ Rien à changer pour le courrier : le SMTP intégré reste en place, volontairem
 ## Protection contre les mots de passe compromis
 
 L'advisor du projet lié signalait cette option désactivée le 29 octobre 2026. La [documentation officielle](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) la réserve à Pro et aux offres supérieures. Vérifier sa disponibilité avant activation. Le code du site ne modifie aucun abonnement. Le formulaire exige 12 caractères ; ce contrôle client ne remplace pas la politique du serveur. Utiliser un mot de passe unique et vérifier les paramètres Auth effectifs. Les RLS restent indispensables.
+
+## Durcissement des privilèges (30 octobre 2026)
+
+Le projet lié est sur l’offre Free : la protection intégrée contre les mots de passe compromis n’est pas activée, car elle demande Pro ou plus. Aucun abonnement n’est modifié.
+
+Pour un projet déjà installé, utiliser uniquement supabase/hardening.sql dans une transaction après vérification des six tables. Ne pas réappliquer le modèle schema.sql à UUID nul sur la production. Le durcissement conserve le CRUD authentifié sous RLS et retire les droits inutiles, y compris TRUNCATE, REFERENCES, TRIGGER et MAINTAIN. Les politiques, les fonctions, les données et les droits backend ne sont pas remplacés.
+
+Les nouvelles tables publiques créées par le rôle qui exécute le script (postgres dans le SQL Editor/MCP) demandent leurs GRANT et politiques explicites. Les défauts du rôle interne supabase_admin restent gérés par la plateforme : postgres n’a pas le droit de les modifier. Contrôler les droits si un autre rôle crée une table.
+
+La CI exécute tests/sql/permissions.sql dans un PostgreSQL jetable : installation, grants historiques, double application, identités propriétaire/autre/anonyme et sauvegarde avec révision. Ne jamais exécuter ces fixtures sur la base réelle.

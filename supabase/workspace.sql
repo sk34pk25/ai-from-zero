@@ -1,4 +1,5 @@
 -- Extension additive : ne remplace pas is_owner() et ne modifie pas les données existantes.
+alter default privileges in schema public revoke all on tables from anon, authenticated, public;
 create table if not exists public.learning_records (
   key text primary key check (length(key) between 1 and 180),
   payload jsonb not null,
@@ -9,7 +10,7 @@ alter table public.learning_records enable row level security;
 drop policy if exists learning_records_owner on public.learning_records;
 create policy learning_records_owner on public.learning_records to authenticated
   using ((select public.is_owner())) with check ((select public.is_owner()));
-revoke all on public.learning_records from anon, public;
+revoke all on public.learning_records from anon, public, authenticated;
 grant select, insert, update, delete on public.learning_records to authenticated;
 create or replace function public.save_learning_record(p_key text, p_payload jsonb, p_revision bigint)
 returns setof public.learning_records language plpgsql security invoker set search_path = '' as $$

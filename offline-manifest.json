@@ -1,5 +1,5 @@
 {
-  "version": "ca1c52377f6b",
+  "version": "e0c7dce10218",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -48,6 +48,7 @@
     "assets/js/placement.js",
     "assets/js/progress.js",
     "assets/js/project-evidence.js",
+    "assets/js/public-url.js",
     "assets/js/pybridge.js",
     "assets/js/pyworker.js",
     "assets/js/quiz.js",
@@ -76,6 +77,7 @@
     "data/benchmark_modern_run.json",
     "data/benchmark_literature_protocol.json",
     "atelier/BANC_FR.md",
+    "atelier/DOSSIER_MODELE.md",
     "atelier/EXTENSIONS.md",
     "atelier/FONDATIONS.md",
     "atelier/GUIDE.md",

@@ -29,3 +29,7 @@ Le rapport complet, les empreintes et la durée de cet environnement sont dans `
 - Lighthouse : seuil 95 ; HTML et tests JavaScript ; génération du cours, inventaire de l’atelier et version des assets cohérents.
 
 La CI de la pull request fournit les résultats de la version exacte. Les essais sur appareils physiques, les explications sans aide et la qualité sur un corpus personnel restent des validations de terrain. La grille du projet final sert à noter ces preuves ; le site n’attribue pas automatiquement 20/20.
+
+## Lecture guidée et projet personnel
+
+Le mode guidé ouvre les fondations avant le code et le quiz ; la révision compacte reste un choix explicite. Les résumés facultatifs ne bloquent plus le cours et leur reprise conserve le travail. La leçon 7.7 distingue la référence uniforme 1 d’un minimum universel, avec le contre-exemple 0,8956. DOSSIER_MODELE.md guide une remise sur un corpus nouveau, sans préremplir les résultats ni la note.
