@@ -16,6 +16,7 @@ test("atelier public : consignes, douze TP et archive autonome", async ({
   await expect(page.getByLabel("Document de l’atelier")).toContainText(
     "Installer ton atelier",
   );
+  await page.getByText("Guides, installation et dossier final", {exact:true}).click();
   await page
     .getByLabel("Guide de l’atelier")
     .selectOption("atelier/PROJET_FINAL.md");

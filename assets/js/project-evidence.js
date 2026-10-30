@@ -31,7 +31,7 @@ export function projectEvidence(index) {
       const check = h("input", { type: "checkbox", checked: explained[tp] === true, disabled: !isOwner(), "aria-label": `Je peux expliquer le TP ${tp} sur un exemple nouveau` });
       check.onchange = () => { const current = read(); save({ ...current, explained: { ...current.explained, [tp]: check.checked } }); };
       const technical = controls.has(tp) ? controls.get(tp) ? report.module === "correction" ? "référence contrôlée" : "contrôle public réussi" : "contrôle à reprendre" : "à construire";
-      return h("li", {}, [h("a", { href: `#/atelier`, text: `TP ${tp}` }), ` · ${technical} · `,
+      return h("li", {}, [h("a", { href: `#/atelier/tp/${tp}`, text: `TP ${tp}` }), ` · ${technical} · `,
         h("label", {}, [check, " Je peux l’expliquer sur un exemple nouveau"]),
         h("p", {}, lessons.flatMap(({ lesson }, n) => [n ? " · " : "Leçons : ", h("a", { href: `#/lecon/${lesson.id}`, text: lesson.id })]))]);
     }));

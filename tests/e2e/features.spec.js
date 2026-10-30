@@ -20,7 +20,7 @@ test("le visiteur reste en lecture seule", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Se connecter" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeVisible();
   await page.goto("/#/lecon/1.6");
-  await expect(page.locator(".lock-note")).toContainText("Réservé au propriétaire");
+  await expect(page.locator(".lock-note")).toContainText("suivi sur cet appareil");
   await expect(page.locator("[data-choice='0']")).toBeDisabled();
   await expect(page.getByRole("button", { name: "Ouvrir dans l'IDE" })).toHaveCount(0);
   await page.getByRole("button", { name: "Activer le thème clair" }).click();

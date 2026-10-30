@@ -33,12 +33,14 @@ export async function attachLessonTools(main, lessonId, owner) {
     );
     visual.insertAdjacentElement("afterend", figure);
   }
-  const column = article.querySelector(".lesson-main");
+  const column = article.querySelector("[data-practice-tools]");
   if (!column) return;
   column.append(marker);
   const exercise = await exerciseFor(lessonId);
+  if (!article.isConnected) return;
   if (exercise) column.append(exercisePanel(exercise, owner));
   const debug = await debugFor(lessonId);
+  if (!article.isConnected) return;
   if (debug) column.append(debugPanel(debug, owner));
 }
 
@@ -64,7 +66,7 @@ function exercisePanel(exercise, owner) {
   const status = h("p", {
     class: "quiz-feedback",
     role: "status",
-    text: owner ? "" : "Réservé au propriétaire.",
+    text: owner ? "" : "Active le suivi sur cet appareil dans le quiz pour lancer le contrôle sans compte.",
   });
   const pre = h("pre");
   pre.append(h("code", { text: exercise.starter }));
@@ -117,7 +119,7 @@ function exercisePanel(exercise, owner) {
             : "Contrôle passé.";
       },
     },
-    owner ? "Lancer le contrôle" : "Réservé au propriétaire",
+    owner ? "Lancer le contrôle" : "Activer le suivi local pour tester",
   );
   return h(
     "section",
@@ -149,7 +151,7 @@ function debugPanel(spec, owner) {
     role: "status",
     text: owner
       ? "Le pas à pas rejoue une trace enregistrée. Il ne met pas la page en pause pendant l'exécution."
-      : "Réservé au propriétaire.",
+      : "Active le suivi sur cet appareil dans le quiz pour utiliser le pas à pas sans compte.",
   });
   const line = h("p", { class: "manip-readout", text: "" });
   const locals = h("div", { class: "debug-locals" });
@@ -203,7 +205,7 @@ function debugPanel(spec, owner) {
         status.textContent = `${snaps.length} pas enregistrés.`;
       },
     },
-    owner ? "Pas à pas" : "Réservé au propriétaire",
+    owner ? "Pas à pas" : "Activer le suivi local pour manipuler",
   );
   const next = h(
     "button",

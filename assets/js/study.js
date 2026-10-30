@@ -16,6 +16,8 @@ import {
 } from "./workspace.js";
 import { isOwner } from "./auth.js";
 import { onLeave } from "./lifecycle.js";
+import { sessionPlanner, courseProgress } from "./course-guide.js";
+import { browserStorage, readLocalProgress, readLocalReading, localLearnerEnabled } from "./local-records.js";
 export function recordAttempt(id, type, ok) {
   if (!isOwner()) return;
   const row = getRecord(`lesson/${id}`, {});
@@ -36,6 +38,11 @@ export function dueLessons(index) {
   });
 }
 export function lessonNotebook(id) {
+  if (!isOwner()) return h("details", { class: "sheet notebook-access" }, [
+    h("summary", { text: "Carnet synchronisé · compte propriétaire" }),
+    h("p", { text: "Les notes synchronisées et les favoris utilisent le compte propriétaire. Les leçons, les TP et le planificateur sont publics ; le suivi local permet de garder tes quiz et brouillons d’exercices sur cet appareil." }),
+    h("a", { href: "#/connexion", text: "Connexion propriétaire" }),
+  ]);
   const data = getRecord(`lesson/${id}`, {});
   const host = h("section", { class: "sheet notebook" });
   const favorite = h(
@@ -172,12 +179,13 @@ export function learningToolbar() {
   return host;
 }
 export function resumePanel(index) {
-  if (!isOwner()) return null;
-  const row = getRecord("reading", {});
+  const owner = isOwner();
+  if (!owner && !localLearnerEnabled(browserStorage())) return null;
+  const row = owner ? getRecord("reading", {}) : readLocalReading(browserStorage());
   const item = index.byId.get(row.id);
   return h("section", { class: "sheet" }, [
     h("h2", { text: "Mon espace d’apprentissage" }),
-    h("p", { text: `${dueLessons(index).length} révision(s) à faire.` }),
+    h("p", { text: owner ? `${dueLessons(index).length} révision(s) à faire.` : "Ton point d’arrêt reste sur cet appareil. Exporte régulièrement tes quiz et brouillons depuis l’accueil." }),
     item
       ? h("a", {
           class: "button",
@@ -209,25 +217,29 @@ export async function backupDownload() {
   );
 }
 export function paintStudy(main, index) {
+  const progress = () => isOwner() ? getRecord("progress", {}).done || [] : readLocalProgress(browserStorage())?.done || [];
   const extras = h("div");
   let current = true;
   onLeave(() => { current = false; });
   Promise.all([import("./path-choice.js"), import("./project-evidence.js")]).then(([path, project]) => {
-    if (current) extras.replaceChildren(path.pathChoice(index), project.projectEvidence(index));
+    if (current) extras.replaceChildren(...[path.pathChoice(index), isOwner() ? project.projectEvidence(index) : null].filter(Boolean));
   }).catch(() => {
     if (current) extras.append(h("p", { role: "status", text: "Les outils du projet n'ont pas pu être chargés. Recharge la page lorsque le réseau revient." }));
   });
   main.replaceChildren(
     h("h1", { text: "Mon espace d’apprentissage" }),
+    courseProgress(index, progress()),
+    sessionPlanner(index, progress),
     extras,
     offlinePanel(),
   );
   if (!isOwner()) {
     main.append(
       h("p", {
-        text: "Connecte-toi au compte propriétaire pour retrouver tes notes, fichiers et révisions.",
+        text: "Sans compte : lis le cours, télécharge les TP et prépare tes séances. Le suivi sur cet appareil conserve les quiz et brouillons d’exercices ; active-le et exporte-les depuis l’accueil. Les notes synchronisées, les preuves importées et l’IDE nécessitent le compte propriétaire.",
       }),
-      h("a", { href: "#/connexion", text: "Se connecter" }),
+      h("a", { href: "#/", text: "Gérer le suivi sur cet appareil" }),
+      h("p", {}, h("a", { href: "#/connexion", text: "Connexion propriétaire pour les outils synchronisés" })),
     );
     return;
   }
@@ -297,54 +309,6 @@ export function paintStudy(main, index) {
     ),
     conflicts,
   );
-  const select = h("select", { "aria-label": "Durée de la séance" });
-  for (const n of [15, 30, 60])
-    select.append(h("option", { value: n, text: `${n} minutes` }));
-  const session = h("ol");
-  const plan = () => {
-    let left = Number(select.value);
-    const done = new Set(getRecord("progress", {}).done || []);
-    const due = dueLessons(index);
-    const ids = [
-      ...due,
-      ...index.orderedIds.filter((id) => !done.has(id) && !due.includes(id)),
-    ];
-    const chosen = [];
-    for (const id of ids) {
-      const lesson = index.byId.get(id).lesson;
-      const duration = due.includes(id)
-        ? Math.min(10, lesson.minutes)
-        : lesson.minutes;
-      if (duration <= left) {
-        chosen.push(
-          h("li", {}, [
-            h("a", { href: `#/lecon/${id}`, text: lesson.title }),
-            ` · ${duration} min${due.includes(id) ? " de révision" : ""}`,
-          ]),
-        );
-        left -= duration;
-      } else if (!due.includes(id)) {
-        // Ne saute jamais une nouvelle leçon pour remplir artificiellement le créneau.
-        break;
-      }
-    }
-    session.replaceChildren(...chosen);
-    if (!chosen.length)
-      session.append(
-        h("li", {
-          text: "Commence la prochaine leçon pendant ce créneau ; conserve ta position pour la terminer plus tard.",
-        }),
-      );
-  };
-  select.onchange = plan;
-  plan();
-  main.append(
-    h("section", { class: "sheet" }, [
-      h("h2", { text: "Ma prochaine séance" }),
-      select,
-      session,
-    ]),
-  );
   const collections = h("div");
   main.append(collections);
   const paintCollections = () => {
@@ -381,7 +345,6 @@ export function paintStudy(main, index) {
   paintCollections();
   const stopCollections = subscribe(() => {
     paintCollections();
-    plan();
   });
   onLeave(stopCollections);
   const result = h("p", { role: "status" });

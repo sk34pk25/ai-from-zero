@@ -34,6 +34,8 @@ export function parseHash(hash) {
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
   if (normalized === "/atelier") return { name: "atelier" };
+  const tp = normalized.match(/^\/atelier\/tp\/(1[0-2]|[1-9])$/);
+  if (tp) return { name: "atelier", tp: Number(tp[1]) };
   if (normalized === "/playground") return { name: "playground" };
   if (normalized === "/ide") return { name: "ide" };
   if (normalized === "/connexion") return { name: "connexion" };
@@ -57,7 +59,7 @@ export function hrefFor(route) {
     case "track":
       return "#/construire";
     case "atelier":
-      return "#/atelier";
+      return route.tp ? `#/atelier/tp/${route.tp}` : "#/atelier";
     case "playground":
       return "#/playground";
     case "ide":

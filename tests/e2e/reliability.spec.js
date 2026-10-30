@@ -18,11 +18,12 @@ test("le cours reste lisible avec un stockage inaccessible ; la navigation garde
   await page.getByRole("button",{name:/thème/i}).click();
   await page.goto("/#/lecon/4.5");
   await expect(page.locator("[data-lesson-id='4.5']")).toBeVisible();
+  await page.locator(".lesson-display > summary").click();
   await page.getByRole("button", { name: "Révision visuelle", exact: true }).click();
   await expect(page.locator(".lesson-deep")).not.toHaveAttribute("open");
   await page.getByRole("button", { name: "Cours guidé", exact: true }).click();
   await expect(page.locator(".lesson-deep")).toHaveAttribute("open", "");
-  await page.getByRole("link",{name:"Étape suivante",exact:true}).click();
+  await page.getByRole("link",{name:/^Leçon suivante :/}).click();
   await expect(page.locator("h1")).toBeFocused();
   expect(errors).toEqual([]);
 });

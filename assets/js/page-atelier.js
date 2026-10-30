@@ -5,7 +5,7 @@ import { onLeave } from "./lifecycle.js";
 import { pathChoice } from "./path-choice.js";
 import { publicAssetUrl } from "./public-url.js";
 
-export async function paintAtelier(main, index) {
+export async function paintAtelier(main, index, targetTp) {
   const controller = new AbortController();
   onLeave(() => controller.abort());
   const response = await fetch(publicAssetUrl("data/atelier.json"), {
@@ -106,6 +106,11 @@ export async function paintAtelier(main, index) {
       ]),
     );
   }
+  const tpNavigation = h("nav", { class: "sheet tp-navigation", "aria-label": "Travaux pratiques" }, [
+    h("h2", { text: "Choisir mon TP" }),
+    h("p", { text: "Chaque lien conduit directement au contrat et à la commande de contrôle. Commence par les leçons associées ; les TP cumulent les composants." }),
+    ...spec.stages.map(stage => h("a", { href: `#/atelier/tp/${stage.id}`, "aria-current": stage.id === targetTp ? "location" : null, text: `TP ${stage.id} · ${stage.title}` })),
+  ]);
   const doc = h("section", { class: "sheet atelier-document" });
   const selector = h("select", { "aria-label": "Guide de l’atelier" });
   const names = [
@@ -175,6 +180,8 @@ export async function paintAtelier(main, index) {
         text: "Les 12 contrôles vérifient des propriétés techniques. Ils ne certifient pas ton autonomie : explique les briques sans le corrigé et réalise le projet final sur tes données.",
       }),
     ]),
+    tpNavigation,
+    list,
     h("section", { class: "sheet" }, [
       h("h2", { text: "Le tronc commun recommandé" }),
       core,
@@ -189,12 +196,17 @@ export async function paintAtelier(main, index) {
       h("button", { type: "button", class: "button button-secondary", onClick: () => {
         selector.value = "atelier/DOSSIER_MODELE.md";
         loadDoc();
-        selector.focus();
+        doc.parentElement.open = true;
+        doc.scrollIntoView({ block: "start" });
+        selector.focus({ preventScroll: true });
       } }, "Ouvrir le dossier final"),
     ]),
-    doc,
-    diagnostics,
-    list,
+    h("details", { class: "atelier-resources" }, [h("summary", { text: "Guides, installation et dossier final" }), doc]),
+    h("details", { class: "atelier-resources" }, [h("summary", { text: "Diagnostics : s’entraîner à chercher une panne" }), diagnostics]),
   );
+  if (targetTp) {
+    const target = list.querySelector(`#tp-${targetTp}`);
+    if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: "start" }); }
+  }
   await loadDoc();
 }

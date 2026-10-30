@@ -16,7 +16,7 @@ La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construi
 
 Le site utilise le thème « Cahier lumineux » : fond clair, bleu vif `#2558E8`, surligneur jaune, polices Inter et Inter Display servies par le site (`assets/fonts/`, licence OFL). La variante sombre « Cahier nuit » suit le réglage du système et reste au choix avec le bouton de thème.
 
-Chaque leçon s'ouvre d'abord en version visuelle : une phrase clé, un schéma (manipulable quand il existe, sinon les trois gestes de l'étape), trois cartes « En image », « L'essentiel » et « Piège », l'exemple de code puis le quiz. L'explication complète reste disponible, repliée sous « Pour aller plus loin ». Les résumés visuels sont écrits dans `curriculum_src/visuel/` ; `scripts/build_curriculum.py` refuse une leçon sans résumé ou un résumé trop long.
+Chaque leçon présente d’abord ses objectifs et prérequis, puis l’intuition illustrée et l’explication complète, ouverte en cours guidé. La révision visuelle permet de la replier. Le code, la pratique et les contrôles précèdent le quiz, le bilan et les liens de suite. Un sommaire permet de rejoindre chaque activité ; les commandes de lecture sont dans « Affichage et lecture ». Les résumés visuels sont écrits dans `curriculum_src/visuel/`.
 
 ## Ce qui s'ajoute au parcours
 
@@ -172,7 +172,7 @@ Le mode `correction` teste la référence. Pour apprendre, complète `eleve.py` 
 
 L’atelier contrôle aussi des valeurs attendues indépendantes de l’attention, de la loss et des têtes. Les tests de mutation refusent sept erreurs volontaires : échelle, loss constante, masque, ordre des têtes, cible, résidu et accumulation. `--tp N` permet un contrôle individuel lorsque les TP précédents demandent des leçons encore non étudiées. Les nouveaux checkpoints lient poids, code, moteur, données normalisées et documents connus ; l’évaluation refuse le recouvrement connu. Les rapports neufs ne peuvent pas écraser sources ou poids.
 
-Le choix « Mon parcours » dans Atelier et Mon espace règle Continuer, les voisins et les séances : par défaut 0 → 1 → 2 → 3 → 4 → 13, puis les approfondissements. Mon espace distingue lecture, rapport de contrôles importé et explications déclarées. Ces déclarations ne certifient pas l’autonomie.
+Le choix « Mon parcours » dès l’accueil, dans Atelier et Mon espace règle Continuer et les séances : par défaut 0 → 1 → 2 → 3 → 4 → 13, soit 84 leçons, puis le bilan du projet. Les 77 explorations restent accessibles séparément et possèdent leur propre indicateur. Le planificateur est public ; le suivi local et son point d’arrêt sont facultatifs. Mon espace distingue lecture, rapport de contrôles importé et explications déclarées. Ces déclarations ne certifient pas l’autonomie.
 
 Le [banc français](atelier/BANC_FR.md) contient douze textes originaux, huit train/deux validation/deux test, sans répétition automatique. Six entraînements réels comparent largeurs 16/24, trois graines appariées et 240 pas. La largeur 16 est retenue sur validation ; son test moyen vaut **2,3921 ± 0,0082 nats/caractère** (écart-type des trois graines), contre **2,4514** pour le bigramme et **3,9703** pour l’uniforme, sur les mêmes cibles. Le tokenizer réserve aussi � ; le détail de couverture est dans le rapport. Ces résultats locaux ne constituent pas une preuve de supériorité générale ni de réponses fiables. [Rapport réel](data/benchmark_fr_run.json).
 
