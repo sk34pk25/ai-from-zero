@@ -242,7 +242,7 @@ export function mountTrainingRun(host, run) {
   };
   cursor.input.addEventListener("input", inspect); inspect();
   const summary = readout(
-    `${run.steps} pas en ${run.seconds} s. ${run.parameter_count} paramètres, vocabulaire ${run.vocab_size}, ${run.dataset_chars} caractères. Train ${Number(run.train_loss_start).toFixed(3)} à ${Number(run.train_loss_end).toFixed(3)}. Validation ${Number(run.val_loss_start).toFixed(3)} à ${Number(run.val_loss_end).toFixed(3)}. Le train est le lot courant ; la validation est mesurée sur des fenêtres réservées. Ces mesures restent celles du run archivé, avec son protocole de découpage.`,
+    `${run.steps} pas en ${run.seconds} s. ${run.parameter_count} paramètres, vocabulaire ${run.vocab_size}, ${run.dataset_chars} caractères. Train moyen (évaluation) ${Number(run.train_loss_start).toFixed(3)} à ${Number(run.train_loss_end).toFixed(3)}. Validation ${Number(run.val_loss_start).toFixed(3)} à ${Number(run.val_loss_end).toFixed(3)}. La courbe bleue montre le lot courant, qui diffère de cette évaluation moyenne du train ; la validation est mesurée sur des fenêtres réservées. Ces mesures restent celles du run archivé, avec son protocole de découpage.`,
   );
   const table = document.createElement("details");
   const title = document.createElement("summary"); title.textContent = "Valeurs de validation, sans dépendre de la courbe";

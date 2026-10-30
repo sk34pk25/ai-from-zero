@@ -1725,3 +1725,4 @@ main[tabindex="-1"]:focus { outline: none; }
   .lesson-main > .lesson-overview { margin-top: 1rem; }
   .lab-chart { min-width: 340px; }
 }
+.visual-host[data-lab] .token-board button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
