@@ -111,6 +111,9 @@ test.describe("Cache public réel", () => {
     await context.setOffline(true);
     await page.goto("/#/lecon/0.9");
     await expect(page.locator("h1")).toHaveText("Fonctions");
+    await page.goto("/#/preuves");
+    await page.getByRole("button", { name: "Démarrer une tentative" }).click();
+    await expect(page.getByLabel("Code du cas nouveau")).toBeVisible();
     expect(
       await page.evaluate(async () => {
         const keys = await caches.keys();

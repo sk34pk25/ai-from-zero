@@ -73,10 +73,13 @@ json.dumps(snaps)
 
 self.onmessage = async (event) => {
   const msg = event.data || {};
+  let phase = "loading";
   try {
     const python = await ensure();
     self.postMessage({ type: "booted" });
+    phase = "dependencies";
     if (msg.files?.length) writeFiles(msg.files);
+    phase = "execution";
     if (msg.type === "boot") {
       self.postMessage({ type: "ready" });
       return;
@@ -120,6 +123,6 @@ trainer = LiveTrainer(train_text * 40, steps=int(train_steps), lr=0.08, batch=2,
     }
     self.postMessage({ type: "error", text: "message inconnu" });
   } catch (error) {
-    self.postMessage({ type: "error", text: String(error && error.message ? error.message : error) });
+    self.postMessage({ type: "error", phase, text: String(error && error.message ? error.message : error) });
   }
 };

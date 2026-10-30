@@ -33,11 +33,11 @@ Le fil rouge de ce niveau tient dans deux fonctions, patchify et project_patches
 @QUESTION
 Avant d'entrer dans le dos, que doivent devenir des pixels ou des échantillons ?
 @CORRECT
-Une suite de vecteurs de largeur compatible avec le modèle
+Une séquence de vecteurs dont la largeur convient au dos choisi
 @WRONG
-- Une loss
-- Un masque causal
-- Un fichier README
+- Des identifiants de caractères UTF-8 obligatoires
+- Des probabilités de prochain mot déjà normalisées
+- Un unique scalaire par document multimodal
 @EXPLANATION
 Le dos consomme des vecteurs. La modalité d'origine doit être convertie, pas branchée comme un fichier brut.
 @@@
@@ -76,11 +76,11 @@ La brique « Patches » du site s'allume à cette étape. Elle désigne patchify
 @QUESTION
 Dans le test, pourquoi le premier patch vaut [0, 1, 4, 5] et non [0, 1, 2, 3] ?
 @CORRECT
-Parce qu'il prend le carré 2 par 2 en haut à gauche, pas la première ligne
+C’est le carré supérieur gauche
 @WRONG
-- Parce que le modèle est déjà entraîné
-- Parce que les canaux sont en couleur
-- Parce que le scan SSM a réordonné les pixels
+- C’est la première ligne complète de l’image
+- Les pixels sont triés par valeur croissante
+- Les canaux ont été moyennés avant extraction
 @EXPLANATION
 arange remplit la ligne 0 avec 0,1,2,3 et la ligne 1 avec 4,5,6,7. Le carré gauche garde 0, 1, 4, 5.
 @@@
@@ -119,11 +119,11 @@ Le fil rouge s'arrête à project_patches. Les leçons d'audio et de vidéo déc
 @QUESTION
 Que fait project_patches, et que ne fait-il pas ?
 @CORRECT
-Une couche linéaire vers D, pas un Transformer visuel complet
+Une projection linéaire vers D
 @WRONG
-- Un tokenizer BPE sur les pixels
-- Un scan sélectif
-- La loss de l'étape 1
+- Un encodeur visuel complet entraîné
+- Un décodeur qui reconstruit les pixels
+- Un tokenizer BPE des couleurs de l’image
 @EXPLANATION
 La fonction est un produit matriciel et un biais. L'attention entre patches n'est pas dans ce module.
 @@@
@@ -162,11 +162,11 @@ Le fil rouge ne gagne pas de fichier audio. Le contrat du niveau reste patchify,
 @QUESTION
 Où est calculé le spectrogramme dans ce dépôt ?
 @CORRECT
-Nulle part : la leçon décrit l'idée, le code ne l'implémente pas
+Nulle part dans le code : le spectrogramme est seulement décrit
 @WRONG
-- Dans model/multimodal.py, fonction spectrogram
-- Dans le tokenizer caractère
-- Dans selective_scan
+- Dans le tokenizer caractère du laboratoire
+- Dans project_patches avant la projection
+- Dans le scan sélectif du dos SSM
 @EXPLANATION
 multimodal.py expose patchify et project_patches. Aucun test audio n'existe, et c'est assumé.
 @@@
@@ -204,11 +204,11 @@ Rien ne s'ajoute au fil rouge. La leçon sert à ne pas sur-vendre model/multimo
 @QUESTION
 Un encodeur audio de ce cours, aujourd'hui, c'est…
 @CORRECT
-Un schéma de projection décrit, sans module ni test
+Une idée décrite, sans module testé
 @WRONG
-- Une fonction testée de model/multimodal.py
-- Le bigramme appliqué aux lettres
-- Le routeur MoE
+- Un encodeur entraîné et sauvegardé
+- Une fonction de model/multimodal.py testée
+- Un tokenizer audio fourni par le playground
 @EXPLANATION
 Le seul code multimodal testé est le découpage d'image et sa projection. L'audio reste une analogie de forme.
 @@@
@@ -246,11 +246,11 @@ Aucun module vidéo n'entre dans le fil rouge. L'étape sert à dimensionner ava
 @QUESTION
 Pourquoi ne pas créer un token par pixel et par frame ?
 @CORRECT
-Parce que T explose et le coût d'attention quadratique avec lui
+Le nombre de positions explose, avec un coût d’attention en T²
 @WRONG
-- Parce que les pixels ne sont pas des nombres
-- Parce que le masque causal l'interdit
-- Parce que NumPy ne sait pas multiplier
+- Le nombre de poids double à chaque pixel
+- Le masque causal devient mathématiquement impossible
+- La projection ne peut accepter de valeurs réelles
 @EXPLANATION
 Le patch et le tube existent pour réduire T. Le niveau 6 a déjà montré que le terme T*T devient le coût dominant.
 @@@
@@ -290,11 +290,11 @@ Le fil rouge montre la compatibilité de forme via project_patches. L'alignement
 @QUESTION
 Deux suites de vecteurs de même largeur D sont-elles pour autant alignées ?
 @CORRECT
-Non : la largeur permet de les concaténer, le sens demande un entraînement que le dépôt ne fait pas
+Non, l’alignement doit être appris
 @WRONG
-- Oui, dès que les formes matchent
-- Oui, grâce au bigramme
-- Non, parce que NumPy interdit la concaténation
+- Oui, D identique garantit le même sens
+- Oui, une concaténation entraîne les deux encodeurs
+- Non, il faut seulement trier les vecteurs
 @EXPLANATION
 La concaténation sur le temps exige le même D. La proximité de sens exige une perte et des données, absentes ici.
 @@@
@@ -333,11 +333,11 @@ Le fil rouge ne gagne pas de fonction fuse. La leçon empêche de confondre un c
 @QUESTION
 Dans une concaténation causale image puis texte, qui peut lire l'autre ?
 @CORRECT
-Le texte peut lire l'image passée ; l'image ne peut pas lire le texte futur
+Texte vers image passée seulement
 @WRONG
-- Les deux se lisent dans les deux sens
-- Personne ne lit personne
-- Seul le routeur MoE décide
+- Image vers texte futur seulement
+- Les deux sens, malgré le masque causal
+- Aucun sens, car les modalités restent séparées
 @EXPLANATION
 Le masque causal suit l'ordre de la suite. Placer une modalité avant l'autre lui donne le rôle de contexte.
 @@@
@@ -375,10 +375,10 @@ Le projet du niveau est livré : découpage et projection, testés. Les sorties 
 @QUESTION
 Quelle sortie multimodale est réellement implémentée et testée ?
 @CORRECT
-Aucune : le module couvre l'entrée image jusqu'à la projection, pas une image reconstruite
+Aucune : seule l’entrée image jusqu’à sa projection est testée
 @WRONG
-- Un décodeur audio testé par pytest
-- Une vidéo générée dans model/__main__.py
-- Une tête qui peint des pixels dans TinyGPT
+- Une image reconstruite depuis le texte
+- Une forme d’onde produite depuis les patches
+- Une vidéo décodée depuis le dos hybride
 @EXPLANATION
 Le test fixe patchify et project_patches. Revenir vers des pixels n'est pas dans le dépôt.

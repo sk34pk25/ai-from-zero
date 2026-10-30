@@ -32,11 +32,11 @@ Le corpus model/data/corpus.txt est de l'UTF-8. CharTokenizer ne le décode pas 
 @QUESTION
 Unicode sert d'abord à quoi, dans ce cours ?
 @CORRECT
-Attribuer un numéro à chaque caractère, indépendamment de l'encodage en octets
+Attribuer des points de code aux caractères, avant l’encodage en octets
 @WRONG
-- Entraîner le modèle
-- Calculer un gradient
-- Compresser la VRAM
+- Compresser les caractères en tokens BPE
+- Imposer un octet par caractère
+- Donner un embedding à chaque mot
 @EXPLANATION
 Unicode catalogue les caractères. L'encodage, le tokenizer et l'entraînement sont des couches suivantes.
 @@@
@@ -73,11 +73,11 @@ Le fichier model/data/corpus.txt est le corpus du fil rouge. python -m model le 
 @QUESTION
 Un corpus, dans ce parcours, désigne quoi ?
 @CORRECT
-L'ensemble de textes dont le modèle estimera des régularités
+Les textes réunis pour l’apprentissage
 @WRONG
-- L'optimiseur
-- La matrice de poids
-- Le learning rate
+- La table des identifiants de tokens
+- Le fichier contenant les poids appris
+- La seule partie réservée à la validation
 @EXPLANATION
 Le corpus est la donnée. Les poids et l'optimiseur viennent après, pour en extraire un modèle.
 @@@
@@ -114,11 +114,11 @@ CharTokenizer documente ce choix : KeyError sur un caractère absent. Le test te
 @QUESTION
 UTF-8 produit quoi à partir d'un texte ?
 @CORRECT
-Une suite d'octets qui représente les caractères
+Des octets qui représentent le texte
 @WRONG
-- Des gradients
-- Des poids de réseau
-- Une loss déjà normalisée
+- Une suite d’embeddings entraînés
+- Une liste de mots séparés par espaces
+- Une distribution sur le vocabulaire
 @EXPLANATION
 L'encodage traduit le texte en octets. Il ne calcule ni loss ni paramètre.
 @@@
@@ -155,11 +155,11 @@ CharTokenizer.vocab_size est cette longueur. Le bigramme alloue une matrice V pa
 @QUESTION
 Le vocabulaire associe des unités à…
 @CORRECT
-Des identifiants entiers stables
+Des entiers fixes qui servent à retrouver ces mêmes unités
 @WRONG
-- Des adresses GPU
-- Des valeurs de loss
-- Des learning rates
+- Des fréquences recalculées à chaque appel
+- Des vecteurs différents à chaque lecture
+- Des probabilités de prochain token
 @EXPLANATION
 Chaque unité reçoit un entier. Cet entier indexera une ligne d'embedding et une case de logit.
 @@@
@@ -200,11 +200,11 @@ La brique est model/tokenizer.py. Le test vérifie l'aller-retour sur « bonjour
 @QUESTION
 Pourquoi ce tokenizer renvoie-t-il des entiers ?
 @CORRECT
-Parce que le modèle ne calcule pas sur des caractères, mais sur des indices
+Les entiers indexent les unités du vocabulaire
 @WRONG
-- Pour accélérer le disque
-- Pour remplacer la loss
-- Pour créer une image
+- Chaque entier encode directement le sens du token
+- Les indices sont déjà les probabilités prédites
+- La taille des entiers remplace les positions
 @EXPLANATION
 Les entiers indexeront des vecteurs. Le texte humain s'arrête à cette frontière.
 @@@
@@ -242,11 +242,11 @@ pair_counts et merge_pair dans model/tokenizer.py sont cette étape, séparée d
 @QUESTION
 BPE fusionne surtout quel genre de paires ?
 @CORRECT
-Des paires d'unités fréquentes et adjacentes
+Les unités fréquentes et adjacentes
 @WRONG
-- Des couches du réseau
-- Des gradients de même signe
-- Des fichiers du dépôt
+- Les caractères les plus éloignés du texte
+- Les mots les plus longs, quelle que soit leur fréquence
+- Les unités dont les embeddings sont les plus proches
 @EXPLANATION
 L'algorithme ne regarde que les suites dans le corpus. Il ne connaît ni les poids ni les dossiers.
 @@@
@@ -284,11 +284,11 @@ La classe MiniBPE est le fil rouge de cette étape. Elle ne dépend d'aucune bib
 @QUESTION
 Une fusion BPE modifie quoi dans le vocabulaire ?
 @CORRECT
-La segmentation : plusieurs unités deviennent une seule, de façon réversible
+Une segmentation différente et réversible
 @WRONG
-- La quantité de RAM physique
-- La loss, directement, sans entraînement
-- Le nombre de cœurs du CPU
+- L’ordre des caractères dans le texte
+- Le sens sémantique des embeddings
+- La normalisation des probabilités de sortie
 @EXPLANATION
 La fusion change la suite d'identifiants. Elle reste décodable. Elle ne touche ni au matériel ni à la loss.
 @@@
@@ -325,11 +325,11 @@ encode et decode sont le contrat public du tokenizer. Les modèles du dépôt, B
 @QUESTION
 Un identifiant de token est…
 @CORRECT
-Un entier qui désigne une unité du vocabulaire
+Un index entier du vocabulaire fixé
 @WRONG
-- Une probabilité
-- Un gradient
-- Une longueur en octets
+- Une mesure numérique de similarité
+- Le nombre d’occurrences dans le corpus
+- Une position absolue dans le document
 @EXPLANATION
 L'identifiant indexe le vocabulaire. La probabilité et le gradient sont d'autres nombres, produits plus tard par le modèle.
 @@@
@@ -368,11 +368,11 @@ La table tok est créée dans TinyGPT.__init__. Le test des options modernes vé
 @QUESTION
 Un embedding transforme un identifiant en…
 @CORRECT
-Un vecteur de dimension fixe
+Une ligne de la table d’embeddings, de dimension fixée
 @WRONG
-- Un fichier
-- Une boucle for
-- Une probabilité déjà sommée à 1
+- Une probabilité scalaire entre 0 et 1
+- Un vecteur de longueur égale au texte
+- Une liste de caractères de même longueur
 @EXPLANATION
 La lecture de table remplace l'entier par D nombres. La probabilité n'apparaît qu'après les logits et softmax.
 @@@
@@ -410,11 +410,11 @@ GPTConfig.pos vaut "absolute" ou "rope". Le forward ajoute la table seulement da
 @QUESTION
 L'information de position sert à…
 @CORRECT
-Distinguer l'ordre des tokens dans la séquence
+La place des tokens dans une séquence
 @WRONG
-- Remplacer la loss
-- Mesurer l'espace disque
-- Numéroter les commits
+- Classer les tokens par fréquence
+- Garantir la causalité sans masque
+- Identifier le document d’origine de chaque token
 @EXPLANATION
 Sans position, l'ordre n'est pas représenté. La loss et le disque sont d'autres sujets.
 @@@
@@ -454,10 +454,10 @@ Tous les forwards du dépôt refusent un idx qui n'est pas de rang 2. C'est une 
 @QUESTION
 Dans un tableau d'identifiants de forme (2, 3), que vaut la première dimension ?
 @CORRECT
-2, le nombre de séquences du batch
+2 séquences dans le batch
 @WRONG
-- 3, la longueur de chaque séquence
-- 6, le nombre total de tokens
-- 1, parce qu'on compte toujours à partir de 1
+- 3 séquences dans le batch
+- 6 séquences dans le batch
+- 2 tokens dans chaque séquence
 @EXPLANATION
 La convention du laboratoire est (batch, temps). Le 2 est le batch, le 3 est la longueur.

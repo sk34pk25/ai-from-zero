@@ -1,0 +1,180 @@
+[
+  {
+    "id": "fondations-A",
+    "stage": "fondations",
+    "title": "Fondations et apprentissage",
+    "variant": "A",
+    "lessons": [
+      "0.9",
+      "0.18",
+      "1.4",
+      "1.9"
+    ],
+    "prompt": "Reconstruis affine(x,w,b). Corrige mse : elle doit renvoyer la moyenne des carrés des écarts.",
+    "starter": "def affine(x,w,b):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef mse(pred,cibles):\n    return (sum(p-y for p,y in zip(pred,cibles))/len(pred))**2\n",
+    "solution": "def affine(x,w,b):\n    return w*x+b\n\ndef mse(pred,cibles):\n    return sum((p-y)**2 for p,y in zip(pred,cibles))/len(pred)\n",
+    "check": "assert affine(-2,3,4)==-2; assert affine(0,7,-1)==-1\nassert mse([2,-2],[0,0])==4; assert mse([3,1],[1,1])==2\n",
+    "explain": "Calcule à la main affine(-3,2,1), puis explique pourquoi les erreurs +2 et −2 donnent une MSE de 4.",
+    "hint": "Le carré s’applique à chaque écart avant la moyenne. Un poids nul ne supprime pas le biais."
+  },
+  {
+    "id": "fondations-B",
+    "stage": "fondations",
+    "title": "Fondations et apprentissage",
+    "variant": "B",
+    "lessons": [
+      "0.9",
+      "0.18",
+      "1.4",
+      "1.9"
+    ],
+    "prompt": "Reconstruis affine(x,w,b). Corrige mse : elle doit renvoyer la moyenne des carrés des écarts.",
+    "starter": "def affine(x,w,b):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef mse(pred,cibles):\n    return sum((p-y)**2 for p,y in zip(pred,cibles))\n",
+    "solution": "def affine(x,w,b):\n    return w*x+b\n\ndef mse(pred,cibles):\n    return sum((p-y)**2 for p,y in zip(pred,cibles))/len(pred)\n",
+    "check": "assert affine(.5,-4,3)==1; assert affine(2,3,-4)==2\nassert mse([3,-3],[0,0])==9; assert mse([1,5],[1,1])==8\n",
+    "explain": "Calcule à la main affine(4,-2,3), puis explique pourquoi les erreurs +3 et −3 donnent une MSE de 9.",
+    "hint": "Le carré s’applique à chaque écart avant la moyenne. Un poids nul ne supprime pas le biais."
+  },
+  {
+    "id": "tokens-A",
+    "stage": "tokens",
+    "title": "Texte, indices et décalage",
+    "variant": "A",
+    "lessons": [
+      "2.4",
+      "2.5",
+      "2.11"
+    ],
+    "prompt": "Reconstruis encoder(texte,vocab), sans changer les indices fournis. Corrige fenetres : y est décalé d’un token et chaque paire est complète.",
+    "starter": "def encoder(texte,vocab):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef fenetres(ids,t):\n    return [(ids[i:i+t],ids[i:i+t]) for i in range(len(ids)-t)]\n",
+    "solution": "def encoder(texte,vocab):\n    return [vocab[c] for c in texte]\n\ndef fenetres(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t)]\n",
+    "check": "assert encoder('é a',{'é':8,' ':2,'a':5})==[8,2,5]; assert encoder('',{})==[]\nassert fenetres([8,2,5,8],2)==[([8,2],[2,5]),([2,5],[5,8])]; assert fenetres([8],2)==[]\n",
+    "explain": "Écris x et y pour les indices [6,1,7,2] avec T=2. Pourquoi y=x ferait-il apprendre une autre tâche ?",
+    "hint": "La table est fixée. À la position i, la cible vient de i+1, avec autant de cibles que d’entrées."
+  },
+  {
+    "id": "tokens-B",
+    "stage": "tokens",
+    "title": "Texte, indices et décalage",
+    "variant": "B",
+    "lessons": [
+      "2.4",
+      "2.5",
+      "2.11"
+    ],
+    "prompt": "Reconstruis encoder(texte,vocab), sans changer les indices fournis. Corrige fenetres : y est décalé d’un token et chaque paire est complète.",
+    "starter": "def encoder(texte,vocab):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef fenetres(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t+1)]\n",
+    "solution": "def encoder(texte,vocab):\n    return [vocab[c] for c in texte]\n\ndef fenetres(ids,t):\n    return [(ids[i:i+t],ids[i+1:i+t+1]) for i in range(len(ids)-t)]\n",
+    "check": "assert encoder('b🙂b',{'b':4,'🙂':9})==[4,9,4]; assert encoder('',{})==[]\nassert fenetres([4,9,4],1)==[([4],[9]),([9],[4])]; assert fenetres([4,9],2)==[]\n",
+    "explain": "Écris x et y pour [3,0,5,3,2] avec T=3. Pourquoi un identifiant plus grand ne signifie-t-il pas un token plus important ?",
+    "hint": "La table est fixée. À la position i, la cible vient de i+1, avec autant de cibles que d’entrées."
+  },
+  {
+    "id": "probabilites-A",
+    "stage": "probabilites",
+    "title": "Scores, probabilités et perte",
+    "variant": "A",
+    "lessons": [
+      "3.5",
+      "3.6",
+      "3.10"
+    ],
+    "prompt": "Reconstruis un softmax stable. Corrige perte(p) : une cible très probable doit avoir une faible perte, exprimée en nats.",
+    "starter": "def softmax(scores):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef perte(p):\n    import math\n    return -math.log10(p)\n",
+    "solution": "def softmax(scores):\n    import math\n    m=max(scores); e=[math.exp(x-m) for x in scores]\n    return [v/sum(e) for v in e]\n\ndef perte(p):\n    import math\n    return -math.log(p)\n",
+    "check": "import math\np=softmax([1000,1000+math.log(3)]); assert abs(p[0]-.25)<1e-10; assert abs(p[1]-.75)<1e-10\nassert abs(perte(.25)-math.log(4))<1e-10; assert perte(1)==0\n",
+    "explain": "La cible a une probabilité 1/4. Donne sa perte en nats et sa perplexité. Pourquoi ajouter 100 à tous les logits ne change-t-il pas softmax ?",
+    "hint": "Soustraire une constante commune aux scores conserve leurs rapports exponentiels. La perplexité est exp(loss)."
+  },
+  {
+    "id": "probabilites-B",
+    "stage": "probabilites",
+    "title": "Scores, probabilités et perte",
+    "variant": "B",
+    "lessons": [
+      "3.5",
+      "3.6",
+      "3.10"
+    ],
+    "prompt": "Reconstruis un softmax stable. Corrige perte(p) : une cible très probable doit avoir une faible perte, exprimée en nats.",
+    "starter": "def softmax(scores):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef perte(p):\n    import math\n    return math.log(p)\n",
+    "solution": "def softmax(scores):\n    import math\n    m=max(scores); e=[math.exp(x-m) for x in scores]\n    return [v/sum(e) for v in e]\n\ndef perte(p):\n    import math\n    return -math.log(p)\n",
+    "check": "import math\np=softmax([-1000,-1000+math.log(4)]); assert abs(p[0]-.2)<1e-10; assert abs(p[1]-.8)<1e-10\nassert abs(perte(.2)-math.log(5))<1e-10; assert perte(1)==0\n",
+    "explain": "La cible a une probabilité 1/5. Donne sa perte en nats et sa perplexité. Pourquoi soustraire le maximum évite-t-il un débordement ?",
+    "hint": "Soustraire une constante commune aux scores conserve leurs rapports exponentiels. La perplexité est exp(loss)."
+  },
+  {
+    "id": "attention-A",
+    "stage": "attention",
+    "title": "Causalité et valeurs attendues",
+    "variant": "A",
+    "lessons": [
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6"
+    ],
+    "prompt": "Reconstruis masque(t), triangulaire inférieur booléen. Corrige attention : les scores doivent être divisés par la racine de la dimension des clés.",
+    "starter": "def masque(t):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef attention(q,k,v):\n    import numpy as np\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T\n    z=np.where(np.asarray(masque(len(q))),z,-np.inf)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
+    "solution": "def masque(t):\n    return [[j<=i for j in range(t)] for i in range(t)]\n\ndef attention(q,k,v):\n    import numpy as np\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T/q.shape[-1]**.5\n    z=np.where(np.asarray(masque(len(q))),z,-np.inf)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
+    "check": "import numpy as np\nassert masque(3)==[[True,False,False],[True,True,False],[True,True,True]]\na=attention([[0,0,0,0],[2,0,0,0]],[[0,0,0,0],[2,0,0,0]],[[2.],[10.]])\nnp.testing.assert_allclose(a,[[2.],[(2+10*np.exp(2))/(1+np.exp(2))]])\n",
+    "explain": "Pour des scores bruts [0,4] avec d_k=4, calcule les scores réduits et les poids. Si une valeur future change, quelle sortie passée doit rester identique ?",
+    "hint": "La forme et la causalité ne détectent pas une échelle manquante. Contrôle une valeur indépendante en plus du masque."
+  },
+  {
+    "id": "attention-B",
+    "stage": "attention",
+    "title": "Causalité et valeurs attendues",
+    "variant": "B",
+    "lessons": [
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6"
+    ],
+    "prompt": "Reconstruis masque(t), triangulaire inférieur booléen. Corrige attention : les scores doivent être divisés par la racine de la dimension des clés.",
+    "starter": "def masque(t):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef attention(q,k,v):\n    import numpy as np\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T/q.shape[-1]\n    z=np.where(np.asarray(masque(len(q))),z,-np.inf)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
+    "solution": "def masque(t):\n    return [[j<=i for j in range(t)] for i in range(t)]\n\ndef attention(q,k,v):\n    import numpy as np\n    q,k,v=map(np.asarray,(q,k,v))\n    z=q@k.T/q.shape[-1]**.5\n    z=np.where(np.asarray(masque(len(q))),z,-np.inf)\n    e=np.exp(z-z.max(-1,keepdims=True))\n    return e/e.sum(-1,keepdims=True)@v\n",
+    "check": "import numpy as np\nassert masque(2)==[[True,False],[True,True]]\na=attention([[0,0,0,0],[4,0,0,0]],[[0,0,0,0],[1,0,0,0]],[[1.],[6.]])\nnp.testing.assert_allclose(a,[[1.],[(1+6*np.exp(2))/(1+np.exp(2))]])\n",
+    "explain": "Pour [0,6] avec d_k=9, calcule les scores réduits et les poids. Une attention sans échelle peut être causale : pourquoi un test de causalité seul ne suffit-il pas ?",
+    "hint": "La forme et la causalité ne détectent pas une échelle manquante. Contrôle une valeur indépendante en plus du masque."
+  },
+  {
+    "id": "evaluation-A",
+    "stage": "evaluation",
+    "title": "Évaluation et modèle personnel",
+    "variant": "A",
+    "lessons": [
+      "5.10",
+      "12.4",
+      "12.5",
+      "12.10",
+      "12.12"
+    ],
+    "prompt": "Reconstruis fuites(train,val) : la liste triée des groupes présents des deux côtés. Corrige deltas : compare variante − baseline pour une même graine, même si les lignes sont permutées.",
+    "starter": "def fuites(train,val):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef deltas(base,variante):\n    return [v[\"loss\"]-b[\"loss\"] for b,v in zip(base,variante)]\n",
+    "solution": "def fuites(train,val):\n    return sorted(set(train)&set(val))\n\ndef deltas(base,variante):\n    b={r[\"seed\"]:r[\"loss\"] for r in base}\n    v={r[\"seed\"]:r[\"loss\"] for r in variante}\n    if b.keys()!=v.keys(): raise ValueError(\"graines non appariées\")\n    return [v[s]-b[s] for s in sorted(b)]\n",
+    "check": "assert fuites(['doc-a','doc-b','doc-a'],['doc-c','doc-b'])==['doc-b']; assert fuites([],['a'])==[]\na=deltas([{'seed':0,'loss':3.},{'seed':1,'loss':2.}], [{'seed':1,'loss':2.5},{'seed':0,'loss':2.}]); assert a==[-1.,.5]\n",
+    "explain": "Sur ton propre checkpoint rechargé, choisis un texte nouveau sans l’utiliser pour choisir les poids. Donne provenance, tokenizer, commande, logits avant/après rechargement et une erreur du modèle. Des deltas [-0,02 ; +0,01 ; -0,01] suffisent-ils à affirmer un gain général ?",
+    "hint": "L’identité documentaire et la graine sont des clés d’appariement. Une preuve de modèle demande aussi un checkpoint, des données réservées et une explication vérifiable."
+  },
+  {
+    "id": "evaluation-B",
+    "stage": "evaluation",
+    "title": "Évaluation et modèle personnel",
+    "variant": "B",
+    "lessons": [
+      "5.10",
+      "12.4",
+      "12.5",
+      "12.10",
+      "12.12"
+    ],
+    "prompt": "Reconstruis fuites(train,val) : la liste triée des groupes présents des deux côtés. Corrige deltas : compare variante − baseline pour une même graine, même si les lignes sont permutées.",
+    "starter": "def fuites(train,val):\n    raise NotImplementedError(\"À reconstruire\")\n\ndef deltas(base,variante):\n    return [b[\"loss\"]-v[\"loss\"] for b,v in zip(base,variante)]\n",
+    "solution": "def fuites(train,val):\n    return sorted(set(train)&set(val))\n\ndef deltas(base,variante):\n    b={r[\"seed\"]:r[\"loss\"] for r in base}\n    v={r[\"seed\"]:r[\"loss\"] for r in variante}\n    if b.keys()!=v.keys(): raise ValueError(\"graines non appariées\")\n    return [v[s]-b[s] for s in sorted(b)]\n",
+    "check": "assert fuites(['famille-2','famille-1'],['famille-1','famille-2','famille-3'])==['famille-1','famille-2']\na=deltas([{'seed':2,'loss':4.},{'seed':7,'loss':3.}], [{'seed':7,'loss':2.5},{'seed':2,'loss':4.5}]); assert a==[.5,-.5]\n",
+    "explain": "Sur ton propre modèle, prédis ce qui change si le prompt est permuté, puis exécute et confronte à la prédiction. Cite checkpoint, commande, sortie, limite et aides utilisées. Pourquoi ne faut-il pas choisir le meilleur modèle après avoir observé le test final ?",
+    "hint": "L’identité documentaire et la graine sont des clés d’appariement. Une preuve de modèle demande aussi un checkpoint, des données réservées et une explication vérifiable."
+  }
+]

@@ -40,11 +40,11 @@ Ajoute cette hypothèse datée au DOSSIER_MODELE.md avant tes entraînements. Co
 @QUESTION
 Quel protocole permet de mettre ton hypothèse à l’épreuve ?
 @CORRECT
-Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût
+Comparer à protocole fixé, avec coût et validation
 @WRONG
-- Choisir la variante après avoir cherché son meilleur score sur test
-- Annoncer une capacité sans entraîner les poids
-- Changer les données et la largeur dans le même essai
+- Choisir la largeur donnant le meilleur exemple généré
+- Comparer des corpus différents à budget différent
+- Choisir la plus grande largeur qui tient en RAM
 @EXPLANATION
 Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Écris le résultat qui réfuterait ton hypothèse.
 
@@ -93,11 +93,11 @@ Dans ton tableau de résultats, réserve trois lignes : uniforme, bigramme et GP
 @QUESTION
 À quoi comparer la perte de ton GPT personnel ?
 @CORRECT
-À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction
+À des baselines sur les mêmes cibles
 @WRONG
-- À une perplexité publiée avec un autre tokenizer sans conversion
-- Au meilleur échantillon choisi après vingt générations
-- À la perte train de données déjà mémorisées
+- À toute loss par token publiée dans un article
+- À une baseline dont le tokenizer est différent
+- À la seule loss du premier lot d’entraînement
 @EXPLANATION
 À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Dans l’exemple, double la taille du vocabulaire.
 
@@ -144,11 +144,11 @@ Archive les deux configurations complètes, les graines et les tokens vus. Une l
 @QUESTION
 Quelle comparaison permet d’attribuer un effet à la largeur ?
 @CORRECT
-Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût
+Fixer données, tokenizer et budget, varier la largeur et rapporter le coût
 @WRONG
-- Modifier simultanément les données et la profondeur
-- Supprimer les essais qui donnent de mauvais résultats
-- Comparer un entraînement complet à un simple forward initialisé
+- Changer largeur et corpus pour garder la même loss
+- Choisir un budget différent après avoir vu le test
+- Ajuster le tokenizer séparément pour chaque largeur
 @EXPLANATION
 Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer.
 
@@ -196,11 +196,11 @@ Dans le dossier, ajoute l’unité, le split et le nombre de cibles à chaque sc
 @QUESTION
 Quand peut-on comparer directement deux pertes par token ?
 @CORRECT
-Quand tokenizer, données évaluées, cibles et réduction sont les mêmes
+Même tokenizer, données, cibles et réduction
 @WRONG
-- Dès que le second modèle a plus de paramètres
-- Quand les deux nombres sont affichés avec trois décimales
-- Toujours, même avec une tokenisation différente
+- Même nombre de paramètres, quel que soit le tokenizer
+- Même durée d’entraînement, quels que soient les textes
+- Même taille de batch, quelle que soit la réduction
 @EXPLANATION
 Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. Remplace la probabilité 0.25 par 0.125.
 
@@ -248,11 +248,11 @@ Prépare le corpus avec preparer.py dans un nouveau dossier. Joins son manifeste
 @QUESTION
 Comment préparer les documents du banc personnel ?
 @CORRECT
-Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance
+Réserver les groupes et contrôler les doublons
 @WRONG
-- Tirer une nouvelle validation jusqu’à obtenir le score voulu
-- Mettre le même livre dans train et test en changeant son nom
-- Ajuster le tokenizer sur tout le corpus réservé
+- Séparer au hasard les tokens après création des fenêtres
+- Entraîner le tokenizer sur tous les documents réservés
+- Affecter les doublons aux deux côtés pour équilibrer
 @EXPLANATION
 Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente.
 
@@ -300,11 +300,11 @@ Dans chaque run, conserve matériel, version Python, durée et paramètres. Marq
 @QUESTION
 Que mettre dans une colonne d’énergie non mesurée ?
 @CORRECT
-Non mesurée, avec la méthode nécessaire pour la mesurer expliquée
+Non mesurée, avec méthode proposée
 @WRONG
-- Le nombre de FLOPs comme s’il s’agissait de joules
-- Zéro pour donner une valeur à toutes les cases
-- Le temps de génération utilisé comme une puissance électrique
+- Zéro, puisque le modèle est petit
+- Le temps en secondes rebaptisé énergie
+- Une estimation du papier présentée comme mesure locale
 @EXPLANATION
 Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. Répète ce mini-calcul plusieurs fois.
 
@@ -343,11 +343,11 @@ Le fil rouge exploite cette modularité étroite. L'architecture candidate est u
 @QUESTION
 Quel est le contrat qui rend les trois dos interchangeables ?
 @CORRECT
-forward renvoie (B, T, D) et reste causal, pour les mêmes tailles
+Un forward de forme (B,T,D) causal aux mêmes dimensions
 @WRONG
-- Ils partagent les mêmes poids
-- Ils ont la même perplexité
-- Ils incluent le tokenizer
+- Valeurs identiques pour toutes les entrées
+- Même loss sans entraînement des variantes
+- Même nombre d’experts dans tous les dos
 @EXPLANATION
 L'appelant dépend de la forme et de la causalité. Les valeurs et les poids restent propres à chaque kind.
 @@@
@@ -389,11 +389,11 @@ Prépare le projet final de l'atelier : un GPT personnel entraîné et une varia
 @QUESTION
 Que revendique la candidate hybrid de ce dépôt ?
 @CORRECT
-Une alternance attention et scan, de forme stable et causale, sans qualité de langage mesurée
+Alternance causale, sans qualité mesurée
 @WRONG
-- Un état de l'art en français
-- Un Mamba officiel plus un ViT
-- Un agent outillé
+- Une victoire linguistique démontrée sur le GPT
+- Un entraînement complet des experts et du scan
+- Une réduction garantie de la perplexité à taille égale
 @EXPLANATION
 L'alternance est dans l'initialisation, la forme et la causalité sont testées. Le reste n'est pas revendiqué.
 @CODEFILE
@@ -437,11 +437,11 @@ Le rapport final doit contenir les hashes des données, la configuration, les co
 @QUESTION
 Quel entraînement le dépôt ne fait-il pas ?
 @CORRECT
-La mise à jour des poids du dos hybrid par rétropropagation
+Le backward entraînant le dos hybride
 @WRONG
-- Le comptage du bigramme
-- La descente sur une tête linéaire convexe
-- Le calcul du gradient d'entropie croisée
+- L’entraînement du GPT NumPy standard
+- Le backward de RoPE dans le GPT NumPy
+- L’ajustement LoRA des matrices ciblées
 @EXPLANATION
 Ces trois derniers ont des tests. Le dos, lui, est un forward initialisé.
 @CODEFILE
@@ -493,11 +493,11 @@ Ajoute un échec réel au dossier : symptôme, hypothèse, test discriminant et 
 @QUESTION
 Que faire si une bonne perte accompagne une fuite du futur ?
 @CORRECT
-Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé
+Corriger la fuite puis refaire les mesures
 @WRONG
-- Conserver uniquement la bonne perte dans le rapport
-- Présenter le bug comme une nouvelle capacité de raisonnement
-- Supprimer le contrôle de causalité pour terminer le projet
+- Conserver la loss car elle est meilleure
+- Réduire le contexte sans vérifier les indices
+- Ne publier que les générations les plus convaincantes
 @EXPLANATION
 Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite.
 
@@ -546,11 +546,11 @@ Décris une seule modification après ton premier résultat de validation. Expli
 @QUESTION
 Sur quoi choisir la nouvelle configuration avant le test final ?
 @CORRECT
-Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale
+Les résultats de validation, en conservant le test pour la fin
 @WRONG
-- Sur le test réservé à chaque nouvel essai
-- Sur la phrase la plus jolie parmi de nombreux tirages
-- Sur un gain annoncé sans code ni entraînement
+- Le test final, consulté après chaque essai
+- La meilleure génération tirée au hasard
+- La loss de train uniquement, sans baseline
 @EXPLANATION
 Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu.
 
@@ -596,11 +596,11 @@ Remets ton dossier, le code, le checkpoint et les rapports. Utilise la grille du
 @QUESTION
 Quelle remise permet d’examiner le modèle et ton autonomie ?
 @CORRECT
-Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau
+Un dossier reproductible et un cas nouveau expliqué
 @WRONG
-- Un compteur de leçons cochées sans code personnel
-- Une capture du meilleur texte sans la recette
-- Le corrigé exécuté présenté comme une construction sans aide
+- Une capture de la meilleure réponse générée
+- Une note de quiz seule, sans code ni checkpoint
+- Le checkpoint seul, sans tokenizer ni provenance
 @EXPLANATION
 Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Donne seulement le dossier et les commandes à une autre personne.
 @CODEFILE

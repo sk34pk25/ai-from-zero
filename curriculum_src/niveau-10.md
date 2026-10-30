@@ -31,11 +31,11 @@ Le fil rouge de ce niveau est model/memory.py. Les fonctions sont pures : mêmes
 @QUESTION
 Quelle différence fais-tu entre la fenêtre et une mémoire externe ?
 @CORRECT
-La fenêtre est lue par le modèle ; la mémoire externe ne contribue que par les extraits choisis
+L’externe contribue via les extraits choisis
 @WRONG
-- La fenêtre est sur disque et la mémoire est le GPU
-- Il n'y a aucune différence
-- La mémoire externe remplace le tokenizer
+- Toute mémoire externe est lue intégralement par le modèle
+- La fenêtre modifie les poids, la mémoire les fige
+- L’externe augmente automatiquement la fenêtre disponible
 @EXPLANATION
 Seuls les tokens du contexte entrent dans le réseau. Le reste de l'archive n'existe pour lui que si tu l'as copié.
 @@@
@@ -73,11 +73,11 @@ Ces vecteurs alimentent retrieve. Ils ne remplacent pas les embeddings du Backbo
 @QUESTION
 Après normalisation, que vaut le produit scalaire de deux sacs de mots ?
 @CORRECT
-Leur cosinus, qui vaut 1 s'ils ont les mêmes proportions de mots
+Le cosinus : 1 pour deux distributions proportionnelles de mots
 @WRONG
-- La perplexité du bigramme
-- Le nombre de tokens BPE
-- La loss MoE
+- La probabilité du prochain token
+- La distance euclidienne brute
+- Le nombre total de mots en commun
 @EXPLANATION
 Diviser par la norme enlève l'effet de la longueur. Le produit restant est le cosinus.
 @@@
@@ -118,11 +118,11 @@ retrieve est la pièce que build_context appelle. Le fil rouge ne stocke pas d'i
 @QUESTION
 Dans le test, pourquoi la requête « pente de la loss » renvoie-t-elle l'index 0 ?
 @CORRECT
-Parce que ce document est le seul à partager ces mots, donc le seul cosinus élevé
+Son cosinus est le plus élevé
 @WRONG
-- Parce que l'index 0 gagne toujours, même à score nul
-- Parce qu'un embedding entraîné rapproche gradient et pente
-- Parce que le routeur MoE choisit le premier expert
+- L’index 0 est toujours choisi en cas de recherche
+- Le modèle a entraîné ses poids sur cette question
+- Le document 0 est obligatoirement le plus long
 @EXPLANATION
 Le score est un sac de mots. Le document 0 contient « pente » et « loss ». Les autres non. L'index ne départage qu'en cas d'égalité.
 @@@
@@ -159,11 +159,11 @@ La brique « Mémoire externe » du site s'allume ici. Elle désigne build_conte
 @QUESTION
 Comment éteins-tu la mémoire de ce laboratoire ?
 @CORRECT
-En lui passant une liste de documents vide, ce qui enlève les extraits
+Fournir une liste de documents vide afin de retirer les extraits
 @WRONG
-- En mettant k à -1
-- En supprimant le tokenizer
-- En entraînant le bigramme plus longtemps
+- Fixer la température de génération à zéro
+- Vider les poids du modèle de langage
+- Diminuer le nombre de couches du dos
 @EXPLANATION
 Sans documents, retrieve n'a rien à classer. Le prompt garde la question et perd les extraits. k négatif est refusé avant cela.
 @@@
@@ -201,11 +201,11 @@ Le fil rouge ne gagne pas de boucle de raisonnement. La leçon fixe la frontièr
 @QUESTION
 Une récurrence de raisonnement, dans ce cours, désigne…
 @CORRECT
-Plusieurs passes dont l'entrée suivante contient un brouillon, pas le scan interne du SSM
+Des passes réutilisant un brouillon
 @WRONG
-- Le produit QK dans une couche
-- Le lissage du bigramme
-- La découpe en patches
+- Les pas internes du scan sur les mêmes tokens
+- Un backward supplémentaire sans nouvelle entrée
+- Un tri des documents par ordre alphabétique
 @EXPLANATION
 Le scan est intérieur à un forward. La boucle de raisonnement empile des forwards, et elle n'est pas implémentée.
 @@@
@@ -242,11 +242,11 @@ Le fil rouge garde une profondeur fixe. L'adaptatif reste une hypothèse pour l'
 @QUESTION
 Que fait Backbone quand une entrée est « facile » ?
 @CORRECT
-Il exécute quand même les n_layers couches prévues
+Exécute toutes les couches prévues
 @WRONG
-- Il saute le SSM
-- Il réduit tout seul n_layers
-- Il vide la mémoire externe
+- S’arrête dès que la loss paraît faible
+- Utilise seulement la première couche
+- Choisit automatiquement le nombre de couches
 @EXPLANATION
 n_layers est un argument de construction. Rien dans forward ne regarde une confiance.
 @@@
@@ -285,11 +285,11 @@ Le seul outil du fil rouge est la recherche de model/memory.py. Pas de boucle d'
 @QUESTION
 Que manque-t-il au dépôt pour parler d'un agent ?
 @CORRECT
-Une boucle qui choisit des outils et une trace d'appels testée
+Une boucle de choix et d’appels d’outils, vérifiée par une trace
 @WRONG
-- Un tokenizer
-- Un patch de 2 pixels
-- Une licence MIT
+- Un vocabulaire de taille plus importante
+- Une seule fonction de recherche de documents
+- Un plus grand tableau de scores de retrieval
 @EXPLANATION
 retrieve est un outil isolé. L'agent serait la politique qui l'appelle, et elle n'existe pas ici.
 @@@
@@ -328,10 +328,10 @@ Le projet du niveau est cette mémoire mesurable et éteignable. L'évaluation c
 @QUESTION
 Quel contrôle montre qu'une mémoire externe a pu servir ?
 @CORRECT
-La même question avec extraits, puis sans extraits, et une différence de résultats
+Comparer avec et sans extraits
 @WRONG
-- Une seule bonne réponse
-- Un forward plus profond
-- Un thème sombre dans l'interface
+- Montrer seulement une réponse avec extraits
+- Compter uniquement le nombre de documents stockés
+- Comparer deux questions et deux modèles différents
 @EXPLANATION
 Sans la condition « mémoire éteinte », tu ne sais pas si l'extrait était nécessaire. Une réussite isolée ne sépare pas les causes.

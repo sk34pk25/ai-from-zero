@@ -9,11 +9,12 @@ import { request, stopWorker } from "./pybridge.js";
 import { mountManipulator } from "./manipulators.js";
 import { publicAssetUrl } from "./public-url.js";
 import { studyScope } from "./study-scope.js";
+import { codeFingerprint, exerciseState, EXERCISE_LABELS } from "./exercise-result.js";
 
 let exercises = null;
 let debugs = null;
 
-export async function attachLessonTools(main, lessonId, owner) {
+export async function attachLessonTools(main, lessonId, owner, receipt = null) {
   const article = main.querySelector(`[data-lesson-id="${lessonId}"]`);
   if (!article || article.querySelector("[data-tools]")) return;
   const marker = h("div", { "data-tools": "true" });
@@ -41,14 +42,14 @@ export async function attachLessonTools(main, lessonId, owner) {
   try {
   const [exercise, debug] = await Promise.all([exerciseFor(lessonId), debugFor(lessonId)]);
   if (!article.isConnected) return;
-  if (exercise) column.append(exercisePanel(exercise, owner));
+  if (exercise) column.append(exercisePanel(exercise, receipt));
   if (debug) column.append(debugPanel(debug, owner));
   } catch {
     if (!article.isConnected) return;
     const retry = h("section", { class: "callout", role: "status" }, [
       h("p", { text: "Les activités n’ont pas pu être chargées. Le cours et ton brouillon restent disponibles." }),
       h("button", { type: "button", class: "button button-secondary", onClick: () => {
-        retry.remove(); marker.remove(); void attachLessonTools(main, lessonId, owner);
+        retry.remove(); marker.remove(); void attachLessonTools(main, lessonId, owner, receipt);
       } }, "Réessayer les activités"),
     ]);
     column.append(retry);
@@ -79,14 +80,12 @@ async function debugFor(lessonId) {
   return debugs.find((item) => item.lessonId === lessonId) || null;
 }
 
-function exercisePanel(exercise, owner) {
+function exercisePanel(exercise, initialReceipt) {
   const status = h("p", {
     class: "quiz-feedback",
     role: "status",
     text: "Contrôle disponible sans compte. Le suivi local est facultatif pour garder ton brouillon.",
   });
-  const pre = h("pre");
-  pre.append(h("code", { text: exercise.starter }));
   const area = h("textarea", {
     class: "ide-fallback",
     "aria-label": "Code de l'exercice",
@@ -94,6 +93,23 @@ function exercisePanel(exercise, owner) {
   const token = localToken(browserStorage());
   const ownerWorkspace = isOwner();
   const scope = studyScope();
+  let receipt = initialReceipt, stateTicket = 0, active = true;
+  const detail = () => ({ id: exercise.lessonId, scope: ownerWorkspace ? "owner" : "local", localToken: token });
+  const history = h("details", { class: "exercise-history" }, [h("summary", { text: "Mes dernières tentatives" })]);
+  const historyList = h("ol"); history.append(historyList);
+  const paintHistory = () => {
+    const attempts = scope.get(`lesson/${exercise.lessonId}`).exerciseAttempts;
+    historyList.replaceChildren(...(Array.isArray(attempts) ? attempts : []).filter(row => row && /^[a-f0-9]{64}$/.test(row.codeHash) && Number.isFinite(row.checkedAt)).slice(-5).reverse().map(row => h("li", { text: `${new Date(row.checkedAt).toLocaleString("fr")} · ${row.ok ? "contrôle passé" : "à corriger"} · code ${row.codeHash.slice(0, 8)}` })));
+    history.hidden = historyList.children.length === 0;
+  };
+  const refreshValidity = async () => {
+    const ticket = ++stateTicket;
+    const hash = await codeFingerprint(area.value);
+    if (!active || ticket !== stateTicket) return;
+    const value = exerciseState(receipt, hash, exercise.validatorVersion);
+    window.dispatchEvent(new CustomEvent("afz-exercise-state", { detail: { ...detail(), state: value } }));
+    if (receipt) status.textContent = value === "passed" ? "Contrôle passé pour ce code." : value === "failed" ? "Le contrôle de ce code est à corriger." : `${EXERCISE_LABELS[value]}. La tentative précédente reste dans l’historique.`;
+  };
   area.value = (ownerWorkspace
     ? getRecord(`lesson/${exercise.lessonId}`, {}).exerciseCode
     : readLocalDraft(browserStorage(), exercise.lessonId) ?? scope.get(`lesson/${exercise.lessonId}`).exerciseCode) ?? exercise.starter;
@@ -111,6 +127,10 @@ function exercisePanel(exercise, owner) {
   area.addEventListener("change", save);
   let timer;
   area.addEventListener("input", () => {
+    stateTicket++;
+    window.dispatchEvent(new CustomEvent("afz-exercise-state", { detail: { ...detail(), state: receipt ? "modified" : "untried" } }));
+    if (receipt) status.textContent = "Code modifié : contrôle à relancer. La tentative précédente reste dans l’historique.";
+    void refreshValidity();
     clearTimeout(timer);
     if (!ownerWorkspace && token) timer = setTimeout(save, 250);
   });
@@ -124,7 +144,7 @@ function exercisePanel(exercise, owner) {
     run.disabled = false;
     status.textContent = "Contrôle arrêté. Ton code est conservé.";
   };
-  onLeave(() => { cancel(); clearTimeout(timer); save(); window.removeEventListener("beforeunload", save); });
+  onLeave(() => { active = false; stateTicket++; cancel(); clearTimeout(timer); save(); window.removeEventListener("beforeunload", save); });
   const run = h(
     "button",
     {
@@ -132,6 +152,7 @@ function exercisePanel(exercise, owner) {
       class: "button button-primary",
       onClick: async () => {
         const current = ++generation;
+        const source = area.value;
         dependencies = new AbortController();
         run.disabled = true;
         save();
@@ -145,14 +166,30 @@ function exercisePanel(exercise, owner) {
           files.push({ path, content: await response.text() });
         }
         if (current !== generation) return;
-        const code = `${area.value}\n${exercise.check}`;
+        const codeHash = await codeFingerprint(source);
+        if (current !== generation) return;
+        const code = `${source}\n${exercise.check}`;
         running = true;
         const result = await request({ type: "exercise", code, files });
         if (current !== generation) return;
+        if (result.cancelled || result.busy) {
+          status.textContent = result.busy ? "Python est déjà occupé. Relance le contrôle quand le calcul est terminé." : "Contrôle arrêté. Ton code est conservé.";
+          return;
+        }
+        if (["loading", "dependencies"].includes(result.phase)) {
+          status.textContent = `Le moteur Python n’est pas prêt. ${result.text || "Vérifie la connexion."} Ton code est conservé ; relance le contrôle. Aucune nouvelle tentative de code n’a été évaluée.`;
+          return;
+        }
         if (!result.cancelled && !result.busy) {
+        receipt = { ok: result.type !== "error", codeHash, validatorVersion: exercise.validatorVersion, checkedAt: Date.now() };
+        if (codeHash) {
+          const key = `lesson/${exercise.lessonId}`, row = scope.get(key);
+          scope.set(key, { ...row, exerciseAttempts: [...(row.exerciseAttempts || []), receipt].slice(-20) });
+          paintHistory();
+        }
         window.dispatchEvent(
           new CustomEvent("afz-exercise", {
-            detail: { id: exercise.lessonId, ok: result.type !== "error", scope: ownerWorkspace ? "owner" : "local", localToken: token },
+            detail: { ...detail(), ...receipt },
           }),
         );
         }
@@ -160,12 +197,15 @@ function exercisePanel(exercise, owner) {
           result.type === "error"
             ? `Le contrôle n'est pas passé. ${result.text || "Vérifie la valeur retournée et les cas limites."}`
             : "Contrôle passé.";
+        if (area.value !== source) await refreshValidity();
+        else if (active) window.dispatchEvent(new CustomEvent("afz-exercise-state", { detail: { ...detail(), state: codeHash ? receipt?.ok ? "passed" : "failed" : "legacy" } }));
         } catch (error) { if (current === generation) status.textContent = `${error.message}. Ton code est conservé ; relance le contrôle quand la connexion revient.`; }
         finally { if (current === generation) { run.disabled = false; running = false; dependencies = null; } }
       },
     },
     "Lancer le contrôle",
   );
+  paintHistory(); void refreshValidity();
   return h(
     "section",
     { class: "callout", "data-exercise": exercise.lessonId },
@@ -186,6 +226,7 @@ function exercisePanel(exercise, owner) {
           ])
         : null,
       status,
+      history,
     ],
   );
 }

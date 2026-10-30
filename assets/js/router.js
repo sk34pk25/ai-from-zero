@@ -30,6 +30,7 @@ export function parseHash(hash) {
   if (normalized === "/parcours") return { name: "home", focus: "roadmap" };
   if (normalized === "/experiences") return { name: "experiments" };
   if (normalized === "/espace") return { name: "study" };
+  if (normalized === "/preuves") return { name: "assessment" };
   if (normalized === "/glossaire") return { name: "glossary" };
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
@@ -52,6 +53,8 @@ export function parseHash(hash) {
 
 export function hrefFor(route) {
   switch (route.name) {
+    case "assessment":
+      return "#/preuves";
     case "home":
       return route.focus === "roadmap" ? "#/parcours" : "#/";
     case "model":

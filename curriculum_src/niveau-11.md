@@ -35,11 +35,11 @@ Le fil rouge du niveau est le comparateur baseline / variante. La lecture d'arti
 @QUESTION
 Que dois-tu écrire avant de citer un résultat de papier dans ton portfolio ?
 @CORRECT
-Ce que tu as réellement reproduit, et ce que tu n'as pas reproduit
+Distinguer reproduit et non reproduit
 @WRONG
-- Le titre, qui tient lieu de preuve
-- Un score lu dans l'abstrait, sans montage
-- Le nombre de paramètres du Backbone
+- Présenter le chiffre du papier comme celui du dépôt
+- Remplacer toutes les mesures par une citation
+- Conserver seulement les essais favorables au modèle
 @EXPLANATION
 Un chiffre d'article n'est pas un chiffre du dépôt. Le portfolio ne garde que les seconds, et nomme les premiers comme non reproduits.
 @CODEFILE
@@ -81,11 +81,11 @@ La brique « Expériences » du site s'allume ici. Elle désigne ce comparateur,
 @QUESTION
 Que vaut la perplexité de la baseline uniforme ?
 @CORRECT
-La taille du vocabulaire
+V, le nombre de tokens différents dans le vocabulaire
 @WRONG
-- Toujours 1
-- Le nombre de couches
-- La loss MoE
+- Le logarithme de sa taille
+- L’inverse de sa taille
+- Le nombre de tokens du corpus
 @EXPLANATION
 Une loi uniforme sur V tokens a une perplexité V. Le code la renvoie dans uniform_perplexity.
 @@@
@@ -123,11 +123,11 @@ Aucune fonction concept n'entre dans le fil rouge. Le comparateur est prêt à r
 @QUESTION
 Pourquoi ce cours ne cite-t-il pas un gain chiffré pour les modèles à concepts ?
 @CORRECT
-Parce que le dépôt ne les implémente pas et ne les mesure pas
+Aucune implémentation ni mesure ici
 @WRONG
-- Parce que l'idée est forcément fausse
-- Parce que le BPE est un concept
-- Parce que la perplexité uniforme vaut 1
+- Le gain est forcément nul pour ces modèles
+- Leur perplexité n’est jamais calculable
+- Le nombre de concepts suffit à prédire leur qualité
 @EXPLANATION
 Une idée lue n'est pas un résultat du laboratoire. Le tokenizer reste au caractère et au BPE.
 @@@
@@ -166,11 +166,11 @@ Le fil rouge ne gagne pas de temps interne. L'idée reste une variante non branc
 @QUESTION
 En quoi un temps interne diffère-t-il du scan SSM du dépôt ?
 @CORRECT
-Le scan avance avec les tokens ; le temps interne ferait des pas sans nouveau token, et il n'est pas codé
+Des pas sans nouveau token, non codés ici
 @WRONG
-- C'est le même code, sous un autre nom
-- Il supprime le besoin d'une baseline
-- Il est testé dans test_ssm_matches_scan_and_is_causal
+- Un scan plus rapide sur les tokens déjà présents
+- Une nouvelle segmentation BPE du texte
+- Un cache KV partagé entre plusieurs couches
 @EXPLANATION
 Le test du scan vérifie une récurrence sur la séquence d'entrée. Aucun pas silencieux n'existe dans Backbone.
 @@@
@@ -209,11 +209,11 @@ Le fil rouge continue de tester des propriétés de calcul, pas des histoires su
 @QUESTION
 Comment juger un calcul latent sans le raconter ?
 @CORRECT
-Par une exactitude sur des questions dont la réponse est connue, contre une baseline
+Comparer l’exactitude à une baseline sur des réponses connues
 @WRONG
-- En lisant la norme du vecteur
-- En copiant le score d'un article
-- En allongeant le README
+- La seule longueur du brouillon produit
+- Le nombre de paramètres du mécanisme
+- Une appréciation subjective sans réponses connues
 @EXPLANATION
 Le vecteur n'est pas une explication. Seule une mesure externe, sur un découpage fixé, dit si la variante aide.
 @@@
@@ -253,11 +253,11 @@ L'alternative présente dans le fil rouge est le dos SSM. Les autres restent des
 @QUESTION
 Qu'a réellement montré le test des trois dos ?
 @CORRECT
-Même forme et causalité, pas une victoire de qualité de langage
+La forme et la causalité
 @WRONG
-- Que le SSM a une perplexité plus basse
-- Que l'attention est obsolète
-- Que hybrid copie les poids du Transformer
+- Une meilleure qualité linguistique de l’hybride
+- Une équivalence des poids entre les trois dos
+- Un entraînement de bout en bout des trois variantes
 @EXPLANATION
 Le test fixe un contrat d'interface. La qualité sur un corpus n'est pas dans les asserts.
 @@@
@@ -294,11 +294,11 @@ Le fil rouge multimodal reste le découpage testé. Le mot « natif » ne s'ajou
 @QUESTION
 Pourquoi patchify ne fait-il pas de ce dépôt un modèle multimodal natif ?
 @CORRECT
-Il change une forme, sans données appariées ni entraînement commun
+Une conversion de forme ne fournit ni données appariées ni entraînement commun
 @WRONG
-- Parce que les patches sont en couleur
-- Parce que le test échoue
-- Parce que le SSM l'interdit
+- Il suffit de renommer les patches en tokens
+- La largeur des patches doit seulement être paire
+- La causalité interdit tout modèle multimodal
 @EXPLANATION
 Le test vérifie un réordonnancement de pixels. Il ne vérifie pas qu'un mot et une image ont été appris ensemble.
 @@@
@@ -338,10 +338,10 @@ Le projet du niveau est ce partage net entre le comparateur réel et les lecture
 @QUESTION
 Laquelle de ces phrases a le droit d'être dans le README comme un résultat ?
 @CORRECT
-Le bigramme est mesuré contre une perplexité uniforme sur une queue non vue
+Le bigramme est comparé à l’uniforme sur du non-vu
 @WRONG
-- Le modèle à concepts dépasse le Transformer
+- Le dos hybride dépasse le GPT sur tous les corpus
 - Le temps interne améliore le raisonnement de 20 %
-- Le multimodal natif est entraîné dans model/
+- L’encodeur audio du dépôt est entraîné de bout en bout
 @EXPLANATION
-Seule la première phrase a une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt.
+La comparaison du bigramme à la baseline uniforme possède une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt.

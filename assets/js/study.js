@@ -1,3 +1,4 @@
+import { publicAssetUrl } from "./public-url.js";
 import { offlinePanel } from "./offline.js";
 import { h } from "./dom.js";
 import {
@@ -20,11 +21,11 @@ import { sessionPlanner, courseProgress } from "./course-guide.js";
 import { studyScope } from "./study-scope.js";
 import { browserStorage, readLocalProgress, readLocalReading, localLearnerEnabled } from "./local-records.js";
 export function recordAttempt(id, type, ok) {
-  if (!isOwner()) return;
-  const row = getRecord(`lesson/${id}`, {});
+  const scope = studyScope();
+  const row = scope.get(`lesson/${id}`);
   const interval = ok ? Math.min((row.review?.interval || 0) + 1, 5) : 0;
   const days = [0, 1, 3, 7, 14, 30][interval];
-  setRecord(`lesson/${id}`, {
+  scope.set(`lesson/${id}`, {
     ...row,
     attempts: [...(row.attempts || []), { type, ok, at: Date.now() }].slice(
       -100,
@@ -225,6 +226,52 @@ export async function backupDownload() {
     await completeBackup(),
   );
 }
+function studyCollections(main, index) {
+  const scope = studyScope();
+  const collections = h("div");
+  main.append(collections);
+  const filter = h("input", { type: "search", "aria-label": "Rechercher dans mes notes et favoris", placeholder: "Rechercher un titre ou une note" });
+  collections.before(h("label", {}, ["Retrouver mon travail", filter]));
+  const paintCollections = () => {
+    collections.replaceChildren();
+    const lessons = index.orderedIds.map((id) => ({
+      id,
+      row: scope.get(`lesson/${id}`),
+      lesson: index.byId.get(id).lesson,
+    }));
+    const needle = filter.value?.trim().toLocaleLowerCase("fr") || "";
+    const matching = lessons.filter(x => `${x.id} ${x.lesson.title} ${x.row.note || ""}`.toLocaleLowerCase("fr").includes(needle));
+    for (const [title, items] of [
+      ["À réviser", matching.filter((x) => x.row.review?.due <= Date.now())],
+      ["Mes favoris", matching.filter((x) => x.row.favorite)],
+      ["Mes notes", matching.filter((x) => x.row.note)],
+    ]) {
+      collections.append(
+        h("section", { class: "sheet" }, [
+          h("h2", { text: title }),
+          ...items.map((x) =>
+            h("article", {}, [
+              h("a", {
+                href: `#/lecon/${x.id}`,
+                text: `${x.id} · ${x.lesson.title}`,
+              }),
+              x.row.note ? h("p", { text: x.row.note }) : null,
+            ]),
+          ),
+          items.length
+            ? null
+            : h("p", { text: "Aucun élément pour le moment." }),
+        ]),
+      );
+    }
+  };
+  paintCollections();
+  filter.oninput = paintCollections;
+  const stopCollections = scope.subscribe(() => {
+    paintCollections();
+  });
+  onLeave(stopCollections);
+}
 export function paintStudy(main, index, sessionProgress = () => []) {
   const progress = () => isOwner() ? getRecord("progress", {}).done || [] : readLocalProgress(browserStorage())?.done || sessionProgress();
   const extras = h("div");
@@ -242,6 +289,8 @@ export function paintStudy(main, index, sessionProgress = () => []) {
     extras,
     offlinePanel(),
   );
+  studyCollections(main, index);
+  main.append(h("a", { class: "button button-primary", href: "#/preuves", text: "Éprouver ma compréhension sur un cas nouveau" }));
   if (!isOwner()) {
     main.append(
       h("p", {
@@ -318,44 +367,6 @@ export function paintStudy(main, index, sessionProgress = () => []) {
     ),
     conflicts,
   );
-  const collections = h("div");
-  main.append(collections);
-  const paintCollections = () => {
-    collections.replaceChildren();
-    const lessons = index.orderedIds.map((id) => ({
-      id,
-      row: getRecord(`lesson/${id}`, {}),
-      lesson: index.byId.get(id).lesson,
-    }));
-    for (const [title, items] of [
-      ["À réviser", lessons.filter((x) => x.row.review?.due <= Date.now())],
-      ["Mes favoris", lessons.filter((x) => x.row.favorite)],
-      ["Mes notes", lessons.filter((x) => x.row.note)],
-    ]) {
-      collections.append(
-        h("section", { class: "sheet" }, [
-          h("h2", { text: title }),
-          ...items.map((x) =>
-            h("article", {}, [
-              h("a", {
-                href: `#/lecon/${x.id}`,
-                text: `${x.id} · ${x.lesson.title}`,
-              }),
-              x.row.note ? h("p", { text: x.row.note }) : null,
-            ]),
-          ),
-          items.length
-            ? null
-            : h("p", { text: "Aucun élément pour le moment." }),
-        ]),
-      );
-    }
-  };
-  paintCollections();
-  const stopCollections = subscribe(() => {
-    paintCollections();
-  });
-  onLeave(stopCollections);
   const result = h("p", { role: "status" });
   let candidate = null;
   const input = h("input", {
@@ -463,14 +474,30 @@ export function paintStudy(main, index, sessionProgress = () => []) {
     ]),
   );
 }
-export function paintGlossary(main, index) {
-  main.replaceChildren(h("h1", { text: "Glossaire du laboratoire" }), h("p", { role: "status", text: "Chargement des définitions…" }));
-  import("./glossary.js").then(mod => { if (main.isConnected && location.hash.includes("/glossaire")) void mod.paintGlossaryPage(main); });
+export function paintGlossary(main) {
+  let active = true, attempt = 0;
+  onLeave(() => { active = false; });
+  const load = async () => {
+    main.replaceChildren(h("h1", { text: "Glossaire du laboratoire" }), h("p", { role: "status", text: "Chargement des définitions…" }));
+    const url = publicAssetUrl(new URL("./glossary.js", import.meta.url));
+    if (attempt++) url.searchParams.set("retry", String(attempt));
+    try {
+      const mod = await import(url.href);
+      if (active) await mod.paintGlossaryPage(main);
+    } catch {
+      if (!active) return;
+      main.replaceChildren(h("h1", { text: "Glossaire indisponible" }),
+        h("p", { role: "status", text: "Le glossaire n’a pas pu être chargé. Le reste du cours reste accessible." }),
+        h("button", { type: "button", onClick: load }, "Réessayer le glossaire"));
+    }
+  };
+  void load();
 }
 
 export function levelCheckpoint(level) {
-  const key = `level/${level.id}`,
-    saved = getRecord(key, {});
+  const scope = studyScope();
+  const key = `level/${level.id}`, saved = scope.get(key);
+  const feedback = h("p", { role: "status", class: "muted", text: scope.message });
   const host = h("section", { class: "sheet" });
   host.append(
     h("h2", { text: "Bilan pratique du niveau" }),
@@ -485,11 +512,11 @@ export function levelCheckpoint(level) {
     "Je peux nommer une limite et un cas d’échec.",
   ];
   criteria.forEach((text, i) => {
-    const box = h("input", { type: "checkbox", disabled: !isOwner() });
+    const box = h("input", { type: "checkbox" });
     box.checked = saved.assessmentVersion === 2 && !!saved.criteria?.[i];
     box.onchange = () => {
-      const row = getRecord(key, {});
-      setRecord(key, {
+      const row = scope.get(key);
+      if (!scope.set(key, {
         ...row,
         assessmentVersion: 2,
         previousCriteria:
@@ -499,7 +526,7 @@ export function levelCheckpoint(level) {
           ...(row.assessmentVersion === 2 ? row.criteria : {}),
           [i]: box.checked,
         },
-      });
+      })) { box.checked = row.assessmentVersion === 2 && !!row.criteria?.[i]; feedback.textContent = "Bilan non enregistré : le suivi a été effacé ou le stockage est refusé."; }
     };
     host.append(h("label", { class: "checkpoint-criterion" }, [box, text]));
   });
@@ -514,20 +541,16 @@ export function levelCheckpoint(level) {
   const note = h("textarea", {
     rows: 4,
     "aria-label": "Compte-rendu du projet",
-    disabled: !isOwner(),
   });
   note.value = saved.note || "";
-  note.onchange = () =>
-    setRecord(key, { ...getRecord(key, {}), note: note.value });
+  const save = () => { if (!scope.set(key, { ...scope.get(key), note: note.value })) feedback.textContent = "Compte-rendu non enregistré : copie-le avant de fermer."; };
+  note.oninput = save;
   host.append(
     h("label", {}, [
       "Résultat observé, commande utilisée et limite rencontrée",
       note,
     ]),
   );
-  onLeave(() => {
-    if (isOwner() && note.value !== (getRecord(key, {}).note || ""))
-      setRecord(key, { ...getRecord(key, {}), note: note.value });
-  });
+  host.append(feedback);
   return host;
 }

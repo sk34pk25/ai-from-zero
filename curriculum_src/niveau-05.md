@@ -32,11 +32,11 @@ GPTConfig.pos accepte "absolute" ou "rope". Le niveau 5 commence en rendant ce c
 @QUESTION
 Une table de positions absolues échoue surtout quand…
 @CORRECT
-La séquence dépasse le nombre de places apprises
+T dépasse la table apprise
 @WRONG
-- Le vocabulaire contient une lettre
-- La loss est positive
-- On utilise un masque causal
+- La taille du batch dépasse T
+- Le vocabulaire dépasse la largeur D
+- Les logits ont une somme différente de 1
 @EXPLANATION
 Le masque et la loss n'ont pas besoin de cette table. C'est la place, au-delà de block_size, qui n'a pas de ligne.
 @@@
@@ -76,11 +76,11 @@ RoPE est une option de TinyGPT, testée dans test_modern_options_keep_contract. 
 @QUESTION
 RoPE modifie la norme des vecteurs tournés.
 @CORRECT
-Non : une rotation conserve la norme
+Non, la norme est conservée
 @WRONG
-- Oui, elle la multiplie par la position
-- Oui, elle la remplace par la loss
-- Non, parce que RoPE supprime les vecteurs
+- Oui, la norme croît avec la position
+- Oui, chaque rotation remet la norme à 1
+- Non, car RoPE ne transforme pas les vecteurs
 @EXPLANATION
 Le test d'égalité des normes est exactement cette propriété. Si elle casse, l'implémentation n'est pas RoPE.
 @@@
@@ -118,11 +118,11 @@ Quand norm="rms", TinyGPT n'alloue pas les biais n1b, n2b, nfb. parameter_count 
 @QUESTION
 RMSNorm, comparée à LayerNorm, …
 @CORRECT
-Remet l'échelle par la RMS et n'ôte pas la moyenne
+Normalise l’échelle par la RMS, sans soustraire la moyenne
 @WRONG
-- Supprime le gain appris
-- Normalise le batch entier
-- Remplace le masque causal
+- Soustrait la moyenne puis divise par l’écart type
+- Centre uniquement, sans remettre à l’échelle
+- Normalise toutes les positions ensemble
 @EXPLANATION
 Le centrage disparaît, le gain reste. Le masque et le batch ne sont pas le sujet de cette couche.
 @@@
@@ -160,11 +160,11 @@ GPTConfig.ffn vaut "gelu" ou "swiglu". _ffn branche les deux. Le test moderne co
 @QUESTION
 SwiGLU ajoute surtout quoi au FFN ?
 @CORRECT
-Une troisième matrice qui sert de porte multipliée au signal
+Une porte multiplicative et sa matrice
 @WRONG
-- Un masque causal supplémentaire
-- Une table de positions
-- Une perte d'équilibrage d'experts
+- Une connexion résiduelle sans nouveaux poids
+- Un masque causal ajouté aux activations
+- Une moyenne des sorties de plusieurs experts
 @EXPLANATION
 La porte est la nouveauté. Le masque, les positions et les experts sont d'autres briques.
 @CODEFILE
@@ -206,11 +206,11 @@ repeat_kv est dans model/attention.py et le forward de TinyGPT l'appelle. Le cac
 @QUESTION
 GQA réduit surtout quelle quantité de clés ?
 @CORRECT
-Le nombre de têtes de clés et de valeurs, pas forcément le nombre de requêtes
+Le nombre de têtes K et V partagées entre plusieurs requêtes
 @WRONG
-- La taille du vocabulaire
-- Le nombre de blocs, automatiquement
-- La précision des labels
+- Les têtes de requêtes uniquement
+- Le nombre de positions dans le contexte
+- La largeur du vocabulaire de sortie
 @EXPLANATION
 Les requêtes restent nombreuses. K et V sont partagés par groupes, ce qui allège le cache.
 @@@
@@ -252,11 +252,11 @@ Le cache est déjà dans TinyGPT.forward. Cette étape le lit et le teste. C'est
 @QUESTION
 Un cache correct, comparé au forward complet, doit…
 @CORRECT
-Produire les mêmes logits sur les tokens nouvellement calculés
+Retrouver les logits du calcul complet
 @WRONG
-- Produire des logits différents, sinon il ne sert à rien
-- Effacer le masque
-- Réentraîner les poids à chaque token
+- Retrouver seulement le token argmax
+- Produire des logits nécessairement plus faibles
+- Modifier les poids au lieu de recalculer les clés
 @EXPLANATION
 Le cache est une accélération exacte. Un écart numérique est un bug de positions ou de masque.
 @@@
@@ -294,11 +294,11 @@ GPTConfig.tie_weights est le drapeau. Le test moderne l'active et refuse la pré
 @QUESTION
 Le weight tying partage quels poids du modèle ?
 @CORRECT
-La table d'embedding et la matrice de la tête de sortie
+La table des embeddings d’entrée et la projection de sortie
 @WRONG
-- Les masques de toutes les couches
-- Le corpus et les labels de test
-- Les têtes KV entre deux modèles différents
+- Requêtes et clés de chaque tête
+- Les deux matrices successives du FFN
+- Les normes de tous les blocs uniquement
 @EXPLANATION
 Ce sont les deux matrices qui parlent le vocabulaire. Le masque et le corpus ne sont pas des poids de ce type.
 @@@
@@ -336,11 +336,11 @@ seed est un champ de GPTConfig. Tous les tests du dépôt fixent une graine. Un 
 @QUESTION
 Deux TinyGPT de même configuration et de même graine doivent…
 @CORRECT
-Produire les mêmes logits sur la même entrée
+Les mêmes logits pour une même entrée
 @WRONG
-- Produire des textes opposés pour prouver l'aléa
-- Ignorer la graine dès qu'il y a un résidu
-- Avoir des shapes différentes
+- Des logits différents à chaque construction
+- La même loss sur tous les corpus possibles
+- Les mêmes logits quelle que soit l’entrée
 @EXPLANATION
 La graine fixe l'initialisation. À code égal, les logits coïncident. Le test same == logits est cette exigence.
 @@@
@@ -378,10 +378,10 @@ Le mini-GPT garde un block_size modeste. Le fil rouge du contexte long est la me
 @QUESTION
 Doubler la longueur T multiplie le terme d'attention en T² par…
 @CORRECT
-4, parce que (2T) au carré vaut quatre fois T au carré
+4, car le terme est quadratique
 @WRONG
-- 2
-- 8
-- 1, parce que le cache annule le coût
+- 2, car T a doublé
+- 8, car il y a Q, K et V
+- 1, car le nombre de poids est fixe
 @EXPLANATION
 (2T)² = 4 T². Le cache n'efface pas ce produit, il évite seulement de le refaire depuis zéro sur le passé déjà connu, et encore : le nouveau token doit quand même regarder tout le passé.

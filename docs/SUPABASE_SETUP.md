@@ -2,9 +2,9 @@
 
 Le projet `qffcqvwndnpdbrmqbjpz` est configuré. `assets/config.js` contient l'URL `https://qffcqvwndnpdbrmqbjpz.supabase.co`, la clé anon publique et l'UUID du propriétaire. Les inscriptions sont désactivées, le compte propriétaire existe, et l'URL du site ainsi que les redirections autorisées pointent vers `https://sk34pk25.github.io/ai-from-zero/`. Le schéma est appliqué, RLS compris. En ligne, `is_owner()` compare `auth.uid()` à cet UUID et fixe `search_path` à une chaîne vide. Le fichier du dépôt garde l'UUID nul : ne pas le réexécuter tel quel sur ce projet.
 
-Le site reste lisible sans compte. L'IDE, les exercices, les quiz, la progression et le plan de données ne s'enregistrent que pour un utilisateur : celui dont l'identifiant est copié dans `assets/config.js`.
+Le cours, les quiz et les contrôles Python sont accessibles sans compte. Notes, favoris, bilans, brouillons et preuves restent en mémoire, ou sur cet appareil si le visiteur active le suivi local ; ils peuvent être exportés sans envoi. L’IDE privé, le plan de données synchronisé et les écritures distantes sont réservés au propriétaire dont l’identifiant figure dans `assets/config.js`.
 
-Le cadenas affiché dans les pages empêche un visiteur de lancer ces actions dans son navigateur. Il ne protège pas le serveur. La protection des lignes est dans `supabase/schema.sql` : `auth.uid()` doit être cet identifiant.
+Le cadenas de l’interface réserve les outils privés au propriétaire. Les activités publiques n’utilisent pas ces écritures distantes. La protection du serveur ne dépend pas de l’interface. La protection des lignes est dans `supabase/schema.sql` : `auth.uid()` doit être cet identifiant.
 
 Aucun mot de passe, aucune clé `service_role`, ne va dans le dépôt.
 
@@ -37,7 +37,7 @@ export const SUPABASE_ANON_KEY = "la clé anon";
 export const OWNER_ID = "l'UUID de l'utilisateur";
 ```
 
-Si l'une de ces trois chaînes est vide, la page Connexion explique que le site reste en lecture seule. Elles sont renseignées pour le site publié.
+Si l'une de ces trois chaînes est vide, la connexion propriétaire est indisponible. Le cours, les contrôles Python et le travail local restent accessibles. Elles sont renseignées pour le site publié.
 
 ## Mot de passe oublié
 

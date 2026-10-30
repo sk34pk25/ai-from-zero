@@ -934,7 +934,7 @@
       "Garde architecture et protocole identiques sauf la position.",
       "Écris les valeurs ou les étapes intermédiaires avant de conclure. Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE."
     ],
-    "solution": "Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE. Entre les deux TinyGPT, ne change que pos, avec dimensions, données, graine et protocole identiques. Ici RoPE n'a pas le backward du decoder entraînable : une comparaison forward mesure forme, causalité et temps, pas une qualité linguistique après entraînement identique.",
+    "solution": "Crée trois lignes : bigramme, TinyGPT absolu, TinyGPT RoPE. Entre les deux TinyGPT, ne change que pos ; conserve dimensions, corpus, tokenizer, graines et budget. RoPE possède le backward du decoder entraînable. Lance model/benchmark_modern.py et compare les deltas de loss de validation appariés par graine, avec temps et RAM réellement mesurés. Les tests de forward seuls ne constituent pas une mesure de qualité linguistique ; le dos hybride reste limité au forward.",
     "pitfalls": [
       "Ne confonds pas le résultat attendu avec sa vérification : Garde architecture et protocole identiques sauf la position."
     ]
@@ -1605,9 +1605,9 @@
   "5.10": {
     "hints": [
       "Garde le dictionnaire commun identique : seule la clé de variante change.",
-      "Écris un tableau avant de conclure : une ligne par graine, une colonne par configuration. Calcule l'écart entre les graines d'une même configuration, puis l'écart entre configurations."
+      "Pour chaque graine, calcule delta = loss_variante − loss_baseline. Compare la moyenne et la dispersion de ces écarts appariés, avec exactement le même protocole."
     ],
-    "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans rien changer d'autre. Note val_loss_end et parameter_count. Si l'écart moyen entre configurations dépasse nettement l'écart entre graines, écris que la variante a amélioré la validation dans ce réglage précis (corpus, taille, nombre de pas). Sinon, écris qu'aucune différence n'est mesurable ici. Dans les deux cas, précise que rien n'est démontré pour un modèle plus grand ou un autre corpus.",
+    "solution": "Entraîne baseline et variante avec seed=0, 1 et 2, sans changer données, dimensions ni budget. Note val_loss_end et parameter_count. Pour chaque graine, calcule delta = loss_variante − loss_baseline ; un delta négatif favorise la variante. Rapporte la moyenne, la dispersion et les trois deltas, sans transformer trois graines en preuve générale. Si les deltas changent de signe ou restent faibles devant leur dispersion, écris que le résultat est incertain dans ce réglage. Même avec des deltas concordants, rien n’est démontré pour un autre corpus ou un modèle plus grand.",
     "pitfalls": [
       "Comparer une variante entraînée 120 pas à une baseline entraînée 60 pas : on mesure alors le budget, pas la pièce.",
       "Changer deux options à la fois : l'effet observé ne peut plus être attribué à l'une ou à l'autre."

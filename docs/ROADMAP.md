@@ -22,7 +22,7 @@ Périmètre autorisé : uniquement ai-from-zero, accès propriétaire conservé.
 
 - [x] Exemples de résidu, export, SiLU, loss stochastique, formes et sauvegarde corrigés.
 - [x] Explications du backward complet réconciliées avec le code ; références par leçon avec fonction précise.
-- [x] Tronc commun 0–4 puis 13, atelier indépendant et corrigé séparé.
+- [x] Tronc commun de 86 leçons : fondations 0–4, données 13.3 et neuf étapes de méthode du niveau 12 ; atelier indépendant et corrigé séparé.
 - [x] Douze TP cumulatifs et projet final entraîné, avec variation et grille d’explications.
 - [x] Exercices réalignés, nouveaux cas numériques et quatre critères propres à chaque niveau.
 - [x] Séparation documentaire, dédoublonnage exact, couverture et provenance.
@@ -41,3 +41,14 @@ Les contrôles vérifient l’outillage et des propriétés. La réussite d’un
 - [x] Content-Security-Policy générée avec les empreintes des scripts inline ; actions CI à jour.
 - [x] Exemples chiffrés dans les TP 3, 6, 7, 8, 10, 11 et 12 de l'atelier, et dans les leçons 1.13 et 3.6.
 - [ ] Observation humaine : faire suivre les niveaux 0 à 2 à un débutant, noter où il bloque (docs/DEVICE_CHECKLIST.md pour les appareils).
+
+## Compréhension vérifiable
+
+- [x] Résultats liés à l’empreinte du code et à la version du contrôle, avec historique de tentatives.
+- [x] Cas supplémentaires dans les 66 exercices et distracteurs rédigés dans les 161 quiz.
+- [x] Portée réelle du code explicitée dans CAPACITES.md.
+- [x] Bilans, notes et favoris utilisables sans compte.
+- [x] Cinq paliers de reconstruction, diagnostic et explication, chacun en deux variantes.
+- [x] Chronologie, aides, relecture humaine distincte et export/import de preuves.
+- [x] Protocole de terrain et synthèse des observations consenties.
+- [ ] Pilote avec de vrais débutants, correction des blocages puis second groupe et essai de rétention. Aucun résultat humain n’est revendiqué à ce stade.

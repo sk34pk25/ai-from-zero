@@ -33,11 +33,11 @@ Le fil rouge quitte le bigramme comme modèle principal, sans le jeter : il rest
 @QUESTION
 L'attention est introduite pour…
 @CORRECT
-Pondérer le passé selon le contenu, plutôt que de tout moyenner ou de ne garder que le voisin
+Pondérer le passé selon le contenu
 @WRONG
-- Remplacer le tokenizer
-- Augmenter la taille du disque
-- Supprimer la fonction de loss
+- Moyenner uniformément toutes les positions
+- Ne conserver que le dernier token
+- Remplacer le vocabulaire par des mots entiers
 @EXPLANATION
 Elle choisit quelles positions du contexte mélangent leurs vecteurs. Le tokenizer et la loss restent en place.
 @@@
@@ -76,11 +76,11 @@ TinyGPT stocke wq, wk, wv, wo par couche. Ce sont les premières matrices vraime
 @QUESTION
 La valeur V, dans l'attention, est…
 @CORRECT
-Le contenu que l'on mélange une fois les poids décidés
+Le vecteur de contenu à combiner selon les poids d’attention
 @WRONG
-- Le learning rate
-- Le token cible
-- La température
+- La question utilisée pour comparer les positions
+- Le score normalisé entre deux tokens
+- Le masque qui interdit le futur
 @EXPLANATION
 Q et K servent à décider les poids. V est ce qui est ensuite sommé. Le learning rate n'entre pas dans ce calcul.
 @@@
@@ -118,11 +118,11 @@ scaled_dot_product_attention commence par ce produit. Le facteur d'échelle est 
 @QUESTION
 La case (i, j) des scores compare…
 @CORRECT
-La requête de la position i et la clé de la position j
+Q de i avec K de j
 @WRONG
-- Deux cibles d'entraînement
-- La loss et le learning rate
-- Deux lignes du fichier README
+- V de i avec V de j
+- K de i avec Q de j
+- Le token cible de i avec le logit de j
 @EXPLANATION
 L'axe des lignes est celui des requêtes, l'axe des colonnes celui des clés. La valeur n'entre pas encore.
 @@@
@@ -161,11 +161,11 @@ La fonction scaled_dot_product_attention est la brique débloquée ici. Le Trans
 @QUESTION
 Dans la self-attention, Q, K et V viennent…
 @CORRECT
-De la même séquence, via trois projections
+D’une séquence, par trois projections
 @WRONG
-- De trois fichiers différents imposés
-- Du label uniquement
-- Du learning rate
+- De trois textes indépendants obligatoirement
+- D’une même matrice sans projection
+- Du softmax, appliqué avant les scores
 @EXPLANATION
 « Self » veut dire même séquence. Les trois projections restent des matrices différentes.
 @@@
@@ -203,11 +203,11 @@ Le forward de TinyGPT construit allowed = positions des clés <= positions des r
 @QUESTION
 Le masque causal empêche une position de…
 @CORRECT
-Lire les tokens situés dans le futur
+Accéder aux tokens futurs
 @WRONG
-- Lire son propre token
-- Utiliser une loss
-- Avoir un embedding
+- Accéder au token courant
+- Lire les tokens les plus anciens
+- Utiliser plusieurs têtes d’attention
 @EXPLANATION
 Le présent et le passé restent visibles. Le futur est fermé, sinon la cible fuite dans l'entrée.
 @@@
@@ -247,11 +247,11 @@ La division est dans model/attention.py. On ne propose pas de l'enlever pour « 
 @QUESTION
 On divise les scores par sqrt(d_k) pour…
 @CORRECT
-Empêcher softmax de devenir trop piqué quand la dimension augmente
+Éviter que la dimension des clés rende le softmax trop piqué
 @WRONG
-- Faire sommer les logits à 1
-- Remplacer le masque causal
-- Réduire le nombre de paramètres
+- Forcer les scores à sommer à un
+- Remplacer le masque causal triangulaire
+- Rendre les clés indépendantes des requêtes
 @EXPLANATION
 L'échelle ne change pas le nombre de poids et ne fabrique pas à elle seule une distribution. Elle calme les scores avant softmax.
 @@@
@@ -288,11 +288,11 @@ TinyGPT découpe exactement ainsi. Le test de causalité utilise 4 têtes et d_m
 @QUESTION
 d_k, la dimension d'une tête, vaut…
 @CORRECT
-d_model divisé par le nombre de têtes
+d_model / nombre de têtes
 @WRONG
-- Toujours 64, quel que soit le modèle
-- Le nombre de tokens
-- La perplexité
+- d_model × nombre de têtes
+- T / nombre de têtes
+- La taille du vocabulaire divisée par T
 @EXPLANATION
 Les têtes se partagent la dimension du modèle. d_k est ce quotient, et il doit tomber juste.
 @@@
@@ -334,11 +334,11 @@ Dans TinyGPT.forward, les deux lignes hidden = hidden + attended et hidden = hid
 @QUESTION
 Si le sous-bloc renvoie zéro, la sortie résiduelle vaut…
 @CORRECT
-L'entrée, inchangée
+L’entrée, car le résidu lui ajoute la sortie nulle du sous-bloc
 @WRONG
-- Zéro
-- Le masque causal
-- Une distribution uniforme
+- Un vecteur nul
+- L’entrée normalisée
+- Le double de l’entrée
 @EXPLANATION
 x + 0 = x. Le chemin direct laisse passer l'entrée quand la correction est nulle : c'est l'intérêt du résidu.
 @CODEFILE
@@ -383,11 +383,11 @@ _norm dans TinyGPT applique LayerNorm ou RMSNorm selon la config, avant chaque s
 @QUESTION
 LayerNorm normalise surtout…
 @CORRECT
-Chaque vecteur sur sa dernière dimension, indépendamment du batch
+Le dernier axe de chaque token séparément
 @WRONG
-- Tout le batch avec une seule moyenne
-- Les identifiants de tokens
-- La loss, pour la forcer entre 0 et 1
+- Chaque feature sur tout le batch
+- Tous les tokens d’une séquence ensemble
+- Toutes les valeurs du batch d’un seul coup
 @EXPLANATION
 La moyenne et la variance sont celles du vecteur courant. Le batch n'entre pas dans ce calcul.
 @@@
@@ -428,11 +428,11 @@ _ffn dans TinyGPT implémente ce calcul, avec hidden = 4 * d_model pour GELU. Le
 @QUESTION
 Le FFN d'un Transformer mélange-t-il les positions entre elles ?
 @CORRECT
-Non : il transforme chaque position séparément, avec les mêmes poids
+Non, il agit position par position
 @WRONG
-- Oui, comme l'attention
-- Oui, mais seulement le futur
-- Non, parce qu'il n'a pas de paramètres
+- Oui, par une moyenne des positions voisines
+- Oui, par un masque triangulaire interne
+- Non, car il ne possède aucun poids appris
 @EXPLANATION
 Le mélange temporel est le travail de l'attention. Le FFN est une fonction identique appliquée à chaque vecteur.
 @@@
@@ -470,11 +470,11 @@ La boucle for layer in range(n_layers) de TinyGPT est ce bloc, répété. Tu es 
 @QUESTION
 Dans le pre-norm du laboratoire, la normalisation est appliquée…
 @CORRECT
-Avant l'attention et avant le FFN, et le résidu ajoute à l'entrée non normalisée
+Avant chaque sous-bloc, résidu sur l’entrée
 @WRONG
-- Après toute l'entraînement, une seule fois
-- À la place du masque causal
-- Uniquement sur les labels
+- Après chaque addition résiduelle
+- Uniquement après le dernier bloc
+- Sur l’entrée résiduelle au lieu du sous-bloc
 @EXPLANATION
 Chaque sous-bloc voit une entrée normalisée, et le chemin résiduel garde la version précédente.
 @@@
@@ -512,11 +512,11 @@ n_layers est un champ de GPTConfig. parameter_count() grandit quand on l'augment
 @QUESTION
 Empiler les blocs sans changer D ni T multiplie surtout le coût par…
 @CORRECT
-Le nombre de blocs, de façon à peu près linéaire
+Le nombre de blocs
 @WRONG
-- Le carré du nombre de blocs, comme l'attention en T
-- Zéro, parce que les poids sont partagés automatiquement
-- La taille du vocabulaire uniquement
+- Le carré du nombre de blocs
+- La racine du nombre de blocs
+- La taille du vocabulaire au carré
 @EXPLANATION
 Chaque bloc ajoute ses matrices. L'attention reste quadratique en T à l'intérieur de chaque bloc, mais la profondeur elle-même entre linéairement.
 @@@
@@ -555,11 +555,11 @@ TinyGPT est le modèle decoder-only du fil rouge. Le composant « Transformer »
 @QUESTION
 Un modèle decoder-only pour le langage…
 @CORRECT
-Utilise uniquement des blocs causaux pour prédire la suite
+Prédit la suite par des blocs causaux
 @WRONG
-- A besoin d'un encodeur qui a lu le futur
-- Ne produit pas de logits
-- Remplace le tokenizer par une image
+- Lit tout le texte futur avant de prédire
+- Exige un encodeur séparé pour chaque prompt
+- Prédit seulement une classe pour le document entier
 @EXPLANATION
 Le décodeur causal suffit pour continuer une séquence. L'encodeur n'est pas dans ce schéma.
 @@@
@@ -602,9 +602,9 @@ Quelles briques l'entraînement du GPT standard met-il à jour ?
 @CORRECT
 Embeddings, attention, FFN, normes et tête de sortie
 @WRONG
-- Seulement la tête linéaire finale
-- Seulement le tokenizer
-- Seulement les valeurs du cache KV
+- Seulement la matrice de sortie
+- Seulement les embeddings d’entrée
+- Seulement les poids de l’attention
 @EXPLANATION
 Le graphe de logits_tensor traverse tous ces paramètres. Le backward et AdamW les mettent à jour. La génération seule, elle, ne change pas les poids.
 @CODEFILE

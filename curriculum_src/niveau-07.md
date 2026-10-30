@@ -38,11 +38,11 @@ expert_forward est la plus petite brique du MoE. Le routeur n'existe pas encore 
 @QUESTION
 Dans ce laboratoire, un expert est…
 @CORRECT
-Un FFN avec ses propres poids, appliqué à un vecteur
+Un réseau FFN distinct possédant ses propres paramètres
 @WRONG
-- Un second tokenizer
-- Un être humain qui annote les données
-- Le masque causal
+- Une copie du tokenizer du corpus
+- Une tête d’attention sans paramètres
+- Un document choisi par le retrieval
 @EXPLANATION
 L'expert est une fonction vectorielle. Le tokenizer et le masque restent partagés, en dehors de lui.
 @@@
@@ -78,11 +78,11 @@ Le fil rouge remplace le FFN dense par moe_ffn. L'attention, elle, reste dense :
 @QUESTION
 Dans un MoE top-1 à 8 experts, le calcul du FFN par token ressemble surtout à…
 @CORRECT
-Un seul expert, pas aux huit
+Le calcul d’un expert
 @WRONG
-- Aux huit experts additionnés
-- À aucun expert
-- Au tokenizer
+- Le calcul des huit experts
+- Le calcul d’un huitième d’expert
+- Aucun calcul FFN, puisque le routeur le remplace
 @EXPLANATION
 Top-1 n'active qu'un FFN pour le calcul. Les sept autres restent en mémoire mais ne transforment pas ce token.
 @@@
@@ -121,11 +121,11 @@ moe_ffn multiplie par le routeur avant de choisir le top-k. La brique « Mixture
 @QUESTION
 Le routeur produit quoi pour chaque expert ?
 @CORRECT
-Des scores, puis des probabilités, sur les experts
+Des scores puis des probabilités
 @WRONG
-- Les tokens du texte
-- La perplexité finale
-- Le masque causal
+- Un identifiant de token suivant
+- Les poids complets de chaque FFN
+- Un masque causal sur les positions
 @EXPLANATION
 Sa sortie est une distribution sur E experts. Elle ne décode pas le texte.
 @@@
@@ -164,11 +164,11 @@ Le composant MoE du fil rouge se débloque à cette étape, parce que top-k est 
 @QUESTION
 Après le top-k, les portes des experts retenus…
 @CORRECT
-Sont renormalisées pour sommer à 1 entre elles
+Somment à 1 après renormalisation
 @WRONG
-- Restent les logits bruts, possiblement négatifs
-- Somment au nombre d'experts
-- Remplacent les embeddings
+- Conservent toujours leur somme avant sélection
+- Deviennent toutes exactement égales
+- Sont remplacées par les nombres de tokens reçus
 @EXPLANATION
 On refait un softmax sur le sous-ensemble. Les experts écartés ne gardent pas de probabilité résiduelle dans ce mélange.
 @@@
@@ -205,11 +205,11 @@ Le champ dropped de moe_ffn est la mesure. Une capacité qui droppe la moitié d
 @QUESTION
 La capacité limite quoi, pour un expert ?
 @CORRECT
-Le nombre de tokens qu'un expert accepte
+Le nombre de tokens qu’il peut recevoir dans un lot
 @WRONG
-- La taille du vocabulaire
-- Le nombre de couches d'attention
-- La précision des caractères Unicode
+- Le nombre de paramètres de son FFN
+- La longueur du vocabulaire partagé
+- Le nombre de couches dans le routeur
 @EXPLANATION
 C'est un quota par expert. Le vocabulaire n'entre pas dans cette formule.
 @@@
@@ -246,11 +246,11 @@ load_balance_loss utilise f et P. L'étape suivante en fait une loss. Ici, on ap
 @QUESTION
 La fraction f_i compte quoi, exactement ?
 @CORRECT
-La part des tokens orientés vers l'expert i
+La part des tokens envoyés à i
 @WRONG
-- Le nombre de paramètres de l'expert
-- La perplexité
-- La longueur du cache
+- La probabilité moyenne attribuée à i
+- Le nombre de poids de l’expert i
+- La loss de langage moyenne de l’expert i
 @EXPLANATION
 C'est une statistique de routage, la part des tokens envoyés à un expert, pas une taille de matrice.
 @@@
@@ -294,11 +294,11 @@ aux est la brique testée. Le fil rouge ne cache pas un coefficient magique : il
 @QUESTION
 Lorsque f et P sont uniformes, la perte auxiliaire du laboratoire vaut…
 @CORRECT
-1, une valeur de référence et non un minimum universel
+1, une valeur de référence
 @WRONG
-- 0
-- Le nombre de tokens
-- La perplexité du bigramme
+- 0, car les experts sont équilibrés
+- Le nombre d’experts, sans normalisation
+- La capacité maximale d’un expert
 @EXPLANATION
 E * somme((1/E)*(1/E)) = 1. L'effondrement certain donne E, mais d'autres probabilités valides peuvent donner moins de 1, comme le montre le contre-exemple.
 @@@
@@ -334,11 +334,11 @@ Pas de librairie multi-GPU dans le dépôt. La leçon empêche de vendre le MoE 
 @QUESTION
 Le parallélisme d'experts est utile si…
 @CORRECT
-Les tokens se répartissent vraiment entre les experts placés sur des machines différentes
+Les tokens chargent réellement plusieurs machines porteuses d’experts
 @WRONG
-- Tous les tokens choisissent le même expert
-- On supprime le routeur
-- On quantifie le tokenizer
+- Tous les tokens vont toujours au même expert
+- Les experts partagent une seule machine saturée
+- Le nombre d’experts remplace le masque causal
 @EXPLANATION
 Sans répartition, les machines supplémentaires stockent des poids inactifs. Le routeur reste indispensable.
 @@@
@@ -376,10 +376,10 @@ moe_ffn remplace le FFN dans le fil rouge conceptuel. L'attention n'est pas remp
 @QUESTION
 Remplacer le FFN par un MoE top-1 de plusieurs experts de même taille…
 @CORRECT
-Augmente surtout les paramètres stockés, pas le calcul par token
+Accroît surtout les poids stockés
 @WRONG
-- Divise toujours la perplexité par le nombre d'experts
-- Supprime le besoin d'un routeur
-- Réduit la RAM
+- Multiplie le FFN par tous les experts à chaque token
+- Divise tous les poids stockés par le nombre d’experts
+- Garantit une amélioration de la loss sans entraînement
 @EXPLANATION
 On stocke tous les experts et on en calcule un. La perplexité n'est pas un cadeau automatique, et la RAM monte.

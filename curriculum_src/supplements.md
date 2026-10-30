@@ -46,11 +46,11 @@ Ouvre model/autograd.py et repère class Tensor : __init__ range data, grad et r
 @QUESTION
 Après a = Compteur(5) puis b = a et b.ajouter(1), que vaut a.valeur ?
 @CORRECT
-6, car a et b désignent le même objet
+6, car les noms partagent le même objet
 @WRONG
-- 5, car b est une copie indépendante de a
-- 1, car ajouter remplace la valeur par le pas
-- Une erreur, car a n'a pas de méthode ajouter
+- 5, car l’affectation crée une copie de l’objet
+- 1, car ajouter remplace la valeur de départ
+- Une erreur, car deux noms ne peuvent viser le même objet
 @EXPLANATION
 L'affectation b = a colle une seconde étiquette sur le même objet. La méthode modifie self.valeur de cet objet, visible par les deux noms. Pour une copie, il faut construire un nouvel objet.
 @@@
@@ -105,11 +105,11 @@ Lance python -m pytest tests/test_lab.py -q depuis la racine du dépôt. Ouvre c
 @QUESTION
 pytest affiche « assert 7.5 == 5 » pour assert moyenne([2, 4, 9]) == 5. Que faut-il faire ?
 @CORRECT
-Relire la fonction : elle a produit 7.5 alors que le calcul à la main donne 5
+Vérifier la fonction : le résultat attendu est 5
 @WRONG
-- Remplacer 5 par 7.5 dans le test pour qu'il passe
-- Supprimer le test, il est trop strict
-- Relancer pytest jusqu'à ce que le résultat change
+- Remplacer l’attendu par 7.5 pour faire passer le test
+- Arrondir 7.5 en entier avant l’assertion
+- Retirer 9 de la liste sans vérifier la spécification
 @EXPLANATION
 La valeur de droite a été calculée à la main, indépendamment du code. Le test signale que le code s'en écarte ; modifier l'attente effacerait justement la preuve. Un calcul déterministe redonnera 7.5 à chaque relance.
 @@@
@@ -172,11 +172,11 @@ Compare ta solution à model/stats.py : load_numbers joue le rôle de lire_dista
 @QUESTION
 Pourquoi arrondir la moyenne à 4 décimales dans le rapport ?
 @CORRECT
-Pour que le rapport soit stable et lisible d'une exécution à l'autre
+Stabiliser la représentation du rapport
 @WRONG
-- Pour rendre le calcul de la moyenne plus exact
-- Parce que json.dumps refuse les nombres à virgule
-- Pour que le test passe même si la moyenne est fausse
+- Rendre la moyenne mathématiquement plus précise
+- Modifier les données avant leur moyenne
+- Garantir que tous les rapports ont la même moyenne
 @EXPLANATION
 L'arrondi ne rend pas le calcul plus juste : il fixe la forme du résultat écrit, pour qu'il se relise et se compare facilement. Le test, lui, garde une valeur attendue calculée à la main.
 @@@
@@ -221,10 +221,10 @@ Ajoute la meilleure variante à ton plan d'expérience du niveau 12. Dans le rap
 @QUESTION
 La variante gagne 0,01 nat sur une graine, mais deux graines de la baseline diffèrent déjà de 0,03 nat. Que conclure ?
 @CORRECT
-Une seule graine ne permet pas de conclure : comparer les différences appariées sur plusieurs graines
+Mesurer des écarts appariés sur plusieurs graines
 @WRONG
-- La variante est meilleure, puisque sa loss est plus basse
-- La baseline est meilleure, puisqu'elle varie davantage
-- Il faut garder la graine la plus favorable à la variante
+- Conclure au gain : 0,01 est strictement positif
+- Conclure à l’égalité : 0,03 dépasse 0,01
+- Choisir la meilleure graine de chaque configuration
 @EXPLANATION
 Il faut étudier les différences appariées : une petite différence peut être stable si les fluctuations des deux modèles sont communes. Avec une seule paire, la variabilité de cette différence reste inconnue. Choisir la graine favorable sélectionnerait le résultat voulu au lieu de le mesurer.

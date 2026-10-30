@@ -1,4 +1,5 @@
 import { ASSET_VERSION } from "./version.js";
+import { normalizeExerciseResult, EXERCISE_LABELS } from "./exercise-result.js";
 import { publicAssetUrl } from "./public-url.js";
 import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
 import { registerOffline } from "./offline.js";
@@ -541,11 +542,15 @@ window.addEventListener("afz-exercise", ({ detail }) => {
   if (detail.scope === "local" && (state.owner || detail.localToken !== state.localToken)) return;
   if (detail.scope === "owner" && !state.owner) return;
   if (!state.index.byId.has(detail.id)) return;
-  state.exercises[detail.id] = { ok: detail.ok };
+  state.exercises[detail.id] = normalizeExerciseResult(detail);
   recordAttempt(detail.id, "exercise", detail.ok);
   persistDone();
+});
+window.addEventListener("afz-exercise-state", ({ detail }) => {
+  if (detail.scope === "local" && (state.owner || detail.localToken !== state.localToken)) return;
+  if (detail.scope === "owner" && !state.owner) return;
   const result = els.main.querySelector(`[data-exercise-summary="${detail.id}"]`);
-  if (result) result.textContent = detail.ok ? "contrôle passé" : "à corriger";
+  if (result) result.textContent = EXERCISE_LABELS[detail.state] || "à recontrôler";
 });
 
 function reviewKey() {
@@ -887,7 +892,9 @@ function paintChrome() {
   const activeLevel = activeLevelId();
   const navLink = (level) => {
     const progress = levelProgress(level, state.done);
-    const current = level.id === activeLevel;
+    const hasCore = level.steps.some(step => state.index.coreIds.includes(step.id));
+    const sharedLevel = state.index.coreIds.some(id => state.index.byId.get(id)?.level.id === level.id);
+    const current = level.id === activeLevel && (state.route.name === "lesson" ? level.steps.some(step => step.id === state.route.id) : state.index.path !== "core" || hasCore || !sharedLevel);
     return h("a", { href: `#/niveau/${level.id}`, class: current ? "nav-level is-active" : "nav-level", "aria-current": current ? "page" : null }, [
       h("span", { class: "nav-index", text: String(level.id).padStart(2, "0") }),
       h("span", { class: "nav-name", text: level.title }),
@@ -919,6 +926,7 @@ function paintMain(route, ticket) {
       (mod) => mod.paintExperiments(els.main),
     );
   else if (route.name === "study") paintStudy(els.main, state.index, () => [...state.done]);
+  else if (route.name === "assessment") paintAsync(ticket, () => import("./page-assessment.js"), mod => mod.paintAssessment(els.main));
   else if (route.name === "glossary") {
     paintGlossary(els.main, state.index);
   }
@@ -942,7 +950,7 @@ function paintMain(route, ticket) {
     import("./lesson-tools.js")
       .then((mod) => {
         if (ticket !== state.pageTicket) return;
-        return mod.attachLessonTools(els.main, route.id, true);
+        return mod.attachLessonTools(els.main, route.id, true, state.exercises[route.id]);
       })
       .catch(() => {});
   } else if (route.name === "model")
@@ -1052,6 +1060,7 @@ function paintAsync(ticket, loader, paint) {
 
 function pageTitle(route) {
   const base = "AI From Zero";
+  if (route.name === "assessment") return `Mes preuves de compréhension · ${base}`;
   if (route.name === "lesson") {
     const item = state.index.byId.get(route.id);
     return item ? `${item.lesson.id} ${item.lesson.title} · ${base}` : base;
@@ -1453,10 +1462,11 @@ function lessonBody(lesson, grade, done, around) {
     h("section", { class: "sheet", id: "lesson-summary" }, [
       h("h2", { text: "Bilan et suite" }),
       h("p", {}, [`Quiz : ${grade.correct ? "réussi" : "à vérifier"}. `,
-        lesson.activityKind === "python" ? h("span", {}, ["Exercice exécutable : ", h("span", { "data-exercise-summary": lesson.id, text: state.exercises[lesson.id] ? state.exercises[lesson.id].ok ? "contrôle passé" : "à corriger" : "non lancé" }), ". "])
+        lesson.activityKind === "python" ? h("span", {}, ["Exercice exécutable : ", h("span", { "data-exercise-summary": lesson.id, text: state.exercises[lesson.id] ? "vérification du code en cours" : "non lancé" }), ". "])
           : lesson.tpIds?.length ? "Pratique : à vérifier dans ton TP local. " : "Activité : à expliquer avec un exemple nouveau. Aucun contrôle Python automatique n’est prévu ici. ",
         "Ces repères ne remplacent pas le projet final."]),
       h("p", { text: "Avant de poursuivre, explique l’idée avec d’autres valeurs et conserve ton code." }),
+      h("a", { href: "#/preuves", text: "Reconstruire, diagnostiquer et expliquer sur un cas nouveau" }),
       ...(lesson.tpIds || []).map(tp => h("p", {}, h("a", { href: `#/atelier/tp/${tp}`, text: `Construire et vérifier le TP ${tp}` }))),
     ]),
     lessonNotebook(lesson.id),

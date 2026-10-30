@@ -42,14 +42,14 @@ function harness({ scriptFailures = 0, packageFailures = 0 } = {}) {
 
 test("le moteur retente le téléchargement après une erreur réseau", async () => {
   const worker = harness({ scriptFailures: 1 });
-  assert.equal((await worker.run()).type, "error");
+  assert.equal((await worker.run()).phase, "loading");
   assert.deepEqual(await worker.run(), { type: "done", text: "31" });
   assert.equal(worker.calls.script, 2);
 });
 
 test("un chargement NumPy interrompu ne publie pas un moteur partiel", async () => {
   const worker = harness({ packageFailures: 1 });
-  assert.equal((await worker.run()).type, "error");
+  assert.equal((await worker.run()).phase, "loading");
   assert.deepEqual(await worker.run(), { type: "done", text: "31" });
   assert.equal(worker.calls.numpy, 2);
 });

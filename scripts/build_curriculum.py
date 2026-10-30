@@ -9,6 +9,7 @@ des docs, lui, ne dépend que du JSON.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import unicodedata
 from pathlib import Path
@@ -779,9 +780,62 @@ def anchor(level: dict) -> str:
     return raw
 
 
+def runtime_fingerprint() -> str:
+    digest = hashlib.sha256()
+    for path in ("assets/js/pyworker.js", "assets/js/pybridge.js"):
+        digest.update(path.encode())
+        digest.update((ROOT / path).read_bytes())
+    return digest.hexdigest()
+
+
+def build_exercises() -> list[dict]:
+    """Le contrat inclut le contrôle, le point de départ et les dépendances Python."""
+    rows = json.loads((SRC / "exercises.json").read_text(encoding="utf-8"))
+    seen = set()
+    for row in rows:
+        lesson_id = row["lessonId"]
+        if lesson_id in seen or not re.fullmatch(r"\d+\.\d+", lesson_id):
+            raise ValueError(f"Exercice invalide : {lesson_id}")
+        seen.add(lesson_id)
+        if any(not isinstance(row.get(key), str) or not row[key].strip() for key in ("prompt", "starter", "solution", "check")):
+            raise ValueError(f"Exercice incomplet : {lesson_id}")
+        dependencies = {}
+        for path in row.get("files", []):
+            if not re.fullmatch(r"model/[a-zA-Z0-9_/.-]+\.py", path) or ".." in path:
+                raise ValueError(f"Dépendance invalide : {path}")
+            dependencies[path] = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        contract = {"schema": 2, "exercise": row, "dependencies": dependencies, "runtime": runtime_fingerprint()}
+        row["validatorVersion"] = hashlib.sha256(json.dumps(contract, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    return rows
+
+
+def build_transfer_tasks() -> dict:
+    rows = json.loads((SRC / "transfer-tasks.json").read_text(encoding="utf-8"))
+    for row in rows:
+        row["validatorVersion"] = hashlib.sha256(json.dumps({"task": row, "runtime": runtime_fingerprint()}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    return {"format": "afz-transfer-tasks-v1", "version": hashlib.sha256(json.dumps(rows, sort_keys=True, ensure_ascii=False).encode()).hexdigest(), "tasks": rows}
+
+
+def build_capabilities() -> list[dict]:
+    rows = json.loads((SRC / "capabilities.json").read_text(encoding="utf-8"))
+    for row in rows:
+        for path in [row["source"], *row["tests"]]:
+            if not (ROOT / path).is_file():
+                raise ValueError(f"Preuve de capacité absente : {path}")
+    return rows
+
+
+def render_capabilities(rows: list[dict]) -> str:
+    lines = ["# Capacités réelles du dépôt", "", "Référence de portée : une forme correcte, un gradient testé et une mesure linguistique sont des preuves distinctes. Les tests cités sont exécutés en CI ; leur présence ne démontre pas une efficacité universelle.", "", "| Brique | Statut | Code et tests | Limite |", "| --- | --- | --- | --- |"]
+    for row in rows:
+        links = ", ".join(f"[{path}](../{path})" for path in [row["source"], *row["tests"]])
+        lines.append(f"| {row['title']} | {row['status']} | {links} | {row['limit']} |")
+    return "\n".join(lines) + "\n"
+
+
 def build_data() -> dict:
     teaching = json.loads((SRC / "teaching.json").read_text(encoding="utf-8"))
-    executable = {row["lessonId"] for row in json.loads((ROOT / "data/exercises.json").read_text(encoding="utf-8"))}
+    executable = {row["lessonId"] for row in build_exercises()}
     by_level: dict[int, list] = {level_id: [] for level_id, *_ in LEVELS}
     order = 0
     for path in sorted(SRC.glob("*.md")):
@@ -891,6 +945,11 @@ def build_glossary(data: dict | None = None) -> list[dict]:
 
 
 def main() -> None:
+    (ROOT / "data/exercises.json").write_text(json.dumps(build_exercises(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "data/transfer-tasks.json").write_text(json.dumps(build_transfer_tasks(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    capabilities = build_capabilities()
+    (ROOT / "data/capabilities.json").write_text(json.dumps(capabilities, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "docs/CAPACITES.md").write_text(render_capabilities(capabilities), encoding="utf-8")
     data = build_data()
     INDEX_PATH.write_text(
         json.dumps(build_index(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
