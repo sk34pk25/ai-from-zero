@@ -1452,7 +1452,7 @@ function lessonOverview(lesson) {
   const stepFigure = !hasVisualLab(lesson) && STEP_FIGURES.has(lesson.visual || "flow");
   return h("div", { class: "lesson-overview", "data-lesson-overview": "true" }, [
     h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
-      h("figcaption", { text: stepFigure ? "Les repères de l'étape." : lesson.visualCaption || "" }),
+      h("figcaption", { text: hasVisualLab(lesson) ? "Observe les valeurs, puis retrouve le code." : stepFigure ? "Les repères de l'étape." : lesson.visualCaption || "" }),
       h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
     h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),

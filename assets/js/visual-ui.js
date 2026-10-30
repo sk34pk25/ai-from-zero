@@ -70,9 +70,9 @@ export function lab(host, { kind, title, source, steps, render, initial = 0 }) {
     code.replaceChildren(...steps.map((s, i) => h('code', { class: i === index ? 'is-active' : '', 'aria-current': i === index ? 'step' : null, text: `${i + 1}  ${s.code}\n` })));
     host.dataset.step = String(index);
   };
-  host.append(h('h2', { class: 'lab-title', text: title }), h('p', { class: 'lab-caption', text: 'Exemple miniature calculé ici. Avance à ton rythme ; les valeurs arrondies servent à lire le calcul.' }),
-    tabs, h('div', { class: 'lab-layout' }, [stage, code]),
+  host.append(h('h2', { class: 'lab-title', text: title }), tabs, h('div', { class: 'lab-layout' }, [stage, code]),
     h('div', { class: 'lab-controls' }, [prev, next, action('Rejouer', () => { index = 0; paint(); })]), count,
+    h('details', { class: 'lab-caption' }, [h('summary', { text: 'Comment lire cet exemple ?' }), note('Exemple miniature calculé ici. Avance à ton rythme ; les valeurs arrondies servent à lire le calcul. Les valeurs complètes servent aux vérifications numériques.')]),
     h('p', { class: 'lab-source' }, ['NumPy équivalent, sans lancer Python. ', h('a', { href: `https://github.com/sk34pk25/ai-from-zero/blob/main/${source}`, text: `Code de référence : ${source}` })]));
   paint();
   return { repaint: paint, get step() { return index; } };
@@ -89,12 +89,13 @@ export function chart(label, series, { xLabel = 'Pas', yLabel = 'Perte (nats / t
   const text = (x, y, t, attrs = {}) => { const n = svg('text', { x, y, fill: 'currentColor', ...attrs }); n.textContent = t; return n; };
   for (let i = 0; i <= 4; i++) {
     const x = minX + (maxX - minX) * i / 4, y = minY + (maxY - minY) * i / 4;
-    canvas.append(text(px(x), 226, fmt(x), { 'text-anchor': 'middle' }), text(49, py(y) + 4, fmt(y), { 'text-anchor': 'end' }));
+    const tick = n => Math.abs(n) >= 10000 ? n.toExponential(1) : String(Number(n.toPrecision(3)));
+    canvas.append(text(px(x), 226, tick(x), { 'text-anchor': 'middle' }), text(49, py(y) + 4, tick(y), { 'text-anchor': 'end' }));
   }
-  canvas.append(text(242, 249, xLabel, { 'text-anchor': 'middle' }), text(8, 16, yLabel));
+  canvas.append(text(242, 249, xLabel, { 'text-anchor': 'middle' }), text(8, 22, yLabel));
   series.forEach((s, i) => canvas.append(svg('polyline', {
     points: s.values.map(([x, y]) => `${px(x)},${py(y)}`).join(' '), class: i ? 'is-val' : 'is-train', fill: 'none', 'stroke-width': 2.5, 'stroke-dasharray': i ? '6 4' : 'none',
   })));
   if (point) canvas.append(svg('circle', { cx: px(point[0]), cy: py(point[1]), r: 5, 'data-chart-point': 'true' }));
-  return h('div', { class: 'lab-chart-wrap' }, [canvas, h('p', { class: 'lab-legend' }, series.map((s, i) => h('span', { class: i ? 'is-val' : 'is-train', text: `${i ? '┄' : '━'} ${s.name}` })))]);
+  return h('div', { class: 'lab-chart-wrap', tabindex: '0', role: 'group', 'aria-label': `${label} · défilement horizontal possible` }, [canvas, h('p', { class: 'lab-legend' }, series.map((s, i) => h('span', { class: i ? 'is-val' : 'is-train', text: `${i ? '┄' : '━'} ${s.name}` })))]);
 }

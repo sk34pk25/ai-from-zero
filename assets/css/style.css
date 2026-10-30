@@ -1719,3 +1719,9 @@ main[tabindex="-1"]:focus { outline: none; }
 .code-head { flex-wrap: wrap; }
 .code-head h2 { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
 .lab-graph text { font-size: 14px; font-family: var(--sans, sans-serif); }
+.lab-chart { min-width: 340px; }
+.lab-chart text { font-size: 18px; }
+@media (max-width: 600px) {
+  .lesson-main > .lesson-overview { margin-top: 1rem; }
+  .lab-chart { min-width: 340px; }
+}
