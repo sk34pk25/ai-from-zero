@@ -7,6 +7,8 @@ import { browserStorage, localToken, readLocalDraft, writeLocalDraft } from "./l
 import { h } from "./dom.js";
 import { request, stopWorker } from "./pybridge.js";
 import { mountManipulator } from "./manipulators.js";
+import { publicAssetUrl } from "./public-url.js";
+import { studyScope } from "./study-scope.js";
 
 let exercises = null;
 let debugs = null;
@@ -36,28 +38,43 @@ export async function attachLessonTools(main, lessonId, owner) {
   const column = article.querySelector("[data-practice-tools]");
   if (!column) return;
   column.append(marker);
-  const exercise = await exerciseFor(lessonId);
+  try {
+  const [exercise, debug] = await Promise.all([exerciseFor(lessonId), debugFor(lessonId)]);
   if (!article.isConnected) return;
   if (exercise) column.append(exercisePanel(exercise, owner));
-  const debug = await debugFor(lessonId);
-  if (!article.isConnected) return;
   if (debug) column.append(debugPanel(debug, owner));
+  } catch {
+    if (!article.isConnected) return;
+    const retry = h("section", { class: "callout", role: "status" }, [
+      h("p", { text: "Les activités n’ont pas pu être chargées. Le cours et ton brouillon restent disponibles." }),
+      h("button", { type: "button", class: "button button-secondary", onClick: () => {
+        retry.remove(); marker.remove(); void attachLessonTools(main, lessonId, owner);
+      } }, "Réessayer les activités"),
+    ]);
+    column.append(retry);
+  }
 }
 
 async function exerciseFor(lessonId) {
   if (!exercises) {
     const response = await fetch(
-      new URL("data/exercises.json", document.baseURI),
+      publicAssetUrl("data/exercises.json"),
     );
-    exercises = response.ok ? await response.json() : [];
+    if (!response.ok) throw new Error("Exercices indisponibles");
+    const data = await response.json();
+    if (!Array.isArray(data) || data.some(row => typeof row.lessonId !== "string" || typeof row.starter !== "string" || typeof row.check !== "string")) throw new Error("Catalogue invalide");
+    exercises = data;
   }
   return exercises.find((item) => item.lessonId === lessonId) || null;
 }
 
 async function debugFor(lessonId) {
   if (!debugs) {
-    const response = await fetch(new URL("data/debug.json", document.baseURI));
-    debugs = response.ok ? await response.json() : [];
+    const response = await fetch(publicAssetUrl("data/debug.json"));
+    if (!response.ok) throw new Error("Traces indisponibles");
+    const data = await response.json();
+    if (!Array.isArray(data) || data.some(row => typeof row.lessonId !== "string" || typeof row.code !== "string")) throw new Error("Traces invalides");
+    debugs = data;
   }
   return debugs.find((item) => item.lessonId === lessonId) || null;
 }
@@ -66,7 +83,7 @@ function exercisePanel(exercise, owner) {
   const status = h("p", {
     class: "quiz-feedback",
     role: "status",
-    text: owner ? "" : "Active le suivi sur cet appareil dans le quiz pour lancer le contrôle sans compte.",
+    text: "Contrôle disponible sans compte. Le suivi local est facultatif pour garder ton brouillon.",
   });
   const pre = h("pre");
   pre.append(h("code", { text: exercise.starter }));
@@ -76,50 +93,78 @@ function exercisePanel(exercise, owner) {
   });
   const token = localToken(browserStorage());
   const ownerWorkspace = isOwner();
+  const scope = studyScope();
   area.value = (ownerWorkspace
     ? getRecord(`lesson/${exercise.lessonId}`, {}).exerciseCode
-    : readLocalDraft(browserStorage(), exercise.lessonId)) ?? exercise.starter;
+    : readLocalDraft(browserStorage(), exercise.lessonId) ?? scope.get(`lesson/${exercise.lessonId}`).exerciseCode) ?? exercise.starter;
   let lastSaved = area.value;
   const save = () => {
     if (ownerWorkspace && isOwner()) setRecord(`lesson/${exercise.lessonId}`, {
       ...getRecord(`lesson/${exercise.lessonId}`, {}), exerciseCode: area.value,
     });
-    else if (!ownerWorkspace && owner && area.value !== lastSaved) {
+    else if (!ownerWorkspace && token && area.value !== lastSaved) {
       if (writeLocalDraft(browserStorage(), exercise.lessonId, area.value, token)) lastSaved = area.value;
       else status.textContent = "Brouillon non enregistré : le suivi a été effacé, le stockage est refusé ou le code dépasse 100 000 caractères. Copie ton code avant de fermer.";
     }
+    else if (!ownerWorkspace && !token && !localToken(browserStorage())) scope.set(`lesson/${exercise.lessonId}`, { ...scope.get(`lesson/${exercise.lessonId}`), exerciseCode: area.value });
   };
   area.addEventListener("change", save);
   let timer;
   area.addEventListener("input", () => {
     clearTimeout(timer);
-    if (!ownerWorkspace && owner) timer = setTimeout(save, 250);
+    if (!ownerWorkspace && token) timer = setTimeout(save, 250);
   });
   window.addEventListener("beforeunload", save);
-  onLeave(() => { clearTimeout(timer); save(); window.removeEventListener("beforeunload", save); });
+  let generation = 0, dependencies = null, running = false;
+  const cancel = () => {
+    generation++;
+    dependencies?.abort(); dependencies = null;
+    if (running) stopWorker();
+    running = false;
+    run.disabled = false;
+    status.textContent = "Contrôle arrêté. Ton code est conservé.";
+  };
+  onLeave(() => { cancel(); clearTimeout(timer); save(); window.removeEventListener("beforeunload", save); });
   const run = h(
     "button",
     {
       type: "button",
       class: "button button-primary",
-      disabled: !owner,
       onClick: async () => {
+        const current = ++generation;
+        dependencies = new AbortController();
+        run.disabled = true;
         save();
-        status.textContent = "Exécution…";
+        status.textContent = "Chargement de Python puis contrôle… Tu peux arrêter le chargement ou le calcul.";
+        try {
+        const files = [];
+        for (const path of exercise.files || []) {
+          if (!/^model\/[a-zA-Z0-9_./-]+\.py$/.test(path) || path.includes("..")) throw new Error("Dépendance invalide");
+          const response = await fetch(publicAssetUrl(path), { signal: dependencies.signal });
+          if (!response.ok) throw new Error("Dépendance indisponible : " + path);
+          files.push({ path, content: await response.text() });
+        }
+        if (current !== generation) return;
         const code = `${area.value}\n${exercise.check}`;
-        const result = await request({ type: "run", code, files: [] });
+        running = true;
+        const result = await request({ type: "exercise", code, files });
+        if (current !== generation) return;
+        if (!result.cancelled && !result.busy) {
         window.dispatchEvent(
           new CustomEvent("afz-exercise", {
             detail: { id: exercise.lessonId, ok: result.type !== "error", scope: ownerWorkspace ? "owner" : "local", localToken: token },
           }),
         );
+        }
         status.textContent =
           result.type === "error"
             ? `Le contrôle n'est pas passé. ${result.text || "Vérifie la valeur retournée et les cas limites."}`
             : "Contrôle passé.";
+        } catch (error) { if (current === generation) status.textContent = `${error.message}. Ton code est conservé ; relance le contrôle quand la connexion revient.`; }
+        finally { if (current === generation) { run.disabled = false; running = false; dependencies = null; } }
       },
     },
-    owner ? "Lancer le contrôle" : "Activer le suivi local pour tester",
+    "Lancer le contrôle",
   );
   return h(
     "section",
@@ -127,14 +172,14 @@ function exercisePanel(exercise, owner) {
     [
       h("h2", { text: "Exercice exécutable" }),
       h("p", { text: exercise.prompt }),
-      owner ? area : pre,
+      area,
       run,
       h(
         "button",
-        { type: "button", disabled: !owner, onClick: () => stopWorker() },
+        { type: "button", class: "button button-secondary", onClick: cancel },
         "Arrêter le contrôle",
       ),
-      exercise.solution && owner
+      exercise.solution
         ? h("details", {}, [
             h("summary", { text: "Corrigé Python de cet exercice" }),
             h("pre", {}, h("code", { text: exercise.solution })),

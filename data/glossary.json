@@ -1,0 +1,5049 @@
+[
+  {
+    "term": "A",
+    "definition": "le facteur qui reçoit du hasard",
+    "contexts": [
+      {
+        "lesson": "13.7",
+        "definition": "le facteur qui reçoit du hasard"
+      }
+    ]
+  },
+  {
+    "term": "Ablation",
+    "definition": "Expérience contrôlée qui retire une brique pour examiner son apport, en maintenant le reste du protocole.",
+    "contexts": [
+      {
+        "lesson": "5.10",
+        "definition": "retirer ou remplacer une pièce pour mesurer son effet"
+      },
+      {
+        "lesson": "12.3",
+        "definition": "retrait contrôlé d’un composant"
+      }
+    ],
+    "english": "ablation",
+    "aliases": [],
+    "example": "Retirer les embeddings de position puis refaire le même entraînement et la même évaluation.",
+    "common": true
+  },
+  {
+    "term": "Absent",
+    "definition": "données appariées image et texte.",
+    "contexts": [
+      {
+        "lesson": "11.7",
+        "definition": "données appariées image et texte."
+      }
+    ]
+  },
+  {
+    "term": "Absente",
+    "definition": "toute tête autre que les logits texte déjà vus dans TinyGPT.",
+    "contexts": [
+      {
+        "lesson": "9.9",
+        "definition": "toute tête autre que les logits texte déjà vus dans TinyGPT."
+      }
+    ]
+  },
+  {
+    "term": "Accumulateur",
+    "definition": "une variable mise à jour à chaque tour, par exemple une somme.",
+    "contexts": [
+      {
+        "lesson": "0.8",
+        "definition": "une variable mise à jour à chaque tour, par exemple une somme."
+      }
+    ]
+  },
+  {
+    "term": "Accumulation",
+    "definition": "sommer les gradients si un paramètre sert à plusieurs endroits",
+    "contexts": [
+      {
+        "lesson": "1.12",
+        "definition": "sommer les gradients si un paramètre sert à plusieurs endroits"
+      },
+      {
+        "lesson": "6.7",
+        "definition": "somme des gradients"
+      }
+    ]
+  },
+  {
+    "term": "Activation",
+    "definition": "la commande qui modifie le PATH du terminal",
+    "contexts": [
+      {
+        "lesson": "0.14",
+        "definition": "la commande qui modifie le PATH du terminal"
+      },
+      {
+        "lesson": "6.2",
+        "definition": "un intermédiaire du forward, oublié après, mais présent pendant"
+      },
+      {
+        "lesson": "6.5",
+        "definition": "proportionnelle au batch et à T, en première approximation."
+      }
+    ]
+  },
+  {
+    "term": "Activation checkpointing",
+    "definition": "ne pas stocker tous les intermédiaires",
+    "contexts": [
+      {
+        "lesson": "6.8",
+        "definition": "ne pas stocker tous les intermédiaires"
+      }
+    ]
+  },
+  {
+    "term": "Adam",
+    "definition": "une moyenne du gradient et une moyenne de son carré, pour adapter le pas par paramètre",
+    "contexts": [
+      {
+        "lesson": "1.14",
+        "definition": "une moyenne du gradient et une moyenne de son carré, pour adapter le pas par paramètre"
+      },
+      {
+        "lesson": "6.1",
+        "definition": "optimiseur à deux états par paramètre"
+      }
+    ]
+  },
+  {
+    "term": "Adaptatif",
+    "definition": "le nombre de couches dépend de l'entrée",
+    "contexts": [
+      {
+        "lesson": "10.6",
+        "definition": "le nombre de couches dépend de l'entrée"
+      }
+    ]
+  },
+  {
+    "term": "Addition",
+    "definition": "le choix simple, embedding de token plus embedding de position",
+    "contexts": [
+      {
+        "lesson": "2.10",
+        "definition": "le choix simple, embedding de token plus embedding de position"
+      }
+    ]
+  },
+  {
+    "term": "Affectation",
+    "definition": "le symbole =, qui lie le nom de gauche à la valeur de droite.",
+    "contexts": [
+      {
+        "lesson": "0.6",
+        "definition": "le symbole =, qui lie le nom de gauche à la valeur de droite."
+      }
+    ]
+  },
+  {
+    "term": "Agent",
+    "definition": "la boucle qui choisit un outil",
+    "contexts": [
+      {
+        "lesson": "10.7",
+        "definition": "la boucle qui choisit un outil"
+      }
+    ]
+  },
+  {
+    "term": "Alignement",
+    "definition": "un grand produit positif.",
+    "contexts": [
+      {
+        "lesson": "4.3",
+        "definition": "un grand produit positif."
+      },
+      {
+        "lesson": "9.7",
+        "definition": "le fait que des vecteurs proches veuillent dire des choses liées"
+      }
+    ]
+  },
+  {
+    "term": "Aller-retour",
+    "definition": "decode(encode(texte)) == texte",
+    "contexts": [
+      {
+        "lesson": "2.5",
+        "definition": "decode(encode(texte)) == texte"
+      }
+    ]
+  },
+  {
+    "term": "Alternance",
+    "definition": "couche paire en attention, couche impaire en SSM, décidée par index % 2",
+    "contexts": [
+      {
+        "lesson": "8.9",
+        "definition": "couche paire en attention, couche impaire en SSM, décidée par index % 2"
+      }
+    ]
+  },
+  {
+    "term": "Alternative codée",
+    "definition": "kind=\"ssm\" ou l'alternance hybrid",
+    "contexts": [
+      {
+        "lesson": "11.6",
+        "definition": "kind=\"ssm\" ou l'alternance hybrid"
+      }
+    ]
+  },
+  {
+    "term": "Alternative lue",
+    "definition": "toute proposition sans fonction dans model/",
+    "contexts": [
+      {
+        "lesson": "11.6",
+        "definition": "toute proposition sans fonction dans model/"
+      }
+    ]
+  },
+  {
+    "term": "Angle",
+    "definition": "position fois une fréquence, plus lente pour les paires suivantes",
+    "contexts": [
+      {
+        "lesson": "5.2",
+        "definition": "position fois une fréquence, plus lente pour les paires suivantes"
+      }
+    ]
+  },
+  {
+    "term": "Aplatissement",
+    "definition": "une ligne de longueur p*p*C",
+    "contexts": [
+      {
+        "lesson": "9.2",
+        "definition": "une ligne de longueur p*p*C"
+      }
+    ]
+  },
+  {
+    "term": "Apprentissage supervisé",
+    "definition": "la cible est fournie",
+    "contexts": [
+      {
+        "lesson": "1.1",
+        "definition": "la cible est fournie"
+      }
+    ]
+  },
+  {
+    "term": "Argument",
+    "definition": "le complément donné à une commande, par exemple le nom du dossier après cd.",
+    "contexts": [
+      {
+        "lesson": "0.3",
+        "definition": "le complément donné à une commande, par exemple le nom du dossier après cd."
+      },
+      {
+        "lesson": "0.9",
+        "definition": "la valeur fournie à l'appel. return : renvoie une valeur et quitte la fonction"
+      }
+    ]
+  },
+  {
+    "term": "assert condition",
+    "definition": "ne fait rien si la condition est vraie, lève AssertionError sinon",
+    "contexts": [
+      {
+        "lesson": "0.22",
+        "definition": "ne fait rien si la condition est vraie, lève AssertionError sinon"
+      }
+    ]
+  },
+  {
+    "term": "Attention",
+    "definition": "la ligne du dernier pas, tête 0 de la dernière couche.",
+    "contexts": [
+      {
+        "lesson": "13.4",
+        "definition": "la ligne du dernier pas, tête 0 de la dernière couche."
+      }
+    ]
+  },
+  {
+    "term": "Attention croisée",
+    "definition": "Q d'une modalité, K et V de l'autre",
+    "contexts": [
+      {
+        "lesson": "9.8",
+        "definition": "Q d'une modalité, K et V de l'autre"
+      }
+    ]
+  },
+  {
+    "term": "Attribut",
+    "definition": "une donnée rangée dans l'objet, comme self.valeur",
+    "contexts": [
+      {
+        "lesson": "0.21",
+        "definition": "une donnée rangée dans l'objet, comme self.valeur"
+      }
+    ]
+  },
+  {
+    "term": "Autograd",
+    "definition": "un programme qui fait ce backward tout seul.",
+    "contexts": [
+      {
+        "lesson": "1.12",
+        "definition": "un programme qui fait ce backward tout seul."
+      },
+      {
+        "lesson": "1.15",
+        "definition": "le moteur du backward automatique."
+      }
+    ]
+  },
+  {
+    "term": "Autonomie",
+    "definition": "capacité observée à refaire et expliquer sur un cas nouveau.",
+    "contexts": [
+      {
+        "lesson": "12.12",
+        "definition": "capacité observée à refaire et expliquer sur un cas nouveau."
+      }
+    ]
+  },
+  {
+    "term": "Autoregressif",
+    "definition": "le modèle produit la suite élément par élément, en réutilisant ce qu'il vient de produire",
+    "contexts": [
+      {
+        "lesson": "3.1",
+        "definition": "le modèle produit la suite élément par élément, en réutilisant ce qu'il vient de produire"
+      },
+      {
+        "lesson": "3.9",
+        "definition": "chaque sortie rejoint l'entrée"
+      }
+    ]
+  },
+  {
+    "term": "Axe V",
+    "definition": "l'axe du vocabulaire",
+    "contexts": [
+      {
+        "lesson": "3.4",
+        "definition": "l'axe du vocabulaire"
+      }
+    ]
+  },
+  {
+    "term": "B",
+    "definition": "le facteur qui commence à zéro",
+    "contexts": [
+      {
+        "lesson": "13.7",
+        "definition": "le facteur qui commence à zéro"
+      }
+    ]
+  },
+  {
+    "term": "Base",
+    "definition": "souvent 10000, qui règle ces fréquences.",
+    "contexts": [
+      {
+        "lesson": "5.2",
+        "definition": "souvent 10000, qui règle ces fréquences."
+      }
+    ]
+  },
+  {
+    "term": "Baseline",
+    "definition": "Système ou configuration choisi comme référence avant d’évaluer une variante, avec le même protocole.",
+    "contexts": [
+      {
+        "lesson": "3.2",
+        "definition": "le modèle simple contre lequel on se compare."
+      },
+      {
+        "lesson": "5.10",
+        "definition": "la configuration de référence (positions absolues, LayerNorm, GELU)"
+      },
+      {
+        "lesson": "11.1",
+        "definition": "le système simple auquel on se compare"
+      },
+      {
+        "lesson": "12.2",
+        "definition": "référence de comparaison"
+      }
+    ],
+    "english": "baseline",
+    "aliases": [
+      "Référence de comparaison"
+    ],
+    "example": "Comparer le GPT au bigramme et à l’uniforme sur les mêmes cibles.",
+    "common": true
+  },
+  {
+    "term": "Baseline uniforme",
+    "definition": "perplexité égale à V",
+    "contexts": [
+      {
+        "lesson": "3.10",
+        "definition": "perplexité égale à V"
+      }
+    ]
+  },
+  {
+    "term": "Batch",
+    "definition": "Petit ensemble d’exemples traités lors d’un même calcul. Pour des séquences de tokens, sa forme est souvent [B,T].",
+    "contexts": [
+      {
+        "lesson": "1.16",
+        "definition": "le paquet d'exemples du pas"
+      },
+      {
+        "lesson": "2.11",
+        "definition": "l'axe B"
+      },
+      {
+        "lesson": "6.5",
+        "definition": "le nombre d'exemples du pas"
+      }
+    ],
+    "english": "batch",
+    "aliases": [
+      "Mini-batch"
+    ],
+    "example": "B=2 et T=4 : deux séquences de quatre tokens.",
+    "common": true
+  },
+  {
+    "term": "Biais",
+    "definition": "décalage ajouté, noté b",
+    "contexts": [
+      {
+        "lesson": "1.5",
+        "definition": "décalage ajouté, noté b"
+      }
+    ]
+  },
+  {
+    "term": "Biais de corpus",
+    "definition": "ce que le texte répète, le modèle le reprend.",
+    "contexts": [
+      {
+        "lesson": "2.2",
+        "definition": "ce que le texte répète, le modèle le reprend."
+      }
+    ]
+  },
+  {
+    "term": "Bigramme",
+    "definition": "une paire de tokens successifs",
+    "contexts": [
+      {
+        "lesson": "3.2",
+        "definition": "une paire de tokens successifs"
+      },
+      {
+        "lesson": "4.1",
+        "definition": "uniquement le voisin"
+      },
+      {
+        "lesson": "12.2",
+        "definition": "prédiction conditionnée par le token précédent"
+      },
+      {
+        "lesson": "12.9",
+        "definition": "observe, qui compte"
+      }
+    ]
+  },
+  {
+    "term": "Bloc",
+    "definition": "les lignes indentées sous les deux-points. elif : une condition testée seulement si les précédentes sont fausses",
+    "contexts": [
+      {
+        "lesson": "0.7",
+        "definition": "les lignes indentées sous les deux-points. elif : une condition testée seulement si les précédentes sont fausses"
+      },
+      {
+        "lesson": "4.11",
+        "definition": "attention + FFN, avec normes et résidus"
+      }
+    ]
+  },
+  {
+    "term": "Booléen",
+    "definition": "True ou False",
+    "contexts": [
+      {
+        "lesson": "0.7",
+        "definition": "True ou False"
+      }
+    ]
+  },
+  {
+    "term": "BPE",
+    "definition": "byte pair encoding, cet algorithme de fusions successives",
+    "contexts": [
+      {
+        "lesson": "2.6",
+        "definition": "byte pair encoding, cet algorithme de fusions successives"
+      }
+    ]
+  },
+  {
+    "term": "Brique du site",
+    "definition": "« Architecture candidate », liée à cette étape.",
+    "contexts": [
+      {
+        "lesson": "12.8",
+        "definition": "« Architecture candidate », liée à cette étape."
+      }
+    ]
+  },
+  {
+    "contexts": [],
+    "term": "Broadcasting",
+    "english": "broadcasting",
+    "aliases": [
+      "Diffusion"
+    ],
+    "definition": "Réutilisation de valeurs sur des axes compatibles d’un tableau. Le backward somme les contributions correspondant à ces réutilisations.",
+    "example": "Ajouter un biais [3] à deux lignes [2,3] utilise chaque biais deux fois.",
+    "common": true
+  },
+  {
+    "term": "Brouillon",
+    "definition": "des tokens produits puis réinjectés",
+    "contexts": [
+      {
+        "lesson": "10.5",
+        "definition": "des tokens produits puis réinjectés"
+      }
+    ]
+  },
+  {
+    "term": "Budget",
+    "definition": "le coût maximal accepté.",
+    "contexts": [
+      {
+        "lesson": "10.6",
+        "definition": "le coût maximal accepté."
+      },
+      {
+        "lesson": "11.4",
+        "definition": "le nombre maximal de pas silencieux."
+      }
+    ]
+  },
+  {
+    "term": "Budget de tokens",
+    "definition": "nombre de cibles utilisées pendant l’entraînement.",
+    "contexts": [
+      {
+        "lesson": "12.1",
+        "definition": "nombre de cibles utilisées pendant l’entraînement."
+      }
+    ]
+  },
+  {
+    "term": "Byte-level",
+    "definition": "un tokenizer dont les unités de base sont ces octets",
+    "contexts": [
+      {
+        "lesson": "2.3",
+        "definition": "un tokenizer dont les unités de base sont ces octets"
+      }
+    ]
+  },
+  {
+    "term": "C",
+    "definition": "nombre de canaux, 1 si l'image est (H, W).",
+    "contexts": [
+      {
+        "lesson": "9.2",
+        "definition": "nombre de canaux, 1 si l'image est (H, W)."
+      }
+    ]
+  },
+  {
+    "term": "Cache",
+    "definition": "par couche, les tenseurs K et V du passé",
+    "contexts": [
+      {
+        "lesson": "5.6",
+        "definition": "par couche, les tenseurs K et V du passé"
+      },
+      {
+        "lesson": "5.9",
+        "definition": "la mémoire des K et V, proportionnelle à T."
+      }
+    ]
+  },
+  {
+    "term": "Cache KV",
+    "definition": "les clés et valeurs des tokens passés, réutilisées",
+    "contexts": [
+      {
+        "lesson": "4.14",
+        "definition": "les clés et valeurs des tokens passés, réutilisées"
+      }
+    ]
+  },
+  {
+    "term": "Cadre",
+    "definition": "une colonne du spectrogramme",
+    "contexts": [
+      {
+        "lesson": "9.5",
+        "definition": "une colonne du spectrogramme"
+      }
+    ]
+  },
+  {
+    "term": "Candidate",
+    "definition": "Backbone kind hybrid, ou un autre kind si ton hypothèse change",
+    "contexts": [
+      {
+        "lesson": "12.8",
+        "definition": "Backbone kind hybrid, ou un autre kind si ton hypothèse change"
+      }
+    ]
+  },
+  {
+    "term": "Capacité",
+    "definition": "à quel point la famille de fonctions peut se plier.",
+    "contexts": [
+      {
+        "lesson": "1.4",
+        "definition": "à quel point la famille de fonctions peut se plier."
+      },
+      {
+        "lesson": "7.5",
+        "definition": "nombre maximal de tokens acceptés par un expert. capacity_factor : multiplicateur, souvent un peu au-dessus de 1"
+      }
+    ]
+  },
+  {
+    "term": "Caractère",
+    "definition": "une unité perçue, comme « é » ou « 🤖 »",
+    "contexts": [
+      {
+        "lesson": "2.1",
+        "definition": "une unité perçue, comme « é » ou « 🤖 »"
+      }
+    ]
+  },
+  {
+    "term": "Caractère de contrôle",
+    "definition": "un retour ligne ou une tabulation, qui compte dans la longueur",
+    "contexts": [
+      {
+        "lesson": "2.2",
+        "definition": "un retour ligne ou une tabulation, qui compte dans la longueur"
+      }
+    ]
+  },
+  {
+    "term": "Caractère inconnu",
+    "definition": "impossible au niveau octet, possible au niveau caractère si le vocabulaire est incomplet.",
+    "contexts": [
+      {
+        "lesson": "2.3",
+        "definition": "impossible au niveau octet, possible au niveau caractère si le vocabulaire est incomplet."
+      },
+      {
+        "lesson": "2.5",
+        "definition": "une clé absente, ici une erreur explicite."
+      },
+      {
+        "lesson": "13.2",
+        "definition": "un signe absent du vocabulaire de départ."
+      }
+    ]
+  },
+  {
+    "term": "Cas limite",
+    "definition": "entrée au bord du domaine, comme une liste vide.",
+    "contexts": [
+      {
+        "lesson": "0.22",
+        "definition": "entrée au bord du domaine, comme une liste vide."
+      }
+    ]
+  },
+  {
+    "term": "Catalogue",
+    "definition": "data/datasets.json, la liste tenue à jour",
+    "contexts": [
+      {
+        "lesson": "13.3",
+        "definition": "data/datasets.json, la liste tenue à jour"
+      }
+    ]
+  },
+  {
+    "term": "Causal",
+    "definition": "le présent ne dépend pas du futur",
+    "contexts": [
+      {
+        "lesson": "4.5",
+        "definition": "le présent ne dépend pas du futur"
+      }
+    ]
+  },
+  {
+    "term": "Causalité",
+    "definition": "absence de dépendance au futur",
+    "contexts": [
+      {
+        "lesson": "12.10",
+        "definition": "absence de dépendance au futur"
+      }
+    ]
+  },
+  {
+    "term": "Chaîne",
+    "definition": "du texte entre guillemets",
+    "contexts": [
+      {
+        "lesson": "0.5",
+        "definition": "du texte entre guillemets"
+      }
+    ]
+  },
+  {
+    "term": "Checkpoint",
+    "definition": "Sauvegarde des poids, de la configuration et du tokenizer. Une reprise exacte d’entraînement exige aussi les états d’optimiseur et du hasard.",
+    "contexts": [
+      {
+        "lesson": "3.11",
+        "definition": "un fichier d'état. state dict : les tableaux nommés"
+      }
+    ],
+    "english": "checkpoint",
+    "aliases": [],
+    "example": "Vérifier les mêmes logits avant et après rechargement, pas seulement la présence du fichier.",
+    "common": true
+  },
+  {
+    "term": "Checkpoint de poids",
+    "definition": "un fichier .npz ou .pt, tout autre chose.",
+    "contexts": [
+      {
+        "lesson": "6.8",
+        "definition": "un fichier .npz ou .pt, tout autre chose."
+      }
+    ]
+  },
+  {
+    "term": "Chemin absolu",
+    "definition": "adresse complète depuis la racine du système",
+    "contexts": [
+      {
+        "lesson": "0.2",
+        "definition": "adresse complète depuis la racine du système"
+      }
+    ]
+  },
+  {
+    "term": "Chemin direct",
+    "definition": "la branche qui ne passe pas par f",
+    "contexts": [
+      {
+        "lesson": "4.8",
+        "definition": "la branche qui ne passe pas par f"
+      }
+    ]
+  },
+  {
+    "term": "Chemin relatif",
+    "definition": "adresse depuis le dossier courant",
+    "contexts": [
+      {
+        "lesson": "0.2",
+        "definition": "adresse depuis le dossier courant"
+      }
+    ]
+  },
+  {
+    "term": "Cible",
+    "definition": "ce qu'on aurait voulu",
+    "contexts": [
+      {
+        "lesson": "1.8",
+        "definition": "ce qu'on aurait voulu"
+      },
+      {
+        "lesson": "3.1",
+        "definition": "l'identifiant du token suivant."
+      },
+      {
+        "lesson": "12.2",
+        "definition": "token dont on évalue la probabilité."
+      }
+    ]
+  },
+  {
+    "term": "Cible décalée",
+    "definition": "la même fenêtre, avancée d'un cran.",
+    "contexts": [
+      {
+        "lesson": "2.11",
+        "definition": "la même fenêtre, avancée d'un cran."
+      },
+      {
+        "lesson": "13.6",
+        "definition": "le token suivant, comme dans le pré-entraînement"
+      }
+    ]
+  },
+  {
+    "term": "Classe",
+    "definition": "la définition, écrite avec class",
+    "contexts": [
+      {
+        "lesson": "0.21",
+        "definition": "la définition, écrite avec class"
+      }
+    ]
+  },
+  {
+    "term": "Classifieur",
+    "definition": "train_linear_classifier dans model/train.py, entropie croisée sur une tête linéaire",
+    "contexts": [
+      {
+        "lesson": "12.9",
+        "definition": "train_linear_classifier dans model/train.py, entropie croisée sur une tête linéaire"
+      }
+    ]
+  },
+  {
+    "term": "Clé",
+    "definition": "l'étiquette dans un dictionnaire. append : ajoute à la fin d'une liste.",
+    "contexts": [
+      {
+        "lesson": "0.10",
+        "definition": "l'étiquette dans un dictionnaire. append : ajoute à la fin d'une liste."
+      }
+    ]
+  },
+  {
+    "term": "Clé K",
+    "definition": "ce que la position propose comme index",
+    "contexts": [
+      {
+        "lesson": "4.2",
+        "definition": "ce que la position propose comme index"
+      }
+    ]
+  },
+  {
+    "term": "Codec",
+    "definition": "un alphabet appris de sons",
+    "contexts": [
+      {
+        "lesson": "9.5",
+        "definition": "un alphabet appris de sons"
+      }
+    ]
+  },
+  {
+    "term": "Coefficient",
+    "definition": "le poids de ce terme, pour ne pas écraser la loss de langage.",
+    "contexts": [
+      {
+        "lesson": "7.7",
+        "definition": "le poids de ce terme, pour ne pas écraser la loss de langage."
+      }
+    ]
+  },
+  {
+    "term": "Cohérence",
+    "definition": "le forward par morceaux égale le forward d'un coup.",
+    "contexts": [
+      {
+        "lesson": "4.14",
+        "definition": "le forward par morceaux égale le forward d'un coup."
+      },
+      {
+        "lesson": "5.6",
+        "definition": "égalité numérique avec un forward d'un seul coup."
+      }
+    ]
+  },
+  {
+    "term": "Collage",
+    "definition": "une projection ajoutée devant un modèle de texte",
+    "contexts": [
+      {
+        "lesson": "11.7",
+        "definition": "une projection ajoutée devant un modèle de texte"
+      }
+    ]
+  },
+  {
+    "term": "Commit",
+    "definition": "un état enregistré avec un message",
+    "contexts": [
+      {
+        "lesson": "0.13",
+        "definition": "un état enregistré avec un message"
+      }
+    ]
+  },
+  {
+    "term": "Communication",
+    "definition": "envoyer les tokens vers la machine qui tient l'expert choisi",
+    "contexts": [
+      {
+        "lesson": "7.8",
+        "definition": "envoyer les tokens vers la machine qui tient l'expert choisi"
+      }
+    ]
+  },
+  {
+    "term": "Comparaison",
+    "definition": "un opérateur qui produit un booléen.",
+    "contexts": [
+      {
+        "lesson": "0.7",
+        "definition": "un opérateur qui produit un booléen."
+      }
+    ]
+  },
+  {
+    "term": "Comparaison contrôlée",
+    "definition": "modification d’une variable annoncée",
+    "contexts": [
+      {
+        "lesson": "12.3",
+        "definition": "modification d’une variable annoncée"
+      }
+    ]
+  },
+  {
+    "term": "Composition",
+    "definition": "appliquer une fonction au résultat d'une autre.",
+    "contexts": [
+      {
+        "lesson": "1.7",
+        "definition": "appliquer une fonction au résultat d'une autre."
+      },
+      {
+        "lesson": "1.11",
+        "definition": "f(g(x))"
+      },
+      {
+        "lesson": "4.12",
+        "definition": "la sortie du bloc i est l'entrée du bloc i+1"
+      },
+      {
+        "lesson": "8.5",
+        "definition": "appliquer un pas puis un autre"
+      }
+    ]
+  },
+  {
+    "term": "Compromis",
+    "definition": "plus de paramètres stockés, un calcul par token proche du dense de départ, un risque de déséquilibre",
+    "contexts": [
+      {
+        "lesson": "7.9",
+        "definition": "plus de paramètres stockés, un calcul par token proche du dense de départ, un risque de déséquilibre"
+      }
+    ]
+  },
+  {
+    "term": "Concaténation",
+    "definition": "remettre les têtes côte à côte",
+    "contexts": [
+      {
+        "lesson": "4.7",
+        "definition": "remettre les têtes côte à côte"
+      },
+      {
+        "lesson": "9.8",
+        "definition": "empiler sur l'axe T"
+      }
+    ]
+  },
+  {
+    "term": "Concept",
+    "definition": "une unité plus large, à définir",
+    "contexts": [
+      {
+        "lesson": "11.3",
+        "definition": "une unité plus large, à définir"
+      }
+    ]
+  },
+  {
+    "term": "Config",
+    "definition": "les hyperparamètres qui fixent les formes",
+    "contexts": [
+      {
+        "lesson": "3.11",
+        "definition": "les hyperparamètres qui fixent les formes"
+      }
+    ]
+  },
+  {
+    "term": "Contexte",
+    "definition": "les tokens déjà connus",
+    "contexts": [
+      {
+        "lesson": "3.1",
+        "definition": "les tokens déjà connus"
+      },
+      {
+        "lesson": "3.3",
+        "definition": "les tokens fournis au modèle. block_size : la longueur maximale de ce contexte"
+      },
+      {
+        "lesson": "10.1",
+        "definition": "les tokens réellement donnés au modèle"
+      }
+    ]
+  },
+  {
+    "term": "Contexte construit",
+    "definition": "la chaîne renvoyée par build_context",
+    "contexts": [
+      {
+        "lesson": "10.4",
+        "definition": "la chaîne renvoyée par build_context"
+      }
+    ]
+  },
+  {
+    "term": "Contexte long",
+    "definition": "une fenêtre de plusieurs milliers de tokens",
+    "contexts": [
+      {
+        "lesson": "5.9",
+        "definition": "une fenêtre de plusieurs milliers de tokens"
+      }
+    ]
+  },
+  {
+    "term": "Contrat",
+    "definition": "sortie (B, T, D), causalité",
+    "contexts": [
+      {
+        "lesson": "11.6",
+        "definition": "sortie (B, T, D), causalité"
+      }
+    ]
+  },
+  {
+    "term": "Contrat de Backbone",
+    "definition": "forward(idx) renvoie (B,T,D)",
+    "contexts": [
+      {
+        "lesson": "12.7",
+        "definition": "forward(idx) renvoie (B,T,D)"
+      }
+    ]
+  },
+  {
+    "term": "Contrat de forme",
+    "definition": "forward renvoie (batch, temps, d_model) pour les trois kinds.",
+    "contexts": [
+      {
+        "lesson": "8.9",
+        "definition": "forward renvoie (batch, temps, d_model) pour les trois kinds."
+      }
+    ]
+  },
+  {
+    "term": "Contrôle d'ablation",
+    "definition": "même question sans l'extrait",
+    "contexts": [
+      {
+        "lesson": "10.8",
+        "definition": "même question sans l'extrait"
+      }
+    ]
+  },
+  {
+    "term": "Convolution",
+    "definition": "somme des entrées passées pondérées par ce noyau",
+    "contexts": [
+      {
+        "lesson": "8.4",
+        "definition": "somme des entrées passées pondérées par ce noyau"
+      }
+    ]
+  },
+  {
+    "term": "Corpus",
+    "definition": "l'ensemble de textes d'entraînement",
+    "contexts": [
+      {
+        "lesson": "2.2",
+        "definition": "l'ensemble de textes d'entraînement"
+      }
+    ]
+  },
+  {
+    "term": "Cosinus",
+    "definition": "le produit de deux vecteurs déjà normés.",
+    "contexts": [
+      {
+        "lesson": "10.2",
+        "definition": "le produit de deux vecteurs déjà normés."
+      }
+    ]
+  },
+  {
+    "term": "Couche cachée",
+    "definition": "une représentation intermédiaire, ni l'entrée ni la cible",
+    "contexts": [
+      {
+        "lesson": "1.7",
+        "definition": "une représentation intermédiaire, ni l'entrée ni la cible"
+      }
+    ]
+  },
+  {
+    "term": "Coût",
+    "definition": "le terme en T au carré de l'attention si tu mélanges tous les tubes.",
+    "contexts": [
+      {
+        "lesson": "9.6",
+        "definition": "le terme en T au carré de l'attention si tu mélanges tous les tubes."
+      }
+    ]
+  },
+  {
+    "term": "Coût linéaire",
+    "definition": "un travail proportionnel à T, pas à T au carré.",
+    "contexts": [
+      {
+        "lesson": "8.1",
+        "definition": "un travail proportionnel à T, pas à T au carré."
+      }
+    ]
+  },
+  {
+    "term": "Coût linéaire en profondeur",
+    "definition": "doubler les couches double à peu près ce coût, à taille de fenêtre fixe.",
+    "contexts": [
+      {
+        "lesson": "4.12",
+        "definition": "doubler les couches double à peu près ce coût, à taille de fenêtre fixe."
+      }
+    ]
+  },
+  {
+    "term": "CPU",
+    "definition": "processeur général",
+    "contexts": [
+      {
+        "lesson": "0.1",
+        "definition": "processeur général"
+      },
+      {
+        "lesson": "6.11",
+        "definition": "peu de cœurs, bon pour le contrôle et les petits branchements"
+      }
+    ]
+  },
+  {
+    "term": "Critère d'arrêt",
+    "definition": "une règle qui décide de sortir plus tôt",
+    "contexts": [
+      {
+        "lesson": "10.6",
+        "definition": "une règle qui décide de sortir plus tôt"
+      }
+    ]
+  },
+  {
+    "term": "CTM",
+    "definition": "un nom de travaux sur ce temps interne, ici une lecture",
+    "contexts": [
+      {
+        "lesson": "11.4",
+        "definition": "un nom de travaux sur ce temps interne, ici une lecture"
+      }
+    ]
+  },
+  {
+    "term": "D",
+    "definition": "d_model, la largeur commune.",
+    "contexts": [
+      {
+        "lesson": "9.3",
+        "definition": "d_model, la largeur commune."
+      }
+    ]
+  },
+  {
+    "term": "D, ou d_model",
+    "definition": "la dimension du modèle",
+    "contexts": [
+      {
+        "lesson": "2.9",
+        "definition": "la dimension du modèle"
+      }
+    ]
+  },
+  {
+    "term": "Débit",
+    "definition": "quantité produite par unité de temps",
+    "contexts": [
+      {
+        "lesson": "12.6",
+        "definition": "quantité produite par unité de temps"
+      }
+    ]
+  },
+  {
+    "term": "Décodage inverse",
+    "definition": "remplacer les identifiants créés, du dernier au premier.",
+    "contexts": [
+      {
+        "lesson": "2.7",
+        "definition": "remplacer les identifiants créés, du dernier au premier."
+      }
+    ]
+  },
+  {
+    "term": "Decoder-only",
+    "definition": "uniquement des blocs causaux",
+    "contexts": [
+      {
+        "lesson": "4.13",
+        "definition": "uniquement des blocs causaux"
+      }
+    ]
+  },
+  {
+    "term": "Décodeur vers le texte",
+    "definition": "la fonction qui réécrit le concept en caractères",
+    "contexts": [
+      {
+        "lesson": "11.3",
+        "definition": "la fonction qui réécrit le concept en caractères"
+      }
+    ]
+  },
+  {
+    "term": "Décodeur visuel",
+    "definition": "l'inverse approximatif de la projection",
+    "contexts": [
+      {
+        "lesson": "9.9",
+        "definition": "l'inverse approximatif de la projection"
+      }
+    ]
+  },
+  {
+    "term": "Découpage",
+    "definition": "split_sequence, par défaut 80 % au début",
+    "contexts": [
+      {
+        "lesson": "11.2",
+        "definition": "split_sequence, par défaut 80 % au début"
+      }
+    ]
+  },
+  {
+    "term": "Dense",
+    "definition": "tous les poids participent, comme le FFN unique",
+    "contexts": [
+      {
+        "lesson": "7.2",
+        "definition": "tous les poids participent, comme le FFN unique"
+      }
+    ]
+  },
+  {
+    "term": "Départage",
+    "definition": "(-score, index), donc le meilleur score puis le plus petit index",
+    "contexts": [
+      {
+        "lesson": "10.3",
+        "definition": "(-score, index), donc le meilleur score puis le plus petit index"
+      }
+    ]
+  },
+  {
+    "term": "Dépendance",
+    "definition": "une bibliothèque listée dans requirements.txt. pip : l'installateur de paquets.",
+    "contexts": [
+      {
+        "lesson": "0.14",
+        "definition": "une bibliothèque listée dans requirements.txt. pip : l'installateur de paquets."
+      }
+    ]
+  },
+  {
+    "term": "Dépôt",
+    "definition": "le projet suivi par Git",
+    "contexts": [
+      {
+        "lesson": "0.13",
+        "definition": "le projet suivi par Git"
+      }
+    ]
+  },
+  {
+    "term": "Dérivée",
+    "definition": "sensibilité locale de la sortie quand l'entrée bouge un peu",
+    "contexts": [
+      {
+        "lesson": "0.20",
+        "definition": "sensibilité locale de la sortie quand l'entrée bouge un peu"
+      }
+    ]
+  },
+  {
+    "term": "Dérivée partielle",
+    "definition": "la dérivée selon un paramètre, les autres étant fixes",
+    "contexts": [
+      {
+        "lesson": "1.10",
+        "definition": "la dérivée selon un paramètre, les autres étant fixes"
+      }
+    ]
+  },
+  {
+    "term": "Descente",
+    "definition": "soustraire une fraction du gradient",
+    "contexts": [
+      {
+        "lesson": "1.10",
+        "definition": "soustraire une fraction du gradient"
+      }
+    ]
+  },
+  {
+    "term": "Déséquilibre",
+    "definition": "une machine surchargée, l'autre idle.",
+    "contexts": [
+      {
+        "lesson": "7.8",
+        "definition": "une machine surchargée, l'autre idle."
+      }
+    ]
+  },
+  {
+    "term": "Diagnostic",
+    "definition": "test d’une cause possible",
+    "contexts": [
+      {
+        "lesson": "12.10",
+        "definition": "test d’une cause possible"
+      }
+    ]
+  },
+  {
+    "term": "Diagonale",
+    "definition": "chaque dimension de h évolue seule, sans mélanger les autres dans la récurrence",
+    "contexts": [
+      {
+        "lesson": "8.3",
+        "definition": "chaque dimension de h évolue seule, sans mélanger les autres dans la récurrence"
+      }
+    ]
+  },
+  {
+    "term": "Différence centrée",
+    "definition": "(f(x+eps) - f(x-eps)) / (2 eps)",
+    "contexts": [
+      {
+        "lesson": "0.20",
+        "definition": "(f(x+eps) - f(x-eps)) / (2 eps)"
+      }
+    ]
+  },
+  {
+    "term": "Dimension",
+    "definition": "le nombre de composantes",
+    "contexts": [
+      {
+        "lesson": "0.17",
+        "definition": "le nombre de composantes"
+      }
+    ]
+  },
+  {
+    "term": "Discrétisation",
+    "definition": "passer d'un temps continu à un pas delta",
+    "contexts": [
+      {
+        "lesson": "8.3",
+        "definition": "passer d'un temps continu à un pas delta"
+      }
+    ]
+  },
+  {
+    "term": "Distillation",
+    "definition": "entraîner un élève sur les sorties d'un professeur",
+    "contexts": [
+      {
+        "lesson": "6.10",
+        "definition": "entraîner un élève sur les sorties d'un professeur"
+      }
+    ]
+  },
+  {
+    "term": "Distribution discrète",
+    "definition": "une probabilité par issue",
+    "contexts": [
+      {
+        "lesson": "0.19",
+        "definition": "une probabilité par issue"
+      }
+    ]
+  },
+  {
+    "term": "Divergence",
+    "definition": "la loss explose parce que le pas est trop grand.",
+    "contexts": [
+      {
+        "lesson": "1.13",
+        "definition": "la loss explose parce que le pas est trop grand."
+      }
+    ]
+  },
+  {
+    "term": "Divergences",
+    "definition": "des activations ou une loss qui explosent.",
+    "contexts": [
+      {
+        "lesson": "5.8",
+        "definition": "des activations ou une loss qui explosent."
+      }
+    ]
+  },
+  {
+    "term": "Document",
+    "definition": "un élément de ce corpus",
+    "contexts": [
+      {
+        "lesson": "2.2",
+        "definition": "un élément de ce corpus"
+      }
+    ]
+  },
+  {
+    "term": "Dos",
+    "definition": "non entraîné de bout en bout.",
+    "contexts": [
+      {
+        "lesson": "12.9",
+        "definition": "non entraîné de bout en bout."
+      }
+    ]
+  },
+  {
+    "term": "dtype",
+    "definition": "le format du nombre. fp32, fp16, bf16, int8, int4 : 4, 2, 2, 1 et 0,5 octet",
+    "contexts": [
+      {
+        "lesson": "6.1",
+        "definition": "le format du nombre. fp32, fp16, bf16, int8, int4 : 4, 2, 2, 1 et 0,5 octet"
+      }
+    ]
+  },
+  {
+    "term": "E",
+    "definition": "le nombre d'experts.",
+    "contexts": [
+      {
+        "lesson": "7.3",
+        "definition": "le nombre d'experts."
+      }
+    ]
+  },
+  {
+    "term": "Early stopping",
+    "definition": "s'arrêter quand la validation cesse de s'améliorer.",
+    "contexts": [
+      {
+        "lesson": "1.17",
+        "definition": "s'arrêter quand la validation cesse de s'améliorer."
+      }
+    ]
+  },
+  {
+    "term": "Écart entre graines",
+    "definition": "la variation due au seul hasard, à comparer à l'effet mesuré.",
+    "contexts": [
+      {
+        "lesson": "5.10",
+        "definition": "la variation due au seul hasard, à comparer à l'effet mesuré."
+      }
+    ]
+  },
+  {
+    "term": "Écart-type",
+    "definition": "ici 0.02 pour les matrices gaussiennes",
+    "contexts": [
+      {
+        "lesson": "5.8",
+        "definition": "ici 0.02 pour les matrices gaussiennes"
+      },
+      {
+        "lesson": "6.4",
+        "definition": "la dispersion de plusieurs mesures."
+      }
+    ]
+  },
+  {
+    "term": "Échantillon",
+    "definition": "une valeur dans le temps, pour le son",
+    "contexts": [
+      {
+        "lesson": "9.1",
+        "definition": "une valeur dans le temps, pour le son"
+      },
+      {
+        "lesson": "9.4",
+        "definition": "amplitude à un instant"
+      },
+      {
+        "lesson": "13.8",
+        "definition": "le texte écrit dans finetune_run.json"
+      }
+    ]
+  },
+  {
+    "term": "Échantillonnage",
+    "definition": "tirage aléatoire selon les probabilités.",
+    "contexts": [
+      {
+        "lesson": "3.7",
+        "definition": "tirage aléatoire selon les probabilités."
+      }
+    ]
+  },
+  {
+    "term": "Échelle",
+    "definition": "1/sqrt(d_k), où d_k est la dimension d'une tête",
+    "contexts": [
+      {
+        "lesson": "4.6",
+        "definition": "1/sqrt(d_k), où d_k est la dimension d'une tête"
+      },
+      {
+        "lesson": "6.7",
+        "definition": "diviser par le nombre de micro-batches pour retrouver la moyenne."
+      },
+      {
+        "lesson": "6.9",
+        "definition": "le facteur qui ramène des entiers vers les vrais poids."
+      }
+    ]
+  },
+  {
+    "term": "Économie",
+    "definition": "V*D paramètres en moins.",
+    "contexts": [
+      {
+        "lesson": "5.7",
+        "definition": "V*D paramètres en moins."
+      }
+    ]
+  },
+  {
+    "term": "Effet de bord",
+    "definition": "une action visible comme print, qui n'est pas la valeur renvoyée.",
+    "contexts": [
+      {
+        "lesson": "0.9",
+        "definition": "une action visible comme print, qui n'est pas la valeur renvoyée."
+      }
+    ]
+  },
+  {
+    "term": "Effondrement",
+    "definition": "un expert reçoit presque tout.",
+    "contexts": [
+      {
+        "lesson": "7.6",
+        "definition": "un expert reçoit presque tout."
+      }
+    ]
+  },
+  {
+    "term": "Égalité",
+    "definition": "deux paires aussi fréquentes, départagées par l'ordre des caractères.",
+    "contexts": [
+      {
+        "lesson": "13.1",
+        "definition": "deux paires aussi fréquentes, départagées par l'ordre des caractères."
+      }
+    ]
+  },
+  {
+    "term": "Élève",
+    "definition": "le modèle plus petit qu'on veut garder.",
+    "contexts": [
+      {
+        "lesson": "6.10",
+        "definition": "le modèle plus petit qu'on veut garder."
+      }
+    ]
+  },
+  {
+    "term": "Embedding",
+    "definition": "Vecteur associé à un identifiant. Dans le modèle entraînable, les lignes de cette table sont des paramètres appris.",
+    "contexts": [
+      {
+        "lesson": "2.9",
+        "definition": "le vecteur d'un token"
+      }
+    ],
+    "english": "embedding",
+    "aliases": [
+      "Embeddings"
+    ],
+    "example": "Une table [V,D] de V=30 et D=16 contient 480 paramètres.",
+    "common": true
+  },
+  {
+    "term": "Empreinte",
+    "definition": "condensat du contenu",
+    "contexts": [
+      {
+        "lesson": "12.5",
+        "definition": "condensat du contenu"
+      }
+    ]
+  },
+  {
+    "term": "Encodage",
+    "definition": "la traduction du numéro en octets, vue à l'étape suivante.",
+    "contexts": [
+      {
+        "lesson": "2.1",
+        "definition": "la traduction du numéro en octets, vue à l'étape suivante."
+      }
+    ]
+  },
+  {
+    "term": "Encodeur",
+    "definition": "un stack non causal, absent ici",
+    "contexts": [
+      {
+        "lesson": "4.13",
+        "definition": "un stack non causal, absent ici"
+      },
+      {
+        "lesson": "9.3",
+        "definition": "la pile qui produit les vecteurs visuels"
+      }
+    ]
+  },
+  {
+    "term": "Encodeur audio",
+    "definition": "la fonction qui sort des vecteurs ou des codes",
+    "contexts": [
+      {
+        "lesson": "9.5",
+        "definition": "la fonction qui sort des vecteurs ou des codes"
+      }
+    ]
+  },
+  {
+    "term": "Énergie",
+    "definition": "intégrale d’une puissance sur une durée, en joules.",
+    "contexts": [
+      {
+        "lesson": "12.6",
+        "definition": "intégrale d’une puissance sur une durée, en joules."
+      }
+    ]
+  },
+  {
+    "term": "Entropie croisée",
+    "definition": "Pour une cible, moins le logarithme de la probabilité attribuée à cette cible. La moyenne précise les cibles comptées et le dénominateur.",
+    "contexts": [
+      {
+        "lesson": "3.6",
+        "definition": "-log(p_cible) pour une cible one-hot"
+      },
+      {
+        "lesson": "12.4",
+        "definition": "surprise moyenne des cibles"
+      }
+    ],
+    "english": "cross-entropy",
+    "aliases": [
+      "Cross-entropy"
+    ],
+    "example": "Si la cible a une probabilité 1/2, sa perte vaut ln(2), environ 0,693 nat.",
+    "common": true
+  },
+  {
+    "term": "Époque",
+    "definition": "un passage sur les données prévues",
+    "contexts": [
+      {
+        "lesson": "1.16",
+        "definition": "un passage sur les données prévues"
+      }
+    ]
+  },
+  {
+    "term": "Erreur",
+    "definition": "l'écart entre prédiction et cible",
+    "contexts": [
+      {
+        "lesson": "1.1",
+        "definition": "l'écart entre prédiction et cible"
+      }
+    ]
+  },
+  {
+    "term": "Espace commun",
+    "definition": "la dimension D partagée avec le texte.",
+    "contexts": [
+      {
+        "lesson": "9.1",
+        "definition": "la dimension D partagée avec le texte."
+      },
+      {
+        "lesson": "9.7",
+        "definition": "R^D"
+      }
+    ]
+  },
+  {
+    "term": "Étape",
+    "definition": "1 jouet, 2 petit corpus, 3 grand corpus, 4 instructions, 5 dialogue, 6 évaluation",
+    "contexts": [
+      {
+        "lesson": "13.3",
+        "definition": "1 jouet, 2 petit corpus, 3 grand corpus, 4 instructions, 5 dialogue, 6 évaluation"
+      }
+    ]
+  },
+  {
+    "term": "État",
+    "definition": "le vecteur qui porte le passé",
+    "contexts": [
+      {
+        "lesson": "8.1",
+        "definition": "le vecteur qui porte le passé"
+      },
+      {
+        "lesson": "8.8",
+        "definition": "les S nombres du SSM"
+      }
+    ]
+  },
+  {
+    "term": "État d'optimiseur",
+    "definition": "ces moyennes, qui occupent de la mémoire.",
+    "contexts": [
+      {
+        "lesson": "1.14",
+        "definition": "ces moyennes, qui occupent de la mémoire."
+      }
+    ]
+  },
+  {
+    "term": "État latent",
+    "definition": "le vecteur mis à jour pendant ces pas",
+    "contexts": [
+      {
+        "lesson": "11.4",
+        "definition": "le vecteur mis à jour pendant ces pas"
+      }
+    ]
+  },
+  {
+    "term": "Événement impossible",
+    "definition": "probabilité 0",
+    "contexts": [
+      {
+        "lesson": "0.19",
+        "definition": "probabilité 0"
+      }
+    ]
+  },
+  {
+    "term": "Exactitude",
+    "definition": "la réponse coincide avec la référence",
+    "contexts": [
+      {
+        "lesson": "10.8",
+        "definition": "la réponse coincide avec la référence"
+      }
+    ]
+  },
+  {
+    "term": "Exception",
+    "definition": "erreur pendant l'exécution, comme IndexError, KeyError, TypeError, ValueError",
+    "contexts": [
+      {
+        "lesson": "0.12",
+        "definition": "erreur pendant l'exécution, comme IndexError, KeyError, TypeError, ValueError"
+      }
+    ]
+  },
+  {
+    "term": "Exemple",
+    "definition": "une observation",
+    "contexts": [
+      {
+        "lesson": "1.1",
+        "definition": "une observation"
+      }
+    ]
+  },
+  {
+    "term": "Expert",
+    "definition": "un FFN avec ses matrices",
+    "contexts": [
+      {
+        "lesson": "7.1",
+        "definition": "un FFN avec ses matrices"
+      }
+    ]
+  },
+  {
+    "term": "Export",
+    "definition": "data/gpt_browser.json, poids en float32 et logits de référence",
+    "contexts": [
+      {
+        "lesson": "13.4",
+        "definition": "data/gpt_browser.json, poids en float32 et logits de référence"
+      }
+    ]
+  },
+  {
+    "term": "Extension",
+    "definition": "la fin du nom, comme .py ou .txt, qui indique souvent le type.",
+    "contexts": [
+      {
+        "lesson": "0.2",
+        "definition": "la fin du nom, comme .py ou .txt, qui indique souvent le type."
+      }
+    ]
+  },
+  {
+    "term": "Extrait",
+    "definition": "une ligne [index] texte",
+    "contexts": [
+      {
+        "lesson": "10.4",
+        "definition": "une ligne [index] texte"
+      }
+    ]
+  },
+  {
+    "term": "Extrapolation",
+    "definition": "utiliser une longueur non vue à l'entraînement",
+    "contexts": [
+      {
+        "lesson": "5.1",
+        "definition": "utiliser une longueur non vue à l'entraînement"
+      },
+      {
+        "lesson": "5.9",
+        "definition": "tester plus long que l'entraînement"
+      }
+    ]
+  },
+  {
+    "term": "Facteur confondant",
+    "definition": "autre différence pouvant expliquer le résultat.",
+    "contexts": [
+      {
+        "lesson": "12.3",
+        "definition": "autre différence pouvant expliquer le résultat."
+      }
+    ]
+  },
+  {
+    "term": "Feature",
+    "definition": "une information d'entrée",
+    "contexts": [
+      {
+        "lesson": "1.2",
+        "definition": "une information d'entrée"
+      }
+    ]
+  },
+  {
+    "term": "Features gelées",
+    "definition": "des vecteurs qu'on ne modifie pas pendant ce pas.",
+    "contexts": [
+      {
+        "lesson": "3.8",
+        "definition": "des vecteurs qu'on ne modifie pas pendant ce pas."
+      }
+    ]
+  },
+  {
+    "term": "Fenêtre",
+    "definition": "un extrait de longueur block_size",
+    "contexts": [
+      {
+        "lesson": "2.11",
+        "definition": "un extrait de longueur block_size"
+      },
+      {
+        "lesson": "8.8",
+        "definition": "les T tokens que l'attention voit encore"
+      },
+      {
+        "lesson": "9.4",
+        "definition": "la tranche sur laquelle on mesure."
+      }
+    ]
+  },
+  {
+    "term": "Fenêtre glissante",
+    "definition": "un extrait qui avance d'un cran",
+    "contexts": [
+      {
+        "lesson": "3.3",
+        "definition": "un extrait qui avance d'un cran"
+      },
+      {
+        "lesson": "3.9",
+        "definition": "on ne garde que les block_size derniers tokens"
+      }
+    ]
+  },
+  {
+    "term": "Feuille",
+    "definition": "une entrée ou un paramètre.",
+    "contexts": [
+      {
+        "lesson": "1.11",
+        "definition": "une entrée ou un paramètre."
+      }
+    ]
+  },
+  {
+    "term": "FFN",
+    "definition": "feed-forward network, deux couches linéaires avec une activation au milieu. d_ff : la largeur cachée, souvent 4 fois d_model",
+    "contexts": [
+      {
+        "lesson": "4.10",
+        "definition": "feed-forward network, deux couches linéaires avec une activation au milieu. d_ff : la largeur cachée, souvent 4 fois d_model"
+      }
+    ]
+  },
+  {
+    "term": "FLOP",
+    "definition": "floating point operation",
+    "contexts": [
+      {
+        "lesson": "6.3",
+        "definition": "floating point operation"
+      }
+    ]
+  },
+  {
+    "term": "Fonction de test",
+    "definition": "fonction dont le nom commence par test_, sans argument. pytest : programme qui trouve ces fonctions dans les fichiers test_*.py et les exécute toutes",
+    "contexts": [
+      {
+        "lesson": "0.22",
+        "definition": "fonction dont le nom commence par test_, sans argument. pytest : programme qui trouve ces fonctions dans les fichiers test_*.py et les exécute toutes"
+      }
+    ]
+  },
+  {
+    "term": "for",
+    "definition": "boucle sur une suite. range(n) : les entiers 0, 1, …, n-1",
+    "contexts": [
+      {
+        "lesson": "0.8",
+        "definition": "boucle sur une suite. range(n) : les entiers 0, 1, …, n-1"
+      }
+    ]
+  },
+  {
+    "term": "Forme (n, m)",
+    "definition": "n lignes, m colonnes",
+    "contexts": [
+      {
+        "lesson": "0.18",
+        "definition": "n lignes, m colonnes"
+      }
+    ]
+  },
+  {
+    "term": "Forward",
+    "definition": "le calcul de la sortie",
+    "contexts": [
+      {
+        "lesson": "1.8",
+        "definition": "le calcul de la sortie"
+      }
+    ]
+  },
+  {
+    "term": "fp16",
+    "definition": "16 bits, plage limitée. bf16 : 16 bits, exposant de fp32, mantisse courte",
+    "contexts": [
+      {
+        "lesson": "6.6",
+        "definition": "16 bits, plage limitée. bf16 : 16 bits, exposant de fp32, mantisse courte"
+      }
+    ]
+  },
+  {
+    "term": "Fraction f_i",
+    "definition": "part des tokens dont le premier choix est i",
+    "contexts": [
+      {
+        "lesson": "7.6",
+        "definition": "part des tokens dont le premier choix est i"
+      }
+    ]
+  },
+  {
+    "term": "Frame",
+    "definition": "une image de la vidéo",
+    "contexts": [
+      {
+        "lesson": "9.6",
+        "definition": "une image de la vidéo"
+      }
+    ]
+  },
+  {
+    "term": "Fréquence",
+    "definition": "le nombre de fois où la paire apparaît",
+    "contexts": [
+      {
+        "lesson": "13.1",
+        "definition": "le nombre de fois où la paire apparaît"
+      }
+    ]
+  },
+  {
+    "term": "Fréquence d'échantillonnage",
+    "definition": "nombre d'échantillons par seconde",
+    "contexts": [
+      {
+        "lesson": "9.4",
+        "definition": "nombre d'échantillons par seconde"
+      }
+    ]
+  },
+  {
+    "term": "Frontière",
+    "definition": "le caractère où « Réponse : » commence",
+    "contexts": [
+      {
+        "lesson": "13.6",
+        "definition": "le caractère où « Réponse : » commence"
+      }
+    ]
+  },
+  {
+    "term": "Fuite",
+    "definition": "une information du test qui a influencé un choix.",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "une information du test qui a influencé un choix."
+      },
+      {
+        "lesson": "11.2",
+        "definition": "une information du test présente dans l'entraînement"
+      },
+      {
+        "lesson": "12.5",
+        "definition": "information réservée utilisée pour apprendre ou choisir."
+      }
+    ]
+  },
+  {
+    "term": "Fusion",
+    "definition": "les remplacer par une nouvelle unité",
+    "contexts": [
+      {
+        "lesson": "2.6",
+        "definition": "les remplacer par une nouvelle unité"
+      },
+      {
+        "lesson": "13.1",
+        "definition": "ces deux morceaux deviennent un seul token"
+      }
+    ]
+  },
+  {
+    "term": "Fusion tardive",
+    "definition": "deux têtes séparées, combinées à la fin",
+    "contexts": [
+      {
+        "lesson": "9.8",
+        "definition": "deux têtes séparées, combinées à la fin"
+      }
+    ]
+  },
+  {
+    "term": "Fusions",
+    "definition": "la liste ordonnée des paires apprises. itos : l'identifiant vers le morceau, pour décoder",
+    "contexts": [
+      {
+        "lesson": "13.2",
+        "definition": "la liste ordonnée des paires apprises. itos : l'identifiant vers le morceau, pour décoder"
+      }
+    ]
+  },
+  {
+    "term": "Gain",
+    "definition": "le vecteur γ, appris, souvent initialisé à 1. eps : un petit terme pour ne pas diviser par zéro.",
+    "contexts": [
+      {
+        "lesson": "5.3",
+        "definition": "le vecteur γ, appris, souvent initialisé à 1. eps : un petit terme pour ne pas diviser par zéro."
+      }
+    ]
+  },
+  {
+    "term": "Gain et biais",
+    "definition": "paramètres γ et β qui rééchelonnent après coup",
+    "contexts": [
+      {
+        "lesson": "4.9",
+        "definition": "paramètres γ et β qui rééchelonnent après coup"
+      }
+    ]
+  },
+  {
+    "term": "Gated",
+    "definition": "SwiGLU compte trois matrices au lieu de deux.",
+    "contexts": [
+      {
+        "lesson": "6.3",
+        "definition": "SwiGLU compte trois matrices au lieu de deux."
+      },
+      {
+        "lesson": "13.3",
+        "definition": "un jeu qu'il faut accepter à la main"
+      }
+    ]
+  },
+  {
+    "term": "Gel",
+    "definition": "les poids de base ne reçoivent pas de gradient.",
+    "contexts": [
+      {
+        "lesson": "13.7",
+        "definition": "les poids de base ne reçoivent pas de gradient."
+      }
+    ]
+  },
+  {
+    "term": "GELU",
+    "definition": "activation lisse, approchée ici par une tanh",
+    "contexts": [
+      {
+        "lesson": "5.4",
+        "definition": "activation lisse, approchée ici par une tanh"
+      }
+    ]
+  },
+  {
+    "term": "Glouton",
+    "definition": "température 0, on prend l'argmax",
+    "contexts": [
+      {
+        "lesson": "3.7",
+        "definition": "température 0, on prend l'argmax"
+      }
+    ]
+  },
+  {
+    "term": "GPT",
+    "definition": "le surnom usuel de cette famille.",
+    "contexts": [
+      {
+        "lesson": "4.13",
+        "definition": "le surnom usuel de cette famille."
+      }
+    ]
+  },
+  {
+    "term": "GPU",
+    "definition": "beaucoup d'unités pour les produits réguliers",
+    "contexts": [
+      {
+        "lesson": "6.11",
+        "definition": "beaucoup d'unités pour les produits réguliers"
+      }
+    ]
+  },
+  {
+    "term": "GQA",
+    "definition": "des groupes, n_kv_heads divise n_heads. repeat : dupliquer chaque tête KV pour le calcul, pas pour le stockage.",
+    "contexts": [
+      {
+        "lesson": "5.5",
+        "definition": "des groupes, n_kv_heads divise n_heads. repeat : dupliquer chaque tête KV pour le calcul, pas pour le stockage."
+      }
+    ]
+  },
+  {
+    "term": "Gradient",
+    "definition": "Ensemble des dérivées de la loss par rapport aux paramètres. Il indique leur sensibilité locale ; l’optimiseur s’en sert pour les mettre à jour.",
+    "contexts": [
+      {
+        "lesson": "0.20",
+        "definition": "le vecteur des dérivées quand il y a plusieurs paramètres."
+      },
+      {
+        "lesson": "1.10",
+        "definition": "le vecteur de ces dérivées"
+      },
+      {
+        "lesson": "3.6",
+        "definition": "(softmax(logits) - one_hot) / N pour la moyenne."
+      }
+    ],
+    "english": "gradient",
+    "aliases": [
+      "Gradients"
+    ],
+    "example": "Pour L=(w−3)², dL/dw=2(w−3). En w=1, le gradient vaut −4.",
+    "common": true
+  },
+  {
+    "term": "Gradient bruité",
+    "definition": "celui d'un tout petit batch",
+    "contexts": [
+      {
+        "lesson": "6.5",
+        "definition": "celui d'un tout petit batch"
+      }
+    ]
+  },
+  {
+    "term": "Gradient local",
+    "definition": "la dérivée d'une opération",
+    "contexts": [
+      {
+        "lesson": "1.12",
+        "definition": "la dérivée d'une opération"
+      }
+    ]
+  },
+  {
+    "term": "Graine",
+    "definition": "le premier token, ou le prompt, d'où part la génération.",
+    "contexts": [
+      {
+        "lesson": "3.9",
+        "definition": "le premier token, ou le prompt, d'où part la génération."
+      },
+      {
+        "lesson": "5.8",
+        "definition": "seed du générateur, pour refaire les mêmes tirages"
+      },
+      {
+        "lesson": "5.10",
+        "definition": "nombre qui fixe le hasard"
+      }
+    ]
+  },
+  {
+    "term": "Graines appariées",
+    "definition": "même liste de graines entre recettes",
+    "contexts": [
+      {
+        "lesson": "12.3",
+        "definition": "même liste de graines entre recettes"
+      }
+    ]
+  },
+  {
+    "term": "Graphe de calcul",
+    "definition": "les opérations dessinées comme des nœuds",
+    "contexts": [
+      {
+        "lesson": "1.11",
+        "definition": "les opérations dessinées comme des nœuds"
+      }
+    ]
+  },
+  {
+    "term": "Grille",
+    "definition": "(H/p) par (W/p) patches",
+    "contexts": [
+      {
+        "lesson": "9.2",
+        "definition": "(H/p) par (W/p) patches"
+      }
+    ]
+  },
+  {
+    "term": "Groupe documentaire",
+    "definition": "textes à garder dans le même split",
+    "contexts": [
+      {
+        "lesson": "12.5",
+        "definition": "textes à garder dans le même split"
+      }
+    ]
+  },
+  {
+    "term": "h_t",
+    "definition": "état au temps t, forme (S,). y_t : sortie, ici c_t multiplié par h_t. a : vecteur (S,) de l'oubli, négatif si l'état doit décroître",
+    "contexts": [
+      {
+        "lesson": "8.2",
+        "definition": "état au temps t, forme (S,). y_t : sortie, ici c_t multiplié par h_t. a : vecteur (S,) de l'oubli, négatif si l'état doit décroître"
+      }
+    ]
+  },
+  {
+    "term": "Hallucination d'outil",
+    "definition": "prétendre un résultat qui n'est pas dans la sortie de la fonction.",
+    "contexts": [
+      {
+        "lesson": "10.7",
+        "definition": "prétendre un résultat qui n'est pas dans la sortie de la fonction."
+      }
+    ]
+  },
+  {
+    "term": "Hard target",
+    "definition": "l'identifiant exact",
+    "contexts": [
+      {
+        "lesson": "6.10",
+        "definition": "l'identifiant exact"
+      }
+    ]
+  },
+  {
+    "term": "Hasard",
+    "definition": "une bonne réponse isolée, sans série.",
+    "contexts": [
+      {
+        "lesson": "10.8",
+        "definition": "une bonne réponse isolée, sans série."
+      }
+    ]
+  },
+  {
+    "term": "Hillis-Steele",
+    "definition": "l'algorithme du laboratoire, qui double le décalage à chaque tour.",
+    "contexts": [
+      {
+        "lesson": "8.5",
+        "definition": "l'algorithme du laboratoire, qui double le décalage à chaque tour."
+      }
+    ]
+  },
+  {
+    "term": "Historique",
+    "definition": "la suite des losses, pour voir si ça descend.",
+    "contexts": [
+      {
+        "lesson": "1.16",
+        "definition": "la suite des losses, pour voir si ça descend."
+      }
+    ]
+  },
+  {
+    "term": "Hit",
+    "definition": "un dictionnaire avec score, index et text.",
+    "contexts": [
+      {
+        "lesson": "10.3",
+        "definition": "un dictionnaire avec score, index et text."
+      }
+    ]
+  },
+  {
+    "term": "Horizon",
+    "definition": "jusqu'où le modèle a le droit de regarder.",
+    "contexts": [
+      {
+        "lesson": "3.3",
+        "definition": "jusqu'où le modèle a le droit de regarder."
+      }
+    ]
+  },
+  {
+    "term": "Hors maquette",
+    "definition": "convolution locale, paramétrisation continue complète, scan fusionné en CUDA.",
+    "contexts": [
+      {
+        "lesson": "8.7",
+        "definition": "convolution locale, paramétrisation continue complète, scan fusionné en CUDA."
+      }
+    ]
+  },
+  {
+    "term": "Hors vocabulaire",
+    "definition": "un entier négatif ou supérieur à V-1.",
+    "contexts": [
+      {
+        "lesson": "2.8",
+        "definition": "un entier négatif ou supérieur à V-1."
+      }
+    ]
+  },
+  {
+    "term": "Hybride",
+    "definition": "kind=\"hybrid\"",
+    "contexts": [
+      {
+        "lesson": "8.9",
+        "definition": "kind=\"hybrid\""
+      }
+    ]
+  },
+  {
+    "term": "Hyperparamètre",
+    "definition": "learning rate, nombre de couches, taille de batch",
+    "contexts": [
+      {
+        "lesson": "1.4",
+        "definition": "learning rate, nombre de couches, taille de batch"
+      }
+    ]
+  },
+  {
+    "term": "Hypothèse",
+    "definition": "ce que tu crois être la cause, testable par une modification.",
+    "contexts": [
+      {
+        "lesson": "0.12",
+        "definition": "ce que tu crois être la cause, testable par une modification."
+      },
+      {
+        "lesson": "12.1",
+        "definition": "affirmation mise à l’épreuve"
+      }
+    ]
+  },
+  {
+    "term": "Identifiant",
+    "definition": "l'entier associé à une unité",
+    "contexts": [
+      {
+        "lesson": "2.4",
+        "definition": "l'entier associé à une unité"
+      }
+    ]
+  },
+  {
+    "term": "Identité",
+    "definition": "la matrice qui laisse un vecteur inchangé",
+    "contexts": [
+      {
+        "lesson": "0.18",
+        "definition": "la matrice qui laisse un vecteur inchangé"
+      }
+    ]
+  },
+  {
+    "term": "import",
+    "definition": "charge un module. from x import y : ne prend qu'un nom",
+    "contexts": [
+      {
+        "lesson": "0.11",
+        "definition": "charge un module. from x import y : ne prend qu'un nom"
+      }
+    ]
+  },
+  {
+    "term": "Index",
+    "definition": "la position dans une liste, à partir de 0. len : le nombre d'éléments",
+    "contexts": [
+      {
+        "lesson": "0.10",
+        "definition": "la position dans une liste, à partir de 0. len : le nombre d'éléments"
+      },
+      {
+        "lesson": "2.8",
+        "definition": "l'usage de cet entier pour lire une ligne de matrice"
+      }
+    ]
+  },
+  {
+    "term": "Inférence",
+    "definition": "un forward utilisé pour répondre, sans mise à jour.",
+    "contexts": [
+      {
+        "lesson": "1.8",
+        "definition": "un forward utilisé pour répondre, sans mise à jour."
+      },
+      {
+        "lesson": "6.12",
+        "definition": "générer ou scorer sans mettre à jour les poids"
+      }
+    ]
+  },
+  {
+    "term": "Injection",
+    "definition": "le fait de coller l'extrait dans le prompt, pas dans les poids.",
+    "contexts": [
+      {
+        "lesson": "10.4",
+        "definition": "le fait de coller l'extrait dans le prompt, pas dans les poids."
+      }
+    ]
+  },
+  {
+    "term": "Instruction",
+    "definition": "un ordre exécutable. print : fonction qui affiche une valeur",
+    "contexts": [
+      {
+        "lesson": "0.5",
+        "definition": "un ordre exécutable. print : fonction qui affiche une valeur"
+      },
+      {
+        "lesson": "13.5",
+        "definition": "une consigne et une réponse attendue"
+      }
+    ]
+  },
+  {
+    "term": "Interpréteur",
+    "definition": "le programme python ou python3",
+    "contexts": [
+      {
+        "lesson": "0.4",
+        "definition": "le programme python ou python3"
+      }
+    ]
+  },
+  {
+    "term": "Invariant",
+    "definition": "propriété attendue malgré une modification précise",
+    "contexts": [
+      {
+        "lesson": "12.10",
+        "definition": "propriété attendue malgré une modification précise"
+      }
+    ]
+  },
+  {
+    "term": "Issue",
+    "definition": "un résultat possible, ici un token",
+    "contexts": [
+      {
+        "lesson": "0.19",
+        "definition": "un résultat possible, ici un token"
+      }
+    ]
+  },
+  {
+    "term": "Itération",
+    "definition": "un tour de boucle",
+    "contexts": [
+      {
+        "lesson": "0.8",
+        "definition": "un tour de boucle"
+      },
+      {
+        "lesson": "1.13",
+        "definition": "un pas"
+      },
+      {
+        "lesson": "12.11",
+        "definition": "nouvelle expérience issue d’un résultat"
+      }
+    ]
+  },
+  {
+    "term": "Itérations de chauffe",
+    "definition": "des tours non comptés, pour éviter le premier appel plus lent",
+    "contexts": [
+      {
+        "lesson": "6.4",
+        "definition": "des tours non comptés, pour éviter le premier appel plus lent"
+      }
+    ]
+  },
+  {
+    "term": "Jeu externe",
+    "definition": "une fiche du catalogue, avec sa licence.",
+    "contexts": [
+      {
+        "lesson": "13.5",
+        "definition": "une fiche du catalogue, avec sa licence."
+      }
+    ]
+  },
+  {
+    "term": "Jouet",
+    "definition": "model/data/instructions_fr.json, écrit pour le cours",
+    "contexts": [
+      {
+        "lesson": "13.5",
+        "definition": "model/data/instructions_fr.json, écrit pour le cours"
+      }
+    ]
+  },
+  {
+    "term": "Justification",
+    "definition": "les tests et les formules, pas un adjectif",
+    "contexts": [
+      {
+        "lesson": "12.8",
+        "definition": "les tests et les formules, pas un adjectif"
+      }
+    ]
+  },
+  {
+    "term": "Kernel",
+    "definition": "une opération lancée sur le GPU.",
+    "contexts": [
+      {
+        "lesson": "6.11",
+        "definition": "une opération lancée sur le GPU."
+      }
+    ]
+  },
+  {
+    "term": "Label, ou cible",
+    "definition": "la réponse attendue",
+    "contexts": [
+      {
+        "lesson": "1.2",
+        "definition": "la réponse attendue"
+      }
+    ]
+  },
+  {
+    "term": "Largeur",
+    "definition": "le nombre de neurones de cette couche",
+    "contexts": [
+      {
+        "lesson": "1.7",
+        "definition": "le nombre de neurones de cette couche"
+      }
+    ]
+  },
+  {
+    "term": "Latence",
+    "definition": "attente avant un résultat",
+    "contexts": [
+      {
+        "lesson": "12.6",
+        "definition": "attente avant un résultat"
+      }
+    ]
+  },
+  {
+    "term": "Latent",
+    "definition": "un vecteur non affiché",
+    "contexts": [
+      {
+        "lesson": "11.5",
+        "definition": "un vecteur non affiché"
+      }
+    ]
+  },
+  {
+    "term": "LayerNorm",
+    "definition": "normaliser sur la dernière dimension, par vecteur",
+    "contexts": [
+      {
+        "lesson": "4.9",
+        "definition": "normaliser sur la dernière dimension, par vecteur"
+      }
+    ]
+  },
+  {
+    "term": "LCM",
+    "definition": "le nom de famille de ces travaux, cité comme lecture, pas comme code.",
+    "contexts": [
+      {
+        "lesson": "11.3",
+        "definition": "le nom de famille de ces travaux, cité comme lecture, pas comme code."
+      }
+    ]
+  },
+  {
+    "term": "Learning rate",
+    "definition": "taille du pas",
+    "contexts": [
+      {
+        "lesson": "1.13",
+        "definition": "taille du pas"
+      }
+    ]
+  },
+  {
+    "term": "Ligne",
+    "definition": "une configuration mesurée. quality_table : le tri du laboratoire, qualité décroissante, puis temps, puis RAM.",
+    "contexts": [
+      {
+        "lesson": "6.12",
+        "definition": "une configuration mesurée. quality_table : le tri du laboratoire, qualité décroissante, puis temps, puis RAM."
+      }
+    ]
+  },
+  {
+    "term": "Ligne de tableau",
+    "definition": "qualité, temps, RAM, plus la colonne dropped.",
+    "contexts": [
+      {
+        "lesson": "7.9",
+        "definition": "qualité, temps, RAM, plus la colonne dropped."
+      }
+    ]
+  },
+  {
+    "term": "Limite",
+    "definition": "ce que le montage ne montre pas.",
+    "contexts": [
+      {
+        "lesson": "11.1",
+        "definition": "ce que le montage ne montre pas."
+      },
+      {
+        "lesson": "12.12",
+        "definition": "conclusion non justifiée par l’expérience"
+      },
+      {
+        "lesson": "13.8",
+        "definition": "le modèle n'a vu que le corpus préparé et les paires du cours."
+      }
+    ]
+  },
+  {
+    "term": "Linéaire",
+    "definition": "f(ax+by) = a f(x) + b f(y), et on passe par l'origine si on oublie le biais ; ici on parle surtout de « affine »",
+    "contexts": [
+      {
+        "lesson": "1.6",
+        "definition": "f(ax+by) = a f(x) + b f(y), et on passe par l'origine si on oublie le biais ; ici on parle surtout de « affine »"
+      }
+    ]
+  },
+  {
+    "term": "Lisibilité",
+    "definition": "le fait de pouvoir expliquer les étapes",
+    "contexts": [
+      {
+        "lesson": "11.5",
+        "definition": "le fait de pouvoir expliquer les étapes"
+      }
+    ]
+  },
+  {
+    "term": "Lissage",
+    "definition": "ajouter alpha à chaque case pour éviter les zéros",
+    "contexts": [
+      {
+        "lesson": "3.2",
+        "definition": "ajouter alpha à chaque case pour éviter les zéros"
+      }
+    ]
+  },
+  {
+    "term": "Logit d'expert",
+    "definition": "le score avant softmax",
+    "contexts": [
+      {
+        "lesson": "7.3",
+        "definition": "le score avant softmax"
+      }
+    ]
+  },
+  {
+    "term": "Logits",
+    "definition": "Scores réels produits avant softmax. Ce ne sont pas encore des probabilités.",
+    "contexts": [
+      {
+        "lesson": "3.4",
+        "definition": "score brut, non normalisé"
+      }
+    ],
+    "english": "logits",
+    "aliases": [
+      "Logit"
+    ],
+    "example": "Les logits [0,0] donnent les probabilités [0,5 ; 0,5] après softmax.",
+    "common": true
+  },
+  {
+    "term": "Longueur tokenisée",
+    "definition": "le nombre d'unités après fusion, plus petit ou égal au nombre de caractères.",
+    "contexts": [
+      {
+        "lesson": "2.6",
+        "definition": "le nombre d'unités après fusion, plus petit ou égal au nombre de caractères."
+      }
+    ]
+  },
+  {
+    "term": "Lookup",
+    "definition": "lire une ligne par un indice, sans multiplication.",
+    "contexts": [
+      {
+        "lesson": "2.9",
+        "definition": "lire une ligne par un indice, sans multiplication."
+      }
+    ]
+  },
+  {
+    "term": "LoRA",
+    "definition": "une correction BA, de rang r, ajoutée à une matrice gelée",
+    "contexts": [
+      {
+        "lesson": "13.7",
+        "definition": "une correction BA, de rang r, ajoutée à une matrice gelée"
+      }
+    ]
+  },
+  {
+    "contexts": [],
+    "term": "Loss",
+    "english": "loss",
+    "aliases": [
+      "Fonction de coût"
+    ],
+    "definition": "Nombre défini par une règle qui compare les prédictions aux cibles. Sa baisse sur train ne garantit pas une meilleure généralisation.",
+    "example": "La perte quadratique de la prédiction 5 face à la cible 7 vaut (5−7)²=4.",
+    "common": true
+  },
+  {
+    "term": "Loss multimodale",
+    "definition": "une perte par sortie, additionnées ou alternées",
+    "contexts": [
+      {
+        "lesson": "9.9",
+        "definition": "une perte par sortie, additionnées ou alternées"
+      }
+    ]
+  },
+  {
+    "term": "Loss, ou fonction de coût",
+    "definition": "le nombre à minimiser",
+    "contexts": [
+      {
+        "lesson": "1.9",
+        "definition": "le nombre à minimiser"
+      }
+    ]
+  },
+  {
+    "term": "LTI",
+    "definition": "linear time-invariant, coefficients constants",
+    "contexts": [
+      {
+        "lesson": "8.4",
+        "definition": "linear time-invariant, coefficients constants"
+      }
+    ]
+  },
+  {
+    "term": "Mamba",
+    "definition": "SSM sélectif proposé comme bloc de séquence, avec un scan pensé pour le GPU",
+    "contexts": [
+      {
+        "lesson": "8.7",
+        "definition": "SSM sélectif proposé comme bloc de séquence, avec un scan pensé pour le GPU"
+      }
+    ]
+  },
+  {
+    "term": "Manifeste",
+    "definition": "inventaire des sources et des splits",
+    "contexts": [
+      {
+        "lesson": "12.5",
+        "definition": "inventaire des sources et des splits"
+      }
+    ]
+  },
+  {
+    "term": "Maquette",
+    "definition": "selective_scan plus un résidu dans Backbone",
+    "contexts": [
+      {
+        "lesson": "8.7",
+        "definition": "selective_scan plus un résidu dans Backbone"
+      },
+      {
+        "lesson": "11.8",
+        "definition": "scan, patches, mémoire par sac de mots, comparateur d'ablation"
+      }
+    ]
+  },
+  {
+    "term": "Masque",
+    "definition": "1 sur les tokens de la réponse, 0 sur ceux de la question",
+    "contexts": [
+      {
+        "lesson": "13.6",
+        "definition": "1 sur les tokens de la réponse, 0 sur ceux de la question"
+      }
+    ]
+  },
+  {
+    "term": "Masque causal",
+    "definition": "Règle qui interdit à une position d’utiliser des tokens futurs pendant la prédiction du suivant.",
+    "contexts": [
+      {
+        "lesson": "4.5",
+        "definition": "les cases j ≤ i restent ouvertes. -1e9 : un score assez petit pour que softmax le traite comme nul."
+      }
+    ],
+    "english": "causal mask",
+    "aliases": [
+      "Masque triangulaire inférieur"
+    ],
+    "example": "À la position 1, les positions 0 et 1 sont visibles ; la position 2 est masquée avant softmax.",
+    "common": true
+  },
+  {
+    "term": "Matrice (T, T)",
+    "definition": "une ligne par requête, une colonne par clé",
+    "contexts": [
+      {
+        "lesson": "4.3",
+        "definition": "une ligne par requête, une colonne par clé"
+      }
+    ]
+  },
+  {
+    "term": "Mémoire éteinte",
+    "definition": "aucun document, donc aucun extrait",
+    "contexts": [
+      {
+        "lesson": "10.4",
+        "definition": "aucun document, donc aucun extrait"
+      }
+    ]
+  },
+  {
+    "term": "Mémoire externe",
+    "definition": "des documents hors de la fenêtre, retrouvés à la demande",
+    "contexts": [
+      {
+        "lesson": "10.1",
+        "definition": "des documents hors de la fenêtre, retrouvés à la demande"
+      }
+    ]
+  },
+  {
+    "term": "Merge",
+    "definition": "le couple (paire, nouvel identifiant)",
+    "contexts": [
+      {
+        "lesson": "2.7",
+        "definition": "le couple (paire, nouvel identifiant)"
+      }
+    ]
+  },
+  {
+    "term": "Méthode",
+    "definition": "une fonction définie dans la classe, appelée par objet.methode(). self : l'objet sur lequel la méthode travaille. __init__ : la méthode appelée automatiquement à la création.",
+    "contexts": [
+      {
+        "lesson": "0.21",
+        "definition": "une fonction définie dans la classe, appelée par objet.methode(). self : l'objet sur lequel la méthode travaille. __init__ : la méthode appelée automatiquement à la création."
+      }
+    ]
+  },
+  {
+    "term": "Métrique externe",
+    "definition": "exactitude sur des réponses connues, pas une norme de vecteur.",
+    "contexts": [
+      {
+        "lesson": "11.5",
+        "definition": "exactitude sur des réponses connues, pas une norme de vecteur."
+      }
+    ]
+  },
+  {
+    "term": "MHA",
+    "definition": "autant de têtes KV que de têtes Q",
+    "contexts": [
+      {
+        "lesson": "5.5",
+        "definition": "autant de têtes KV que de têtes Q"
+      }
+    ]
+  },
+  {
+    "term": "Micro-batch",
+    "definition": "le paquet qui tient en mémoire",
+    "contexts": [
+      {
+        "lesson": "6.7",
+        "definition": "le paquet qui tient en mémoire"
+      }
+    ]
+  },
+  {
+    "term": "Mixed precision",
+    "definition": "mélanger les formats dans un même pas",
+    "contexts": [
+      {
+        "lesson": "6.6",
+        "definition": "mélanger les formats dans un même pas"
+      }
+    ]
+  },
+  {
+    "term": "Modalité",
+    "definition": "un type de mesure",
+    "contexts": [
+      {
+        "lesson": "9.1",
+        "definition": "un type de mesure"
+      }
+    ]
+  },
+  {
+    "term": "Module",
+    "definition": "une pièce à contrat stable",
+    "contexts": [
+      {
+        "lesson": "12.7",
+        "definition": "une pièce à contrat stable"
+      }
+    ]
+  },
+  {
+    "term": "Momentum",
+    "definition": "une moyenne des gradients passés",
+    "contexts": [
+      {
+        "lesson": "1.14",
+        "definition": "une moyenne des gradients passés"
+      }
+    ]
+  },
+  {
+    "term": "MQA",
+    "definition": "une seule tête KV pour toutes les requêtes",
+    "contexts": [
+      {
+        "lesson": "5.5",
+        "definition": "une seule tête KV pour toutes les requêtes"
+      }
+    ]
+  },
+  {
+    "term": "MSE",
+    "definition": "moyenne des carrés des écarts",
+    "contexts": [
+      {
+        "lesson": "1.9",
+        "definition": "moyenne des carrés des écarts"
+      }
+    ]
+  },
+  {
+    "term": "Nat",
+    "definition": "unité issue du logarithme naturel",
+    "contexts": [
+      {
+        "lesson": "12.4",
+        "definition": "unité issue du logarithme naturel"
+      }
+    ]
+  },
+  {
+    "term": "Natif",
+    "definition": "modalités présentes dans le même entraînement, tôt dans le réseau",
+    "contexts": [
+      {
+        "lesson": "11.7",
+        "definition": "modalités présentes dans le même entraînement, tôt dans le réseau"
+      }
+    ]
+  },
+  {
+    "term": "ndarray",
+    "definition": "le tableau NumPy. shape : le tuple des dimensions. dtype : le type des nombres, souvent float64 ici",
+    "contexts": [
+      {
+        "lesson": "0.15",
+        "definition": "le tableau NumPy. shape : le tuple des dimensions. dtype : le type des nombres, souvent float64 ici"
+      }
+    ]
+  },
+  {
+    "term": "NLL",
+    "definition": "negative log-likelihood, le même nombre",
+    "contexts": [
+      {
+        "lesson": "3.6",
+        "definition": "negative log-likelihood, le même nombre"
+      }
+    ]
+  },
+  {
+    "term": "Non entraîné",
+    "definition": "le cas du test, où les poids sont des uns.",
+    "contexts": [
+      {
+        "lesson": "9.7",
+        "definition": "le cas du test, où les poids sont des uns."
+      }
+    ]
+  },
+  {
+    "term": "Non reproduit",
+    "definition": "une idée d'article sans cet assert",
+    "contexts": [
+      {
+        "lesson": "11.8",
+        "definition": "une idée d'article sans cet assert"
+      }
+    ]
+  },
+  {
+    "term": "Normalisation L2",
+    "definition": "division par la norme",
+    "contexts": [
+      {
+        "lesson": "10.2",
+        "definition": "division par la norme"
+      }
+    ]
+  },
+  {
+    "term": "Norme",
+    "definition": "la longueur, racine du produit scalaire du vecteur avec lui-même.",
+    "contexts": [
+      {
+        "lesson": "0.17",
+        "definition": "la longueur, racine du produit scalaire du vecteur avec lui-même."
+      }
+    ]
+  },
+  {
+    "term": "Noyau",
+    "definition": "la suite des contributions d'une impulsion",
+    "contexts": [
+      {
+        "lesson": "8.4",
+        "definition": "la suite des contributions d'une impulsion"
+      }
+    ]
+  },
+  {
+    "term": "Objet (ou instance)",
+    "definition": "une valeur créée à partir de la classe, par exemple Compteur()",
+    "contexts": [
+      {
+        "lesson": "0.21",
+        "definition": "une valeur créée à partir de la classe, par exemple Compteur()"
+      }
+    ]
+  },
+  {
+    "term": "Octet",
+    "definition": "un entier entre 0 et 255",
+    "contexts": [
+      {
+        "lesson": "2.3",
+        "definition": "un entier entre 0 et 255"
+      }
+    ]
+  },
+  {
+    "term": "One-hot",
+    "definition": "un vecteur nul sauf un 1 à l'indice cible",
+    "contexts": [
+      {
+        "lesson": "3.6",
+        "definition": "un vecteur nul sauf un 1 à l'indice cible"
+      }
+    ]
+  },
+  {
+    "term": "OOM",
+    "definition": "out of memory, plus de place de travail.",
+    "contexts": [
+      {
+        "lesson": "6.2",
+        "definition": "out of memory, plus de place de travail."
+      }
+    ]
+  },
+  {
+    "term": "Optimiste",
+    "definition": "une perplexité calculée sur les données déjà vues.",
+    "contexts": [
+      {
+        "lesson": "3.10",
+        "definition": "une perplexité calculée sur les données déjà vues."
+      }
+    ]
+  },
+  {
+    "term": "Oubli structurel",
+    "definition": "perte due à la taille de l'état, pas à un mauvais entraînement.",
+    "contexts": [
+      {
+        "lesson": "8.8",
+        "definition": "perte due à la taille de l'état, pas à un mauvais entraînement."
+      }
+    ]
+  },
+  {
+    "term": "Outil",
+    "definition": "une fonction hors des poids, avec des entrées et des sorties",
+    "contexts": [
+      {
+        "lesson": "10.7",
+        "definition": "une fonction hors des poids, avec des entrées et des sorties"
+      }
+    ]
+  },
+  {
+    "term": "Overfitting",
+    "definition": "train bon, validation mauvaise",
+    "contexts": [
+      {
+        "lesson": "1.17",
+        "definition": "train bon, validation mauvaise"
+      }
+    ]
+  },
+  {
+    "term": "Package",
+    "definition": "un dossier de modules, souvent avec __init__.py. __main__ : le nom spécial du fichier que tu lances directement.",
+    "contexts": [
+      {
+        "lesson": "0.11",
+        "definition": "un dossier de modules, souvent avec __init__.py. __main__ : le nom spécial du fichier que tu lances directement."
+      }
+    ]
+  },
+  {
+    "term": "Paire",
+    "definition": "deux unités voisines",
+    "contexts": [
+      {
+        "lesson": "2.6",
+        "definition": "deux unités voisines"
+      },
+      {
+        "lesson": "5.2",
+        "definition": "deux composantes tournées ensemble"
+      },
+      {
+        "lesson": "13.1",
+        "definition": "deux morceaux voisins"
+      }
+    ]
+  },
+  {
+    "term": "Papier",
+    "definition": "un article qui pose une question",
+    "contexts": [
+      {
+        "lesson": "11.1",
+        "definition": "un article qui pose une question"
+      }
+    ]
+  },
+  {
+    "term": "Parallélisme d'experts",
+    "definition": "répartir les experts sur plusieurs accélérateurs",
+    "contexts": [
+      {
+        "lesson": "7.8",
+        "definition": "répartir les experts sur plusieurs accélérateurs"
+      }
+    ]
+  },
+  {
+    "term": "Paramètre",
+    "definition": "le nom utilisé dans la définition",
+    "contexts": [
+      {
+        "lesson": "0.9",
+        "definition": "le nom utilisé dans la définition"
+      },
+      {
+        "lesson": "1.1",
+        "definition": "nombre ajusté par l'entraînement."
+      },
+      {
+        "lesson": "1.4",
+        "definition": "w, b, puis plus tard les matrices de poids"
+      }
+    ]
+  },
+  {
+    "term": "Paramètres actifs",
+    "definition": "ceux du top-k, ceux qui coûtent du calcul.",
+    "contexts": [
+      {
+        "lesson": "7.2",
+        "definition": "ceux du top-k, ceux qui coûtent du calcul."
+      }
+    ]
+  },
+  {
+    "term": "Paramètres stockés",
+    "definition": "tous les experts en mémoire",
+    "contexts": [
+      {
+        "lesson": "7.2",
+        "definition": "tous les experts en mémoire"
+      }
+    ]
+  },
+  {
+    "term": "Parsing",
+    "definition": "transformer du texte en valeurs utilisables. strip() : enlever espaces et retours à la ligne aux bords. json.dumps : transformer un dictionnaire en texte JSON",
+    "contexts": [
+      {
+        "lesson": "0.23",
+        "definition": "transformer du texte en valeurs utilisables. strip() : enlever espaces et retours à la ligne aux bords. json.dumps : transformer un dictionnaire en texte JSON"
+      }
+    ]
+  },
+  {
+    "term": "Pas affine",
+    "definition": "h → a h + b",
+    "contexts": [
+      {
+        "lesson": "8.5",
+        "definition": "h → a h + b"
+      }
+    ]
+  },
+  {
+    "term": "Pas d'entraînement",
+    "definition": "une mise à jour",
+    "contexts": [
+      {
+        "lesson": "3.8",
+        "definition": "une mise à jour"
+      }
+    ]
+  },
+  {
+    "term": "Pas effectif",
+    "definition": "la mise à jour, une fois la somme complète",
+    "contexts": [
+      {
+        "lesson": "6.7",
+        "definition": "la mise à jour, une fois la somme complète"
+      }
+    ]
+  },
+  {
+    "term": "Pas glouton",
+    "definition": "température 0, on prend l'argmax",
+    "contexts": [
+      {
+        "lesson": "4.14",
+        "definition": "température 0, on prend l'argmax"
+      }
+    ]
+  },
+  {
+    "term": "Pas, ou learning rate",
+    "definition": "cette fraction.",
+    "contexts": [
+      {
+        "lesson": "1.10",
+        "definition": "cette fraction."
+      }
+    ]
+  },
+  {
+    "term": "Pas, ou step",
+    "definition": "une mise à jour",
+    "contexts": [
+      {
+        "lesson": "1.16",
+        "definition": "une mise à jour"
+      }
+    ]
+  },
+  {
+    "term": "Passe",
+    "definition": "un forward complet",
+    "contexts": [
+      {
+        "lesson": "10.5",
+        "definition": "un forward complet"
+      }
+    ]
+  },
+  {
+    "term": "Patch",
+    "definition": "bloc p par p, non recouvrant",
+    "contexts": [
+      {
+        "lesson": "9.2",
+        "definition": "bloc p par p, non recouvrant"
+      },
+      {
+        "lesson": "11.7",
+        "definition": "le seul geste image testé"
+      }
+    ]
+  },
+  {
+    "term": "Perplexité",
+    "definition": "Exponentielle de l’entropie croisée moyenne exprimée avec le logarithme naturel. Elle dépend du tokenizer et des données évaluées.",
+    "contexts": [
+      {
+        "lesson": "3.10",
+        "definition": "exp de la cross-entropy moyenne naturelle"
+      },
+      {
+        "lesson": "12.4",
+        "definition": "exponentielle de cette moyenne"
+      }
+    ],
+    "english": "perplexity",
+    "aliases": [],
+    "example": "Pour une distribution uniforme sur V tokens, elle vaut V.",
+    "common": true
+  },
+  {
+    "term": "Perplexité bigramme",
+    "definition": "celle mesurée sur la queue.",
+    "contexts": [
+      {
+        "lesson": "11.2",
+        "definition": "celle mesurée sur la queue."
+      }
+    ]
+  },
+  {
+    "term": "Perplexité uniforme",
+    "definition": "égale au vocabulaire, pour un modèle qui ne préfère rien",
+    "contexts": [
+      {
+        "lesson": "11.2",
+        "definition": "égale au vocabulaire, pour un modèle qui ne préfère rien"
+      }
+    ]
+  },
+  {
+    "term": "Perte auxiliaire",
+    "definition": "un terme en plus de la loss principale",
+    "contexts": [
+      {
+        "lesson": "7.7",
+        "definition": "un terme en plus de la loss principale"
+      }
+    ]
+  },
+  {
+    "term": "Perte masquée",
+    "definition": "la moyenne ne compte que les positions à 1.",
+    "contexts": [
+      {
+        "lesson": "13.6",
+        "definition": "la moyenne ne compte que les positions à 1."
+      }
+    ]
+  },
+  {
+    "term": "Pic mémoire",
+    "definition": "maximum observé pendant le calcul",
+    "contexts": [
+      {
+        "lesson": "12.6",
+        "definition": "maximum observé pendant le calcul"
+      }
+    ]
+  },
+  {
+    "term": "Pixel",
+    "definition": "une valeur dans l'espace, pour l'image",
+    "contexts": [
+      {
+        "lesson": "9.1",
+        "definition": "une valeur dans l'espace, pour l'image"
+      }
+    ]
+  },
+  {
+    "term": "Poids",
+    "definition": "coefficient multiplicatif",
+    "contexts": [
+      {
+        "lesson": "1.5",
+        "definition": "coefficient multiplicatif"
+      },
+      {
+        "lesson": "4.4",
+        "definition": "softmax des scores, une distribution par ligne"
+      }
+    ]
+  },
+  {
+    "term": "Poids d'attention",
+    "definition": "des coefficients positifs qui somment à 1, un par position du passé.",
+    "contexts": [
+      {
+        "lesson": "4.1",
+        "definition": "des coefficients positifs qui somment à 1, un par position du passé."
+      }
+    ]
+  },
+  {
+    "term": "Poids seuls",
+    "definition": "la mémoire sans optimiseur, celle de l'inférence.",
+    "contexts": [
+      {
+        "lesson": "6.1",
+        "definition": "la mémoire sans optimiseur, celle de l'inférence."
+      }
+    ]
+  },
+  {
+    "term": "Point de code",
+    "definition": "son numéro Unicode, obtenu par ord. chr : l'opération inverse",
+    "contexts": [
+      {
+        "lesson": "2.1",
+        "definition": "son numéro Unicode, obtenu par ord. chr : l'opération inverse"
+      }
+    ]
+  },
+  {
+    "term": "Pont",
+    "definition": "un entraînement à l'échelle d'un article.",
+    "contexts": [
+      {
+        "lesson": "11.8",
+        "definition": "un entraînement à l'échelle d'un article."
+      }
+    ]
+  },
+  {
+    "term": "Porte",
+    "definition": "le poids, après softmax restreint. k=1 : un seul expert, la porte vaut 1.",
+    "contexts": [
+      {
+        "lesson": "7.4",
+        "definition": "le poids, après softmax restreint. k=1 : un seul expert, la porte vaut 1."
+      },
+      {
+        "lesson": "8.6",
+        "definition": "b ou c, qui dose l'écriture et la lecture."
+      }
+    ]
+  },
+  {
+    "term": "Position absolue",
+    "definition": "un vecteur appris pour la place 0, un autre pour la place 1, etc",
+    "contexts": [
+      {
+        "lesson": "2.10",
+        "definition": "un vecteur appris pour la place 0, un autre pour la place 1, etc"
+      },
+      {
+        "lesson": "5.1",
+        "definition": "un vecteur par indice, appris"
+      }
+    ]
+  },
+  {
+    "term": "Position de départ",
+    "definition": "la longueur déjà en cache, pour RoPE ou la table absolue",
+    "contexts": [
+      {
+        "lesson": "5.6",
+        "definition": "la longueur déjà en cache, pour RoPE ou la table absolue"
+      }
+    ]
+  },
+  {
+    "term": "Position relative",
+    "definition": "une relation entre deux places, pas une case fixe.",
+    "contexts": [
+      {
+        "lesson": "5.1",
+        "definition": "une relation entre deux places, pas une case fixe."
+      }
+    ]
+  },
+  {
+    "term": "Position-wise",
+    "definition": "la même fonction, appliquée séparément à chaque position.",
+    "contexts": [
+      {
+        "lesson": "4.10",
+        "definition": "la même fonction, appliquée séparément à chaque position."
+      }
+    ]
+  },
+  {
+    "term": "Pré-activation",
+    "definition": "z, avant la fonction non linéaire.",
+    "contexts": [
+      {
+        "lesson": "1.5",
+        "definition": "z, avant la fonction non linéaire."
+      }
+    ]
+  },
+  {
+    "term": "Pre-norm",
+    "definition": "normaliser à l'entrée du sous-bloc",
+    "contexts": [
+      {
+        "lesson": "4.9",
+        "definition": "normaliser à l'entrée du sous-bloc"
+      },
+      {
+        "lesson": "4.11",
+        "definition": "norme avant le sous-bloc"
+      }
+    ]
+  },
+  {
+    "term": "Prédiction",
+    "definition": "la sortie du modèle",
+    "contexts": [
+      {
+        "lesson": "1.1",
+        "definition": "la sortie du modèle"
+      },
+      {
+        "lesson": "1.8",
+        "definition": "cette sortie"
+      }
+    ]
+  },
+  {
+    "term": "Préparer",
+    "definition": "nettoyer, couper train et val, écrire la licence à côté.",
+    "contexts": [
+      {
+        "lesson": "13.3",
+        "definition": "nettoyer, couper train et val, écrire la licence à côté."
+      }
+    ]
+  },
+  {
+    "term": "Probabilité de routage",
+    "definition": "le softmax de ces scores",
+    "contexts": [
+      {
+        "lesson": "7.3",
+        "definition": "le softmax de ces scores"
+      }
+    ]
+  },
+  {
+    "term": "Probabilité moyenne P_i",
+    "definition": "moyenne des softmax du routeur pour i",
+    "contexts": [
+      {
+        "lesson": "7.6",
+        "definition": "moyenne des softmax du routeur pour i"
+      }
+    ]
+  },
+  {
+    "term": "Produit matriciel",
+    "definition": "(n, k) fois (k, m) donne (n, m)",
+    "contexts": [
+      {
+        "lesson": "0.18",
+        "definition": "(n, k) fois (k, m) donne (n, m)"
+      }
+    ]
+  },
+  {
+    "term": "Produit scalaire",
+    "definition": "somme des produits composante par composante",
+    "contexts": [
+      {
+        "lesson": "0.17",
+        "definition": "somme des produits composante par composante"
+      },
+      {
+        "lesson": "1.5",
+        "definition": "la somme pondérée"
+      }
+    ]
+  },
+  {
+    "term": "Profondeur",
+    "definition": "le nombre de blocs empilés.",
+    "contexts": [
+      {
+        "lesson": "4.8",
+        "definition": "le nombre de blocs empilés."
+      },
+      {
+        "lesson": "4.12",
+        "definition": "n_layers"
+      },
+      {
+        "lesson": "10.6",
+        "definition": "n_layers"
+      }
+    ]
+  },
+  {
+    "term": "Programme",
+    "definition": "instructions chargées en mémoire puis exécutées.",
+    "contexts": [
+      {
+        "lesson": "0.1",
+        "definition": "instructions chargées en mémoire puis exécutées."
+      }
+    ]
+  },
+  {
+    "term": "Projection",
+    "definition": "une matrice qui transforme le vecteur d'entrée en Q, en K ou en V.",
+    "contexts": [
+      {
+        "lesson": "4.2",
+        "definition": "une matrice qui transforme le vecteur d'entrée en Q, en K ou en V."
+      },
+      {
+        "lesson": "9.3",
+        "definition": "patches @ poids + biais"
+      }
+    ]
+  },
+  {
+    "term": "Projection modale",
+    "definition": "la matrice propre au texte, à l'image ou au son",
+    "contexts": [
+      {
+        "lesson": "9.7",
+        "definition": "la matrice propre au texte, à l'image ou au son"
+      }
+    ]
+  },
+  {
+    "term": "Provenance",
+    "definition": "origine des données et du code",
+    "contexts": [
+      {
+        "lesson": "12.12",
+        "definition": "origine des données et du code"
+      }
+    ]
+  },
+  {
+    "term": "Puissance",
+    "definition": "x**2 est x fois x. exp(x) : e puissance x, toujours positif. log : le logarithme naturel, inverse de exp. e : la base, environ 2,718, notée math.e.",
+    "contexts": [
+      {
+        "lesson": "0.16",
+        "definition": "x**2 est x fois x. exp(x) : e puissance x, toujours positif. log : le logarithme naturel, inverse de exp. e : la base, environ 2,718, notée math.e."
+      }
+    ]
+  },
+  {
+    "term": "pwd",
+    "definition": "affiche le dossier courant. ls : liste le contenu. cd : change de dossier",
+    "contexts": [
+      {
+        "lesson": "0.3",
+        "definition": "affiche le dossier courant. ls : liste le contenu. cd : change de dossier"
+      }
+    ]
+  },
+  {
+    "term": "Qualité de langage",
+    "definition": "non mesurée pour ces dos, faute de corpus et d'entraînement complet.",
+    "contexts": [
+      {
+        "lesson": "11.6",
+        "definition": "non mesurée pour ces dos, faute de corpus et d'entraînement complet."
+      }
+    ]
+  },
+  {
+    "term": "Quantification",
+    "definition": "représenter les poids avec moins de bits. int8 : 1 octet. int4 : un demi-octet dans le compte du laboratoire",
+    "contexts": [
+      {
+        "lesson": "6.9",
+        "definition": "représenter les poids avec moins de bits. int8 : 1 octet. int4 : un demi-octet dans le compte du laboratoire"
+      }
+    ]
+  },
+  {
+    "term": "Raisonnement latent",
+    "definition": "une suite de vecteurs avant la sortie",
+    "contexts": [
+      {
+        "lesson": "11.5",
+        "definition": "une suite de vecteurs avant la sortie"
+      }
+    ]
+  },
+  {
+    "term": "RAM",
+    "definition": "mémoire vive, rapide et volatile",
+    "contexts": [
+      {
+        "lesson": "0.1",
+        "definition": "mémoire vive, rapide et volatile"
+      },
+      {
+        "lesson": "6.2",
+        "definition": "mémoire du CPU"
+      }
+    ]
+  },
+  {
+    "term": "Rang",
+    "definition": "la largeur du tiroir",
+    "contexts": [
+      {
+        "lesson": "13.7",
+        "definition": "la largeur du tiroir"
+      }
+    ]
+  },
+  {
+    "term": "Rappel exact",
+    "definition": "recopier un token lointain",
+    "contexts": [
+      {
+        "lesson": "8.8",
+        "definition": "recopier un token lointain"
+      }
+    ]
+  },
+  {
+    "term": "Rapport",
+    "definition": "fichier de sortie destiné à être relu",
+    "contexts": [
+      {
+        "lesson": "0.23",
+        "definition": "fichier de sortie destiné à être relu"
+      },
+      {
+        "lesson": "13.8",
+        "definition": "pertes de départ et de fin, nombre de poids, recette retenue"
+      }
+    ]
+  },
+  {
+    "term": "Recomputation",
+    "definition": "les refaire pendant le backward",
+    "contexts": [
+      {
+        "lesson": "6.8",
+        "definition": "les refaire pendant le backward"
+      }
+    ]
+  },
+  {
+    "term": "Récurrence",
+    "definition": "h_t dépend de h_{t-1} et de l'entrée x_t",
+    "contexts": [
+      {
+        "lesson": "8.1",
+        "definition": "h_t dépend de h_{t-1} et de l'entrée x_t"
+      },
+      {
+        "lesson": "8.4",
+        "definition": "la même chose, calculée pas à pas."
+      }
+    ]
+  },
+  {
+    "term": "Récurrence de raisonnement",
+    "definition": "enchaîner des passes",
+    "contexts": [
+      {
+        "lesson": "10.5",
+        "definition": "enchaîner des passes"
+      }
+    ]
+  },
+  {
+    "term": "Réduction",
+    "definition": "la façon de passer de plusieurs écarts à un seul nombre, ici la moyenne.",
+    "contexts": [
+      {
+        "lesson": "1.9",
+        "definition": "la façon de passer de plusieurs écarts à un seul nombre, ici la moyenne."
+      },
+      {
+        "lesson": "12.4",
+        "definition": "règle qui transforme les pertes individuelles en une valeur."
+      }
+    ]
+  },
+  {
+    "term": "Réfutation",
+    "definition": "observation incompatible avec l’affirmation",
+    "contexts": [
+      {
+        "lesson": "12.1",
+        "definition": "observation incompatible avec l’affirmation"
+      }
+    ]
+  },
+  {
+    "term": "Règle de chaîne",
+    "definition": "la dérivée d'une composition est le produit des dérivées",
+    "contexts": [
+      {
+        "lesson": "1.11",
+        "definition": "la dérivée d'une composition est le produit des dérivées"
+      }
+    ]
+  },
+  {
+    "term": "Régression",
+    "definition": "train_linear_regression dans model/mlp.py",
+    "contexts": [
+      {
+        "lesson": "12.9",
+        "definition": "train_linear_regression dans model/mlp.py"
+      }
+    ]
+  },
+  {
+    "term": "Régularisation",
+    "definition": "une contrainte qui limite la liberté du modèle, comme un poids trop grand pénalisé",
+    "contexts": [
+      {
+        "lesson": "1.17",
+        "definition": "une contrainte qui limite la liberté du modèle, comme un poids trop grand pénalisé"
+      }
+    ]
+  },
+  {
+    "term": "ReLU",
+    "definition": "max(0, z)",
+    "contexts": [
+      {
+        "lesson": "1.6",
+        "definition": "max(0, z)"
+      }
+    ]
+  },
+  {
+    "term": "Remote",
+    "definition": "la copie distante, ici GitHub.",
+    "contexts": [
+      {
+        "lesson": "0.13",
+        "definition": "la copie distante, ici GitHub."
+      }
+    ]
+  },
+  {
+    "term": "REPL",
+    "definition": "la boucle interactive où tu tapes une instruction et vois le résultat tout de suite.",
+    "contexts": [
+      {
+        "lesson": "0.4",
+        "definition": "la boucle interactive où tu tapes une instruction et vois le résultat tout de suite."
+      }
+    ]
+  },
+  {
+    "term": "Reproductibilité",
+    "definition": "possibilité de refaire la recette documentée",
+    "contexts": [
+      {
+        "lesson": "12.12",
+        "definition": "possibilité de refaire la recette documentée"
+      }
+    ]
+  },
+  {
+    "term": "Reproductible",
+    "definition": "la même entrée redonne exactement le même rapport.",
+    "contexts": [
+      {
+        "lesson": "0.23",
+        "definition": "la même entrée redonne exactement le même rapport."
+      }
+    ]
+  },
+  {
+    "term": "Reproduit",
+    "definition": "un assert pytest dans ce dépôt",
+    "contexts": [
+      {
+        "lesson": "11.8",
+        "definition": "un assert pytest dans ce dépôt"
+      }
+    ]
+  },
+  {
+    "term": "Requête Q",
+    "definition": "ce que la position cherche",
+    "contexts": [
+      {
+        "lesson": "4.2",
+        "definition": "ce que la position cherche"
+      }
+    ]
+  },
+  {
+    "term": "Résidu",
+    "definition": "prédiction moins cible",
+    "contexts": [
+      {
+        "lesson": "1.9",
+        "definition": "prédiction moins cible"
+      },
+      {
+        "lesson": "4.8",
+        "definition": "l'ajout x + f(x)"
+      }
+    ]
+  },
+  {
+    "term": "Résultat",
+    "definition": "un nombre obtenu dans un montage décrit",
+    "contexts": [
+      {
+        "lesson": "11.1",
+        "definition": "un nombre obtenu dans un montage décrit"
+      }
+    ]
+  },
+  {
+    "term": "Retrieval",
+    "definition": "le geste d'aller chercher. k : le nombre d'extraits gardés.",
+    "contexts": [
+      {
+        "lesson": "10.1",
+        "definition": "le geste d'aller chercher. k : le nombre d'extraits gardés."
+      }
+    ]
+  },
+  {
+    "term": "Rétropropagation",
+    "definition": "Application de la règle de chaîne dans l’ordre inverse du graphe de calcul pour obtenir les gradients. Les chemins partagés s’additionnent.",
+    "contexts": [
+      {
+        "lesson": "1.12",
+        "definition": "la passe arrière"
+      }
+    ],
+    "english": "backpropagation",
+    "aliases": [
+      "Backward",
+      "Backpropagation"
+    ],
+    "example": "Pour y=w*w+w et w=3, le gradient de w vaut 7.",
+    "common": true
+  },
+  {
+    "term": "RMS",
+    "definition": "root mean square, racine de la moyenne des carrés",
+    "contexts": [
+      {
+        "lesson": "5.3",
+        "definition": "root mean square, racine de la moyenne des carrés"
+      }
+    ]
+  },
+  {
+    "term": "RMSNorm",
+    "definition": "diviser par la racine de la moyenne des carrés, sans soustraire la moyenne.",
+    "contexts": [
+      {
+        "lesson": "4.9",
+        "definition": "diviser par la racine de la moyenne des carrés, sans soustraire la moyenne."
+      }
+    ]
+  },
+  {
+    "term": "RoPE",
+    "definition": "une rotation du vecteur selon la place, vue au niveau 5.",
+    "contexts": [
+      {
+        "lesson": "2.10",
+        "definition": "une rotation du vecteur selon la place, vue au niveau 5."
+      },
+      {
+        "lesson": "5.2",
+        "definition": "rotary position embedding"
+      }
+    ]
+  },
+  {
+    "term": "Routeur",
+    "definition": "matrice (D, E)",
+    "contexts": [
+      {
+        "lesson": "7.3",
+        "definition": "matrice (D, E)"
+      }
+    ]
+  },
+  {
+    "term": "S",
+    "definition": "taille de l'état.",
+    "contexts": [
+      {
+        "lesson": "8.2",
+        "definition": "taille de l'état."
+      }
+    ]
+  },
+  {
+    "term": "Sac de mots",
+    "definition": "un compte par type, sans ordre",
+    "contexts": [
+      {
+        "lesson": "10.2",
+        "definition": "un compte par type, sans ordre"
+      }
+    ]
+  },
+  {
+    "term": "Sac de vecteurs",
+    "definition": "une somme ou une moyenne, sans choix",
+    "contexts": [
+      {
+        "lesson": "4.1",
+        "definition": "une somme ou une moyenne, sans choix"
+      }
+    ]
+  },
+  {
+    "term": "Saturation de softmax",
+    "definition": "une exponentielle écrase les autres quand un score domine de beaucoup. d_k : dimension d'une tête, pas forcément D du modèle.",
+    "contexts": [
+      {
+        "lesson": "4.6",
+        "definition": "une exponentielle écrase les autres quand un score domine de beaucoup. d_k : dimension d'une tête, pas forcément D du modèle."
+      }
+    ]
+  },
+  {
+    "term": "Scan",
+    "definition": "la récurrence interne du SSM, qui n'est pas une relecture consciente.",
+    "contexts": [
+      {
+        "lesson": "10.5",
+        "definition": "la récurrence interne du SSM, qui n'est pas une relecture consciente."
+      }
+    ]
+  },
+  {
+    "term": "Scan associatif",
+    "definition": "préfixe de compositions",
+    "contexts": [
+      {
+        "lesson": "8.5",
+        "definition": "préfixe de compositions"
+      }
+    ]
+  },
+  {
+    "term": "Score",
+    "definition": "le produit scalaire, avant softmax",
+    "contexts": [
+      {
+        "lesson": "4.3",
+        "definition": "le produit scalaire, avant softmax"
+      },
+      {
+        "lesson": "10.3",
+        "definition": "le cosinus. k : le nombre de fiches renvoyées"
+      }
+    ]
+  },
+  {
+    "term": "Score, ou logit",
+    "definition": "un nombre encore libre, pas encore converti en probabilité.",
+    "contexts": [
+      {
+        "lesson": "0.19",
+        "definition": "un nombre encore libre, pas encore converti en probabilité."
+      }
+    ]
+  },
+  {
+    "term": "Sélectif",
+    "definition": "les coefficients du pas dépendent de l'entrée. delta : le pas de temps, ici forcé positif. softplus : log(1+exp(z)), utilisé pour que delta ne soit pas négatif",
+    "contexts": [
+      {
+        "lesson": "8.6",
+        "definition": "les coefficients du pas dépendent de l'entrée. delta : le pas de temps, ici forcé positif. softplus : log(1+exp(z)), utilisé pour que delta ne soit pas négatif"
+      }
+    ]
+  },
+  {
+    "term": "Sélection",
+    "definition": "choix d’une recette sur validation",
+    "contexts": [
+      {
+        "lesson": "12.11",
+        "definition": "choix d’une recette sur validation"
+      }
+    ]
+  },
+  {
+    "term": "Self-attention",
+    "definition": "Q, K et V issus du même X",
+    "contexts": [
+      {
+        "lesson": "4.4",
+        "definition": "Q, K et V issus du même X"
+      }
+    ]
+  },
+  {
+    "term": "Séquence",
+    "definition": "la liste d'entiers d'un texte",
+    "contexts": [
+      {
+        "lesson": "2.8",
+        "definition": "la liste d'entiers d'un texte"
+      },
+      {
+        "lesson": "2.11",
+        "definition": "l'axe T"
+      }
+    ]
+  },
+  {
+    "term": "SFT",
+    "definition": "l'ajustement supervisé après le pré-entraînement",
+    "contexts": [
+      {
+        "lesson": "13.5",
+        "definition": "l'ajustement supervisé après le pré-entraînement"
+      }
+    ]
+  },
+  {
+    "term": "SGD",
+    "definition": "soustraire lr fois le gradient",
+    "contexts": [
+      {
+        "lesson": "1.14",
+        "definition": "soustraire lr fois le gradient"
+      }
+    ]
+  },
+  {
+    "term": "Signe",
+    "definition": "positif si la fonction monte, négatif si elle descend",
+    "contexts": [
+      {
+        "lesson": "0.20",
+        "definition": "positif si la fonction monte, négatif si elle descend"
+      }
+    ]
+  },
+  {
+    "term": "SiLU",
+    "definition": "z * sigmoid(z), utilisée plus tard dans SwiGLU.",
+    "contexts": [
+      {
+        "lesson": "1.6",
+        "definition": "z * sigmoid(z), utilisée plus tard dans SwiGLU."
+      },
+      {
+        "lesson": "5.4",
+        "definition": "x * sigmoid(x), peut être négative et dépasser 1"
+      }
+    ]
+  },
+  {
+    "term": "Soft targets",
+    "definition": "la distribution du professeur",
+    "contexts": [
+      {
+        "lesson": "6.10",
+        "definition": "la distribution du professeur"
+      }
+    ]
+  },
+  {
+    "term": "Softmax",
+    "definition": "Transforme les scores d’une ligne en probabilités positives dont la somme vaut un. Soustraire le maximum avant exponentiation stabilise le calcul.",
+    "contexts": [
+      {
+        "lesson": "3.5",
+        "definition": "exp(z_i) / somme exp(z_j)"
+      }
+    ],
+    "english": "softmax",
+    "aliases": [],
+    "example": "Deux scores identiques donnent chacun une probabilité de 1/2.",
+    "common": true
+  },
+  {
+    "term": "Sortie",
+    "definition": "poids @ V, une moyenne des valeurs.",
+    "contexts": [
+      {
+        "lesson": "4.4",
+        "definition": "poids @ V, une moyenne des valeurs."
+      }
+    ]
+  },
+  {
+    "term": "Sortie d'expert",
+    "definition": "un vecteur de la même dimension que l'entrée.",
+    "contexts": [
+      {
+        "lesson": "7.1",
+        "definition": "un vecteur de la même dimension que l'entrée."
+      }
+    ]
+  },
+  {
+    "term": "Sortie du bloc",
+    "definition": "un tenseur de même forme que l'entrée, (B, T, D).",
+    "contexts": [
+      {
+        "lesson": "4.11",
+        "definition": "un tenseur de même forme que l'entrée, (B, T, D)."
+      }
+    ]
+  },
+  {
+    "term": "Sous-bloc",
+    "definition": "attention ou FFN",
+    "contexts": [
+      {
+        "lesson": "4.8",
+        "definition": "attention ou FFN"
+      }
+    ]
+  },
+  {
+    "term": "Sparse",
+    "definition": "une fraction des experts participe",
+    "contexts": [
+      {
+        "lesson": "7.2",
+        "definition": "une fraction des experts participe"
+      }
+    ]
+  },
+  {
+    "term": "Spécialisation",
+    "definition": "ce que l'entraînement fera peut-être apparaître, pas ce qu'on programme",
+    "contexts": [
+      {
+        "lesson": "7.1",
+        "definition": "ce que l'entraînement fera peut-être apparaître, pas ce qu'on programme"
+      }
+    ]
+  },
+  {
+    "term": "Spectrogramme",
+    "definition": "énergie par temps et par bande de fréquence",
+    "contexts": [
+      {
+        "lesson": "9.4",
+        "definition": "énergie par temps et par bande de fréquence"
+      }
+    ]
+  },
+  {
+    "term": "SSM",
+    "definition": "modèle d'état, état plus observation",
+    "contexts": [
+      {
+        "lesson": "8.3",
+        "definition": "modèle d'état, état plus observation"
+      }
+    ]
+  },
+  {
+    "term": "Stabilité",
+    "definition": "soustraire le max avant exp, pour ne pas déborder.",
+    "contexts": [
+      {
+        "lesson": "3.4",
+        "definition": "soustraire le max avant exp, pour ne pas déborder."
+      }
+    ]
+  },
+  {
+    "term": "Stabilité numérique",
+    "definition": "soustraire max(z) avant exp",
+    "contexts": [
+      {
+        "lesson": "3.5",
+        "definition": "soustraire max(z) avant exp"
+      }
+    ]
+  },
+  {
+    "term": "Staging",
+    "definition": "la zone de ce qui partira dans le prochain commit, remplie par git add",
+    "contexts": [
+      {
+        "lesson": "0.13",
+        "definition": "la zone de ce qui partira dans le prochain commit, remplie par git add"
+      }
+    ]
+  },
+  {
+    "term": "Stockage",
+    "definition": "SSD ou disque, persistant et plus lent",
+    "contexts": [
+      {
+        "lesson": "0.1",
+        "definition": "SSD ou disque, persistant et plus lent"
+      }
+    ]
+  },
+  {
+    "term": "stoi",
+    "definition": "string to index. itos : index to string",
+    "contexts": [
+      {
+        "lesson": "2.5",
+        "definition": "string to index. itos : index to string"
+      }
+    ]
+  },
+  {
+    "term": "Suradaptation",
+    "definition": "ajustement excessif aux données utilisées pour choisir.",
+    "contexts": [
+      {
+        "lesson": "12.11",
+        "definition": "ajustement excessif aux données utilisées pour choisir."
+      }
+    ]
+  },
+  {
+    "term": "SwiGLU",
+    "definition": "silu(x W_gate) * (x W_up), puis W_down",
+    "contexts": [
+      {
+        "lesson": "5.4",
+        "definition": "silu(x W_gate) * (x W_up), puis W_down"
+      }
+    ]
+  },
+  {
+    "term": "Switch",
+    "definition": "la formule E * somme(f P), qui vaut 1 lorsque f et P sont uniformes ; c'est une référence, pas un minimum universel",
+    "contexts": [
+      {
+        "lesson": "7.7",
+        "definition": "la formule E * somme(f P), qui vaut 1 lorsque f et P sont uniformes ; c'est une référence, pas un minimum universel"
+      }
+    ]
+  },
+  {
+    "term": "Symptôme",
+    "definition": "observation à expliquer avant de modifier la recette.",
+    "contexts": [
+      {
+        "lesson": "12.10",
+        "definition": "observation à expliquer avant de modifier la recette."
+      }
+    ]
+  },
+  {
+    "term": "Syntaxe",
+    "definition": "les règles d'écriture, avant même l'exécution.",
+    "contexts": [
+      {
+        "lesson": "0.5",
+        "definition": "les règles d'écriture, avant même l'exécution."
+      }
+    ]
+  },
+  {
+    "term": "SyntaxError",
+    "definition": "phrase illégale, rien n'a commencé",
+    "contexts": [
+      {
+        "lesson": "0.12",
+        "definition": "phrase illégale, rien n'a commencé"
+      }
+    ]
+  },
+  {
+    "term": "T_visuel",
+    "definition": "le nombre de tubes, qui joue le rôle de T",
+    "contexts": [
+      {
+        "lesson": "9.6",
+        "definition": "le nombre de tubes, qui joue le rôle de T"
+      }
+    ]
+  },
+  {
+    "term": "Table",
+    "definition": "la matrice (V, D)",
+    "contexts": [
+      {
+        "lesson": "2.9",
+        "definition": "la matrice (V, D)"
+      }
+    ]
+  },
+  {
+    "term": "Table de comptes",
+    "definition": "matrice V par V",
+    "contexts": [
+      {
+        "lesson": "3.2",
+        "definition": "matrice V par V"
+      }
+    ]
+  },
+  {
+    "term": "Table figée",
+    "definition": "la même correspondance à l'entraînement et à la génération.",
+    "contexts": [
+      {
+        "lesson": "2.4",
+        "definition": "la même correspondance à l'entraînement et à la génération."
+      }
+    ]
+  },
+  {
+    "term": "Taille",
+    "definition": "le nombre d'unités, souvent notée V",
+    "contexts": [
+      {
+        "lesson": "2.4",
+        "definition": "le nombre d'unités, souvent notée V"
+      }
+    ]
+  },
+  {
+    "term": "Température",
+    "definition": "un diviseur des logits, qui viendra à l'étape 3.7.",
+    "contexts": [
+      {
+        "lesson": "3.5",
+        "definition": "un diviseur des logits, qui viendra à l'étape 3.7."
+      },
+      {
+        "lesson": "3.7",
+        "definition": "diviseur des logits avant softmax"
+      },
+      {
+        "lesson": "13.4",
+        "definition": "un diviseur des scores, avant le softmax"
+      }
+    ]
+  },
+  {
+    "term": "Température nulle",
+    "definition": "le token le plus probable, sans tirage",
+    "contexts": [
+      {
+        "lesson": "13.8",
+        "definition": "le token le plus probable, sans tirage"
+      }
+    ]
+  },
+  {
+    "term": "Temps interne",
+    "definition": "des pas qui ne consomment pas un token d'entrée",
+    "contexts": [
+      {
+        "lesson": "11.4",
+        "definition": "des pas qui ne consomment pas un token d'entrée"
+      }
+    ]
+  },
+  {
+    "term": "Temps mural",
+    "definition": "l'heure qui passe, pas les FLOPs",
+    "contexts": [
+      {
+        "lesson": "6.4",
+        "definition": "l'heure qui passe, pas les FLOPs"
+      }
+    ]
+  },
+  {
+    "term": "Tenseur",
+    "definition": "Tableau à plusieurs axes. Le Tensor du cours ajoute un suivi des opérations et de leurs gradients ; un tableau n’enregistre pas nécessairement un graphe.",
+    "contexts": [
+      {
+        "lesson": "1.15",
+        "definition": "tableau à N dimensions. requires_grad : demande le suivi des dérivées. .grad : le gradient accumulé. zero_grad : remet ces cases à zéro"
+      }
+    ],
+    "english": "tensor",
+    "aliases": [
+      "Tenseurs"
+    ],
+    "example": "[B,T,D]=[2,4,8] contient 64 valeurs.",
+    "common": true
+  },
+  {
+    "term": "Terme linéaire",
+    "definition": "le FFN et les projections",
+    "contexts": [
+      {
+        "lesson": "6.3",
+        "definition": "le FFN et les projections"
+      }
+    ]
+  },
+  {
+    "term": "Terme quadratique",
+    "definition": "les produits QKᵀ et AV",
+    "contexts": [
+      {
+        "lesson": "5.9",
+        "definition": "les produits QKᵀ et AV"
+      },
+      {
+        "lesson": "6.3",
+        "definition": "T² de l'attention"
+      }
+    ]
+  },
+  {
+    "term": "Test",
+    "definition": "données gardées pour une mesure finale",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "données gardées pour une mesure finale"
+      }
+    ]
+  },
+  {
+    "term": "Test final",
+    "definition": "mesure après fixation de la recette",
+    "contexts": [
+      {
+        "lesson": "12.11",
+        "definition": "mesure après fixation de la recette"
+      }
+    ]
+  },
+  {
+    "contexts": [],
+    "term": "Test réservé",
+    "english": "held-out test",
+    "aliases": [],
+    "definition": "Jeu conservé à part jusqu’à la mesure finale après sélection. Réutiliser son score pour régler le modèle le transforme en validation.",
+    "example": "Après changement de recette choisi grâce au test, préparer un nouveau test indépendant.",
+    "common": true
+  },
+  {
+    "term": "Tête",
+    "definition": "un bloc d'attention de dimension d_k. d_k = d_model / n_heads",
+    "contexts": [
+      {
+        "lesson": "4.7",
+        "definition": "un bloc d'attention de dimension d_k. d_k = d_model / n_heads"
+      },
+      {
+        "lesson": "9.9",
+        "definition": "la couche finale vers un vocabulaire ou vers des pixels"
+      }
+    ]
+  },
+  {
+    "term": "Tête de sortie",
+    "definition": "la matrice qui passe de D à V",
+    "contexts": [
+      {
+        "lesson": "4.13",
+        "definition": "la matrice qui passe de D à V"
+      }
+    ]
+  },
+  {
+    "term": "Tête linéaire",
+    "definition": "la dernière matrice, des vecteurs vers les logits",
+    "contexts": [
+      {
+        "lesson": "3.8",
+        "definition": "la dernière matrice, des vecteurs vers les logits"
+      }
+    ]
+  },
+  {
+    "term": "Token",
+    "definition": "Unité de la segmentation d’un texte, représentée par un identifiant entier. Ce peut être un caractère, un octet ou une unité issue de fusions.",
+    "contexts": [
+      {
+        "lesson": "11.3",
+        "definition": "l'unité du tokenizer actuel, ici souvent un caractère"
+      }
+    ],
+    "english": "token",
+    "aliases": [
+      "Tokens"
+    ],
+    "example": "Un tokenizer caractère peut encoder « abba » par [0,1,1,0].",
+    "common": true
+  },
+  {
+    "term": "Token dropped",
+    "definition": "un token refusé, dont la contribution d'expert reste nulle dans notre code.",
+    "contexts": [
+      {
+        "lesson": "7.5",
+        "definition": "un token refusé, dont la contribution d'expert reste nulle dans notre code."
+      }
+    ]
+  },
+  {
+    "term": "Token id",
+    "definition": "l'entier",
+    "contexts": [
+      {
+        "lesson": "2.8",
+        "definition": "l'entier"
+      }
+    ]
+  },
+  {
+    "contexts": [],
+    "term": "Tokenizer",
+    "english": "tokenizer",
+    "aliases": [
+      "Tokeniseur"
+    ],
+    "definition": "Règle et vocabulaire qui encodent le texte en identifiants et permettent son décodage. Les identifiants doivent rester stables après entraînement.",
+    "example": "Le même vocabulaire doit être rechargé avec le checkpoint du modèle.",
+    "common": true
+  },
+  {
+    "term": "Top-k",
+    "definition": "on ne garde que les k meilleurs scores",
+    "contexts": [
+      {
+        "lesson": "3.7",
+        "definition": "on ne garde que les k meilleurs scores"
+      },
+      {
+        "lesson": "7.4",
+        "definition": "les k indices de plus forts logits"
+      },
+      {
+        "lesson": "13.4",
+        "definition": "on ne tire que parmi les k scores les plus hauts"
+      }
+    ]
+  },
+  {
+    "term": "Trace",
+    "definition": "l'historique des appels",
+    "contexts": [
+      {
+        "lesson": "10.7",
+        "definition": "l'historique des appels"
+      }
+    ]
+  },
+  {
+    "term": "Traceback",
+    "definition": "la pile d'appels affichée",
+    "contexts": [
+      {
+        "lesson": "0.12",
+        "definition": "la pile d'appels affichée"
+      }
+    ]
+  },
+  {
+    "term": "Train",
+    "definition": "Données utilisées pour ajuster les paramètres. Une mesure sur ces données décrit aussi la mémorisation et ne suffit pas à évaluer la généralisation.",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "données utilisées pour modifier les paramètres"
+      }
+    ],
+    "english": "training data",
+    "aliases": [],
+    "example": "Le tokenizer est appris sur train ; les documents de validation et de test restent réservés.",
+    "common": true
+  },
+  {
+    "term": "Trajectoire",
+    "definition": "la suite des valeurs du paramètre",
+    "contexts": [
+      {
+        "lesson": "1.13",
+        "definition": "la suite des valeurs du paramètre"
+      }
+    ]
+  },
+  {
+    "term": "Transfert",
+    "definition": "copier des données entre RAM et VRAM, ce qui a un coût",
+    "contexts": [
+      {
+        "lesson": "6.11",
+        "definition": "copier des données entre RAM et VRAM, ce qui a un coût"
+      }
+    ]
+  },
+  {
+    "term": "Transposée",
+    "definition": "lignes et colonnes échangées.",
+    "contexts": [
+      {
+        "lesson": "0.18",
+        "definition": "lignes et colonnes échangées."
+      },
+      {
+        "lesson": "5.7",
+        "definition": "les logits valent h @ Eᵀ si E est (V, D)"
+      }
+    ]
+  },
+  {
+    "term": "Tube",
+    "definition": "un patch qui s'étend sur plusieurs frames",
+    "contexts": [
+      {
+        "lesson": "9.6",
+        "definition": "un patch qui s'étend sur plusieurs frames"
+      }
+    ]
+  },
+  {
+    "term": "Underfitting",
+    "definition": "même le train reste mauvais, le modèle est trop pauvre ou trop peu entraîné",
+    "contexts": [
+      {
+        "lesson": "1.17",
+        "definition": "même le train reste mauvais, le modèle est trop pauvre ou trop peu entraîné"
+      }
+    ]
+  },
+  {
+    "term": "Underflow / overflow",
+    "definition": "nombre trop petit devenu 0, ou trop grand devenu infini.",
+    "contexts": [
+      {
+        "lesson": "6.6",
+        "definition": "nombre trop petit devenu 0, ou trop grand devenu infini."
+      }
+    ]
+  },
+  {
+    "term": "Uniforme",
+    "definition": "même probabilité pour chaque token",
+    "contexts": [
+      {
+        "lesson": "12.2",
+        "definition": "même probabilité pour chaque token"
+      }
+    ]
+  },
+  {
+    "term": "Usage",
+    "definition": "la différence entre les deux",
+    "contexts": [
+      {
+        "lesson": "10.8",
+        "definition": "la différence entre les deux"
+      }
+    ]
+  },
+  {
+    "term": "UTF-8",
+    "definition": "l'encodage qui transforme un caractère en 1 à 4 octets",
+    "contexts": [
+      {
+        "lesson": "2.3",
+        "definition": "l'encodage qui transforme un caractère en 1 à 4 octets"
+      }
+    ]
+  },
+  {
+    "term": "Valeur attendue",
+    "definition": "calculée à la main AVANT d'exécuter",
+    "contexts": [
+      {
+        "lesson": "0.22",
+        "definition": "calculée à la main AVANT d'exécuter"
+      }
+    ]
+  },
+  {
+    "term": "Valeur V",
+    "definition": "le contenu mélangé si la clé est retenue",
+    "contexts": [
+      {
+        "lesson": "4.2",
+        "definition": "le contenu mélangé si la clé est retenue"
+      }
+    ]
+  },
+  {
+    "term": "Validation",
+    "definition": "Données réservées servant à choisir une configuration ou un checkpoint. Elles ne servent pas à mettre à jour les poids.",
+    "contexts": [
+      {
+        "lesson": "1.3",
+        "definition": "données pour choisir un réglage, comme le pas d'apprentissage"
+      }
+    ],
+    "english": "validation",
+    "aliases": [],
+    "example": "Choisir la largeur sur validation, puis évaluer le choix sur un test encore réservé.",
+    "common": true
+  },
+  {
+    "term": "Variable",
+    "definition": "nom lié à une valeur. str : texte. int : entier. float : nombre à virgule",
+    "contexts": [
+      {
+        "lesson": "0.6",
+        "definition": "nom lié à une valeur. str : texte. int : entier. float : nombre à virgule"
+      },
+      {
+        "lesson": "12.1",
+        "definition": "réglage étudié"
+      }
+    ]
+  },
+  {
+    "term": "Variante",
+    "definition": "une seule modification par rapport à elle",
+    "contexts": [
+      {
+        "lesson": "5.10",
+        "definition": "une seule modification par rapport à elle"
+      }
+    ]
+  },
+  {
+    "term": "Vectorisation",
+    "definition": "une opération appliquée au tableau, sans boucle Python explicite.",
+    "contexts": [
+      {
+        "lesson": "0.15",
+        "definition": "une opération appliquée au tableau, sans boucle Python explicite."
+      }
+    ]
+  },
+  {
+    "term": "venv",
+    "definition": "environnement virtuel créé par python -m venv",
+    "contexts": [
+      {
+        "lesson": "0.14",
+        "definition": "environnement virtuel créé par python -m venv"
+      }
+    ]
+  },
+  {
+    "term": "Version",
+    "definition": "le numéro affiché par --version",
+    "contexts": [
+      {
+        "lesson": "0.4",
+        "definition": "le numéro affiché par --version"
+      }
+    ]
+  },
+  {
+    "term": "ViT",
+    "definition": "l'idée d'un Transformer sur des patches, citée comme référence, pas comme code",
+    "contexts": [
+      {
+        "lesson": "9.3",
+        "definition": "l'idée d'un Transformer sur des patches, citée comme référence, pas comme code"
+      }
+    ]
+  },
+  {
+    "term": "Vocabulaire",
+    "definition": "l'ensemble des unités",
+    "contexts": [
+      {
+        "lesson": "2.4",
+        "definition": "l'ensemble des unités"
+      },
+      {
+        "lesson": "3.11",
+        "definition": "la table qu'il faut sauver avec les poids."
+      },
+      {
+        "lesson": "10.2",
+        "definition": "la liste triée des types vus"
+      },
+      {
+        "lesson": "13.2",
+        "definition": "le dictionnaire morceau vers identifiant"
+      }
+    ]
+  },
+  {
+    "term": "Vocabulaire étendu",
+    "definition": "caractères de base plus fusions",
+    "contexts": [
+      {
+        "lesson": "2.7",
+        "definition": "caractères de base plus fusions"
+      }
+    ]
+  },
+  {
+    "term": "VRAM",
+    "definition": "mémoire du GPU",
+    "contexts": [
+      {
+        "lesson": "0.1",
+        "definition": "mémoire du GPU"
+      },
+      {
+        "lesson": "6.2",
+        "definition": "mémoire du GPU"
+      }
+    ]
+  },
+  {
+    "term": "W_o",
+    "definition": "la matrice qui mélange les têtes après coup.",
+    "contexts": [
+      {
+        "lesson": "4.7",
+        "definition": "la matrice qui mélange les têtes après coup."
+      }
+    ]
+  },
+  {
+    "term": "Weight tying",
+    "definition": "une seule matrice pour l'embedding et la tête",
+    "contexts": [
+      {
+        "lesson": "5.7",
+        "definition": "une seule matrice pour l'embedding et la tête"
+      }
+    ]
+  },
+  {
+    "term": "X",
+    "definition": "le tableau des entrées, une ligne par exemple. y : les cibles alignées sur ces lignes.",
+    "contexts": [
+      {
+        "lesson": "1.2",
+        "definition": "le tableau des entrées, une ligne par exemple. y : les cibles alignées sur ces lignes."
+      }
+    ]
+  }
+]

@@ -26,3 +26,26 @@ test('worker : concurrence refusée, résultat conservé, arrêt et panne libèr
     assert.equal((await next).text, 'repris');
   } finally { stopWorker(); delete globalThis.Worker; }
 });
+
+test('un démarrage bloqué expire, libère le worker et permet de réessayer', async () => {
+  globalThis.Worker = WorkerMock;
+  try {
+    const expired = await request({ type: 'exercise' }, undefined, { bootTimeoutMs: 10 });
+    assert.equal(expired.type, 'error');
+    assert.match(expired.text, /délai/);
+    const next = request({ type: 'exercise' });
+    getWorker().emit({ type: 'done', text: 'repris après panne' });
+    assert.equal((await next).text, 'repris après panne');
+  } finally { stopWorker(); delete globalThis.Worker; }
+});
+
+test('le délai de chargement ne coupe pas un calcul déjà démarré', async () => {
+  globalThis.Worker = WorkerMock;
+  try {
+    const task = request({ type: 'run' }, undefined, { bootTimeoutMs: 10 });
+    getWorker().emit({ type: 'booted' });
+    await new Promise(resolve => setTimeout(resolve, 25));
+    getWorker().emit({ type: 'done', text: 'calcul terminé' });
+    assert.equal((await task).text, 'calcul terminé');
+  } finally { stopWorker(); delete globalThis.Worker; }
+});

@@ -464,7 +464,7 @@ def bloc(x, attention, ffn, norm):
 @EXPERIMENT
 Si attention et ffn renvoient 0, bloc doit renvoyer x. Vérifie-le avec des fonctions lambda sur un vecteur NumPy.
 @EXERCISE
-Écris les quatre noms de matrices principales d'un bloc à une tête groupée : Wq, Wk, Wv, Wo, puis W1, W2. Dis laquelle appartient au FFN.
+Nomme les quatre matrices de l’attention : Wq, Wk, Wv, Wo. Ajoute les deux matrices du FFN : W1 et W2. Pour chaque groupe, indique les formes attendues et son rôle dans le bloc.
 @BUILD
 La boucle for layer in range(n_layers) de TinyGPT est ce bloc, répété. Tu es au point du fil rouge où « un Transformer » devient un objet concret.
 @QUESTION

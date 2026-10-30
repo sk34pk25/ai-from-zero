@@ -94,7 +94,8 @@
             ],
             "answer": 0,
             "explanation": "Les poids utilisés pour calculer et les résultats intermédiaires doivent être dans la mémoire de travail. Le stockage conserve les fichiers, il ne remplace pas la RAM au moment du calcul."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.2",
@@ -168,7 +169,8 @@
             ],
             "answer": 1,
             "explanation": "Un chemin relatif se lit depuis le dossier courant. notes/machine.txt descend dans notes puis nomme le fichier. Le slash initial en ferait un chemin absolu."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.3",
@@ -242,7 +244,8 @@
             ],
             "answer": 2,
             "explanation": "cd signifie change directory. ls regarde, pwd situe, cd déplace le « ici » des commandes suivantes."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.4",
@@ -316,7 +319,8 @@
             ],
             "answer": 3,
             "explanation": "L'interpréteur est le programme qui exécute le texte Python. Il ne devine pas un modèle et ne modifie pas le matériel."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.5",
@@ -390,7 +394,8 @@
             ],
             "answer": 1,
             "explanation": "print n'apprend rien et n'écrit pas un fichier. Il envoie une représentation de la valeur vers la sortie du terminal."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.6",
@@ -464,7 +469,8 @@
             ],
             "answer": 2,
             "explanation": "Le nom est à gauche du =, la valeur à droite. n_layers désigne donc l'entier 4 tant qu'on ne le réaffecte pas."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.7",
@@ -538,7 +544,8 @@
             ],
             "answer": 3,
             "explanation": "L'opérateur < est strict. 1.0 n'est pas inférieur à 1.0, donc l'expression vaut False et le bloc if est sauté."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.8",
@@ -612,7 +619,8 @@
             ],
             "answer": 0,
             "explanation": "range(4) s'arrête avant 4. Les valeurs sont 0, 1, 2 et 3, donc quatre tours."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.9",
@@ -686,7 +694,8 @@
             ],
             "answer": 2,
             "explanation": "return transmet une valeur. L'affichage est un autre geste, print, qui ne remplace pas la valeur renvoyée."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.10",
@@ -771,7 +780,8 @@
             ],
             "answer": 3,
             "explanation": "Les index commencent à 0. -1 est autorisé, mais il pointe vers le dernier élément, pas vers le premier."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.11",
@@ -845,7 +855,8 @@
             ],
             "answer": 0,
             "explanation": "Le module est l'unité de code réutilisable. L'import le charge pour utiliser ses fonctions sans les recopier."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.12",
@@ -919,7 +930,8 @@
             ],
             "answer": 1,
             "explanation": "La dernière ligne porte le type utile. Une seule modification à la fois garde la cause identifiable."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.13",
@@ -993,7 +1005,8 @@
             ],
             "answer": 3,
             "explanation": "Le commit fige un ensemble de fichiers. L'exécution et la publication sont d'autres commandes, lancées plus tard, parfois à partir de cet état."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.14",
@@ -1067,7 +1080,8 @@
             ],
             "answer": 0,
             "explanation": "L'environnement virtuel sépare les paquets. Il n'augmente pas la carte réseau et ne versionne pas le code : c'est le rôle de Git."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "0.15",
@@ -1148,7 +1162,8 @@
             ],
             "answer": 1,
             "explanation": "shape est un tuple d'entiers. Il dit comment les nombres sont rangés, pas comment la variable s'appelle."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.16",
@@ -1222,7 +1237,8 @@
             ],
             "answer": 2,
             "explanation": "exp et log s'annulent l'un l'autre sur leur domaine. exp seul ne somme pas à 1 : il faut encore diviser, c'est le travail de softmax."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.17",
@@ -1296,7 +1312,8 @@
             ],
             "answer": 0,
             "explanation": "La dimension est le nombre de composantes, ici trois. La somme est une autre quantité, pas la dimension."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.18",
@@ -1381,7 +1398,8 @@
             ],
             "answer": 1,
             "explanation": "On compte d'abord les lignes, puis les colonnes. Il y a deux listes internes de trois nombres, donc (2, 3)."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.19",
@@ -1455,7 +1473,8 @@
             ],
             "answer": 2,
             "explanation": "Chaque issue reçoit une masse entre 0 et 1, et la masse totale vaut 1. Les logits ne respectent pas encore cette contrainte."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.20",
@@ -1531,7 +1550,8 @@
             ],
             "answer": 3,
             "explanation": "Le signe positif veut dire « ça monte ». La descente de gradient ira donc dans l'autre sens. La dérivée n'est pas bornée entre 0 et 1."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.21",
@@ -1606,7 +1626,8 @@
             ],
             "answer": 0,
             "explanation": "L'affectation b = a colle une seconde étiquette sur le même objet. La méthode modifie self.valeur de cet objet, visible par les deux noms. Pour une copie, il faut construire un nouvel objet."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.22",
@@ -1681,7 +1702,8 @@
             ],
             "answer": 1,
             "explanation": "La valeur de droite a été calculée à la main, indépendamment du code. Le test signale que le code s'en écarte ; modifier l'attente effacerait justement la preuve. Un calcul déterministe redonnera 7.5 à chaque relance."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "0.23",
@@ -1756,7 +1778,8 @@
             ],
             "answer": 2,
             "explanation": "L'arrondi ne rend pas le calcul plus juste : il fixe la forme du résultat écrit, pour qu'il se relise et se compare facilement. Le test, lui, garde une valeur attendue calculée à la main."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -1848,7 +1871,8 @@
             ],
             "answer": 1,
             "explanation": "L'entraînement ajuste des nombres internes. Le code qui décrit la forme du modèle reste le tien, et le matériel ne change pas."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.2",
@@ -1922,7 +1946,8 @@
             ],
             "answer": 2,
             "explanation": "Le prix est ce qu'on demande au modèle de retrouver. Le mettre aussi dans les entrées fuite la réponse."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.3",
@@ -2001,7 +2026,8 @@
             ],
             "answer": 3,
             "explanation": "Le test reste de côté jusqu'à la fin. La validation guide les choix. Le train modifie les paramètres."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.4",
@@ -2075,7 +2101,8 @@
             ],
             "answer": 0,
             "explanation": "w est un paramètre. Le pas, le nombre de tours et les noms de fichiers sont des choix humains, des hyperparamètres ou de simples réglages."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.5",
@@ -2149,7 +2176,8 @@
             ],
             "answer": 2,
             "explanation": "x est une donnée. w et b sont les paramètres. print ne fait qu'afficher le calcul."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.6",
@@ -2223,7 +2251,8 @@
             ],
             "answer": 3,
             "explanation": "ReLU met à zéro tout ce qui est négatif et laisse passer le reste. Ce n'est ni une valeur absolue ni une probabilité."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.7",
@@ -2297,7 +2326,8 @@
             ],
             "answer": 0,
             "explanation": "Le produit de deux matrices est une matrice. L'activation est ce qui empêche de tout fusionner."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.8",
@@ -2371,7 +2401,8 @@
             ],
             "answer": 1,
             "explanation": "Le forward calcule. La mise à jour des poids est un autre temps, après la mesure de l'erreur."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "1.9",
@@ -2445,7 +2476,8 @@
             ],
             "answer": 3,
             "explanation": "Le carré est positif. Deux erreurs de signes opposés ne se compensent plus, et une grande erreur pèse plus que deux petites."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.10",
@@ -2521,7 +2553,8 @@
             ],
             "answer": 0,
             "explanation": "La règle est w := w - lr * gradient. Un gradient positif fait donc diminuer w, ce qui est le sens où la loss locale redescend."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.11",
@@ -2597,7 +2630,8 @@
             ],
             "answer": 1,
             "explanation": "Dès qu'une sortie dépend d'une suite d'opérations, la sensibilité totale est le produit des sensibilités locales."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.12",
@@ -2678,7 +2712,8 @@
             ],
             "answer": 2,
             "explanation": "La passe arrière ne crée pas de données. Elle attribue à chaque paramètre sa part de responsabilité dans la loss."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.13",
@@ -2757,7 +2792,8 @@
             ],
             "answer": 0,
             "explanation": "Le pas multiplie le gradient. Il ne change ni le vocabulaire ni le sens mathématique de la loss."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.14",
@@ -2833,7 +2869,8 @@
             ],
             "answer": 1,
             "explanation": "L'optimiseur reçoit des gradients. La loss les a produits, le tokenizer n'a rien à voir avec ce choix."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "1.15",
@@ -2921,7 +2958,8 @@
             ],
             "answer": 2,
             "explanation": "Ce drapeau active le suivi du graphe. Il ne choisit pas le matériel et ne sauvegarde rien tout seul."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.16",
@@ -2997,7 +3035,8 @@
             ],
             "answer": 3,
             "explanation": "L'accumulation est utile seulement quand on la demande, par exemple pour simuler un plus gros batch. Par défaut, un pas doit voir uniquement son propre gradient."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "1.17",
@@ -3071,7 +3110,8 @@
             ],
             "answer": 1,
             "explanation": "L'écart train/validation est le symptôme. Une baisse conjointe est plutôt le signe que le modèle apprend encore quelque chose de transférable."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -3165,7 +3205,8 @@
             ],
             "answer": 2,
             "explanation": "Unicode catalogue les caractères. L'encodage, le tokenizer et l'entraînement sont des couches suivantes."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "2.2",
@@ -3239,7 +3280,8 @@
             ],
             "answer": 3,
             "explanation": "Le corpus est la donnée. Les poids et l'optimiseur viennent après, pour en extraire un modèle."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "2.3",
@@ -3320,7 +3362,8 @@
             ],
             "answer": 0,
             "explanation": "L'encodage traduit le texte en octets. Il ne calcule ni loss ni paramètre."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "2.4",
@@ -3394,7 +3437,8 @@
             ],
             "answer": 2,
             "explanation": "Chaque unité reçoit un entier. Cet entier indexera une ligne d'embedding et une case de logit."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "2.5",
@@ -3470,7 +3514,8 @@
             ],
             "answer": 3,
             "explanation": "Les entiers indexeront des vecteurs. Le texte humain s'arrête à cette frontière."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "2.6",
@@ -3544,7 +3589,8 @@
             ],
             "answer": 0,
             "explanation": "L'algorithme ne regarde que les suites dans le corpus. Il ne connaît ni les poids ni les dossiers."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "2.7",
@@ -3625,7 +3671,8 @@
             ],
             "answer": 1,
             "explanation": "La fusion change la suite d'identifiants. Elle reste décodable. Elle ne touche ni au matériel ni à la loss."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "2.8",
@@ -3699,7 +3746,8 @@
             ],
             "answer": 3,
             "explanation": "L'identifiant indexe le vocabulaire. La probabilité et le gradient sont d'autres nombres, produits plus tard par le modèle."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "2.9",
@@ -3773,7 +3821,8 @@
             ],
             "answer": 0,
             "explanation": "La lecture de table remplace l'entier par D nombres. La probabilité n'apparaît qu'après les logits et softmax."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "2.10",
@@ -3847,7 +3896,8 @@
             ],
             "answer": 1,
             "explanation": "Sans position, l'ordre n'est pas représenté. La loss et le disque sont d'autres sujets."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "2.11",
@@ -3923,7 +3973,8 @@
             ],
             "answer": 2,
             "explanation": "La convention du laboratoire est (batch, temps). Le 2 est le batch, le 3 est la longueur."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -4017,7 +4068,8 @@
             ],
             "answer": 0,
             "explanation": "On supervise un entier du vocabulaire. La phrase lisible n'existe qu'après décodage."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.2",
@@ -4091,7 +4143,8 @@
             ],
             "answer": 1,
             "explanation": "La ligne de la matrice ne dépend que de l'identifiant présent. C'est sa force (simplicité) et sa limite (pas de contexte long)."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "3.3",
@@ -4167,7 +4220,8 @@
             ],
             "answer": 2,
             "explanation": "C'est un hyperparamètre de longueur. Il borne la fenêtre, il ne mesure pas l'erreur."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.4",
@@ -4241,7 +4295,8 @@
             ],
             "answer": 3,
             "explanation": "Le logit est libre de signe et d'échelle. La probabilité viendra de softmax."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "3.5",
@@ -4317,7 +4372,8 @@
             ],
             "answer": 1,
             "explanation": "La division par la somme des exponentielles fabrique une distribution. La somme vaut donc 1."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.6",
@@ -4404,7 +4460,8 @@
             ],
             "answer": 2,
             "explanation": "-log(p) est grand quand p est petit. Une cible bien prédite rapproche la loss de zéro."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.7",
@@ -4480,7 +4537,8 @@
             ],
             "answer": 3,
             "explanation": "Les écarts de logits sont amplifiés. À la limite, seule la case maximale garde de la masse. Le code traite 0 comme l'argmax exact."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.8",
@@ -4554,7 +4612,8 @@
             ],
             "answer": 0,
             "explanation": "La tâche reste next-token. Seul l'estimateur change. Le bigramme compte, la tête suit un gradient."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.9",
@@ -4630,7 +4689,8 @@
             ],
             "answer": 2,
             "explanation": "Le token choisi devient une entrée. Les poids ne bougent pas pendant la génération : ce n'est pas un pas d'entraînement."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "3.10",
@@ -4704,7 +4764,8 @@
             ],
             "answer": 3,
             "explanation": "La loss uniforme vaut log(V), et exp(log(V)) = V. C'est la baseline à battre."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "3.11",
@@ -4780,7 +4841,8 @@
             ],
             "answer": 0,
             "explanation": "Un entier 4 désigne des caractères différents selon la table. Les poids appris pour une table sont illisibles avec une autre."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -4872,7 +4934,8 @@
             ],
             "answer": 1,
             "explanation": "Elle choisit quelles positions du contexte mélangent leurs vecteurs. Le tokenizer et la loss restent en place."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "4.2",
@@ -4948,7 +5011,8 @@
             ],
             "answer": 3,
             "explanation": "Q et K servent à décider les poids. V est ce qui est ensuite sommé. Le learning rate n'entre pas dans ce calcul."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "4.3",
@@ -5024,7 +5088,8 @@
             ],
             "answer": 0,
             "explanation": "L'axe des lignes est celui des requêtes, l'axe des colonnes celui des clés. La valeur n'entre pas encore."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.4",
@@ -5100,7 +5165,8 @@
             ],
             "answer": 1,
             "explanation": "« Self » veut dire même séquence. Les trois projections restent des matrices différentes."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.5",
@@ -5176,7 +5242,8 @@
             ],
             "answer": 2,
             "explanation": "Le présent et le passé restent visibles. Le futur est fermé, sinon la cible fuite dans l'entrée."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.6",
@@ -5264,7 +5331,8 @@
             ],
             "answer": 0,
             "explanation": "L'échelle ne change pas le nombre de poids et ne fabrique pas à elle seule une distribution. Elle calme les scores avant softmax."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.7",
@@ -5340,7 +5408,8 @@
             ],
             "answer": 1,
             "explanation": "Les têtes se partagent la dimension du modèle. d_k est ce quotient, et il doit tomber juste."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.8",
@@ -5416,7 +5485,8 @@
             ],
             "answer": 2,
             "explanation": "x + 0 = x. Le chemin direct laisse passer l'entrée quand la correction est nulle : c'est l'intérêt du résidu."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.9",
@@ -5492,7 +5562,8 @@
             ],
             "answer": 3,
             "explanation": "La moyenne et la variance sont celles du vecteur courant. Le batch n'entre pas dans ce calcul."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.10",
@@ -5568,7 +5639,8 @@
             ],
             "answer": 1,
             "explanation": "Le mélange temporel est le travail de l'attention. Le FFN est une fonction identique appliquée à chaque vecteur."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.11",
@@ -5610,7 +5682,7 @@
               "text": "Si attention et ffn renvoient 0, bloc doit renvoyer x. Vérifie-le avec des fonctions lambda sur un vecteur NumPy."
             }
           ],
-          "exercise": "Écris les quatre noms de matrices principales d'un bloc à une tête groupée : Wq, Wk, Wv, Wo, puis W1, W2. Dis laquelle appartient au FFN.",
+          "exercise": "Nomme les quatre matrices de l’attention : Wq, Wk, Wv, Wo. Ajoute les deux matrices du FFN : W1 et W2. Pour chaque groupe, indique les formes attendues et son rôle dans le bloc.",
           "build": "La boucle for layer in range(n_layers) de TinyGPT est ce bloc, répété. Tu es au point du fil rouge où « un Transformer » devient un objet concret.",
           "visual": "transformer",
           "visualCaption": "Un bloc relit, ajoute le résidu, transforme, puis ajoute encore. La forme ne change pas.",
@@ -5644,7 +5716,8 @@
             ],
             "answer": 2,
             "explanation": "Chaque sous-bloc voit une entrée normalisée, et le chemin résiduel garde la version précédente."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "4.12",
@@ -5720,7 +5793,8 @@
             ],
             "answer": 3,
             "explanation": "Chaque bloc ajoute ses matrices. L'attention reste quadratique en T à l'intérieur de chaque bloc, mais la profondeur elle-même entre linéairement."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "4.13",
@@ -5796,7 +5870,8 @@
             ],
             "answer": 0,
             "explanation": "Le décodeur causal suffit pour continuer une séquence. L'encodeur n'est pas dans ce schéma."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "4.14",
@@ -5878,7 +5953,8 @@
             ],
             "answer": 2,
             "explanation": "Le graphe de logits_tensor traverse tous ces paramètres. Le backward et AdamW les mettent à jour. La génération seule, elle, ne change pas les poids."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -5970,7 +6046,8 @@
             ],
             "answer": 3,
             "explanation": "Le masque et la loss n'ont pas besoin de cette table. C'est la place, au-delà de block_size, qui n'a pas de ligne."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.2",
@@ -6051,7 +6128,8 @@
             ],
             "answer": 0,
             "explanation": "Le test d'égalité des normes est exactement cette propriété. Si elle casse, l'implémentation n'est pas RoPE."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.3",
@@ -6132,7 +6210,8 @@
             ],
             "answer": 1,
             "explanation": "Le centrage disparaît, le gain reste. Le masque et le batch ne sont pas le sujet de cette couche."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.4",
@@ -6206,7 +6285,8 @@
             ],
             "answer": 3,
             "explanation": "La porte est la nouveauté. Le masque, les positions et les experts sont d'autres briques."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.5",
@@ -6280,7 +6360,8 @@
             ],
             "answer": 0,
             "explanation": "Les requêtes restent nombreuses. K et V sont partagés par groupes, ce qui allège le cache."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "5.6",
@@ -6354,7 +6435,8 @@
             ],
             "answer": 1,
             "explanation": "Le cache est une accélération exacte. Un écart numérique est un bug de positions ou de masque."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.7",
@@ -6428,7 +6510,8 @@
             ],
             "answer": 2,
             "explanation": "Ce sont les deux matrices qui parlent le vocabulaire. Le masque et le corpus ne sont pas des poids de ce type."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "5.8",
@@ -6502,7 +6585,8 @@
             ],
             "answer": 0,
             "explanation": "La graine fixe l'initialisation. À code égal, les logits coïncident. Le test same == logits est cette exigence."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "5.9",
@@ -6576,7 +6660,8 @@
             ],
             "answer": 1,
             "explanation": "(2T)² = 4 T². Le cache n'efface pas ce produit, il évite seulement de le refaire depuis zéro sur le passé déjà connu, et encore : le nouveau token doit quand même regarder tout le passé."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "5.10",
@@ -6651,7 +6736,8 @@
             ],
             "answer": 0,
             "explanation": "Il faut étudier les différences appariées : une petite différence peut être stable si les fluctuations des deux modèles sont communes. Avec une seule paire, la variabilité de cette différence reste inconnue. Choisir la graine favorable sélectionnerait le résultat voulu au lieu de le mesurer."
-          }
+          },
+          "activityKind": "explanation"
         }
       ]
     },
@@ -6743,7 +6829,8 @@
             ],
             "answer": 2,
             "explanation": "m et v sont deux flottants 32 bits. Ils dominent souvent la mémoire d'entraînement, plus que les poids fp16 eux-mêmes."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "6.2",
@@ -6817,7 +6904,8 @@
             ],
             "answer": 3,
             "explanation": "La VRAM est le plan de travail. Le disque peut rester libre pendant que le GPU refuse le chargement."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.3",
@@ -6898,7 +6986,8 @@
             ],
             "answer": 1,
             "explanation": "QKᵀ et AV parcourent toutes les paires de positions. L'embedding, lui, est linéaire en T."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.4",
@@ -6972,7 +7061,8 @@
             ],
             "answer": 2,
             "explanation": "Le temps bruit. La médiane de plusieurs essais, après chauffe, est le minimum honnête. Les FLOPs restent le complément, pas un ennemi."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.5",
@@ -7046,7 +7136,8 @@
             ],
             "answer": 3,
             "explanation": "Les poids ne dépendent pas du batch. Les activations et le temps du pas, si."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.6",
@@ -7120,7 +7211,8 @@
             ],
             "answer": 0,
             "explanation": "bf16 sacrifie de la précision fine mais garde de grandes magnitudes. fp16 est plus précis localement et déborde plus vite."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.7",
@@ -7205,7 +7297,8 @@
             ],
             "answer": 2,
             "explanation": "On additionne des pentes de petits paquets. Les poids ne deviennent pas plus nombreux."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "6.8",
@@ -7279,7 +7372,8 @@
             ],
             "answer": 3,
             "explanation": "On jette des intermédiaires et on les recalcule. Le vocabulaire n'est pas en cause."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.9",
@@ -7353,7 +7447,8 @@
             ],
             "answer": 0,
             "explanation": "On compresse les poids. La qualité se mesure après. Ce n'est ni une fenêtre magique ni un test optionnel."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.10",
@@ -7427,7 +7522,8 @@
             ],
             "answer": 1,
             "explanation": "L'élève imite des sorties, pas le nom du fichier. Copier les poids est impossible si les formes diffèrent."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.11",
@@ -7501,7 +7597,8 @@
             ],
             "answer": 3,
             "explanation": "Il parallélise le calcul dense. Il ne rend pas une loss meilleure par sa seule présence, et il n'enlève pas le coût des toutes petites étapes."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "6.12",
@@ -7575,7 +7672,8 @@
             ],
             "answer": 0,
             "explanation": "Une comparaison utile isole un facteur. Le tri n'enlève pas cette obligation."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -7674,7 +7772,8 @@
             ],
             "answer": 1,
             "explanation": "L'expert est une fonction vectorielle. Le tokenizer et le masque restent partagés, en dehors de lui."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.2",
@@ -7748,7 +7847,8 @@
             ],
             "answer": 2,
             "explanation": "Top-1 n'active qu'un FFN pour le calcul. Les sept autres restent en mémoire mais ne transforment pas ce token."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.3",
@@ -7822,7 +7922,8 @@
             ],
             "answer": 0,
             "explanation": "Sa sortie est une distribution sur E experts. Elle ne décode pas le texte."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.4",
@@ -7896,7 +7997,8 @@
             ],
             "answer": 1,
             "explanation": "On refait un softmax sur le sous-ensemble. Les experts écartés ne gardent pas de probabilité résiduelle dans ce mélange."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.5",
@@ -7970,7 +8072,8 @@
             ],
             "answer": 2,
             "explanation": "C'est un quota par expert. Le vocabulaire n'entre pas dans cette formule."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "7.6",
@@ -8044,7 +8147,8 @@
             ],
             "answer": 3,
             "explanation": "C'est une statistique de routage, la part des tokens envoyés à un expert, pas une taille de matrice."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.7",
@@ -8118,7 +8222,8 @@
             ],
             "answer": 1,
             "explanation": "E * somme((1/E)*(1/E)) = 1. L'effondrement certain donne E, mais d'autres probabilités valides peuvent donner moins de 1, comme le montre le contre-exemple."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.8",
@@ -8192,7 +8297,8 @@
             ],
             "answer": 2,
             "explanation": "Sans répartition, les machines supplémentaires stockent des poids inactifs. Le routeur reste indispensable."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "7.9",
@@ -8266,7 +8372,8 @@
             ],
             "answer": 3,
             "explanation": "On stocke tous les experts et on en calcule un. La perplexité n'est pas un cadeau automatique, et la RAM monte."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -8358,7 +8465,8 @@
             ],
             "answer": 0,
             "explanation": "Le travail par pas est proportionnel à la taille de l'état, pas au nombre de paires. La mémoire du passé est cet état, pas une matrice d'attention."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.2",
@@ -8432,7 +8540,8 @@
             ],
             "answer": 2,
             "explanation": "delta est positif. Multiplié par un a négatif, l'exposant est négatif et le facteur d'oubli est dans (0, 1)."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.3",
@@ -8506,7 +8615,8 @@
             ],
             "answer": 3,
             "explanation": "La prédiction, plus tard, se lit sur une tête. h est l'état du scan, une mémoire comprimée du passé."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.4",
@@ -8580,7 +8690,8 @@
             ],
             "answer": 0,
             "explanation": "Le noyau est la liste des puissances des coefficients. S'ils varient avec x, il n'y a plus un seul noyau à précalculer."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "8.5",
@@ -8654,7 +8765,8 @@
             ],
             "answer": 1,
             "explanation": "Les deux fonctions calculent h_t = a_t h_{t-1} + b_t. Le test fixe cette égalité, pas une qualité de langage."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "8.6",
@@ -8728,7 +8840,8 @@
             ],
             "answer": 3,
             "explanation": "La sélectivité est la dépendance des coefficients à l'entrée. Le scan reste causal : on ne lit pas le futur."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.7",
@@ -8809,7 +8922,8 @@
             ],
             "answer": 0,
             "explanation": "C'est une maquette pédagogique. La forme et la causalité sont testées, pas la parité avec un article."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.8",
@@ -8883,7 +8997,8 @@
             ],
             "answer": 1,
             "explanation": "L'état comprime. L'attention, dans sa fenêtre, conserve l'accès aux vecteurs passés. Hors fenêtre, elle aussi oublie."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "8.9",
@@ -8957,7 +9072,8 @@
             ],
             "answer": 2,
             "explanation": "Le test fixe la forme et l'absence d'effet du futur sur la position 0. Les fonctions restent différentes."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -9049,7 +9165,8 @@
             ],
             "answer": 0,
             "explanation": "Le dos consomme des vecteurs. La modalité d'origine doit être convertie, pas branchée comme un fichier brut."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.2",
@@ -9130,7 +9247,8 @@
             ],
             "answer": 1,
             "explanation": "arange remplit la ligne 0 avec 0,1,2,3 et la ligne 1 avec 4,5,6,7. Le carré gauche garde 0, 1, 4, 5."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "9.3",
@@ -9204,7 +9322,8 @@
             ],
             "answer": 2,
             "explanation": "La fonction est un produit matriciel et un biais. L'attention entre patches n'est pas dans ce module."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.4",
@@ -9278,7 +9397,8 @@
             ],
             "answer": 3,
             "explanation": "multimodal.py expose patchify et project_patches. Aucun test audio n'existe, et c'est assumé."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.5",
@@ -9352,7 +9472,8 @@
             ],
             "answer": 1,
             "explanation": "Le seul code multimodal testé est le découpage d'image et sa projection. L'audio reste une analogie de forme."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.6",
@@ -9426,7 +9547,8 @@
             ],
             "answer": 2,
             "explanation": "Le patch et le tube existent pour réduire T. Le niveau 6 a déjà montré que le terme T*T devient le coût dominant."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.7",
@@ -9500,7 +9622,8 @@
             ],
             "answer": 3,
             "explanation": "La concaténation sur le temps exige le même D. La proximité de sens exige une perte et des données, absentes ici."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.8",
@@ -9574,7 +9697,8 @@
             ],
             "answer": 0,
             "explanation": "Le masque causal suit l'ordre de la suite. Placer une modalité avant l'autre lui donne le rôle de contexte."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "9.9",
@@ -9648,7 +9772,8 @@
             ],
             "answer": 2,
             "explanation": "Le test fixe patchify et project_patches. Revenir vers des pixels n'est pas dans le dépôt."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -9740,7 +9865,8 @@
             ],
             "answer": 3,
             "explanation": "Seuls les tokens du contexte entrent dans le réseau. Le reste de l'archive n'existe pour lui que si tu l'as copié."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.2",
@@ -9814,7 +9940,8 @@
             ],
             "answer": 0,
             "explanation": "Diviser par la norme enlève l'effet de la longueur. Le produit restant est le cosinus."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.3",
@@ -9895,7 +10022,8 @@
             ],
             "answer": 1,
             "explanation": "Le score est un sac de mots. Le document 0 contient « pente » et « loss ». Les autres non. L'index ne départage qu'en cas d'égalité."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "10.4",
@@ -9969,7 +10097,8 @@
             ],
             "answer": 3,
             "explanation": "Sans documents, retrieve n'a rien à classer. Le prompt garde la question et perd les extraits. k négatif est refusé avant cela."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.5",
@@ -10043,7 +10172,8 @@
             ],
             "answer": 0,
             "explanation": "Le scan est intérieur à un forward. La boucle de raisonnement empile des forwards, et elle n'est pas implémentée."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.6",
@@ -10117,7 +10247,8 @@
             ],
             "answer": 1,
             "explanation": "n_layers est un argument de construction. Rien dans forward ne regarde une confiance."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.7",
@@ -10191,7 +10322,8 @@
             ],
             "answer": 2,
             "explanation": "retrieve est un outil isolé. L'agent serait la politique qui l'appelle, et elle n'existe pas ici."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "10.8",
@@ -10265,7 +10397,8 @@
             ],
             "answer": 0,
             "explanation": "Sans la condition « mémoire éteinte », tu ne sais pas si l'extrait était nécessaire. Une réussite isolée ne sépare pas les causes."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -10357,7 +10490,8 @@
             ],
             "answer": 1,
             "explanation": "Un chiffre d'article n'est pas un chiffre du dépôt. Le portfolio ne garde que les seconds, et nomme les premiers comme non reproduits."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.2",
@@ -10431,7 +10565,8 @@
             ],
             "answer": 2,
             "explanation": "Une loi uniforme sur V tokens a une perplexité V. Le code la renvoie dans uniform_perplexity."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.3",
@@ -10505,7 +10640,8 @@
             ],
             "answer": 3,
             "explanation": "Une idée lue n'est pas un résultat du laboratoire. Le tokenizer reste au caractère et au BPE."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.4",
@@ -10579,7 +10715,8 @@
             ],
             "answer": 1,
             "explanation": "Le test du scan vérifie une récurrence sur la séquence d'entrée. Aucun pas silencieux n'existe dans Backbone."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.5",
@@ -10653,7 +10790,8 @@
             ],
             "answer": 2,
             "explanation": "Le vecteur n'est pas une explication. Seule une mesure externe, sur un découpage fixé, dit si la variante aide."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.6",
@@ -10727,7 +10865,8 @@
             ],
             "answer": 3,
             "explanation": "Le test fixe un contrat d'interface. La qualité sur un corpus n'est pas dans les asserts."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.7",
@@ -10801,7 +10940,8 @@
             ],
             "answer": 0,
             "explanation": "Le test vérifie un réordonnancement de pixels. Il ne vérifie pas qu'un mot et une image ont été appris ensemble."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "11.8",
@@ -10875,7 +11015,8 @@
             ],
             "answer": 2,
             "explanation": "Seule la première phrase a une fonction et un test. Les autres sont des lectures, ou des chiffres qui ne sortent pas du dépôt."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -10900,43 +11041,43 @@
           "title": "Formuler une hypothèse",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Une architecture personnelle commence par une phrase falsifiable. « Mon modèle est meilleur » ne l'est pas. « Remplacer une couche d'attention sur deux par un scan baisse le coût et garde la causalité » l'est, parce que le dépôt peut le mesurer.",
+          "why": "Une hypothèse annonce ce qui pourrait se produire et ce qui la contredirait. « Plus large sera mieux » est trop vague. « À budget de tokens égal, la largeur 24 réduira la perte de validation moyenne face à 16 » donne une mesure à vérifier. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Écrire une hypothèse avec une baseline",
-            "Choisir une mesure déjà dans le labo",
-            "Écarter les hypothèses du niveau 11 non outillées"
+            "Formuler une affirmation réfutable sur la largeur du GPT",
+            "Fixer une mesure et une règle de comparaison avant les essais",
+            "Conserver les mêmes données et graines pour les deux configurations"
           ],
-          "prereq": "Le partage reproduit / non reproduit.",
+          "prereq": "Un premier GPT entraîné et rechargeable, étape 4.14.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Tu paries sur un changement précis, et tu dis à l'avance quel nombre te donnerait tort. Sans ce nombre, tu pourras toujours raconter que la maquette est prometteuse."
+              "text": "Une hypothèse annonce ce qui pourrait se produire et ce qui la contredirait. « Plus large sera mieux » est trop vague. « À budget de tokens égal, la largeur 24 réduira la perte de validation moyenne face à 16 » donne une mesure à vérifier."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Hypothèse : un changement et un effet attendu. Falsifiable : un résultat possible la contredit. Baseline : la configuration sans le changement. Effet : une différence sur une métrique nommée."
+              "text": "Hypothèse : affirmation mise à l’épreuve. Réfutation : observation incompatible avec l’affirmation. Variable : réglage étudié. Budget de tokens : nombre de cibles utilisées pendant l’entraînement."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le changement que le fil rouge sait faire est le kind du Backbone : transformer, ssm, hybrid. Une hypothèse recevable est : à tailles égales, les trois kinds ont la même forme de sortie et restent causaux, et le coût d'appariement de l'attention est le seul à porter un terme en T au carré. Une hypothèse non recevable aujourd'hui : le hybrid parle mieux français. Rien ne mesure le français. run_ablation est prêt à ranger les configurations, à condition que ta fonction renvoie des métriques que tu as vraiment calculées. Le test jouet utilise loss = 1/lr seulement pour vérifier que les noms et les nombres traversent la fonction. Tu ne présenteras pas 1/lr comme une qualité de modèle."
+              "text": "Fixe deux largeurs compatibles avec le nombre de têtes, par exemple 16 et 24 avec deux têtes. Garde tokenizer, contexte, batch, pas, données et graines identiques. Écris le critère de sélection avant de lancer les calculs. Si le gain varie de signe entre graines ou coûte trop de mémoire pour ta machine, conserve cette observation. Le résultat concerne cette recette et ce corpus ; il ne prouve pas que tous les modèles plus larges sont meilleurs."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "hypothese = {\n    \"changement\": \"kind hybrid au lieu de transformer\",\n    \"baseline\": \"transformer\",\n    \"mesure\": \"forme, causalite, FLOPs d'attention\",\n}\nprint(hypothese[\"mesure\"])"
+              "code": "hypothese = {\"variable\": \"largeur\", \"valeurs\": [16, 24],\n             \"graines\": [0, 1, 2], \"selection\": \"validation\",\n             \"resultats\": None}\nassert all(d % 2 == 0 for d in hypothese[\"valeurs\"])\nassert hypothese[\"resultats\"] is None  # à mesurer, pas à inventer\nprint(hypothese)"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "La mesure tient en trois propriétés déjà testées ou calculables. Ajoute « perplexité française » et la phrase devient fausse dans ce dépôt."
+              "text": "Écris le résultat qui réfuterait ton hypothèse. Puis remplace « meilleur » par une métrique, son unité et un budget. Fais relire cette phrase sans montrer de courbe."
             }
           ],
-          "exercise": "Réécris « le SSM est plus intelligent » en une hypothèse falsifiable avec une métrique du dépôt. Par exemple : même forme, causalité conservée, coût linéaire en T.",
-          "build": "Le fil rouge du niveau part de cette phrase. Les étapes suivantes la découpent en baseline, ablation, métriques et tableau.",
+          "exercise": "Écris une hypothèse sur la largeur de ton GPT, puis le résultat qui te ferait la rejeter. Fixe les textes, les graines et le budget avant de lancer les deux configurations.",
+          "build": "Ajoute cette hypothèse datée au DOSSIER_MODELE.md avant tes entraînements. Conserve les réglages des deux variantes et le critère qui déterminera ton choix.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -10944,73 +11085,74 @@
           "codeSymbol": "run_ablation",
           "tpIds": [],
           "takeaways": [
-            "La première phrase est un assert du dépôt. Les autres demandent des mesures qui n'existent pas.",
-            "Pourquoi cette étape arrive maintenant : Une architecture personnelle commence par une phrase falsifiable.",
+            "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Écris le résultat qui réfuterait ton hypothèse.",
+            "Pourquoi cette étape arrive maintenant : Une hypothèse annonce ce qui pourrait se produire et ce qui la contredirait.",
             "Le fichier à ouvrir à côté du cours est model/experiment.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Remplace intelligent par une quantité observable et un protocole."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Remplace intelligent par une quantité observable et un protocole.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense »."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Passer de largeur 16 à 24, à données et nombre de tokens vus identiques, peut réduire la perte de validation. Il faut aussi mesurer les paramètres et le coût."
           ],
-          "solution": "Hypothèse possible : « Sur des séquences de longueurs fixées, le dos SSM conserve la causalité et son temps de forward croît moins vite que celui de l'attention dense ». Mesure réellement ces durées à D, batch et machine constants. Une formule de complexité n'est pas encore une mesure de temps.",
+          "solution": "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Passer de largeur 16 à 24, à données et nombre de tokens vus identiques, peut réduire la perte de validation. Il faut aussi mesurer les paramètres et le coût.",
           "review": "Sans rouvrir la page, explique « Formuler une hypothèse » en une phrase, puis dis ce que model/experiment.py en garde vraiment.",
           "quiz": {
-            "question": "Laquelle de ces phrases est une hypothèse recevable ici ?",
+            "question": "Quel protocole permet de mettre ton hypothèse à l’épreuve ?",
             "choices": [
-              "Hybrid comprend mieux les textes longs",
-              "Le SSM a gagné un benchmark public",
-              "La mémoire externe raisonne",
-              "À tailles égales, hybrid reste causal et de forme (B, T, D)"
+              "Choisir la variante après avoir cherché son meilleur score sur test",
+              "Annoncer une capacité sans entraîner les poids",
+              "Changer les données et la largeur dans le même essai",
+              "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût"
             ],
             "answer": 3,
-            "explanation": "La première phrase est un assert du dépôt. Les autres demandent des mesures qui n'existent pas."
-          }
+            "explanation": "Comparer deux largeurs entraînées sur les mêmes données, graines et budget, puis examiner validation et coût. Écris le résultat qui réfuterait ton hypothèse."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.2",
           "title": "La baseline",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Sans baseline, une variante n'a pas de sens. La baseline du langage, depuis le niveau 3, est le bigramme, et derrière lui la loi uniforme. La baseline du dos est le kind transformer, pas une absence de modèle.",
+          "why": "Une note de 2 ne dit rien sans son échelle. Pour une perte, la référence uniforme donne un point de départ sans apprentissage. Le bigramme montre ce que suffit à apprendre le token précédent ; ton GPT initial apporte le contexte plus long. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Choisir la baseline la plus simple qui marche",
-            "Garder le même découpage",
-            "Lire bigram_versus_uniform comme modèle du geste"
+            "Calculer la perte d’une distribution uniforme",
+            "Distinguer uniforme, bigramme et GPT initial entraîné",
+            "Évaluer les références sur les mêmes cibles que la variante"
           ],
-          "prereq": "Hypothèse.",
+          "prereq": "Méthode du projet personnel, étape 12.1.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Tu chronomètres un nouveau trajet contre le bus, pas contre « rester chez toi », si la question est de te déplacer. La baseline doit faire la même tâche."
+              "text": "Une note de 2 ne dit rien sans son échelle. Pour une perte, la référence uniforme donne un point de départ sans apprentissage. Le bigramme montre ce que suffit à apprendre le token précédent ; ton GPT initial apporte le contexte plus long."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Baseline : la configuration de référence, nommée. Uniforme : la baseline du bigramme, perplexité V. Transformer : la baseline des autres kinds, parce qu'il est le dos déjà construit au niveau 4. Même découpage : la condition qui empêche de changer les données en même temps que le modèle."
+              "text": "Baseline : référence de comparaison. Uniforme : même probabilité pour chaque token. Bigramme : prédiction conditionnée par le token précédent. Cible : token dont on évalue la probabilité."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "bigram_versus_uniform fixe le découpage avant d'entraîner, observe seulement le train, et compare à vocab_size. C'est le patron. Pour les dos, la baseline est Backbone(kind=\"transformer\") avec les mêmes vocab_size, d_model, n_layers, block_size et seed. Changer la graine en même temps que le kind mélangerait deux causes. Le test utilise seed=3 pour les trois, justement pour ne pas offrir cette excuse. La baseline n'est pas « le meilleur papier de l'année ». Tu ne l'as pas exécutée. Elle est le système le plus simple du dépôt qui fait déjà la tâche."
+              "text": "Avec V tokens possibles, l’uniforme attribue 1/V à la cible : sa perte vaut log(V) nats par token. Le bigramme et le GPT sont appris sur train, puis évalués sur les mêmes fenêtres de validation, avec le même tokenizer et la même réduction. Une perte train ne remplace pas une perte validation. Le code ci-dessous calcule des distributions miniatures pour comprendre la métrique ; il ne représente pas le résultat entraîné de ton projet."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.experiment import bigram_versus_uniform\nprint(bigram_versus_uniform([0, 1, 0, 1, 0, 1, 0, 1], 2)[\"uniform_perplexity\"])"
+              "code": "import math\nvocab = 4\nperte_uniforme = math.log(vocab)\n# Distributions inventées uniquement pour vérifier la formule.\np_cibles = [0.5, 0.25]\nperte_exemple = -sum(math.log(p) for p in p_cibles) / len(p_cibles)\nassert math.isclose(perte_uniforme, -math.log(1 / vocab))\nprint(perte_uniforme, perte_exemple)"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "La valeur est 2, la taille du vocabulaire. C'est la baseline, pas un score à battre à tout prix sur d'autres tâches."
+              "text": "Dans l’exemple, double la taille du vocabulaire. Prédis la variation de la perte uniforme avant de relancer. Puis vérifie qu’une cible jugée moins probable augmente la perte."
             }
           ],
-          "exercise": "Pourquoi ne pas prendre hybrid comme baseline du transformer ? Parce que la baseline doit préexister au changement. Le transformer est construit avant le scan dans le parcours.",
-          "build": "Chaque ligne de run_ablation aura un name. L'une d'elles s'appellera baseline, et elle ne bougera pas pendant que tu changes la variante.",
+          "exercise": "Nomme les trois références de ton projet : uniforme, bigramme et GPT initial. Explique pourquoi elles doivent être évaluées sur les mêmes cibles et avec le même tokenizer.",
+          "build": "Dans ton tableau de résultats, réserve trois lignes : uniforme, bigramme et GPT initial. Renseigne tokenizer, nombre de cibles et perte de validation pour chacune.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11018,73 +11160,74 @@
           "codeSymbol": "bigram_versus_uniform",
           "tpIds": [],
           "takeaways": [
-            "uniform_perplexity renvoie vocab_size. Aucun modèle externe n'est téléchargé.",
-            "Pourquoi cette étape arrive maintenant : Sans baseline, une variante n'a pas de sens.",
+            "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Dans l’exemple, double la taille du vocabulaire.",
+            "Pourquoi cette étape arrive maintenant : Une note de 2 ne dit rien sans son échelle.",
             "Le fichier à ouvrir à côté du cours est model/experiment.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : La baseline doit être un point de comparaison défini à l'avance."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "La baseline doit être un point de comparaison défini à l'avance.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Une référence uniforme attribue la même probabilité à chaque token. Le bigramme apprend sur train. Le GPT de référence est entraîné avec une recette fixée avant la variante."
           ],
-          "solution": "Le Transformer déjà construit sert de référence avant l'introduction du scan et de l'hybride. Choisir l'hybride après avoir regardé ses résultats rendrait la référence opportuniste. Une autre baseline reste possible si tu la justifies avant l'essai et conserves le même protocole.",
+          "solution": "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Une référence uniforme attribue la même probabilité à chaque token. Le bigramme apprend sur train. Le GPT de référence est entraîné avec une recette fixée avant la variante.",
           "review": "Sans rouvrir la page, explique « La baseline » en une phrase, puis dis ce que model/experiment.py en garde vraiment.",
           "quiz": {
-            "question": "Quelle est la baseline de perplexité du bigramme dans ce dépôt ?",
+            "question": "À quoi comparer la perte de ton GPT personnel ?",
             "choices": [
-              "La loi uniforme, dont la perplexité vaut la taille du vocabulaire",
-              "Un grand modèle téléchargé",
-              "La loss du routeur MoE",
-              "Zéro, si le texte est français"
+              "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction",
+              "À une perplexité publiée avec un autre tokenizer sans conversion",
+              "Au meilleur échantillon choisi après vingt générations",
+              "À la perte train de données déjà mémorisées"
             ],
             "answer": 0,
-            "explanation": "uniform_perplexity renvoie vocab_size. Aucun modèle externe n'est téléchargé."
-          }
+            "explanation": "À des baselines évaluées sur les mêmes cibles avec le même tokenizer et la même réduction. Dans l’exemple, double la taille du vocabulaire."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.3",
-          "title": "L'ablation",
+          "title": "L’ablation",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Une ablation retire ou remplace une seule pièce. Si tu changes le dos, la graine et la taille en même temps, tu ne sais plus laquelle a fait bouger le nombre.",
+          "why": "Si tu changes à la fois la largeur et les textes, tu ne sais plus à quoi attribuer un gain. Deux recettes qui ne diffèrent que par la largeur rendent l’explication plus précise ; elles peuvent cependant demander des coûts différents. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Changer un seul facteur",
-            "Nommer chaque configuration",
-            "Lire run_ablation"
+            "Isoler le réglage qui diffère entre deux expériences",
+            "Apparier les graines et le budget de tokens",
+            "Distinguer budget identique et coût de calcul identique"
           ],
-          "prereq": "Baseline.",
+          "prereq": "Méthode du projet personnel, étape 12.2.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Tu remplaces un ingrédient, tu goûtes, tu remets l'ancien avant d'en changer un autre. Goûter trois changements d'un coup ne t'apprend pas la recette."
+              "text": "Si tu changes à la fois la largeur et les textes, tu ne sais plus à quoi attribuer un gain. Deux recettes qui ne diffèrent que par la largeur rendent l’explication plus précise ; elles peuvent cependant demander des coûts différents."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Ablation : un écart d'un seul facteur par rapport à la baseline. Facteur : kind, d_model, n_layers, ou un autre argument explicite. Configuration : le dictionnaire passé à run_ablation, avec un name."
+              "text": "Ablation : retrait contrôlé d’un composant. Comparaison contrôlée : modification d’une variable annoncée. Graines appariées : même liste de graines entre recettes. Facteur confondant : autre différence pouvant expliquer le résultat."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "run_ablation exige un name et copie la configuration avant d'appeler la fonction, pour que la fonction ne puisse pas réécrire la liste d'origine par effet de bord. Le test envoie baseline à lr 0,1 et variante à lr 0,2, et vérifie l'ordre des noms ainsi que la baisse de la loss jouet. Dans le fil rouge réel, le facteur intéressant est kind. Une ablation propre lance transformer, puis ssm, puis hybrid, en figeant le reste. Ajouter en même temps un changement de n_layers demande une quatrième ligne, pas un mélange dans la troisième. Les métriques renvoyées doivent être calculées, pas choisies pour que l'histoire tienne."
+              "text": "Une ablation retire un composant pour estimer son apport. Une variation de largeur est une comparaison contrôlée proche de ce raisonnement, sans retrait de composant. Fixe les mêmes graines pour apparier les essais, puis calcule les différences de validation pour chaque paire. Un même nombre de tokens vus ne signifie ni mêmes paramètres, ni mêmes FLOPs, ni même durée. Note ces différences dans le rapport au lieu de qualifier les budgets de parfaitement équivalents."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.experiment import run_ablation\nlignes = run_ablation(\n    [{\"name\": \"baseline\", \"kind\": \"transformer\"}, {\"name\": \"variante\", \"kind\": \"ssm\"}],\n    lambda config: {\"kind\": config[\"kind\"], \"couches\": 2},\n)\nprint(lignes[1][\"name\"], lignes[1][\"kind\"])"
+              "code": "base = {\"largeur\": 16, \"contexte\": 16, \"batch\": 4, \"pas\": 240}\nvariante = {**base, \"largeur\": 24}\ndifferences = {k for k in base if base[k] != variante[k]}\nassert differences == {\"largeur\"}\nassert base[\"contexte\"] * base[\"batch\"] * base[\"pas\"] == 15360\nprint(differences)"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "La deuxième ligne s'appelle variante et porte kind ssm. La fonction n'a pas entraîné de modèle : elle montre seulement que le facteur traverse."
+              "text": "Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer. Explique quelles comparaisons de coût restent nécessaires même après avoir rétabli le contexte."
             }
           ],
-          "exercise": "Tu veux aussi tester n_layers=4. Combien de lignes minimum pour ne pas confondre les causes ? Trois : baseline, kind seul, profondeur seule. Une quatrième si tu veux le croisement.",
-          "build": "Le fil rouge enregistre les ablations par run_ablation. Le tableau du niveau 6 pourra trier les lignes une fois qu'elles auront qualité, secondes et RAM.",
+          "exercise": "Construis deux lignes d’expérience qui diffèrent seulement par la largeur. Indique ce qui reste fixe et pourquoi paramètres, temps et mémoire peuvent tout de même changer.",
+          "build": "Archive les deux configurations complètes, les graines et les tokens vus. Une ligne de tableau par run permet de retrouver aussi un essai qui contredit ton attente.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11092,73 +11235,74 @@
           "codeSymbol": "run_ablation",
           "tpIds": [],
           "takeaways": [
-            "dict(config) isole la ligne. Le test, lui, vérifie que les noms ressortent dans l'ordre.",
-            "Pourquoi cette étape arrive maintenant : Une ablation retire ou remplace une seule pièce.",
+            "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer.",
+            "Pourquoi cette étape arrive maintenant : Si tu changes à la fois la largeur et les textes, tu ne sais plus à quoi attribuer un gain.",
             "Le fichier à ouvrir à côté du cours est model/experiment.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Change une cause par ligne pour lire son effet."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Change une cause par ligne pour lire son effet.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Une comparaison contrôlée modifie une seule variable. Pour largeur 16 contre 24, conserver textes, tokenizer, contexte, batch, pas et graines apparie les expériences."
           ],
-          "solution": "Lignes minimales : Transformer à profondeur initiale ; autre kind à cette même profondeur ; Transformer à quatre couches. Ajoute une quatrième ligne autre kind à quatre couches pour mesurer l'interaction. Une seule ligne qui change kind et profondeur ne permet pas d'attribuer le résultat.",
-          "review": "Sans rouvrir la page, explique « L'ablation » en une phrase, puis dis ce que model/experiment.py en garde vraiment.",
+          "solution": "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Une comparaison contrôlée modifie une seule variable. Pour largeur 16 contre 24, conserver textes, tokenizer, contexte, batch, pas et graines apparie les expériences.",
+          "review": "Sans rouvrir la page, explique « L’ablation » en une phrase, puis dis ce que model/experiment.py en garde vraiment.",
           "quiz": {
-            "question": "Pourquoi run_ablation copie-t-il chaque configuration avant l'appel ?",
+            "question": "Quelle comparaison permet d’attribuer un effet à la largeur ?",
             "choices": [
-              "Pour entraîner le réseau",
-              "Pour qu'une fonction ne modifie pas la liste des expériences par effet de bord",
-              "Pour mélanger les graines",
-              "Pour supprimer la baseline"
+              "Modifier simultanément les données et la profondeur",
+              "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût",
+              "Supprimer les essais qui donnent de mauvais résultats",
+              "Comparer un entraînement complet à un simple forward initialisé"
             ],
             "answer": 1,
-            "explanation": "dict(config) isole la ligne. Le test, lui, vérifie que les noms ressortent dans l'ordre."
-          }
+            "explanation": "Garder données, tokenizer et budget fixes, modifier la largeur et documenter les différences de coût. Ajoute volontairement un changement de contexte à la variante : le contrôle doit échouer."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.4",
           "title": "Les métriques",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Une métrique sans unité est un slogan. Le dépôt en a quelques-unes, précises : perplexité, forme, causalité, octets, FLOPs, score de retrieval. Les mélanger dans une note unique les détruit.",
+          "why": "Mesurer une distance en pas ne suffit pas si les deux personnes n’ont pas la même foulée. Une perte par token dépend elle aussi de la découpe. Le même texte peut demander quatre tokens dans un modèle et dix dans un autre. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Associer une unité à chaque nombre",
-            "Refuser une note unique",
-            "Choisir la métrique qui répond à l'hypothèse"
+            "Calculer cross-entropy et perplexité sans confondre leurs unités",
+            "Vérifier le dénominateur et le nombre de cibles",
+            "Expliquer pourquoi deux tokenizers empêchent une comparaison directe par token"
           ],
-          "prereq": "Ablation.",
+          "prereq": "Méthode du projet personnel, étape 12.3.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Des centimètres et des degrés ne se moyennent pas. Une perplexité et un temps non plus. Tu les poses côte à côte, avec leur nom."
+              "text": "Mesurer une distance en pas ne suffit pas si les deux personnes n’ont pas la même foulée. Une perte par token dépend elle aussi de la découpe. Le même texte peut demander quatre tokens dans un modèle et dix dans un autre."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Perplexité : l'effectif du hasard équivalent, sans unité de « qualité morale ». Forme : un tuple d'entiers. Causalité : un booléen de test. Octet : l'unité de parameter_bytes. FLOP : l'opération comptée par attention_flops, une multiplication-addition vaut 2."
+              "text": "Cross-entropy : surprise moyenne des cibles. Nat : unité issue du logarithme naturel. Perplexité : exponentielle de cette moyenne. Réduction : règle qui transforme les pertes individuelles en une valeur."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "L'hypothèse de l'étape 12.1 ne se mesure pas en perplexité française. Elle se mesure par un succès de forme, un succès de causalité, et un entier de FLOPs. La perplexité reste la métrique du bigramme, sur une queue. Le score de retrieve est un cosinus, pas une note de raisonnement. quality_table exige trois colonnes déjà calculées — quality, seconds, ram_bytes — et trie par qualité décroissante puis temps puis RAM. Il ne calcule pas ces colonnes. Si tu y mets des perplexités, documente que « quality » est alors l'opposé de la perplexité, parce que le tri prend la plus grande quality comme meilleure. Oublier ce signe classerait le pire modèle en premier."
+              "text": "La cross-entropy moyenne est la somme des log-probabilités négatives divisée par le nombre de cibles évaluées. Avec le logarithme naturel, son unité est le nat par token. La perplexité est exp(perte) : une perte plus faible donne une perplexité plus faible. Pour des tokenizers différents, une unité commune comme les nats par caractère exige de conserver la log-probabilité totale et un dénominateur commun sur le même texte, en précisant les cibles, la normalisation et les caractères inconnus. La perplexité ne mesure pas directement la vérité des phrases."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.bench import quality_table\nlignes = quality_table([\n    {\"name\": \"a\", \"quality\": 1.0, \"seconds\": 2.0, \"ram_bytes\": 100},\n    {\"name\": \"b\", \"quality\": 1.0, \"seconds\": 1.0, \"ram_bytes\": 100},\n])\nprint([ligne[\"name\"] for ligne in lignes])"
+              "code": "import math\n# Deux cibles fictives : contrôle de la formule, pas score entraîné.\nnll = [-math.log(0.5), -math.log(0.25)]\nloss = sum(nll) / len(nll)\nperplexite = math.exp(loss)\nassert math.isclose(perplexite, math.sqrt(8))\nprint({\"nats_par_token\": loss, \"perplexite\": perplexite, \"cibles\": len(nll)})"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "À qualité égale, b passe devant a parce qu'il est plus court. Le test du dépôt couvre ce tri."
+              "text": "Remplace la probabilité 0.25 par 0.125. Prédis le sens du changement de perplexité, puis vérifie. Explique pourquoi comparer ce score à une loss train serait trompeur."
             }
           ],
-          "exercise": "Tu veux classer des perplexités, où plus petit est meilleur. Que mets-tu dans quality ? L'opposé de la perplexité, et tu l'écris à côté du tableau.",
-          "build": "Le fil rouge n'invente pas de métrique composite. Chaque étape du parcours a déjà la sienne, et le tableau ne fait que les ranger.",
+          "exercise": "Classe deux pertes de validation obtenues sur les mêmes cibles, puis explique pourquoi cette comparaison serait insuffisante avec deux tokenizers différents. Conserve les unités dans ton tableau.",
+          "build": "Dans le dossier, ajoute l’unité, le split et le nombre de cibles à chaque score. Si tu compares des tokenizers, décris explicitement la conversion et la couverture du texte.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11166,73 +11310,74 @@
           "codeSymbol": "quality_table",
           "tpIds": [],
           "takeaways": [
-            "La fonction exige des colonnes déjà remplies. Le sens de quality — plus grand, meilleur — doit être documenté par toi.",
-            "Pourquoi cette étape arrive maintenant : Une métrique sans unité est un slogan.",
+            "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. Remplace la probabilité 0.25 par 0.125.",
+            "Pourquoi cette étape arrive maintenant : Mesurer une distance en pas ne suffit pas si les deux personnes n’ont pas la même foulée.",
             "Le fichier à ouvrir à côté du cours est model/bench.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : quality_table trie la qualité du plus grand au plus petit."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "quality_table trie la qualité du plus grand au plus petit.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "La cross-entropy moyenne est en nats par token. La perplexité est son exponentielle. Entre tokenizers, utiliser une unité commune comme les nats par caractère et préciser les cibles retenues."
           ],
-          "solution": "Si ta mesure est une perplexité à minimiser, utilise quality = -perplexity et documente ce signe. Une perplexité 10 donne -10 et doit passer avant une perplexité 20 donnant -20. Conserve aussi la valeur originale pour faciliter la lecture.",
+          "solution": "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. La cross-entropy moyenne est en nats par token. La perplexité est son exponentielle. Entre tokenizers, utiliser une unité commune comme les nats par caractère et préciser les cibles retenues.",
           "review": "Sans rouvrir la page, explique « Les métriques » en une phrase, puis dis ce que model/bench.py en garde vraiment.",
           "quiz": {
-            "question": "Que fait quality_table des nombres qu'on lui donne ?",
+            "question": "Quand peut-on comparer directement deux pertes par token ?",
             "choices": [
-              "Il entraîne un Transformer",
-              "Il convertit la perplexité en français",
-              "Il prouve la causalité",
-              "Il les trie, il ne les mesure pas"
+              "Dès que le second modèle a plus de paramètres",
+              "Quand les deux nombres sont affichés avec trois décimales",
+              "Toujours, même avec une tokenisation différente",
+              "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes"
             ],
             "answer": 3,
-            "explanation": "La fonction exige des colonnes déjà remplies. Le sens de quality — plus grand, meilleur — doit être documenté par toi."
-          }
+            "explanation": "Quand tokenizer, données évaluées, cibles et réduction sont les mêmes. Remplace la probabilité 0.25 par 0.125."
+          },
+          "activityKind": "python"
         },
         {
           "id": "12.5",
-          "title": "Un banc d'essai",
+          "title": "Un banc d’essai",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Un benchmark est un banc fixe : mêmes entrées, mêmes métriques, plusieurs systèmes. Changer le banc en même temps que le système annule la comparaison. Le tien doit tenir sur une machine modeste, puisque c'est le sujet du niveau 6.",
+          "why": "Changer le nom d’un fichier ne change pas son contenu. Deux copies du même texte dans train et test permettraient au modèle d’être évalué sur des phrases déjà vues ; cela déforme la question que l’on voulait lui poser. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Fixer les entrées avant les modèles",
-            "Réutiliser les tests comme banc minimal",
-            "Éviter un classement public non rejoué"
+            "Réserver les documents avant l’entraînement",
+            "Repérer des doublons après normalisation Unicode",
+            "Conserver provenance, groupes et empreintes dans un manifeste"
           ],
-          "prereq": "Métriques.",
+          "prereq": "Méthode du projet personnel, étape 12.4.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "La même piste, les mêmes chronomètres, plusieurs coureurs. Changer la piste pour le deuxième coureur ne donne pas un record."
+              "text": "Changer le nom d’un fichier ne change pas son contenu. Deux copies du même texte dans train et test permettraient au modèle d’être évalué sur des phrases déjà vues ; cela déforme la question que l’on voulait lui poser."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Banc : le couple entrées + métriques. Entrée fixe : le idx du test, ou le corpus du bigramme. Classement public : un jeu externe, non exécuté ici. Machine modeste : le CPU qui lance pytest, sans GPU requis."
+              "text": "Manifeste : inventaire des sources et des splits. Empreinte : condensat du contenu. Groupe documentaire : textes à garder dans le même split. Fuite : information réservée utilisée pour apprendre ou choisir."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le banc minimal du dos est celui du test : un batch d'identifiants [[1, 2, 3, 4]], vocabulaire 8, d_model 8, deux couches, block_size 6, graine 3, puis une copie où le dernier token devient 7. La métrique est la forme et l'égalité de la position 0. Le banc du bigramme est une liste d'identifiants, un vocabulaire, et deux perplexités. Le banc du retrieval est trois phrases et une requête. Aucun de ces bancs n'est un classement international. Les citer comme tels serait faux. Les citer comme bancs locaux, rejouables par pytest, est exact. Si tu ajoutes un texte plus long, tu crées un nouveau banc et tu relances toutes les lignes, y compris la baseline."
+              "text": "Découpe les données par documents ou groupes documentaires avant d’entraîner tokenizer et poids. Normalise de façon annoncée, déduplique, puis conserve sources, droits d’usage et empreintes. Le script preparer.py réserve train, validation et test et enregistre le manifeste. Une empreinte identique révèle une copie exacte normalisée ; une empreinte différente ne garantit pas l’absence de paraphrases ou d’extraits communs. Vérifie aussi ces recouvrements et décide à l’avance ce que ta mesure prétend généraliser."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "import numpy as np\nidx = np.array([[1, 2, 3, 4]])\nchange = idx.copy()\nchange[0, -1] = 7\nprint(idx.tolist(), change.tolist())"
+              "code": "import hashlib, unicodedata\ndef empreinte(texte):\n    normalise = unicodedata.normalize(\"NFC\", texte.replace(\"\\r\\n\", \"\\n\"))\n    return hashlib.sha256(normalise.encode(\"utf-8\")).hexdigest()\nassert empreinte(\"café\\n\") == empreinte(\"cafe\\u0301\\r\\n\")\nassert empreinte(\"chat\") != empreinte(\"chien\")\nprint(empreinte(\"chat\"))"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "Les deux suites ne diffèrent qu'au dernier token. C'est l'entrée du test de causalité, pas un corpus de français."
+              "text": "Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente. Vérifie les empreintes, puis explique pourquoi des extraits partagés demandent encore une relecture."
             }
           ],
-          "exercise": "Tu changes d_model pour un essai. Que dois-tu relancer ? Toutes les configurations, baseline comprise, sur ce nouveau banc.",
-          "build": "Le fil rouge publie ses bancs comme des tests, pas comme un tableau de leaders. Le README doit donner la commande pytest, pas un rang.",
+          "exercise": "Prépare un manifeste train, validation et test avec sources, empreintes et groupes documentaires. Explique pourquoi deux fichiers de noms différents peuvent encore contenir la même information.",
+          "build": "Prépare le corpus avec preparer.py dans un nouveau dossier. Joins son manifeste au projet et garde le test réservé jusqu’à la recette finale.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11240,73 +11385,74 @@
           "codeSymbol": "corpus_loss",
           "tpIds": [],
           "takeaways": [
-            "pytest relance les mêmes entrées. Aucun téléchargement de benchmark n'est nécessaire.",
-            "Pourquoi cette étape arrive maintenant : Un benchmark est un banc fixe : mêmes entrées, mêmes métriques, plusieurs systèmes.",
+            "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente.",
+            "Pourquoi cette étape arrive maintenant : Changer le nom d’un fichier ne change pas son contenu.",
             "Le fichier à ouvrir à côté du cours est model/gpt_train.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Le banc doit rester commun aux configurations comparées."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Le banc doit rester commun aux configurations comparées.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Changer d_model modifie paramètres, calcul et mémoire."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Un banc réunit des données gelées, une recette, des métriques et un protocole de sélection. Réserver des documents entiers avant entraînement et examiner les doublons évite de récompenser la simple mémorisation."
           ],
-          "solution": "Changer d_model modifie paramètres, calcul et mémoire. Relance toutes les configurations, y compris la baseline, avec cette nouvelle largeur et le même protocole. Un ancien score de baseline à une autre largeur n'isole plus l'effet du kind.",
-          "review": "Sans rouvrir la page, explique « Un banc d'essai » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
+          "solution": "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Un banc réunit des données gelées, une recette, des métriques et un protocole de sélection. Réserver des documents entiers avant entraînement et examiner les doublons évite de récompenser la simple mémorisation.",
+          "review": "Sans rouvrir la page, explique « Un banc d’essai » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
           "quiz": {
-            "question": "Qu'est-ce qui rend ces bancs défendables dans un portfolio ?",
+            "question": "Comment préparer les documents du banc personnel ?",
             "choices": [
-              "Ils sont petits, fixés, et rejoués par les tests du dépôt",
-              "Ils viennent d'un classement public",
-              "Ils mesurent la compréhension du français",
-              "Ils nécessitent un GPU"
+              "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance",
+              "Tirer une nouvelle validation jusqu’à obtenir le score voulu",
+              "Mettre le même livre dans train et test en changeant son nom",
+              "Ajuster le tokenizer sur tout le corpus réservé"
             ],
             "answer": 0,
-            "explanation": "pytest relance les mêmes entrées. Aucun téléchargement de benchmark n'est nécessaire."
-          }
+            "explanation": "Réserver les groupes documentaires avant entraînement, contrôler les doublons et conserver leur provenance. Crée deux fichiers avec le même texte mais des noms différents et une fin de ligne différente."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.6",
           "title": "Qualité, latence, mémoire, énergie",
           "tag": "Architecture",
           "minutes": 35,
-          "why": "Un modèle qui gagne sur une colonne peut perdre sur les autres. Le niveau 6 a préparé le tableau. Ici tu l'utilises pour l'architecture, et tu n'inventes pas une colonne énergie que tu ne mesures pas.",
+          "why": "Un modèle peut produire un meilleur score tout en dépassant la mémoire de ta machine. Il faut donc plusieurs colonnes pour décrire le compromis. Chacune répond à une question et porte une unité différente. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Remplir quality, seconds, ram_bytes sans tricher",
-            "Distinguer une estimation d'octets et une mesure de temps",
-            "Laisser l'énergie vide si elle n'est pas mesurée"
+            "Mesurer une durée avec une horloge adaptée",
+            "Séparer perte, latence, débit, mémoire et énergie",
+            "Indiquer une mesure absente sans lui donner une valeur fictive"
           ],
-          "prereq": "Banc d'essai et bench.py.",
+          "prereq": "Méthode du projet personnel, étape 12.5.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Une voiture plus rapide qui consomme le réservoir en dix minutes n'a pas « gagné » tant que tu n'as pas dit le critère. Tu montres les colonnes et tu laisses le critère explicite."
+              "text": "Un modèle peut produire un meilleur score tout en dépassant la mémoire de ta machine. Il faut donc plusieurs colonnes pour décrire le compromis. Chacune répond à une question et porte une unité différente."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Qualité : la colonne que tu as définie, plus grand veut dire meilleur dans le tri. Latence : seconds, un temps mesuré, pas un FLOP. RAM : ram_bytes, souvent une estimation via parameter_bytes. Énergie : absente, faute de capteur dans le dépôt."
+              "text": "Latence : attente avant un résultat. Débit : quantité produite par unité de temps. Pic mémoire : maximum observé pendant le calcul. Énergie : intégrale d’une puissance sur une durée, en joules."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "parameter_bytes(n, dtype, optimizer) estime des octets, y compris les états Adam si tu passes optimizer=\"adam\". Ce n'est pas une lecture de la RAM du processus. attention_flops estime un volume, pas une durée : la durée dépend de la machine. Si tu mets des FLOPs dans seconds, le nom de colonne ment. Le tri de quality_table départage d'abord par qualité, puis par temps, puis par RAM. L'énergie n'a pas de fonction. Un joule imaginaire n'entre pas dans le tableau. Tu peux écrire « énergie non mesurée » dans le README. Pour les trois kinds, une comparaison honnête sur ce dépôt est : même nombre de couches, qualité de langage non mesurée, causalité oui, et un terme quadratique présent seulement quand la couche est une attention. Le hybrid a donc moins de couches d'attention que le transformer à n_layers égal, pas « moins d'énergie »."
+              "text": "Note la perte de validation, la durée d’entraînement en secondes et les paramètres. Pour la génération, distingue latence avant le premier token et débit des suivants. La mémoire des poids n’est pas la mémoire maximale du processus : gradients, états d’optimiseur et activations s’ajoutent. Les FLOPs décrivent un compte d’opérations, pas une mesure de joules. Mesurer l’énergie demande une puissance observée au cours du temps et un périmètre annoncé. Le mini-calcul ci-dessous mesure uniquement sa durée locale ; il ne donne pas la performance du GPT."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.bench import parameter_bytes, attention_flops\nprint(parameter_bytes(1000, \"fp32\", \"adam\"))\nprint(attention_flops(32, 8, 2))"
+              "code": "from time import perf_counter\ndebut = perf_counter()\ncontrole = sum(i * i for i in range(1000))\nsecondes = perf_counter() - debut\nrapport = {\"duree_s\": secondes, \"energie_J\": None, \"controle\": controle}\nassert secondes >= 0 and rapport[\"energie_J\"] is None\nprint(rapport)"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "Adam ajoute 8 octets par paramètre aux 4 octets du fp32, donc 12 000 octets pour 1 000 paramètres. Les FLOPs sont un entier, pas des secondes."
+              "text": "Répète ce mini-calcul plusieurs fois. Observe les variations de durée et distingue cet effet du résultat arithmétique. Écris les mesures nécessaires avant de convertir une puissance en énergie."
             }
           ],
-          "exercise": "Pourquoi ne pas remplir seconds avec attention_flops ? Parce que l'unité n'est pas le temps. Le nom de la colonne deviendrait faux.",
-          "build": "Le tableau du fil rouge ne contient que des colonnes que bench.py sait trier, avec des unités écrites à côté. L'énergie reste hors tableau.",
+          "exercise": "Écris une ligne de rapport avec perte, durée et mémoire, chacune avec son unité. Si tu ne disposes pas d’une mesure d’énergie, marque-la Non mesurée plutôt que de la déduire des FLOPs.",
+          "build": "Dans chaque run, conserve matériel, version Python, durée et paramètres. Marque « Non mesurée » pour une mémoire ou une énergie que tu n’as pas réellement observée.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11314,30 +11460,31 @@
           "codeSymbol": "parameter_bytes",
           "tpIds": [],
           "takeaways": [
-            "Une estimation d'octets est étiquetée comme estimation. Un joule sans capteur n'est pas une estimation, c'est une invention.",
-            "Pourquoi cette étape arrive maintenant : Un modèle qui gagne sur une colonne peut perdre sur les autres.",
+            "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. Répète ce mini-calcul plusieurs fois.",
+            "Pourquoi cette étape arrive maintenant : Un modèle peut produire un meilleur score tout en dépassant la mémoire de ta machine.",
             "Le fichier à ouvrir à côté du cours est model/bench.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Vérifie l'unité derrière chaque colonne."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Vérifie l'unité derrière chaque colonne.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. attention_flops compte des opérations estimées, pas des secondes."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "La qualité prédictive, la durée, les octets et l’énergie sont des mesures différentes. Les FLOPs estiment un calcul ; ils ne donnent pas automatiquement des secondes ni des joules sur ton ordinateur."
           ],
-          "solution": "attention_flops compte des opérations estimées, pas des secondes. Remplis seconds avec un chronométrage et documente échauffement, répétitions et synchronisation. L'énergie demanderait une mesure dédiée ; elle ne se déduit pas automatiquement des FLOPs.",
+          "solution": "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. La qualité prédictive, la durée, les octets et l’énergie sont des mesures différentes. Les FLOPs estiment un calcul ; ils ne donnent pas automatiquement des secondes ni des joules sur ton ordinateur.",
           "review": "Sans rouvrir la page, explique « Qualité, latence, mémoire, énergie » en une phrase, puis dis ce que model/bench.py en garde vraiment.",
           "quiz": {
-            "question": "Quelle colonne n'as-tu pas le droit de remplir avec un nombre inventé ?",
+            "question": "Que mettre dans une colonne d’énergie non mesurée ?",
             "choices": [
-              "La forme de sortie, parce qu'elle est testée",
-              "L'énergie, parce que le dépôt ne la mesure pas",
-              "Le nombre d'octets estimé par parameter_bytes",
-              "Le nom de la configuration"
+              "Le nombre de FLOPs comme s’il s’agissait de joules",
+              "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée",
+              "Zéro pour donner une valeur à toutes les cases",
+              "Le temps de génération utilisé comme une puissance électrique"
             ],
             "answer": 1,
-            "explanation": "Une estimation d'octets est étiquetée comme estimation. Un joule sans capteur n'est pas une estimation, c'est une invention."
-          }
+            "explanation": "Non mesurée, avec la méthode nécessaire pour la mesurer expliquée. Répète ce mini-calcul plusieurs fois."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.7",
@@ -11411,7 +11558,8 @@
             ],
             "answer": 2,
             "explanation": "L'appelant dépend de la forme et de la causalité. Les valeurs et les poids restent propres à chaque kind."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.8",
@@ -11485,7 +11633,8 @@
             ],
             "answer": 0,
             "explanation": "L'alternance est dans l'initialisation, la forme et la causalité sont testées. Le reste n'est pas revendiqué."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.9",
@@ -11559,50 +11708,51 @@
             ],
             "answer": 1,
             "explanation": "Ces trois derniers ont des tests. Le dos, lui, est un forward initialisé."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.10",
           "title": "Analyser un échec",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "Un test rouge, ou une métrique pire que la baseline, est un résultat. Le cacher casse le portfolio plus sûrement qu'un modèle moyen. Analyser, c'est relier l'échec à une cause que tu peux nommer.",
+          "why": "Une bonne note obtenue en voyant la réponse n’est pas une preuve d’apprentissage. Un masque causal incorrect peut produire cette illusion : la loss baisse parce que le calcul a accès à une information qui devrait rester cachée. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Traiter une baisse comme une donnée",
-            "Séparer bug et hypothèse fausse",
-            "Relire la causalité avant la qualité"
+            "Séparer une erreur du programme d’une faiblesse du modèle",
+            "Tester la causalité sur deux contextes au même préfixe",
+            "Refaire les mesures invalidées après correction d’un bug"
           ],
-          "prereq": "Entraînement limité.",
+          "prereq": "Un protocole et des métriques fixés, étapes 12.3 et 12.6.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Le gâteau est plat. Avant de changer de four, tu vérifies que tu as mis la levure. Le bug d'abord, l'hypothèse ensuite, le récit jamais en premier."
+              "text": "Une bonne note obtenue en voyant la réponse n’est pas une preuve d’apprentissage. Un masque causal incorrect peut produire cette illusion : la loss baisse parce que le calcul a accès à une information qui devrait rester cachée."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Échec : une métrique pire, ou un assert faux. Bug : le code ne fait pas ce que le commentaire dit. Hypothèse fausse : le code fait ce qui est écrit, et l'effet attendu n'arrive pas. Cause nommable : un facteur de l'ablation."
+              "text": "Diagnostic : test d’une cause possible. Invariant : propriété attendue malgré une modification précise. Causalité : absence de dépendance au futur. Symptôme : observation à expliquer avant de modifier la recette."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Si la position 0 change quand tu modifies le dernier token, c'est un bug de masque ou de scan, pas « une architecture créative ». Le test est là pour l'attraper. Si la forme est bonne, la causalité aussi, et qu'un jour une perplexité de hybrid est pire que celle du transformer sur un banc que tu auras ajouté, c'est peut-être l'hypothèse qui tombe : l'alternance ne suffit pas. Tu le notes dans la ligne, tu ne retires pas la ligne. quality_table mettra la meilleure quality en haut, et la baseline restera visible. Un échec d'outillage — énergie vide, français non mesuré — se documente comme limite, pas comme un zéro inventé qui ferait chuter la ligne."
+              "text": "Avant de commenter un gain, vérifie les indices des cibles, la causalité, les gradients et le rechargement. Pour la causalité, construis deux séquences identiques jusqu’à une position et différentes ensuite. Les logits de leur préfixe doivent rester égaux à poids et mode déterministes. Le court exemple ci-dessous illustre une dépendance limitée au préfixe ; applique ensuite ce principe au vrai decoder avec les contrôles du TP 8. Si le code fuit le futur, corrige puis refais les runs concernés : une ancienne courbe ne reste pas valide après la correction."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.bench import quality_table\nlignes = quality_table([\n    {\"name\": \"baseline\", \"quality\": 0.8, \"seconds\": 1.0, \"ram_bytes\": 10},\n    {\"name\": \"variante\", \"quality\": 0.5, \"seconds\": 1.0, \"ram_bytes\": 10},\n])\nprint(lignes[0][\"name\"], lignes[1][\"name\"])"
+              "code": "def prefixe_causal(tokens, position):\n    return sum(tokens[:position + 1])\na, b = [1, 2, 3], [1, 2, 99]\nassert prefixe_causal(a, 1) == prefixe_causal(b, 1)\n# Le vrai TP vérifie les logits, pas cette simple somme.\nassert sum(a) != sum(b)\nprint(\"Le suffixe change ; le préfixe causal reste identique.\")"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "La baseline reste devant. Effacer la variante parce qu'elle est moins bonne fausserait le tableau : le tri suffit à la placer seconde."
+              "text": "Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite. Retrouve ensuite le contrôle de masque dans verifier.py et explique ce qu’il compare."
             }
           ],
-          "exercise": "La causalité échoue. Que fais-tu avant de conclure que « le SSM oublie trop » ? Tu corriges le bug de fuite du futur, puis tu remesures.",
-          "build": "Le fil rouge garde les lignes perdantes. L'analyse tient dans le nom du facteur, pas dans un adjectif.",
+          "exercise": "Ton GPT bat la baseline mais le test de causalité échoue. Explique l’ordre des contrôles avant toute conclusion et indique ce qu’il faut refaire après correction du bug.",
+          "build": "Ajoute un échec réel au dossier : symptôme, hypothèse, test discriminant et correction. Identifie les rapports devenus invalides et refais les mesures qui dépendaient du bug.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11610,73 +11760,74 @@
           "codeSymbol": "quality_table",
           "tpIds": [],
           "takeaways": [
-            "La causalité est un contrat du code. La qualité vient après, sur un banc, quand le contrat tient.",
-            "Pourquoi cette étape arrive maintenant : Un test rouge, ou une métrique pire que la baseline, est un résultat.",
+            "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite.",
+            "Pourquoi cette étape arrive maintenant : Une bonne note obtenue en voyant la réponse n’est pas une preuve d’apprentissage.",
             "Le fichier à ouvrir à côté du cours est model/bench.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Une fuite de futur invalide la comparaison de qualité."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Une fuite de futur invalide la comparaison de qualité.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Une perte plus basse peut cacher une fuite de données ou de futur. Vérifier d’abord les contrats : entrées et cibles décalées, masque causal, gradients, splits et rechargement. Une hypothèse fausse reste un résultat à conserver."
           ],
-          "solution": "Corrige d'abord le masque, les indices ou le cache qui laissent voir une cible future. Relance les tests de causalité, puis les mesures avec le même protocole. Une baisse de loss obtenue grâce à une fuite n'est pas une amélioration du SSM.",
+          "solution": "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Une perte plus basse peut cacher une fuite de données ou de futur. Vérifier d’abord les contrats : entrées et cibles décalées, masque causal, gradients, splits et rechargement. Une hypothèse fausse reste un résultat à conserver.",
           "review": "Sans rouvrir la page, explique « Analyser un échec » en une phrase, puis dis ce que model/bench.py en garde vraiment.",
           "quiz": {
-            "question": "Un assert de causalité qui échoue indique d'abord…",
+            "question": "Que faire si une bonne perte accompagne une fuite du futur ?",
             "choices": [
-              "Que la variante est plus intelligente",
-              "Que la perplexité uniforme vaut 1",
-              "Un bug de fuite du futur, pas une hypothèse de qualité",
-              "Qu'il faut supprimer le test"
+              "Conserver uniquement la bonne perte dans le rapport",
+              "Présenter le bug comme une nouvelle capacité de raisonnement",
+              "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé",
+              "Supprimer le contrôle de causalité pour terminer le projet"
             ],
             "answer": 2,
-            "explanation": "La causalité est un contrat du code. La qualité vient après, sur un banc, quand le contrat tient."
-          }
+            "explanation": "Corriger le masque ou les indices, vérifier la causalité puis refaire les mesures avec le protocole fixé. Remplace tokens[:position + 1] par tokens dans l’exemple : le test doit détecter la fuite."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.11",
           "title": "Itérer une fois",
           "tag": "Architecture",
           "minutes": 25,
-          "why": "Itérer, c'est changer un facteur après avoir lu une ligne, pas empiler des idées. Une itération tient dans une nouvelle configuration et une nouvelle mesure sur le même banc.",
+          "why": "La validation est une répétition où tu peux encore choisir ta recette. Le test est le bilan de la recette fixée. Le consulter à chaque essai finit par le transformer en un deuxième jeu de validation. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Choisir le prochain facteur d'après une colonne",
-            "Garder le banc fixe",
-            "S'arrêter quand la colonne visée ne bouge plus assez"
+            "Choisir une modification à partir du diagnostic de validation",
+            "Conserver les essais écartés et les règles de sélection",
+            "Réserver le test à la mesure finale de la recette choisie"
           ],
-          "prereq": "Analyse des échecs.",
+          "prereq": "Méthode du projet personnel, étape 12.10.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Tu changes la quantité de levure, pas la recette, le four et la farine. Tu notes le nouveau gâteau à côté de l'ancien. Puis tu décides si une troisième fournée vaut le temps."
+              "text": "La validation est une répétition où tu peux encore choisir ta recette. Le test est le bilan de la recette fixée. Le consulter à chaque essai finit par le transformer en un deuxième jeu de validation."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Itération : une nouvelle ligne, un seul facteur modifié. Banc fixe : les mêmes entrées que la ligne précédente. Gain : la différence sur la colonne que l'hypothèse visait. Arrêt : quand le gain est nul ou que tu sors de ce que le dépôt sait mesurer."
+              "text": "Itération : nouvelle expérience issue d’un résultat. Sélection : choix d’une recette sur validation. Test final : mesure après fixation de la recette. Suradaptation : ajustement excessif aux données utilisées pour choisir."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Suppose que transformer et hybrid ont la même forme et la même causalité. La colonne qui peut encore bouger, dans ce dépôt, est le coût d'attention : hybrid exécute moins de couches attn. Une itération recevable est de passer n_layers de 2 à 4 en le figeant pour les deux kinds, et de recalculer les FLOPs d'attention, pas d'ajouter un agent. Une itération non recevable est d'annoncer un gain de français. Le critère d'arrêt est simple : si la seule colonne mesurable ne distingue plus tes choix, tu documentes l'égalité et tu t'arrêtes. Continuer à empiler des kinds ne crée pas une information que le banc ne voit pas."
+              "text": "Après le premier résultat, propose une modification justifiée : largeur, taux d’apprentissage ou qualité des données, une variable à la fois. Applique le même protocole aux recettes comparées et conserve tous les runs. Une validation utilisée très souvent peut aussi être suradaptée : documente le nombre d’essais. Sélectionne la recette, fige code et configurations, puis déclenche la mesure finale sur le test réservé. Si ce bilan inspire une nouvelle modification, considère-la comme une nouvelle expérience et réserve de nouvelles données pour une future conclusion indépendante."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "from model.bench import attention_flops\nprint(\"2 couches attn\", attention_flops(32, 8, 2))\nprint(\"1 couche attn\", attention_flops(32, 8, 1))"
+              "code": "candidats = [\n    {\"nom\": \"initial\", \"validation\": 2.4},\n    {\"nom\": \"variante\", \"validation\": 2.3},\n]  # Nombres fictifs pour montrer la sélection.\nchoix = min(candidats, key=lambda run: run[\"validation\"])\nbilan = {\"recette\": choix[\"nom\"], \"test\": None}\nassert bilan[\"recette\"] == \"variante\" and bilan[\"test\"] is None\nprint(bilan)"
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "Passer d'un transformer à deux couches à un hybrid qui n'en garde qu'une divise ce terme par deux, à T et D égaux. C'est un gain de coût, pas de qualité."
+              "text": "Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu. Explique pourquoi un score test favorable ne doit pas servir à la sélectionner."
             }
           ],
-          "exercise": "Quelle itération refuses-tu même si elle sonne bien ? Ajouter un temps interne non codé pour « améliorer le raisonnement ».",
-          "build": "Le fil rouge s'autorise une itération seulement quand elle ajoute une ligne sur le même banc. Le README comptera ces lignes, pas les idées écartées.",
+          "exercise": "Décris une seule modification après ton premier résultat de validation. Explique quel contrôle tu relances et pourquoi consulter le test ne doit pas servir à choisir la nouvelle recette.",
+          "build": "Écris la modification retenue et son motif dans le dossier. Date le choix de la recette avant le test final et garde les configurations des essais abandonnés.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11684,69 +11835,70 @@
           "codeSymbol": "train_gpt",
           "tpIds": [],
           "takeaways": [
-            "Une itération sans nouvelle mesure sur le banc fixe ne change pas ce que tu sais. L'arrêt fait partie du résultat.",
-            "Pourquoi cette étape arrive maintenant : Itérer, c'est changer un facteur après avoir lu une ligne, pas empiler des idées.",
+            "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu.",
+            "Pourquoi cette étape arrive maintenant : La validation est une répétition où tu peux encore choisir ta recette.",
             "Le fichier à ouvrir à côté du cours est model/gpt_train.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Une itération doit correspondre à un changement exécutable et mesurable."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Une itération doit correspondre à un changement exécutable et mesurable.",
-            "Écris les valeurs ou les étapes intermédiaires avant de conclure. Refuse l'ajout d'un temps interne seulement décrit dans le texte."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Une itération doit répondre à une observation sur train et validation. Choisir la configuration sur validation, documenter le changement et garder un budget fixé. Le test final réservé ne doit pas devenir un réglage supplémentaire."
           ],
-          "solution": "Refuse l'ajout d'un temps interne seulement décrit dans le texte. Choisis plutôt une modification implémentée, un test qui la couvre et un budget fixe. Fais une seule itération, conserve baseline et résultat, puis explique ce que tu as observé sans inventer une capacité.",
+          "solution": "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Une itération doit répondre à une observation sur train et validation. Choisir la configuration sur validation, documenter le changement et garder un budget fixé. Le test final réservé ne doit pas devenir un réglage supplémentaire.",
           "review": "Sans rouvrir la page, explique « Itérer une fois » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
           "quiz": {
-            "question": "Quand t'arrêtes-tu d'itérer sur les kinds ?",
+            "question": "Sur quoi choisir la nouvelle configuration avant le test final ?",
             "choices": [
-              "Quand le README est assez long",
-              "Quand un article annonce mieux",
-              "Après exactement dix modèles",
-              "Quand le banc ne distingue plus les choix sur les colonnes que tu sais mesurer"
+              "Sur le test réservé à chaque nouvel essai",
+              "Sur la phrase la plus jolie parmi de nombreux tirages",
+              "Sur un gain annoncé sans code ni entraînement",
+              "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale"
             ],
             "answer": 3,
-            "explanation": "Une itération sans nouvelle mesure sur le banc fixe ne change pas ce que tu sais. L'arrêt fait partie du résultat."
-          }
+            "explanation": "Sur la validation et le protocole fixé, en conservant le test réservé pour la mesure finale. Ajoute une variante moins bonne à la liste : elle doit rester visible sans devenir le choix retenu."
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "12.12",
           "title": "Documenter la candidate",
           "tag": "Architecture",
           "minutes": 30,
-          "why": "La dernière étape du parcours est un texte que quelqu'un d'autre peut vérifier. Il dit l'hypothèse, la baseline, les tests verts, les colonnes, et les limites. Il ne dit pas qu'un article a été reproduit.",
+          "why": "Un dossier utile permet à une autre personne de refaire ton expérience et de comprendre ce que tu as appris. Une jolie génération isolée ne donne ni la recette, ni la provenance du texte, ni l’explication de ton programme. Cette étape produit un élément vérifiable de ton dossier de modèle.",
           "objectives": [
-            "Écrire la fiche de la candidate",
-            "Pointer vers pytest et les modules",
-            "Fermer le parcours sur des faits"
+            "Assembler un dossier reproductible avec ses limites",
+            "Distinguer contrôles publics, aide consultée et autonomie",
+            "Reconstruire et expliquer une brique sur un exemple nouveau"
           ],
-          "prereq": "Itération.",
+          "prereq": "Méthode du projet personnel, étape 12.11.",
           "sections": [
             {
               "kind": "intuition",
               "heading": "Intuition",
-              "text": "Tu laisses sur la maquette une fiche : à quoi elle sert, comment la refaire, ce qu'elle ne porte pas. Un visiteur pressé lit la fiche avant d'admirer les pièces."
+              "text": "Un dossier utile permet à une autre personne de refaire ton expérience et de comprendre ce que tu as appris. Une jolie génération isolée ne donne ni la recette, ni la provenance du texte, ni l’explication de ton programme."
             },
             {
               "kind": "vocab",
               "heading": "Vocabulaire",
-              "text": "Fiche : un court texte de README ou de modèle. Commande : pytest, qui rejoue les bancs. Limite : entraînement du dos absent, énergie absente, scores d'articles absents. Candidate : le dos interchangeable."
+              "text": "Reproductibilité : possibilité de refaire la recette documentée. Provenance : origine des données et du code. Limite : conclusion non justifiée par l’expérience. Autonomie : capacité observée à refaire et expliquer sur un cas nouveau."
             },
             {
               "kind": "explain",
               "heading": "Explication",
-              "text": "Le projet final obligatoire est un modèle que tu peux reconstruire et entraîner dans un nouveau dossier. Remets ton code, les tests, le corpus et sa provenance, le tokenizer fixé sur train, les courbes, les baselines et le checkpoint. Ajoute une génération à invites et graines fixées avant le tirage, puis une variation contrôlée. Le correcteur automatique vérifie des propriétés techniques et la présence des mesures ; la qualité de tes explications et l'indépendance des données doivent aussi être relues. La fiche résume hypothèse, protocole, résultat et limites. Une variation perdante reste un résultat valable si tu la mesures et l'expliques. Le dos hybride non entraîné, l'énergie non mesurée et le dialogue non évalué restent des limites explicites. Cocher une leçon n'est pas une certification de maîtrise."
+              "text": "Complète DOSSIER_MODELE.md avec le code personnel, les données autorisées et réservées, le tokenizer, les configurations, les contrôles et les métriques. Joins un checkpoint rechargeable, une commande de reproduction et un échec analysé. Annonce les aides utilisées : exécuter correction.py vérifie la référence mais ne montre pas que tu as conçu eleve.py. La grille /20 distingue ces preuves. Termine par une explication du flux des tenseurs et la reconstruction d’une petite brique sur des valeurs nouvelles, sans regarder la solution. Les limites d’un petit corpus et des contrôles publics font partie du résultat."
             },
             {
               "kind": "code",
               "heading": "Exemple",
               "lang": "python",
-              "code": "fiche = [\n    \"hypothese : kind interchangeable\",\n    \"baseline : transformer et uniforme\",\n    \"preuve : pytest\",\n    \"cout : octets et FLOPs\",\n    \"limites : dos non entraine, energie non mesuree\",\n]\nprint(len(fiche))"
+              "code": "requises = {\"donnees\", \"config\", \"baselines\", \"rechargement\", \"limites\"}\nfiche = {\"config\": {\"largeur\": 16}, \"limites\": [\"petit corpus\"]}\nmanquantes = sorted(requises - set(fiche))\nassert manquantes == [\"baselines\", \"donnees\", \"rechargement\"]\nprint(manquantes)  # Présence des rubriques, pas validation de leurs preuves."
             },
             {
               "kind": "experiment",
               "heading": "Expérience",
-              "text": "Cinq lignes, aucune ne cite un score d'article. Si tu en ajoutes une sixième, elle doit pointer vers un test ou rester dans les limites."
+              "text": "Donne seulement le dossier et les commandes à une autre personne. Note ce qui lui manque pour reproduire. Puis explique une multiplication matricielle et un gradient avec de nouveaux nombres."
             },
             {
               "kind": "explain",
@@ -11754,8 +11906,8 @@
               "text": "Remets ton code personnel, la recette, les splits et leurs conditions d’utilisation, les contrôles, un diagnostic de panne, les mesures appariées et le checkpoint rechargé. Importe controles.json dans Mon espace pour distinguer contrôles publics et explications déclarées. Fais ensuite relire le projet avec PROJET_FINAL.md, sur un exemple nouveau. Le banc français du site mesure une petite expérience réelle ; il ne certifie ni ta compréhension ni une supériorité générale."
             }
           ],
-          "exercise": "Dans un dossier distinct, complète le projet final décrit dans atelier/PROJET_FINAL.md. Livre code, rapport, données réservées, checkpoint rechargé et variation contrôlée. Fais relire tes explications sans ouvrir le corrigé : les preuves techniques seules ne suffisent pas à démontrer l'autonomie.",
-          "build": "La piste se termine par l'épreuve finale de l'atelier. Les critères et commandes sont dans atelier/PROJET_FINAL.md. Les extensions MoE, SSM et multimodalité sont facultatives après ce premier modèle entraîné.",
+          "exercise": "Complète DOSSIER_MODELE.md avec ton code personnel, tes données réservées, les baselines, une variation contrôlée et les limites. Prépare une explication et une reconstruction sur un cas nouveau sans ouvrir le corrigé.",
+          "build": "Remets ton dossier, le code, le checkpoint et les rapports. Utilise la grille du projet final avec une relecture réelle ; conserve à part déclarations, contrôles et autonomie observée.",
           "visual": "stack",
           "visualCaption": "Les briques s'empilent. Changer celle du milieu ne change pas la forme de la sortie.",
           "interactive": false,
@@ -11765,30 +11917,31 @@
             12
           ],
           "takeaways": [
-            "Le contrat de sortie demande d'expliquer, de retrouver dans model/, de lancer le test, de dire le coût, et de comparer à une baseline. La fiche est ce contrat en cinq lignes.",
-            "Pourquoi cette étape arrive maintenant : La dernière étape du parcours est un texte que quelqu'un d'autre peut vérifier.",
+            "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Donne seulement le dossier et les commandes à une autre personne.",
+            "Pourquoi cette étape arrive maintenant : Un dossier utile permet à une autre personne de refaire ton expérience et de comprendre ce que tu as appris.",
             "Le fichier à ouvrir à côté du cours est model/gpt_train.py."
           ],
           "pitfalls": [
-            "Ne confonds pas le résultat attendu avec sa vérification : Associe chaque affirmation à une preuve ou retire-la."
+            "Une leçon cochée ou un contrôle public ne remplace pas un modèle personnel entraîné et expliqué."
           ],
           "hints": [
-            "Écris d'abord le contrat de forme ou le protocole attendu.",
-            "Vérifie les valeurs sur un cas simple, puis les limites de cette vérification."
+            "Retrouve le protocole, les unités et le rôle de la validation avant de conclure.",
+            "Le dossier final relie code, données, tokenizer, recette, contrôles, checkpoint et interprétation. Une autre personne doit pouvoir refaire le petit entraînement et obtenir les mêmes logits après rechargement."
           ],
-          "solution": "Le dossier final réunit le code de tes composants, les documents séparés, le tokenizer, la configuration, les courbes, les baselines et les logits après rechargement. Ajoute une variation contrôlée et explique les résultats, y compris négatifs. Un rapport automatique vérifie des propriétés ; la compréhension doit aussi être démontrée sans le corrigé.",
+          "solution": "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Le dossier final relie code, données, tokenizer, recette, contrôles, checkpoint et interprétation. Une autre personne doit pouvoir refaire le petit entraînement et obtenir les mêmes logits après rechargement.",
           "review": "Sans rouvrir la page, explique « Documenter la candidate » en une phrase, puis dis ce que model/gpt_train.py en garde vraiment.",
           "quiz": {
-            "question": "Que doit contenir la fiche pour que le parcours soit réussi ?",
+            "question": "Quelle remise permet d’examiner le modèle et ton autonomie ?",
             "choices": [
-              "Un classement public",
-              "L'hypothèse, la baseline, les tests, les unités de coût, et les limites non mesurées",
-              "La promesse d'un modèle entraîné de bout en bout",
-              "Une énergie en joules"
+              "Un compteur de leçons cochées sans code personnel",
+              "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau",
+              "Une capture du meilleur texte sans la recette",
+              "Le corrigé exécuté présenté comme une construction sans aide"
             ],
             "answer": 1,
-            "explanation": "Le contrat de sortie demande d'expliquer, de retrouver dans model/, de lancer le test, de dire le coût, et de comparer à une baseline. La fiche est ce contrat en cinq lignes."
-          }
+            "explanation": "Code, provenance, protocole, contrôles, checkpoint, résultats et explication sur un cas nouveau. Donne seulement le dossier et les commandes à une autre personne."
+          },
+          "activityKind": "python"
         }
       ]
     },
@@ -11880,7 +12033,8 @@
             ],
             "answer": 2,
             "explanation": "La clé est la fréquence décroissante, puis le morceau gauche, puis le morceau droit. Rien n'est tiré au sort."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "13.2",
@@ -11954,7 +12108,8 @@
             ],
             "answer": 3,
             "explanation": "Un identifiant inventé décalerait tous les poids. L'erreur explicite est le comportement voulu."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "13.3",
@@ -11967,7 +12122,7 @@
             "Repérer une licence et une réserve",
             "Préparer un extrait sans le versionner"
           ],
-          "prereq": "Le BPE sait s'enregistrer.",
+          "prereq": "Corpus et tokenizer, étapes 2.2 et 2.5 ; premier GPT, étape 4.14.",
           "sections": [
             {
               "kind": "intuition",
@@ -12030,7 +12185,8 @@
             ],
             "answer": 0,
             "explanation": "Le JSON est la source. Les fichiers lourds sont reconstruits localement et ne sont pas versionnés."
-          }
+          },
+          "activityKind": "practice"
         },
         {
           "id": "13.4",
@@ -12104,7 +12260,8 @@
             ],
             "answer": 2,
             "explanation": "Le navigateur lit les poids arrondis. La référence doit partir de ces poids-là."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "13.5",
@@ -12178,7 +12335,8 @@
             ],
             "answer": 3,
             "explanation": "Le fichier est écrit pour les leçons. Les jeux externes restent dans le catalogue, avec leur licence."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "13.6",
@@ -12252,7 +12410,8 @@
             ],
             "answer": 0,
             "explanation": "La question est le contexte. La cible est la réponse, encodée à part pour que le BPE ne traverse pas la frontière."
-          }
+          },
+          "activityKind": "python"
         },
         {
           "id": "13.7",
@@ -12333,7 +12492,8 @@
             ],
             "answer": 1,
             "explanation": "A est aléatoire, B est nulle. Tant que B n'a pas bougé, ajouter BA ne change pas la matrice."
-          }
+          },
+          "activityKind": "explanation"
         },
         {
           "id": "13.8",
@@ -12412,7 +12572,8 @@
             ],
             "answer": 3,
             "explanation": "L'échantillon est une lecture du checkpoint. Le catalogue et les pertes restent les pièces à citer à côté."
-          }
+          },
+          "activityKind": "python"
         }
       ]
     }
@@ -12658,7 +12819,8 @@
       2,
       3,
       4,
-      13
+      13,
+      12
     ],
     "afterCoreLevels": [
       5,
@@ -12667,8 +12829,95 @@
       8,
       9,
       10,
-      11,
-      12
+      11
+    ],
+    "coreSteps": [
+      "0.1",
+      "0.2",
+      "0.3",
+      "0.4",
+      "0.5",
+      "0.6",
+      "0.7",
+      "0.8",
+      "0.9",
+      "0.10",
+      "0.11",
+      "0.12",
+      "0.13",
+      "0.14",
+      "0.15",
+      "0.16",
+      "0.17",
+      "0.18",
+      "0.19",
+      "0.20",
+      "0.21",
+      "0.22",
+      "0.23",
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6",
+      "1.7",
+      "1.8",
+      "1.9",
+      "1.10",
+      "1.11",
+      "1.12",
+      "1.13",
+      "1.14",
+      "1.15",
+      "1.16",
+      "1.17",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4",
+      "2.5",
+      "2.6",
+      "2.7",
+      "2.8",
+      "2.9",
+      "2.10",
+      "2.11",
+      "3.1",
+      "3.2",
+      "3.3",
+      "3.4",
+      "3.5",
+      "3.6",
+      "3.7",
+      "3.8",
+      "3.9",
+      "3.10",
+      "3.11",
+      "4.1",
+      "4.2",
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6",
+      "4.7",
+      "4.8",
+      "4.9",
+      "4.10",
+      "4.11",
+      "4.12",
+      "4.13",
+      "4.14",
+      "13.3",
+      "12.1",
+      "12.2",
+      "12.3",
+      "12.4",
+      "12.5",
+      "12.6",
+      "12.10",
+      "12.11",
+      "12.12"
     ]
   }
 }

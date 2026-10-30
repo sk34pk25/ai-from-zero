@@ -27,7 +27,7 @@ async function axe(page) {
 test("l'accueil s'affiche et la navigation ouvre un niveau", async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("architecture");
+  await expect(page.locator("h1")).toContainText("modèle de langage");
   await expect(page.locator("#progress-meta")).toHaveText("Aucune étape terminée");
   await page.locator("#course-nav a", { hasText: "Fondations numériques" }).click();
   await expect(page).toHaveURL(/#\/niveau\/0$/);
@@ -52,7 +52,8 @@ test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
     await expect(page.locator(".glance-phrase")).toHaveText(lesson.glance.phrase);
     await expect(page.getByRole("heading", { name: "Analogie" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Piège", exact: true })).toBeVisible();
-    await expect(page.locator(".glance-step")).toHaveCount(3);
+    // Le laboratoire porte ses propres étapes ; le résumé statique ne les duplique pas.
+    await expect(page.locator(".glance-step")).toHaveCount(await page.locator("[data-lab]").count() ? 0 : 3);
     await expect(page.locator("details.lesson-deep")).toHaveCount(1);
     await expect(page.locator("details.lesson-deep")).toHaveAttribute("open", "");
     expect(await page.evaluate(() => Boolean(document.querySelector(".lesson-deep")
@@ -121,7 +122,7 @@ test("le bouton retour revient à l'accueil", async ({ page }) => {
   await expect(page.locator("[data-lesson-id='4.5']")).toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(/#\/$/);
-  await expect(page.locator("h1")).toContainText("architecture");
+  await expect(page.locator("h1")).toContainText("modèle de langage");
 });
 
 test("le menu mobile s'ouvre", async ({ page }) => {

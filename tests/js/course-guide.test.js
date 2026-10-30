@@ -9,12 +9,12 @@ const data = JSON.parse(readFileSync(new URL("../../data/curriculum-index.json",
 
 test("finir le premier GPT ne demande aucune exploration et mène au bilan", () => {
   const index = indexCurriculum(data);
-  assert.equal(index.activeIds.length, 84);
+  assert.equal(index.activeIds.length, 86);
   const result = pathProgress(index, index.coreIds);
   assert.equal(result.core.percent, 100);
   assert.equal(result.core.nextId, null);
   assert.equal(result.exploration.count, 0);
-  assert.equal(result.exploration.total, 77);
+  assert.equal(result.exploration.total, 75);
   assert.deepEqual(planSession(index, index.coreIds, 60), []);
   applyLearningPath(index, "all");
   assert.equal(index.activeIds.length, 161);
@@ -25,7 +25,7 @@ test("les explorations ne gonflent pas la progression du premier GPT", () => {
   const index = indexCurriculum(data);
   const result = pathProgress(index, [...index.explorationIds, "0.1", "inconnu"]);
   assert.equal(result.core.count, 1);
-  assert.equal(result.exploration.count, 77);
+  assert.equal(result.exploration.count, 75);
   assert.deepEqual(PHASES.flatMap(phase => phase.levels), data.learningPath.coreLevels);
 });
 

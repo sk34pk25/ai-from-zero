@@ -319,7 +319,11 @@
     "prompt": "Fais plusieurs vrais backward et pas SGD sur une loss quadratique. Le TP 12 étend cette boucle au GPT.",
     "starter": "from model.autograd import Tensor\n\ndef entrainer(w, n, lr):\n    raise NotImplementedError('À compléter')\n",
     "solution": "from model.autograd import Tensor\ndef entrainer(w,n,lr):\n    w=Tensor(float(w))\n    for _ in range(n):\n        w.zero_grad(); loss=(w-3)*(w-3); loss.backward(); w.data-=lr*w.grad\n    return float(w.data)\n",
-    "check": "assert abs(entrainer(0,30,.1)-3)<.01; assert abs(entrainer(0,1,.5)-3)<1e-8\n"
+    "check": "assert abs(entrainer(0,30,.1)-3)<.01; assert abs(entrainer(0,1,.5)-3)<1e-8\n",
+    "files": [
+      "model/__init__.py",
+      "model/autograd.py"
+    ]
   },
   {
     "lessonId": "5.5",
@@ -435,10 +439,10 @@
   },
   {
     "lessonId": "12.4",
-    "prompt": "Transforme une perplexité à minimiser pour un tri qualité décroissant.",
-    "starter": "def qualite(perplexite):\n    # À compléter\n    pass\n",
-    "solution": "def qualite(perplexite):\n    return -perplexite\n",
-    "check": "assert qualite(10)>qualite(20); assert qualite(0)==0\n"
+    "prompt": "Calcule la perplexité à partir d’une loss en nats par token. Une loss plus faible doit donner une perplexité plus faible.",
+    "starter": "import math\n\ndef perplexite(loss):\n    raise NotImplementedError(\"À compléter\")\n",
+    "solution": "import math\n\ndef perplexite(loss):\n    return math.exp(loss)\n",
+    "check": "assert math.isclose(perplexite(0),1); assert math.isclose(perplexite(math.log(4)),4); assert perplexite(1)<perplexite(2)\n"
   },
   {
     "lessonId": "12.12",

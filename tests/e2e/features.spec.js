@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { installOwner, OWNER_ID, signInAs } from "./session.js";
 
-test("le visiteur reste en lecture seule", async ({ page }) => {
+test("le visiteur pratique sans compte et ne peut pas écrire dans le compte propriétaire", async ({ page }) => {
   const hits = [];
   const errors = [];
   page.on("request", (request) => {
@@ -20,8 +20,8 @@ test("le visiteur reste en lecture seule", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Se connecter" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Mot de passe oublié" })).toBeVisible();
   await page.goto("/#/lecon/1.6");
-  await expect(page.locator(".lock-note")).toContainText("suivi sur cet appareil");
-  await expect(page.locator("[data-choice='0']")).toBeDisabled();
+  await expect(page.locator(".lock-note")).toContainText("Tu peux répondre et pratiquer sans compte");
+  await expect(page.locator("[data-choice='0']")).toBeEnabled();
   await expect(page.getByRole("button", { name: "Ouvrir dans l'IDE" })).toHaveCount(0);
   await page.getByRole("button", { name: "Activer le thème clair" }).click();
   await page.goto("/#/ide");
@@ -77,7 +77,7 @@ test("la déconnexion referme la session", async ({ page }) => {
   await page.getByRole("button", { name: "Se déconnecter" }).click();
   await expect(page.locator("h1")).toHaveText("Compte propriétaire");
   await page.goto("/#/lecon/1.6");
-  await expect(page.locator("[data-choice='0']")).toBeDisabled();
+  await expect(page.locator("[data-choice='0']")).toBeEnabled();
 });
 
 test("le catalogue, le playground, une adresse supprimée et une figure passent axe", async ({ page }) => {
@@ -91,7 +91,7 @@ test("le catalogue, le playground, une adresse supprimée et une figure passent 
   await expect(page.locator("h1")).toHaveText("Cette adresse ne mène nulle part");
   await expect(page.locator('a[href="#/a-propos"]')).toHaveCount(0);
   await page.getByRole("link", { name: "Retour à l'accueil", exact: true }).click();
-  await expect(page.locator("h1")).toContainText("architecture");
+  await expect(page.locator("h1")).toContainText("modèle de langage");
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
   await page.goto("/#/playground");

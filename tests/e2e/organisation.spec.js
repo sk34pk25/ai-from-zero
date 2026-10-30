@@ -33,10 +33,11 @@ test("accueil visiteur : pas de null, deux progressions et planificateur sans co
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Mes repères de progression" })).toBeVisible();
   expect(await page.locator("main").evaluate(main => [...main.childNodes].filter(node => node.nodeType === 3).map(node => node.textContent.trim()).filter(Boolean))).toEqual([]);
-  await expect(page.locator(".course-progress")).toContainText("0 / 84");
-  await expect(page.locator(".course-progress")).toContainText("0 / 77");
+  await expect(page.locator(".course-progress")).toContainText("0 / 86");
+  await expect(page.locator(".course-progress")).toContainText("0 / 75");
   await page.getByLabel("Durée de la séance").selectOption("120");
   await expect(page.locator(".session-planner li").first()).toContainText("0.1");
+  await page.locator(".home-catalogue > summary").click();
   expect(await page.locator(".legend").evaluate(node => node.getBoundingClientRect().width)).toBeGreaterThan(150);
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations).toEqual([]);
@@ -70,7 +71,7 @@ test("une leçon conduit au TP exact et le bouton retour conserve la route", asy
 });
 
 test("le parcours premier GPT se termine par le projet, avant les explorations", async ({ page }) => {
-  await page.goto("/#/lecon/13.8");
+  await page.goto("/#/lecon/12.12");
   await expect(page.getByRole("link", { name: "Préparer le bilan du projet", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /^Leçon suivante :/ })).toHaveCount(0);
 });

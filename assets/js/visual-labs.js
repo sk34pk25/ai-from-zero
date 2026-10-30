@@ -353,6 +353,22 @@ function mountLossLab(host, lesson) {
   prediction(host, { question: 'Si la probabilité correcte vaut 1, quelle est −ln(1) ?', answer: 0, tolerance: 0, explanation: 'La perte vaut 0 ; une cible certaine ne surprend plus le modèle.' });
 }
 
+function mountMse(host) {
+  const predictionValue = slider('Prédiction du premier exemple', -2, 12, 5), target = slider('Cible du premier exemple', -2, 12, 7);
+  const average = h('input', { type: 'checkbox', 'aria-label': 'Ajouter un second exemple exact et calculer la moyenne' });
+  const stage = h('div'), status = note('');
+  const paint = () => {
+    const p = Number(predictionValue.input.value), y = Number(target.input.value), error = p-y, square = error*error, count = average.checked ? 2 : 1;
+    stage.replaceChildren(cards([{label:'Prédiction − cible',value:`${p} − ${y} = ${error}`},{label:'Écart au carré',value:square},{label:count===2?'Moyenne sur deux exemples':'Perte de cet exemple',value:square/count,active:true}]));
+    status.textContent = `MSE = somme des écarts au carré / nombre d’exemples = ${square} / ${count} = ${fmt(square/count)}. ${average.checked?'Le second exemple a une prédiction et une cible égales à 0, donc un écart nul.':'Un seul exemple est compté.'} La perte est en unités de la cible au carré ; ce n’est pas une probabilité.`;
+    host.dataset.loss = String(square/count);
+  };
+  host.dataset.lab='mse';host.append(h('h2',{class:'lab-title',text:'Perte quadratique : comparer, mettre au carré, moyenner'}),predictionValue.field,target.field,h('label',{},[average,'Ajouter un second exemple exact']),stage,status);
+  for(const input of [predictionValue.input,target.input,average])input.addEventListener('input',paint);
+  average.addEventListener('change',paint);paint();
+  prediction(host,{question:'Pour prédiction 10 et cible 6, combien vaut le carré de l’écart ?',answer:16,tolerance:0,explanation:'10−6=4, puis 4²=16. Avec un second exemple exact, la moyenne vaudrait 8.'});
+}
+
 export function mountArchitectureLab(host) {
   const trace = attentionTrace(), x = ATTENTION_X, residual = x.map((r, i) => r.map((n, j) => n + trace.output[i][j])), norm = residual.map(r => normalize(r));
   const projection = [[1, 0, -1], [0, 1, 1]], logits = matmul(norm, projection);
@@ -433,6 +449,7 @@ function mountCheckpointing(host) {
 import { mountSampling, mountRetrieval, mountAdaptive, mountModalities, mountPrecision } from './visual-systems.js';
 import { foundationIds, mountFoundation, mountExperiment, mountHybrid, mountSplit, mountOverfit } from './visual-foundations.js';
 const SPECIAL = {
+  '1.9': mountMse,
   '0.15': mountMatrix, '0.18': mountMatrix, '1.15': mountGraph, '2.11': mountMatrix,
   '1.5': mountGraph, '1.7': mountGraph, '1.8': mountGraph, '1.10': mountGraph, '1.11': mountGraph, '1.12': mountGraph,
   '1.3': mountSplit, '1.17': mountOverfit, '2.2': mountSplit, '13.3': mountSplit,

@@ -31,7 +31,7 @@ import {
   paintGlossary,
   levelCheckpoint,
 } from "./study.js";
-import { indexCurriculum, levelProgress, neighbors, applyLearningPath, preferredLearningPath } from "./curriculum.js";
+import { indexCurriculum, levelProgress, neighbors, applyLearningPath, preferredLearningPath, pathLevels, lessonTiming } from "./curriculum.js";
 import { appendChildren, crumb, h, ICONS, svgIcon } from "./dom.js";
 import { gradeQuiz } from "./quiz.js";
 import {
@@ -65,6 +65,8 @@ import { mountVisual, hasVisualLab } from "./visuals.js";
 import { pathChoice } from "./path-choice.js";
 import { courseProgress, phaseGuide, sessionPlanner } from "./course-guide.js";
 import { readLocalReading, writeLocalReading } from "./local-records.js";
+import { writeLocalStudyRecord } from "./local-records.js";
+import { forgetStudyMemory, persistStudyMemory } from "./study-scope.js";
 
 const REVIEW_KEY = "afz-review";
 const LESSON_MODE_KEY = "afz-lesson-mode";
@@ -425,6 +427,8 @@ function applyStoredProgress() {
     return;
   }
   if (!state.owner || !state.index) {
+    state.localToken = null;
+    state.localSnapshot = null;
     state.done = new Set();
     state.quizzes = {};
     state.exercises = {};
@@ -534,12 +538,14 @@ subscribe(() => {
   }
 });
 window.addEventListener("afz-exercise", ({ detail }) => {
-  if (!tracking()) return;
   if (detail.scope === "local" && (state.owner || detail.localToken !== state.localToken)) return;
   if (detail.scope === "owner" && !state.owner) return;
+  if (!state.index.byId.has(detail.id)) return;
   state.exercises[detail.id] = { ok: detail.ok };
   recordAttempt(detail.id, "exercise", detail.ok);
   persistDone();
+  const result = els.main.querySelector(`[data-exercise-summary="${detail.id}"]`);
+  if (result) result.textContent = detail.ok ? "contrôle passé" : "à corriger";
 });
 
 function reviewKey() {
@@ -879,35 +885,23 @@ function paintChrome() {
     else els.track.removeAttribute("aria-current");
   }
   const activeLevel = activeLevelId();
-  const links = state.index.levels.map((level) => {
+  const navLink = (level) => {
     const progress = levelProgress(level, state.done);
     const current = level.id === activeLevel;
-    const link = h("a", {
-      href: `#/niveau/${level.id}`,
-      class: current ? "nav-level is-active" : "nav-level",
-    });
-    if (current) link.setAttribute("aria-current", "page");
-    appendChildren(link, [
-      h("span", {
-        class: "nav-index",
-        text: String(level.id).padStart(2, "0"),
-      }),
+    return h("a", { href: `#/niveau/${level.id}`, class: current ? "nav-level is-active" : "nav-level", "aria-current": current ? "page" : null }, [
+      h("span", { class: "nav-index", text: String(level.id).padStart(2, "0") }),
       h("span", { class: "nav-name", text: level.title }),
-      h("span", {
-        class: "nav-count",
-        text: `${progress.count}/${progress.total}`,
-      }),
+      h("span", { class: "nav-count", text: `${progress.count}/${progress.total}` }),
     ]);
-    return link;
-  });
+  };
   if (state.index.path === "core") {
-    const core = state.index.learningPath.coreLevels;
-    const exploration = h("details", { class: "nav-explorations", open: activeLevel != null && !core.includes(activeLevel) }, [
-      h("summary", { text: "Explorations · 77 leçons" }),
-      ...links.filter((_, i) => !core.includes(state.index.levels[i].id)),
+    const exploring = state.route.name === "lesson" && !state.index.coreIds.includes(state.route.id);
+    const exploration = h("details", { class: "nav-explorations", open: exploring }, [
+      h("summary", { text: `Explorations · ${state.index.explorationIds.length} leçons` }),
+      ...pathLevels(state.index, false).map(navLink),
     ]);
-    els.nav.replaceChildren(h("p", { class: "side-title", text: "Mon premier GPT · 84 leçons" }), ...links.filter((_, i) => core.includes(state.index.levels[i].id)), exploration);
-  } else els.nav.replaceChildren(...links);
+    els.nav.replaceChildren(h("p", { class: "side-title", text: `Mon premier GPT · ${state.index.coreIds.length} leçons` }), ...pathLevels(state.index).map(navLink), exploration);
+  } else els.nav.replaceChildren(...state.index.levels.map(navLink));
 }
 
 function activeLevelId() {
@@ -924,10 +918,9 @@ function paintMain(route, ticket) {
       () => import("./page-experiments.js"),
       (mod) => mod.paintExperiments(els.main),
     );
-  else if (route.name === "study") paintStudy(els.main, state.index);
+  else if (route.name === "study") paintStudy(els.main, state.index, () => [...state.done]);
   else if (route.name === "glossary") {
-    if (!state.lessonsReady) waitForLessons(ticket, "Chargement du glossaire…");
-    else paintGlossary(els.main, state.index);
+    paintGlossary(els.main, state.index);
   }
   else if (route.name === "placement")
     paintAsync(ticket, () => import("./placement.js"), (mod) =>
@@ -935,16 +928,7 @@ function paintMain(route, ticket) {
         index: state.index,
         canTrack: tracking,
         onMarkKnown: markKnown,
-        enableTracking: () => {
-          const storage = safeStorage();
-          if (!storage || !enableLocalLearner(storage)) {
-            toast("Ce navigateur refuse le stockage local.");
-            return false;
-          }
-          refreshLocalMode();
-          applyStoredProgress();
-          return true;
-        },
+        enableTracking: activateLocalTracking,
       }),
     );
   else if (route.name === "home") paintHome();
@@ -958,7 +942,7 @@ function paintMain(route, ticket) {
     import("./lesson-tools.js")
       .then((mod) => {
         if (ticket !== state.pageTicket) return;
-        return mod.attachLessonTools(els.main, route.id, tracking());
+        return mod.attachLessonTools(els.main, route.id, true);
       })
       .catch(() => {});
   } else if (route.name === "model")
@@ -1090,123 +1074,43 @@ function pageTitle(route) {
 }
 
 function paintHome() {
-  const { count, total, percent, nextId } = stats();
+  const { count, nextId } = stats();
   const next = nextId ? state.index.byId.get(nextId) : null;
-  const heroActions = [
-    h(
-      "a",
-      {
-        class: "button button-primary",
-        href: nextId ? `#/lecon/${nextId}` : "#/atelier",
-      },
-      nextId
-        ? count === 0
-          ? "Commencer le parcours"
-          : "Reprendre le parcours"
-        : "Préparer le bilan du projet",
-    ),
-    h(
-      "a",
-      { href: "#/parcours" },
-      "Voir le programme",
-    ),
-    h(
-      "a",
-      { href: "#/construire" },
-      "Construire mon LLM",
-    ),
-    h(
-      "a",
-      { href: "#/atelier" },
-      "Ouvrir les 12 TP",
-    ),
-  ];
-  const cards = [
-    statCard("Progression", `${percent} %`, stepsLabel(count)),
-    statCard(
-      "Prochaine étape",
-      next ? next.lesson.id : "Terminé",
-      next ? next.lesson.title : "Toutes les étapes sont cochées",
-    ),
-    statCard(
-      "Ton modèle",
-      "tiny_lm.py",
-      "Un petit modèle entraîné par rétropropagation",
-    ),
-  ];
-  const roadmap = h(
-    "section",
-    { class: "panel", id: "roadmap", "aria-labelledby": "roadmap-title" },
-    [
-      h("div", { class: "panel-head" }, [
-        h("div", {}, [
-          h("p", { class: "eyebrow", text: "Roadmap" }),
-          h("h2", {
-            id: "roadmap-title",
-            text: "Mon premier GPT et explorations",
-          }),
-          h("p", {
-            text: "Commence par les six niveaux du tronc commun, puis prépare ton projet final. Les approfondissements restent disponibles séparément.",
-          }),
-        ]),
-        h("p", { class: "legend", text: `${count} / ${total} leçons du parcours choisi` }),
-      ]),
-      h(
-        "div",
-        { class: "roadmap" },
-        state.index.levels.filter(level => state.index.path === "all" || state.index.learningPath.coreLevels.includes(level.id)).map((level) => levelCard(level)),
-      ),
-      state.index.path === "core" ? h("details", { class: "roadmap-explorations" }, [
-        h("summary", { text: "Explorer les 77 leçons avancées" }),
-        h("p", { text: "Ces niveaux ne sont pas nécessaires pour terminer ton premier GPT." }),
-        h("div", { class: "roadmap" }, state.index.levels.filter(level => !state.index.learningPath.coreLevels.includes(level.id)).map(levelCard)),
-      ]) : null,
-    ],
-  );
+  const catalogue = h("section", { class: "panel", "aria-labelledby": "catalogue-title" }, [
+    h("h2", { id: "catalogue-title", text: "Mon premier GPT et explorations" }),
+    h("p", { class: "legend", text: `${state.index.coreIds.length} leçons pour construire et évaluer ; ${state.index.explorationIds.length} extensions au choix.` }),
+    h("div", { class: "roadmap" }, pathLevels(state.index).map(levelCard)),
+    h("details", {}, [h("summary", { text: `Explorer les ${state.index.explorationIds.length} autres leçons` }),
+      h("div", { class: "roadmap" }, pathLevels(state.index, false).map(levelCard))]),
+  ]);
   els.main.replaceChildren(...[
-    h("section", { class: "hero" }, [
-      h("div", {}, [
-        h("p", { class: "eyebrow", text: "Laboratoire francophone" }),
-        h("h1", {}, [
-          "De zéro à ta propre ",
-          h("em", { text: "architecture" }),
-          ".",
-        ]),
-        h("p", { class: "lead", text: state.index.meta.description }),
-        h("div", { class: "hero-actions" }, heroActions),
+    h("section", { class: "hero" }, [h("div", {}, [
+      h("p", { class: "eyebrow", text: "Laboratoire francophone · Python et NumPy" }),
+      h("h1", {}, ["Construis ton premier ", h("em", { text: "modèle de langage" }), "."]),
+      h("p", { class: "lead", text: "Pars de zéro. Programme les composants de ton petit GPT, entraîne-le et explique ses résultats sur tes propres données." }),
+      h("div", { class: "hero-actions" }, [
+        h("a", { class: "button button-primary", href: nextId ? `#/lecon/${nextId}` : "#/atelier" }, nextId ? count ? "Reprendre le parcours" : "Commencer le parcours" : "Préparer le bilan du projet"),
+        h("a", { href: "#/positionnement", text: "J’ai déjà les bases" }),
+        h("a", { href: "#/parcours", text: "Voir le programme" }),
       ]),
-      h(
-        "ol",
-        { class: "hero-levels", "aria-label": "Aperçu des niveaux" },
-        state.index.levels.filter(level => state.index.path === "all" || state.index.learningPath.coreLevels.includes(level.id)).map((level) =>
-          h("li", {}, [
-            h("span", { text: String(level.id).padStart(2, "0") }),
-            h("span", { text: level.title }),
-          ]),
-        ),
-      ),
-    ]),
-    h("div", { class: "stat-grid" }, cards),
-    pathChoice(state.index),
+      next ? h("p", { class: "muted", text: `Prochain geste : ${next.lesson.title}. Un quiz réussi et une leçon parcourue ne remplacent pas la construction de ton projet.` }) : null,
+    ])]),
     courseProgress(state.index, state.done),
-    sessionPlanner(state.index, () => state.done),
-    phaseGuide(state.index),
+    h("div", { id: "roadmap" }, [phaseGuide(state.index)]),
+    h("section", { class: "sheet project-entry" }, [
+      h("h2", { text: "Mon projet : construire, vérifier, expliquer" }),
+      h("p", { text: "Les TP accompagnent les leçons. Chaque brique a ses prérequis, un exemple et un contrôle individuel. Le dossier final réunit ton code, tes mesures et tes explications." }),
+      h("a", { href: "#/atelier", class: "button button-secondary", text: "Ouvrir les 12 TP et mon dossier" }),
+      h("p", {}, h("a", { href: "#/construire", text: "Voir les fichiers et résultats de référence" })),
+    ]),
     resumePanel(state.index),
-    localPanel({
-      owner: state.owner,
-      local: state.local,
-      done: state.done,
-      quizzes: state.quizzes,
-      exercises: state.exercises,
-      orderedIds: state.index.orderedIds,
-      numericIds: state.index.numericIds,
-      enable: enableLocalTracking,
-      importProgress: importLocalProgress,
-      erase: onReset,
-    }),
+    sessionPlanner(state.index, () => state.done),
+    pathChoice(state.index),
+    localPanel({ owner: state.owner, local: state.local, done: state.done, quizzes: state.quizzes, exercises: state.exercises,
+      orderedIds: state.index.orderedIds, numericIds: state.index.numericIds, enable: enableLocalTracking, importProgress: importLocalProgress, erase: onReset }),
     reviewBlock(),
-    roadmap,
-  ].filter((node) => node != null && node !== false));
+    h("details", { class: "home-catalogue", open: state.index.path === "all" }, [h("summary", { text: `Catalogue : les ${state.index.lessons.length} leçons` }), catalogue]),
+  ].filter(Boolean));
 }
 
 function statCard(kicker, value, detail) {
@@ -1257,6 +1161,9 @@ function paintLevel(id) {
   }
   const progress = levelProgress(level, state.done);
   const list = h("ol", { class: "chapter-list" });
+  const extraList = h("ol", { class: "chapter-list" });
+  const selected = level.steps.filter(step => state.index.coreIds.includes(step.id));
+  const mixed = state.index.path === "core" && selected.length > 0 && selected.length < level.steps.length;
   for (const step of level.steps) {
     const done = state.done.has(step.id);
     const item = h("li");
@@ -1272,7 +1179,7 @@ function paintLevel(id) {
           h("span", { class: "chapter-title", text: step.title }),
           h("span", {
             class: "chapter-tag",
-            text: `${step.tag} · ${step.minutes} min`,
+            text: `${state.index.coreIds.includes(step.id) ? "Premier GPT" : "Exploration"} · activité ≈ ${step.minutes} min`,
           }),
         ]),
         h("span", {
@@ -1282,23 +1189,26 @@ function paintLevel(id) {
       ],
     );
     item.append(link);
-    list.append(item);
+    (mixed && !state.index.coreIds.includes(step.id) ? extraList : list).append(item);
   }
   els.main.replaceChildren(
     crumb([{ href: "#/", label: "Accueil" }, { label: `Niveau ${level.id}` }]),
     h("p", { class: "eyebrow", text: `Niveau ${level.id}` }),
     h("h1", { text: level.title }),
-    h("p", { class: "lead", text: level.summary }),
+    h("p", { class: "lead", text: mixed ? `${selected.length} leçon(s) sélectionnée(s) pour ton premier GPT. Les autres prolongent ce projet ; elles sont regroupées dans les explorations ci-dessous.` : level.summary }),
     h("section", { class: "callout callout-build" }, [
-      h("h2", { text: "Projet du niveau" }),
-      h("p", { text: level.project }),
+      h("h2", { text: mixed ? "Dans le parcours du premier GPT" : "Projet du niveau" }),
+      h("p", { text: mixed ? id === 13 ? "Préparer et réserver tes données avant l’évaluation de ton modèle personnel." : "Mesurer ton modèle, comparer une variation contrôlée et livrer un dossier reproductible." : level.project }),
       h("p", {
         class: "muted",
         text: `${stepsLabel(progress.count)} sur ${progress.total}.`,
       }),
     ]),
     list,
-    levelCheckpoint(level),
+    mixed ? h("details", { class: "level-explorations" }, [
+      h("summary", { text: `Explorations du niveau · ${extraList.children.length} leçons et bilan complet` }),
+      h("p", { text: level.summary }), extraList, levelCheckpoint(level),
+    ]) : levelCheckpoint(level),
   );
 }
 
@@ -1324,15 +1234,15 @@ function paintLesson(id) {
       { href: `#/niveau/${level.id}`, label: `Niveau ${level.id}` },
       { label: lesson.id },
     ]),
-    h("p", { class: "eyebrow", text: `${lesson.tag} · ${lesson.minutes} min` }),
+    h("p", { class: "eyebrow", text: `${lesson.tag} · texte ≈ ${lessonTiming(lesson).reading} min · activité ≈ ${lessonTiming(lesson).activity} min` }),
     h("h1", { text: lesson.title }),
     h("section", { class: "sheet lesson-objectives", id: "lesson-objectives", "aria-labelledby": "objectives-title" }, [
       h("h2", { id: "objectives-title", text: "Objectifs et prérequis" }),
       h("ul", {}, lesson.objectives.map(goal => h("li", { text: goal }))),
       h("p", { class: "eyebrow", text: "Prérequis" }), prerequisiteLinks(lesson.prereq),
       h("p", { text: state.index.coreIds.includes(lesson.id) ? "Tronc commun · Mon premier GPT" : "Exploration · à poursuivre après ton premier GPT" }),
-      ...(lesson.tpIds || []).map(tp => h("p", {}, h("a", { href: `#/atelier/tp/${tp}`, text: `Pratiquer : TP ${tp}` }))),
-      !tracking() ? h("button", { type: "button", class: "button button-secondary", onClick: enableLocalTracking }, "Activer le suivi pour pratiquer sans compte") : null,
+      ...(lesson.tpIds || []).map(tp => h("p", {}, [h("a", { href: `#/atelier/tp/${tp}`, text: `Pratiquer : TP ${tp}` }), " · vérifier les prérequis indiqués dans le TP avant de le commencer."])),
+      !tracking() ? h("button", { type: "button", class: "button button-secondary", onClick: enableLocalTracking }, "Garder ma progression sur cet appareil") : null,
     ]),
     lessonContents(),
     h("div", { class: "lesson-grid" }, [
@@ -1357,6 +1267,7 @@ function paintLesson(id) {
   const host = article.querySelector("[data-visual-host]");
   if (host) mountVisual(host, lesson);
   restoreLessonAids(article, lesson);
+  import("./term-help.js").then(mod => mod.attachTermHelp(article)).catch(() => {});
   article.querySelector(".lesson-objectives").after(h("details", { class: "lesson-display" }, [
     h("summary", { text: "Affichage et lecture" }), lessonModeControl(), learningToolbar(),
   ]));
@@ -1473,7 +1384,7 @@ function glanceIntro(lesson) {
 function glanceExtras(lesson) {
   if (!lesson.glance) return [];
   const nodes = [];
-  if (hasVisualLab(lesson) || !STEP_FIGURES.has(lesson.visual || "flow"))
+  if (!hasVisualLab(lesson) && !STEP_FIGURES.has(lesson.visual || "flow"))
     nodes.push(h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
       h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
       stepsDiagram(lesson.glance.steps),
@@ -1485,11 +1396,11 @@ function glanceExtras(lesson) {
 function lessonOverview(lesson) {
   const stepFigure = !hasVisualLab(lesson) && STEP_FIGURES.has(lesson.visual || "flow");
   return h("div", { class: "lesson-overview", id: "lesson-observe", "data-lesson-overview": "true" }, [
+    h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),
     h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
       h("figcaption", { text: hasVisualLab(lesson) ? "Observe les valeurs, puis retrouve le code." : stepFigure ? "Les repères de l'étape." : lesson.visualCaption || "" }),
       h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
-    h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),
     h("div", { "data-glance-extra": "true" }, glanceExtras(lesson)),
   ]);
 }
@@ -1516,10 +1427,7 @@ function refreshLessonOverview() {
 }
 
 function readingMinutes(lesson) {
-  const words = [lesson.why, lesson.build, lesson.review, ...lesson.sections.map((s) => s.text || ""), ...(lesson.takeaways || []), ...(lesson.pitfalls || [])]
-    .join(" ")
-    .split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
+  return lessonTiming(lesson).reading;
 }
 
 function lessonBody(lesson, grade, done, around) {
@@ -1529,7 +1437,7 @@ function lessonBody(lesson, grade, done, around) {
       ...paragraphs(lesson.exercise),
       h("div", { class: "aid-actions" }, [
         h("button", { type: "button", "data-hint-button": "true", onClick: () => revealHint(lesson) }, "Indice suivant"),
-        h("button", { type: "button", "data-solution-button": "true", disabled: !tracking(), onClick: () => { if (tracking()) toggleSolution(); } }, tracking() ? "Voir une correction" : "Activer le suivi local pour la correction"),
+        h("button", { type: "button", "data-solution-button": "true", onClick: toggleSolution }, "Voir une correction"),
       ]),
       h("ol", { id: "hint-list", "aria-live": "polite" }),
       h("div", { id: "solution", hidden: true }, paragraphs(lesson.solution || "")),
@@ -1540,12 +1448,14 @@ function lessonBody(lesson, grade, done, around) {
   return [
     lessonOverview(lesson),
     lessonDeep(lesson),
-    ...lesson.sections.filter(section => section.kind === "code").map(codeBlock),
     practice,
     quizBlock(lesson, grade),
     h("section", { class: "sheet", id: "lesson-summary" }, [
       h("h2", { text: "Bilan et suite" }),
-      h("p", { text: `Quiz : ${grade.correct ? "réussi" : "à vérifier"}. Exercice exécutable : ${state.exercises[lesson.id]?.ok ? "contrôle passé" : "non validé"}. Ces repères ne remplacent pas le projet final.` }),
+      h("p", {}, [`Quiz : ${grade.correct ? "réussi" : "à vérifier"}. `,
+        lesson.activityKind === "python" ? h("span", {}, ["Exercice exécutable : ", h("span", { "data-exercise-summary": lesson.id, text: state.exercises[lesson.id] ? state.exercises[lesson.id].ok ? "contrôle passé" : "à corriger" : "non lancé" }), ". "])
+          : lesson.tpIds?.length ? "Pratique : à vérifier dans ton TP local. " : "Activité : à expliquer avec un exemple nouveau. Aucun contrôle Python automatique n’est prévu ici. ",
+        "Ces repères ne remplacent pas le projet final."]),
       h("p", { text: "Avant de poursuivre, explique l’idée avec d’autres valeurs et conserve ton code." }),
       ...(lesson.tpIds || []).map(tp => h("p", {}, h("a", { href: `#/atelier/tp/${tp}`, text: `Construire et vérifier le TP ${tp}` }))),
     ]),
@@ -1563,7 +1473,7 @@ function lessonBody(lesson, grade, done, around) {
 function lessonDeep(lesson) {
   const body = [h("p", { text: lesson.why })];
   for (const section of lesson.sections) {
-    if (section.kind === "code") continue;
+    if (section.kind === "code") { body.push(codeBlock(section)); continue; }
     if (section.kind === "reference")
       body.push(
         h("section", { class: "block block-reference" }, [
@@ -1685,9 +1595,7 @@ function quizBlock(lesson, grade) {
         class: classes.join(" "),
         "data-choice": String(index),
         "aria-pressed": selected ? "true" : "false",
-        disabled: !tracking(),
         onClick: () => {
-          if (!tracking()) return;
           state.quizChoice = index;
           recordAttempt(lesson.id, "quiz", index === lesson.quiz.answer);
           state.quizzes[lesson.id] = {
@@ -1722,7 +1630,7 @@ function quizBlock(lesson, grade) {
       ? null
       : h("div", { class: "lock-note" }, [
           h("p", {
-            text: "Active le suivi sur cet appareil pour répondre au quiz, consulter la correction et tester les exercices sans compte. Tes réponses restent dans ce navigateur.",
+            text: "Tu peux répondre et pratiquer sans compte. Le suivi est facultatif : active-le pour conserver ton travail après fermeture du navigateur.",
           }),
           localOptInButton(enableLocalTracking),
         ]),
@@ -1767,10 +1675,6 @@ function feedbackText(lesson, grade) {
 }
 
 function toggleLesson(id) {
-  if (!tracking()) {
-    toast("Active le suivi sur cet appareil pour garder tes étapes.");
-    return;
-  }
   if (state.done.has(id)) {
     state.done.delete(id);
     writeReviewStamp(id, false);
@@ -1781,7 +1685,7 @@ function toggleLesson(id) {
   persistDone();
   toast(
     state.done.has(id)
-      ? "Étape enregistrée sur cet appareil."
+      ? tracking() ? "Étape enregistrée sur cet appareil." : "Étape parcourue pour cette session. Active le suivi pour la conserver."
       : "Étape retirée de la progression.",
   );
   render({ scroll: "keep" });
@@ -1895,26 +1799,40 @@ function paintNotFound(path) {
   );
 }
 
-function enableLocalTracking() {
+function activateLocalTracking() {
   const storage = safeStorage();
   if (!storage || !enableLocalLearner(storage)) {
     toast("Ce navigateur refuse le stockage local.");
     return false;
   }
+  const session = { v: 1, done: [...state.done], quizzes: state.quizzes, exercises: state.exercises };
   refreshLocalMode();
+  const token = localToken(storage);
+  writeLocalProgress(storage, session, readLocalProgress(storage), token);
+  persistStudyMemory(storage, token);
+  const draft = els.main.querySelector("[data-exercise] textarea");
+  if (draft) writeLocalDraft(storage, draft.closest("[data-exercise]").dataset.exercise, draft.value, token);
   applyStoredProgress();
+  return true;
+}
+
+function enableLocalTracking() {
+  if (!activateLocalTracking()) return false;
   toast("Suivi activé : ta progression reste dans ce navigateur.");
   render({ scroll: "keep" });
   return true;
 }
 
-function importLocalProgress(progress, drafts = {}) {
+function importLocalProgress(progress, drafts = {}, study = {}) {
   if (!progress || !writeLocalProgress(safeStorage(), progress, readLocalProgress(safeStorage()), state.localToken)) {
     toast("Sauvegarde non reconnue.");
     return;
   }
   applyStoredProgress();
   for (const [id, code] of Object.entries(drafts)) writeLocalDraft(safeStorage(), id, code, state.localToken);
+  for (const [key, value] of Object.entries(study)) {
+    if (key === "preferences" || key.startsWith("lesson/") && state.index.byId.has(key.slice(7)) || /^level\/\d+$/.test(key)) writeLocalStudyRecord(safeStorage(), key, value, state.localToken);
+  }
   toast(`Progression importée : ${stepsLabel(progress.done.length).toLowerCase()}.`);
   render({ scroll: "keep" });
 }
@@ -1938,6 +1856,7 @@ function onReset() {
   if (!state.owner && state.local) {
     if (!window.confirm("Effacer la progression gardée dans ce navigateur ? Exporte-la d'abord si tu veux la garder.")) return;
     forgetLocalLearner(safeStorage());
+    forgetStudyMemory();
     refreshLocalMode();
     applyStoredProgress();
     toast("Progression locale effacée.");

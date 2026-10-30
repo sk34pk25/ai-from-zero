@@ -1,6 +1,6 @@
 # AI From Zero
 
-Parcours francophone pour partir d'aucune base en informatique et arriver à concevoir une petite architecture : Python, réseau, tokenizer, bigramme, Transformer, variantes modernes, coût, Mixture of Experts, SSM, multimodal, mémoire, puis une candidate que tu peux mesurer.
+Parcours francophone pour partir de zéro en informatique et construire son premier modèle de langage : Python, gradients, tokenizer, bigramme, Transformer, puis évaluation et dossier personnel. Les architectures modernes, le BPE approfondi, le SFT et LoRA prolongent ce premier projet dans des explorations facultatives.
 
 Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.github.io/ai-from-zero/)
 
@@ -8,7 +8,7 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 ## Où en est le parcours
 
-161 étapes, 14 niveaux, toutes rédigées. Aucune étape n'est laissée au statut « planifié ». Chaque leçon ouvre sur une intuition, un schéma (parfois manipulable), puis les objectifs, les pièges, des indices progressifs et une correction. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; le script `scripts/build_curriculum.py` régénère le JSON, les aides et le plan, et les tests refusent qu'ils divergent.
+161 étapes, 14 niveaux : 86 leçons dans le parcours du premier GPT et 75 explorations. Les objectifs et prérequis précèdent l’intuition illustrée, l’explication, la pratique et le quiz. Les 66 exercices Python contrôlés se distinguent des activités à expliquer ou à réaliser dans les TP. Le plan lisible est généré dans [`docs/CURRICULUM.md`](docs/CURRICULUM.md) à partir de [`data/curriculum.json`](data/curriculum.json). Les sources de rédaction sont dans `curriculum_src/` ; `scripts/build_curriculum.py` régénère le cours, les résumés, le glossaire et le plan. Les tests refusent leur divergence.
 
 La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie les leçons aux fichiers de `model/`, du dossier vide jusqu'à un TinyGPT entraîné, puis au BPE, au catalogue de données, au playground et à l'ajustement. Le compte-rendu d'un run CPU réel est dans [`data/gpt_run.json`](data/gpt_run.json).
 
@@ -172,7 +172,11 @@ Le mode `correction` teste la référence. Pour apprendre, complète `eleve.py` 
 
 L’atelier contrôle aussi des valeurs attendues indépendantes de l’attention, de la loss et des têtes. Les tests de mutation refusent sept erreurs volontaires : échelle, loss constante, masque, ordre des têtes, cible, résidu et accumulation. `--tp N` permet un contrôle individuel lorsque les TP précédents demandent des leçons encore non étudiées. Les nouveaux checkpoints lient poids, code, moteur, données normalisées et documents connus ; l’évaluation refuse le recouvrement connu. Les rapports neufs ne peuvent pas écraser sources ou poids.
 
-Le choix « Mon parcours » dès l’accueil, dans Atelier et Mon espace règle Continuer et les séances : par défaut 0 → 1 → 2 → 3 → 4 → 13, soit 84 leçons, puis le bilan du projet. Les 77 explorations restent accessibles séparément et possèdent leur propre indicateur. Le planificateur est public ; le suivi local et son point d’arrêt sont facultatifs. Mon espace distingue lecture, rapport de contrôles importé et explications déclarées. Ces déclarations ne certifient pas l’autonomie.
+Le choix « Mon parcours » dès l’accueil, dans Atelier et Mon espace règle Continuer et les séances : par défaut les niveaux 0 à 4, puis la leçon 13.3 sur les données et neuf leçons de méthode (12.1 à 12.6, 12.10 à 12.12), soit 86 leçons jusqu’au dossier final. Les 75 explorations restent accessibles séparément avec leur propre indicateur. Les durées distinguent lecture estimée et budget d’activité indicatif ; elles ne mesurent pas le temps de maîtrise. Le planificateur est public. Quiz, contrôles, corrections, notes et preuves de construction sont utilisables sans compte. Sur demande, le suivi local conserve aussi notes, favoris et preuves et permet leur export/import. Mon espace distingue lecture, rapport importé et explications déclarées ; ces déclarations ne certifient pas l’autonomie.
+
+Le glossaire regroupe les usages d’un même terme, conserve les liens vers leurs contextes et propose vingt définitions communes avec exemples. Ces termes peuvent aussi se déplier dans le texte des leçons. Les guides de l’atelier sont rendus avec titres, listes, tableaux et code copiable. Chaque TP donne son propre énoncé, ses prérequis et la commande `python verifier.py --tp N`.
+
+Les contrôles Python utilisent un espace de noms neuf à chaque essai et chargent leurs dépendances déclarées. Une solution précédente ne peut donc plus faire réussir un exercice vide. Un délai de démarrage termine un chargement bloqué et permet de relancer le moteur ; il ne coupe pas les calculs déjà démarrés. Les tests de navigateur exécutent les 66 corrigés avec le vrai Python/NumPy et vérifient la reprise après panne JavaScript et WASM.
 
 Le [banc français](atelier/BANC_FR.md) contient douze textes originaux, huit train/deux validation/deux test, sans répétition automatique. Six entraînements réels comparent largeurs 16/24, trois graines appariées et 240 pas. La largeur 16 est retenue sur validation ; son test moyen vaut **2,3921 ± 0,0082 nats/caractère** (écart-type des trois graines), contre **2,4514** pour le bigramme et **3,9703** pour l’uniforme, sur les mêmes cibles. Le tokenizer réserve aussi � ; le détail de couverture est dans le rapport. Ces résultats locaux ne constituent pas une preuve de supériorité générale ni de réponses fiables. [Rapport réel](data/benchmark_fr_run.json).
 

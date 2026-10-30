@@ -170,6 +170,8 @@ function stamp() {
     "data/curriculum-index.json",
     "data/curriculum.json",
     "data/glance.json",
+    "data/glossary.json",
+    "data/glossary-core.json",
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
   ];
   const course = [

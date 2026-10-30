@@ -110,3 +110,29 @@ export function writeLocalReading(storage, row, token) {
   if (!token || token !== localToken(storage) || !STEP.test(row.id) || !Number.isFinite(row.y) || row.y < 0) return false;
   return writeJson(storage, LOCAL_PREFIX + token + "/reading", { id: row.id, y: row.y, at: row.at });
 }
+
+const STUDY_KEY = /^(preferences|lesson\/\d+\.\d+|level\/\d+)$/;
+export function readLocalStudyRecords(storage) {
+  const token = localToken(storage);
+  if (!token) return {};
+  const prefix = LOCAL_PREFIX + token + "/study/";
+  const result = {};
+  for (const key of keys(storage).filter(k => k.startsWith(prefix))) {
+    let id; try { id = decodeURIComponent(key.slice(prefix.length)); } catch { continue; }
+    const value = readJson(storage, key, null);
+    if (STUDY_KEY.test(id) && value && typeof value === "object" && !Array.isArray(value)) result[id] = value;
+  }
+  return result;
+}
+export function writeLocalStudyRecord(storage, key, value, token) {
+  if (!STUDY_KEY.test(key) || !token || token !== localToken(storage) || !value || typeof value !== "object" || Array.isArray(value)) return false;
+  const serialized = JSON.stringify(value);
+  if (serialized.length > 2_000_000) return false;
+  const path = LOCAL_PREFIX + token + "/study/" + encodeURIComponent(key);
+  const ok = writeJson(storage, path, value);
+  if (token !== localToken(storage)) {
+    try { storage.removeItem(path); } catch { /* génération inactive */ }
+    return false;
+  }
+  return ok;
+}

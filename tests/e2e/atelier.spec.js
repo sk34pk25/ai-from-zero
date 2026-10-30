@@ -46,7 +46,7 @@ test("atelier public : consignes, douze TP et archive autonome", async ({
 
 test("la navigation applique le parcours choisi et le conserve au rechargement", async ({ page }) => {
   await page.goto("/#/lecon/4.14");
-  await expect(page.locator('main a[href="#/lecon/13.1"]').last()).toBeVisible();
+  await expect(page.locator('main a[href="#/lecon/13.3"]').last()).toBeVisible();
   await page.goto("/#/atelier");
   await page.getByLabel("Mon parcours", { exact: true }).selectOption("all");
   await page.goto("/#/lecon/4.14");

@@ -75,16 +75,21 @@ self.onmessage = async (event) => {
   const msg = event.data || {};
   try {
     const python = await ensure();
-    if (msg.files) writeFiles(msg.files);
+    self.postMessage({ type: "booted" });
+    if (msg.files?.length) writeFiles(msg.files);
     if (msg.type === "boot") {
       self.postMessage({ type: "ready" });
       return;
     }
     python.setStdout({ batched: (text) => self.postMessage({ type: "stdout", text: String(text) }) });
     python.setStderr({ batched: (text) => self.postMessage({ type: "stdout", text: String(text) }) });
-    if (msg.type === "run") {
-      const value = await python.runPythonAsync(msg.code || "");
-      self.postMessage({ type: "done", text: value == null ? "" : String(value) });
+    if (msg.type === "run" || msg.type === "exercise") {
+      // L'IDE garde sa session. Un contrôle ne doit jamais réutiliser une ancienne fonction.
+      const namespace = msg.type === "exercise" ? python.runPython('{"__name__": "__exercise__"}') : null;
+      try {
+        const value = await python.runPythonAsync(msg.code || "", namespace ? { globals: namespace, locals: namespace } : undefined);
+        self.postMessage({ type: "done", text: value == null ? "" : String(value) });
+      } finally { namespace?.destroy(); }
       return;
     }
     if (msg.type === "train-init") {
