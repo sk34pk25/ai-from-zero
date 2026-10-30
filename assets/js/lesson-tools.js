@@ -176,7 +176,7 @@ function exercisePanel(exercise, owner) {
       run,
       h(
         "button",
-        { type: "button", onClick: cancel },
+        { type: "button", class: "button button-secondary", onClick: cancel },
         "Arrêter le contrôle",
       ),
       exercise.solution

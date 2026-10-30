@@ -170,7 +170,7 @@ test("le code PKCE ouvre la même page sans être avalé par la route", async ({
   await installOwner(page);
   await page.addInitScript(() => {
     localStorage.setItem(
-      "sb-example-auth-token-code-verifier",
+      "sb-127-auth-token-code-verifier",
       JSON.stringify("verifier-secret/recovery"),
     );
   });
