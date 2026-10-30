@@ -1,5 +1,5 @@
 {
-  "version": "e0c7dce10218",
+  "version": "e2cbcf81b886",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -58,6 +58,10 @@
     "assets/js/storage.js",
     "assets/js/study.js",
     "assets/js/text.js",
+    "assets/js/visual-foundations.js",
+    "assets/js/visual-labs.js",
+    "assets/js/visual-math.js",
+    "assets/js/visual-ui.js",
     "assets/js/visuals.js",
     "assets/js/workspace.js",
     "assets/js/zipstore.js"

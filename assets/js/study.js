@@ -137,9 +137,10 @@ export function learningToolbar() {
     class: "learning-toolbar",
     "aria-label": "Lecture",
   });
-  const mode = h("button", { type: "button" }, "Mode lecture");
+  const mode = h("button", { type: "button", "aria-pressed": "false" }, "Lecture sans distraction");
   mode.onclick = () => {
-    document.body.classList.toggle("reading-mode");
+    const active = document.body.classList.toggle("reading-mode");
+    mode.setAttribute("aria-pressed", String(active));
   };
   const size = h("select", { "aria-label": "Taille du texte" });
   for (const [v, label] of [

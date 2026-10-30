@@ -61,7 +61,7 @@ import {
   writeJson,
 } from "./storage.js";
 import { modifierLabel } from "./text.js";
-import { mountVisual } from "./visuals.js";
+import { mountVisual, hasVisualLab } from "./visuals.js";
 
 const REVIEW_KEY = "afz-review";
 const LESSON_MODE_KEY = "afz-lesson-mode";
@@ -1401,7 +1401,7 @@ function glanceCards(glance) {
 
 function lessonModeControl() {
   return h("div", { class: "lesson-mode", role: "group", "aria-label": "Mode de lecture" }, [
-    h("p", { class: "eyebrow", text: "Mode de lecture" }),
+    h("span", { class: "lesson-mode-label", text: "Lecture" }),
     h("div", { class: "lesson-mode-actions" }, [
       ["guided", "Cours guidé"], ["review", "Révision visuelle"],
     ].map(([mode, label]) => h("button", {
@@ -1415,7 +1415,7 @@ function lessonModeControl() {
         els.main.querySelector(".lesson-deep").open = mode === "guided";
       },
     }, label))),
-    h("p", { class: "muted", text: "Première lecture : comprends l’explication avant le quiz. Pour réviser, replie-la et retrouve les repères visuels." }),
+    h("details", { class: "lesson-mode-help" }, [h("summary", { text: "Quel mode choisir ?" }), h("p", { class: "muted", text: "Cours guidé ouvre l’explication avant le quiz. Révision visuelle la replie ; les schémas et ton travail restent disponibles." })]),
   ]);
 }
 
@@ -1439,7 +1439,7 @@ function glanceIntro(lesson) {
 function glanceExtras(lesson) {
   if (!lesson.glance) return [];
   const nodes = [];
-  if (!STEP_FIGURES.has(lesson.visual || "flow"))
+  if (hasVisualLab(lesson) || !STEP_FIGURES.has(lesson.visual || "flow"))
     nodes.push(h("section", { class: "glance-strip", "aria-labelledby": "glance-steps-title" }, [
       h("h2", { id: "glance-steps-title", class: "glance-label", text: "Pas à pas" }),
       stepsDiagram(lesson.glance.steps),
@@ -1449,13 +1449,13 @@ function glanceExtras(lesson) {
 }
 
 function lessonOverview(lesson) {
-  const stepFigure = STEP_FIGURES.has(lesson.visual || "flow");
+  const stepFigure = !hasVisualLab(lesson) && STEP_FIGURES.has(lesson.visual || "flow");
   return h("div", { class: "lesson-overview", "data-lesson-overview": "true" }, [
-    h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),
     h("figure", { class: stepFigure ? "visual is-steps" : "visual", "data-visual": lesson.visual || "flow" }, [
       h("figcaption", { text: stepFigure ? "Les repères de l'étape." : lesson.visualCaption || "" }),
       h("div", { class: "visual-host", "data-visual-host": "true" }),
     ]),
+    h("div", { "data-glance-intro": "true" }, glanceIntro(lesson)),
     h("div", { "data-glance-extra": "true" }, glanceExtras(lesson)),
   ]);
 }
@@ -1469,7 +1469,7 @@ function refreshLessonOverview() {
   const retryFocused = document.activeElement?.matches("[data-glance-retry]");
   overview.querySelector("[data-glance-intro]").replaceChildren(...glanceIntro(lesson));
   overview.querySelector("[data-glance-extra]").replaceChildren(...glanceExtras(lesson));
-  if (STEP_FIGURES.has(lesson.visual || "flow")) {
+  if (!hasVisualLab(lesson) && STEP_FIGURES.has(lesson.visual || "flow")) {
     const host = overview.querySelector("[data-visual-host]");
     host.replaceChildren();
     mountVisual(host, lesson);

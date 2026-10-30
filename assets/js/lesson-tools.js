@@ -20,7 +20,7 @@ export async function attachLessonTools(main, lessonId, owner) {
     class: "manip-host",
     "data-manip-host": "true",
   });
-  if (mountManipulator(manipHost, lessonId) && visual) {
+  if (!visual?.querySelector("[data-lab]") && mountManipulator(manipHost, lessonId) && visual) {
     const figure = h(
       "figure",
       { class: "manipulator", "data-manipulator": lessonId },
