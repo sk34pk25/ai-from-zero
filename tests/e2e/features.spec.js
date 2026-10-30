@@ -80,17 +80,18 @@ test("la déconnexion referme la session", async ({ page }) => {
   await expect(page.locator("[data-choice='0']")).toBeDisabled();
 });
 
-test("le catalogue, le playground, l'à propos et une figure passent axe", async ({ page }) => {
+test("le catalogue, le playground, une adresse supprimée et une figure passent axe", async ({ page }) => {
   await page.goto("/#/donnees");
   await expect(page.locator("h1")).toHaveText("Catalogue des jeux");
   await page.locator("#size-filter").selectOption("petit");
   await expect(page.locator("article[data-dataset-id='jouet-francais']")).toBeVisible();
   let results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
-  await page.goto("/#/a-propos");
-  await expect(page.locator("h1")).toHaveText("Patrik Skala");
-  await expect(page.locator("main")).toContainText("ENI");
-  await expect(page.locator("main")).toContainText("23 novembre 2026");
+  await page.goto("/?v=18ac980fd6e1#/a-propos");
+  await expect(page.locator("h1")).toHaveText("Cette adresse ne mène nulle part");
+  await expect(page.locator('a[href="#/a-propos"]')).toHaveCount(0);
+  await page.getByRole("link", { name: "Retour à l'accueil", exact: true }).click();
+  await expect(page.locator("h1")).toContainText("architecture");
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
   await page.goto("/#/playground");

@@ -1,5 +1,5 @@
 {
-  "version": "18ac980fd6e1",
+  "version": "d73f45faddd0",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -32,7 +32,6 @@
     "assets/js/local-records.js",
     "assets/js/manipulators.js",
     "assets/js/offline.js",
-    "assets/js/page-about.js",
     "assets/js/page-atelier.js",
     "assets/js/page-connexion.js",
     "assets/js/page-donnees.js",

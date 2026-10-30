@@ -25,7 +25,7 @@ test("les routes hash couvrent l'accueil, un niveau, une leçon et le modèle", 
   assert.deepEqual(parseHash("#/donnees"), { name: "donnees" });
   assert.deepEqual(parseHash("#/playground"), { name: "playground" });
   assert.deepEqual(parseHash("#/ide"), { name: "ide" });
-  assert.equal(hrefFor({ name: "about" }), "#/a-propos");
+  assert.deepEqual(parseHash("#/a-propos"), { name: "notfound", path: "/a-propos" });
   assert.equal(hrefFor({ name: "connexion" }), "#/connexion");
   assert.deepEqual(parseHash("#/changer-mot-de-passe"), { name: "password" });
   assert.equal(hrefFor({ name: "password" }), "#/changer-mot-de-passe");

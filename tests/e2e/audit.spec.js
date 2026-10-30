@@ -18,7 +18,6 @@ const ROUTES = [
   ["/#/connexion", /Compte propriétaire/],
   ["/#/changer-mot-de-passe", /Changer mon mot de passe/],
   ["/#/nouveau-mot-de-passe", /Choisir un nouveau mot de passe/],
-  ["/#/a-propos", /Patrik Skala/],
   ["/#/donnees", /Catalogue des jeux/],
 ];
 
