@@ -51,7 +51,7 @@ test("chaque leçon s'ouvre sans erreur de console", async ({ page }) => {
     await expect(page.locator("[data-visual-host]")).toBeVisible();
     await expect(page.locator(".glance-phrase")).toHaveText(lesson.glance.phrase);
     await expect(page.getByRole("heading", { name: "En image" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Piège" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Piège", exact: true })).toBeVisible();
     await expect(page.locator(".glance-step")).toHaveCount(3);
     await expect(page.locator("details.lesson-deep")).toHaveCount(1);
     await expect(page.locator("details.lesson-deep")).toHaveAttribute("open", "");
