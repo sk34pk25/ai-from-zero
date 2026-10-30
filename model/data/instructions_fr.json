@@ -158,7 +158,7 @@
     {"question": "une question neuve peut échouer", "answer": "oui, le jeu est petit et le modèle aussi"},
     {"question": "cite la page des données", "answer": "la route donnees"},
     {"question": "cite la page du playground", "answer": "la route playground"},
-    {"question": "cite la page à propos", "answer": "la route a-propos"},
+    {"question": "cite la page du parcours", "answer": "la route parcours"},
     {"question": "quel est le format question réponse", "answer": "question deux-points, puis réponse deux-points"},
     {"question": "où écrit-on l'attribution", "answer": "à côté du texte préparé, dans attribution.md"},
     {"question": "qu'est-ce qu'un extrait", "answer": "une partie du texte, pas le fichier entier"},

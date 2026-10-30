@@ -39,7 +39,6 @@ export function parseHash(hash) {
   if (normalized === "/connexion") return { name: "connexion" };
   if (normalized === "/changer-mot-de-passe") return { name: "password" };
   if (normalized === "/nouveau-mot-de-passe") return { name: "recovery" };
-  if (normalized === "/a-propos") return { name: "about" };
   if (normalized === "/donnees") return { name: "donnees" };
   if (normalized === "/positionnement") return { name: "placement" };
   const lesson = normalized.match(LESSON);
@@ -69,8 +68,6 @@ export function hrefFor(route) {
       return "#/changer-mot-de-passe";
     case "recovery":
       return "#/nouveau-mot-de-passe";
-    case "about":
-      return "#/a-propos";
     case "donnees":
       return "#/donnees";
     case "placement":

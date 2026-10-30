@@ -238,7 +238,6 @@ test("captures bureau et mobile, clair et sombre", async ({ page }) => {
     ["donnees-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/donnees"],
     ["playground-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/playground"],
     ["playground-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/playground"],
-    ["propos-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/a-propos"],
     ["ide-bureau-sombre.png", { width: 1440, height: 900 }, "dark", "/#/ide"],
     ["ide-mobile-clair.png", { width: 390, height: 844 }, "light", "/#/ide"],
     ["connexion-bureau-clair.png", { width: 1440, height: 900 }, "light", "/#/connexion"],

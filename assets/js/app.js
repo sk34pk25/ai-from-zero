@@ -1002,12 +1002,6 @@ function paintMain(route, ticket) {
       (mod) => mod.paintPassword(els.main),
     );
   else if (route.name === "recovery") paintRecovery(ticket);
-  else if (route.name === "about")
-    paintAsync(
-      ticket,
-      () => import("./page-about.js"),
-      (mod) => mod.paintAbout(els.main),
-    );
   else if (route.name === "donnees")
     paintAsync(
       ticket,
@@ -1078,7 +1072,6 @@ function pageTitle(route) {
   if (route.name === "connexion") return `Connexion · ${base}`;
   if (route.name === "password") return `Mot de passe · ${base}`;
   if (route.name === "recovery") return `Nouveau mot de passe · ${base}`;
-  if (route.name === "about") return `À propos · ${base}`;
   if (route.name === "donnees") return `Données · ${base}`;
   if (route.name === "placement") return `Positionnement · ${base}`;
   return `${base} — le parcours pour construire la tienne`;
