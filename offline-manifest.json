@@ -1,5 +1,5 @@
 {
-  "version": "7b2ca31c643b",
+  "version": "a30c84676cf8",
   "shell": [
     "offline-manifest.json",
     "index.html",
@@ -20,6 +20,11 @@
     "data/harness-index.json",
     "data/harness-curriculum.json",
     "data/harness-project.json",
+    "harness/README.md",
+    "harness/GUIDE.md",
+    "harness/MODELE.md",
+    "harness/PROJET_FINAL.md",
+    "harness/PERMISSIONS.md",
     "data/harness/h1.1.json",
     "data/harness/h1.2.json",
     "data/harness/h1.3.json",

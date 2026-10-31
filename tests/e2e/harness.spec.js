@@ -148,7 +148,12 @@ test.describe('Lecture hors connexion du harness',()=>{
  test('le programme, les leçons et les guides sont disponibles après installation',async({page,context})=>{
   await page.goto('/#/harness');
   test.skip(!await page.evaluate(()=> 'serviceWorker' in navigator),'Service worker absent');
-  await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
+  const cachedGuides=await page.evaluate(async()=>{
+   await navigator.serviceWorker.ready;
+   const paths=['README.md','GUIDE.md','MODELE.md','PERMISSIONS.md','PROJET_FINAL.md'];
+   return Promise.all(paths.map(async name=>!!await caches.match(new URL('harness/'+name,document.baseURI).href)));
+  });
+  expect(cachedGuides).toEqual([true,true,true,true,true]);
   await page.reload();await context.setOffline(true);
   await page.goto('/#/harness/lecon/h6.3');
   await expect(page.locator('[data-harness-lesson=h6\\.3]')).toBeVisible();

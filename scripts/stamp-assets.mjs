@@ -33,6 +33,7 @@ export function assetHash() {
   for (const file of [
     ...assetFiles(),
     "sw.js",
+    "scripts/stamp-assets.mjs",
     "manifest.webmanifest",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
     ...JSON.parse(readFileSync(join(root, "data/harness-project.json"), "utf8")).files,
@@ -179,6 +180,7 @@ function stamp() {
     "data/harness-index.json",
     "data/harness-curriculum.json",
     "data/harness-project.json",
+    ...JSON.parse(readFileSync(join(root, "data/harness-project.json"), "utf8")).documents,
     ...readdirSync(join(root, "data/harness")).filter(p=>p.endsWith('.json')).map(p=>`data/harness/${p}`),
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
   ];
