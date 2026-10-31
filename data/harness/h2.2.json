@@ -1,0 +1,51 @@
+{
+  "id": "h2.2",
+  "title": "Calculer sans exécuter du code libre",
+  "minutes": 30,
+  "objectives": [
+    "Lire un arbre syntaxique",
+    "Autoriser seulement quelques opérations",
+    "Borner la taille du calcul"
+  ],
+  "prerequisites": [
+    "h2.1",
+    "0.16"
+  ],
+  "vocabulary": {
+    "AST": "Arbre des opérations décrit par une expression.",
+    "Liste blanche": "Nœuds et opérations explicitement acceptés.",
+    "Budget": "Limite de longueur, de complexité ou de valeur."
+  },
+  "why": "Une calculatrice ne doit pas devenir un interpréteur Python général. Le texte d’un modèle reste une entrée à contrôler.",
+  "explanation": "ast.parse transforme 2+3*4 en un arbre. Notre visiteur accepte les nombres réels, les signes et quelques opérations arithmétiques. Il rejette les appels de fonction, attributs, noms et valeurs booléennes. Il n’utilise jamais eval.\n\nLa correction limite aussi la longueur de l’expression, le nombre de nœuds, l’exposant et la taille des résultats intermédiaires. Ces contraintes évitent qu’une expression valide demande un calcul disproportionné. Une division par zéro est une observation d’erreur, pas un résultat inventé.\n\nTeste un cas numérique indépendant et un cas hostile. Un calcul qui renvoie 14 pour 2+3*4 mais accepte __import__ ne remplit pas le contrat.",
+  "code": "from harness.correction import calculate\nassert calculate('2+3*4')==14\nfor raw in ['1/0','2**1000','__import__(\"os\")']:\n    try:calculate(raw)\n    except ValueError:print('refus',raw)",
+  "lab": "calculation",
+  "exercise": {
+    "prompt": "Écris une mini-calculatrice AST pour les nombres, +, − et *. Tout autre nœud est refusé.",
+    "starter": "def petit_calcul(raw):\n    raise NotImplementedError('À compléter')",
+    "solution": "def petit_calcul(raw):\n    import ast\n    if len(raw)>100:raise ValueError('trop long')\n    def visiter(n):\n        if isinstance(n,ast.Constant) and type(n.value) in (int,float):return n.value\n        if isinstance(n,ast.BinOp) and type(n.op) in (ast.Add,ast.Sub,ast.Mult):\n            a,b=visiter(n.left),visiter(n.right)\n            return a+b if isinstance(n.op,ast.Add) else a-b if isinstance(n.op,ast.Sub) else a*b\n        raise ValueError('noeud interdit')\n    return visiter(ast.parse(raw,mode='eval').body)",
+    "check": "assert petit_calcul('2+3*4')==14\nassert petit_calcul('7-9')==-2\nfor raw in ['abs(2)','True+1','2**3']:\n    try:petit_calcul(raw)\n    except ValueError:pass\n    else:raise AssertionError('noeud interdit accepté')",
+    "validatorVersion": "fca14994a10813590dbb00fbea474d994fcb6a2e7b7f082831b3e2686457f2d9"
+  },
+  "hints": [
+    "La multiplication se trouve plus bas dans l’arbre de 2+3*4.",
+    "bool hérite de int : utilise type(valeur) pour le distinguer."
+  ],
+  "transfer": "Pourquoi une limite sur la longueur seule ne suffit-elle pas à rendre 9**999999 acceptable ?",
+  "quiz": {
+    "question": "Quel texte doit être refusé par la calculatrice limitée ?",
+    "choices": [
+      "2+3*4",
+      "abs(-3)",
+      "(7-2)*3",
+      "10-12"
+    ],
+    "answer": 1,
+    "explanation": "Un appel de fonction sort du petit langage arithmétique autorisé, même si cette fonction paraît inoffensive.",
+    "version": "c55976496e1b56cda64c05fd7d058591fd835675a6f95a4c163c321863ed2b54"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "calculate"
+  }
+}

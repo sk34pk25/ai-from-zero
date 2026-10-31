@@ -1832,3 +1832,38 @@ main[tabindex="-1"]:focus { outline: none; }
   .assessment-workspace button { width: 100%; margin-inline: 0; }
   .assessment-review { padding-inline: .6rem; }
 }
+
+/* Le harness prolonge le modèle, avec son suivi de lecture et ses preuves distinctes. */
+.side-harness { margin-block: .5rem 1rem; white-space: normal; }
+.harness-hero { margin-bottom: 1.5rem; }
+.harness-modules { display: grid; gap: 1.2rem; margin-block: 1.2rem; }
+.harness-module { scroll-margin-top: calc(var(--header) + 1rem); }
+.harness-lesson > .sheet, .harness-lesson > section { margin-block: 1.2rem; }
+.harness-lesson pre { max-height: 32rem; background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 1rem; }
+.harness-lesson textarea { width: 100%; max-width: 100%; min-width: 0; padding: .7rem; background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 10px; }
+.harness-lesson label, .harness-search, .harness-project > label { display: grid; gap: .5rem; margin-block: 1rem; }
+.harness-project select, .harness-search input, .harness-lab select, .harness-lab input[type="search"] { width: 100%; min-width: 0; max-width: 100%; min-height: 44px; padding: .5rem; background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 8px; }
+.harness-project button, .harness-lesson button { margin-block: .3rem; }
+.harness-vocabulary dt { font-weight: 700; margin-top: .7rem; }
+.harness-vocabulary dd { margin: .2rem 0 .6rem; color: var(--muted); }
+.harness-flow { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .6rem; }
+.harness-flow li { min-width: 0; }
+.harness-node { display: grid; width: 100%; min-height: 5rem; gap: .2rem; text-align: left; padding: .7rem; border: 1px solid var(--line-strong); border-radius: 12px; color: var(--ink); background: var(--bg); }
+.harness-flow .is-active .harness-node { border: 2px solid var(--accent); background: var(--accent-soft); }
+.harness-cells { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: .5rem; }
+.harness-cells > div { display: grid; padding: .7rem; border: 1px solid var(--line); border-radius: 8px; overflow-wrap: anywhere; }
+.harness-cells .is-kept { background: var(--accent-soft); border-color: var(--accent); }
+.harness-cells .is-muted { background: var(--bg); color: var(--muted); }
+.harness-range { display: grid; grid-template-columns: minmax(0, 1fr) 3rem; align-items: center; gap: .5rem; }
+.harness-range input { grid-row: 2; width: 100%; }
+.harness-lab-controls { display: flex; flex-wrap: wrap; gap: 1rem; }
+.harness-lab-controls > label { flex: 1 1 12rem; min-width: 0; }
+.harness-lab-controls .checkpoint-criterion { display: flex; }
+.harness-project .rendered-guide { margin-top: 1rem; }
+.harness-project .rendered-guide pre { max-height: 30rem; }
+@media (max-width: 480px) {
+  .harness-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .harness-node { min-height: 5.5rem; padding: .5rem; font-size: .95rem; }
+  .harness-lesson .button, .harness-project > .button { width: 100%; white-space: normal; }
+  .harness-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "h8.2",
+  "title": "Une passerelle locale authentifiée",
+  "minutes": 30,
+  "objectives": [
+    "Distinguer API de modèle et API d’agent",
+    "Authentifier et borner la requête",
+    "Dédupliquer un appel client identifié"
+  ],
+  "prerequisites": [
+    "h8.1",
+    "h6.2"
+  ],
+  "vocabulary": {
+    "Passerelle": "Point d’entrée qui reçoit une tâche et appelle le harness.",
+    "Jeton Bearer": "Secret transmis dans l’en-tête d’authentification.",
+    "Clé d’idempotence": "Identifiant client qui lie une requête à son résultat."
+  },
+  "why": "Un autre programme peut vouloir soumettre une tâche à ton agent. Il faut définir cette interface aussi précisément que celle des outils.",
+  "explanation": "passerelle.py écoute uniquement sur 127.0.0.1 et attend un jeton local de trente-deux caractères au minimum, lu dans HARNESS_TOKEN. POST /run accepte exactement une tâche. Les corps trop longs, les origines web et les requêtes concurrentes sont refusés.\n\nIdempotency-Key réutilise le résultat d’une même tâche dans le processus courant ; une clé associée à une autre tâche est refusée. Ce cache limité à cent entrées est en mémoire, pas un mécanisme durable de distribution. La passerelle garde les outils en lecture seule et ne peut pas approuver une création.\n\nL’API du modèle reçoit un prompt et génère du texte. L’API d’agent reçoit une tâche et renvoie une trace de travail. Un déploiement public demanderait une authentification et une isolation supplémentaires ; le projet fourni reste une passerelle locale.",
+  "code": "from harness.correction import validate_request\ntask=validate_request({'task':'Calcule 3*7.'})\nassert task=='Calcule 3*7.'\nprint('La passerelle n’interprète aucun champ de permission.')",
+  "lab": "gateway",
+  "exercise": {
+    "prompt": "Compare deux clés d’idempotence : la même clé n’est réutilisable que pour la même tâche.",
+    "starter": "def rejeu_client(cache, cle, tache):\n    raise NotImplementedError('À compléter')",
+    "solution": "def rejeu_client(cache, cle, tache):\n    if cle not in cache:return None\n    ancienne,resultat=cache[cle]\n    if ancienne!=tache:raise ValueError('clé contradictoire')\n    return resultat",
+    "check": "cache={'a':('tâche 1',{'status':'finished'})}\nassert rejeu_client(cache,'a','tâche 1')=={'status':'finished'}\nassert rejeu_client(cache,'b','tâche 2') is None\ntry:rejeu_client(cache,'a','autre tâche')\nexcept ValueError:pass\nelse:raise AssertionError('rejeu contradictoire')",
+    "validatorVersion": "bb5c7e135dfa9aa48fb2782fcc3b3c406aa83762454f45e0bcaba7607db34319"
+  },
+  "hints": [
+    "Une clé seule n’identifie pas le contenu.",
+    "Le cache de la démonstration ne survit pas à un redémarrage."
+  ],
+  "transfer": "Pourquoi le jeton doit-il rester dans un en-tête et une variable d’environnement plutôt que dans l’URL ou le prompt ?",
+  "quiz": {
+    "question": "La passerelle fournie est conçue pour…",
+    "choices": [
+      "Être exposée publiquement sans configuration",
+      "Recevoir localement des tâches authentifiées et bornées",
+      "Écouter sur toutes les interfaces par défaut",
+      "Approuver les écritures depuis un navigateur"
+    ],
+    "answer": 1,
+    "explanation": "La boucle locale garde une frontière simple. Une exposition à d’autres machines constitue un autre travail de déploiement.",
+    "version": "dc42fee0212e35e8570ad4e70cdd5b8550764ac6a92102201dbc5a9a9e103a7e"
+  },
+  "reference": {
+    "file": "harness/passerelle.py",
+    "symbol": "server"
+  }
+}

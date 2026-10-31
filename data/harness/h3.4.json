@@ -1,0 +1,51 @@
+{
+  "id": "h3.4",
+  "title": "Reprendre sans doubler un effet",
+  "minutes": 40,
+  "objectives": [
+    "Associer identité et arguments d’une action",
+    "Réutiliser un résultat déjà connu",
+    "Reconnaître un effet incertain après panne"
+  ],
+  "prerequisites": [
+    "h3.3",
+    "h2.4"
+  ],
+  "vocabulary": {
+    "Idempotence": "Un rejeu identifié ne reproduit pas un effet déjà connu.",
+    "Ledger": "Registre des appels et résultats par identifiant.",
+    "Réconciliation": "Examen de l’état réel quand une panne empêche de conclure."
+  },
+  "why": "Rejouer automatiquement une création après une panne peut produire un doublon. La reprise doit connaître ce qui a été demandé et ce qui est confirmé.",
+  "explanation": "call_key calcule une empreinte du nom et des arguments canoniques. Le ledger associe call_id à cette empreinte et à l’observation. Le même identifiant avec les mêmes arguments réutilise le résultat ; le même identifiant avec d’autres arguments est refusé.\n\nL’état est enregistré avant l’effet avec pending.started=true, puis après son résultat. Une panne entre les deux rend une écriture incertaine. Le moteur s’arrête avec uncertain_effect au lieu de la rejouer. Une lecture peut être retentée en conservant son budget.\n\nUne demande d’approbation n’a encore produit aucun effet. Elle peut donc être reprise, puis examinée par la personne. Les budgets déjà consommés restent dans l’état, et un changement de code, de permissions ou de modèle exige une nouvelle session.",
+  "code": "from harness.correction import call_key\na={'name':'calculer','arguments':{'expression':'2+3'},'id':'a'}\nb={**a,'id':'b'}\nassert call_key(a)==call_key(b)\nprint(call_key(a)[:12])",
+  "lab": "replay",
+  "exercise": {
+    "prompt": "Fabrique une clé stable à partir du nom et des arguments, indépendante de l’ordre des clés du dictionnaire et du call_id.",
+    "starter": "def cle_action(action):\n    raise NotImplementedError('À compléter')",
+    "solution": "def cle_action(action):\n    import json,hashlib\n    raw=json.dumps({'name':action['name'],'arguments':action['arguments']},sort_keys=True,ensure_ascii=False)\n    return hashlib.sha256(raw.encode()).hexdigest()",
+    "check": "a={'id':'a','name':'x','arguments':{'p':1,'q':2}}\nb={'id':'b','arguments':{'q':2,'p':1},'name':'x'}\nassert cle_action(a)==cle_action(b)\nassert cle_action(a)!=cle_action({**a,'arguments':{'p':3,'q':2}})\nassert len(cle_action(a))==64",
+    "validatorVersion": "a6afc925f769fd84e34a12073eed317c7b91f09cb25fe57a3e53573e22c5551e"
+  },
+  "hints": [
+    "Le JSON canonique trie les clés.",
+    "Une clé identique ne prouve pas à elle seule que l’effet est terminé : il faut le ledger."
+  ],
+  "transfer": "Le journal montre tool_started pour une écriture, sans tool_finished. Pourquoi ne faut-il pas conclure automatiquement « rien n’a été écrit » ?",
+  "quiz": {
+    "question": "Un identifiant d’appel réutilisé avec un contenu différent doit…",
+    "choices": [
+      "Remplacer silencieusement le résultat précédent",
+      "Être exécuté deux fois pour comparer",
+      "Rester accepté si le nom de l’outil est identique",
+      "Être refusé comme une contradiction"
+    ],
+    "answer": 3,
+    "explanation": "Un identifiant désigne une proposition précise. Le réutiliser avec d’autres arguments détruirait la preuve de ce qui a été exécuté.",
+    "version": "f25b41c51c3f07e2db780d9aad83e53bd8fafa16fe8025128241aa9c341257ec"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "call_key"
+  }
+}

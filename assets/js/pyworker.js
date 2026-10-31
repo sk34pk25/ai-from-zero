@@ -40,7 +40,7 @@ import sys
 if "/course" not in sys.path:
     sys.path.insert(0, "/course")
 for name in list(sys.modules):
-    if name == "model" or name.startswith("model."):
+    if name == "model" or name.startswith("model.") or name == "harness" or name.startswith("harness."):
         del sys.modules[name]
 `);
 }

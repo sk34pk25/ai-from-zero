@@ -1,0 +1,51 @@
+{
+  "id": "h8.1",
+  "title": "Une CLI qui montre ce qu’elle fait",
+  "minutes": 30,
+  "objectives": [
+    "Choisir le module élève et le fournisseur",
+    "Conserver session, budgets et rapport",
+    "Examiner chaque création proposée"
+  ],
+  "prerequisites": [
+    "h7.4",
+    "0.3"
+  ],
+  "vocabulary": {
+    "CLI": "Interface en ligne de commande.",
+    "Configuration": "Paramètres choisis par l’opérateur avant l’exécution.",
+    "Code de retour": "Indication de fin exploitable par un autre programme."
+  },
+  "why": "Le projet devient un outil lorsque tu peux le lancer, comprendre son statut, arrêter et reprendre son travail sans modifier son code à chaque fois.",
+  "explanation": "La CLI démarre avec le module eleve. Les fonctions non construites produisent un message TP incomplet. --module correction sert à contrôler la référence. --demo choisit une fixture ; --endpoint ou --repo avec --checkpoint choisit une origine réelle du modèle.\n\nLes chemins workspace et state-db sont distincts. --session identifie une tâche et --resume reprend son état compatible. --out crée un rapport neuf sans écraser un fichier existant. Le statut finished signifie que le protocole a conclu ; l’évaluation vérifie encore le résultat.\n\nPour les créations, --allow-write ouvre une proposition suivie d’une confirmation précise. Les commandes terminal proposées par l’outil diagnostic restent des presets fixes : aucune commande shell libre n’est exposée. Documente toute extension de cette frontière avant son utilisation.",
+  "code": "from harness.cli import demo\nfrom harness import correction as f\na=f.parse_action(demo('calcul').complete([],[],1))\nassert a['name']=='calculer'\nprint(a['arguments'])",
+  "lab": "loop",
+  "exercise": {
+    "prompt": "Valide une requête contenant seulement une tâche textuelle non vide, sans accepter un champ qui élargit les permissions.",
+    "starter": "def lire_requete(row):\n    raise NotImplementedError('À compléter')",
+    "solution": "def lire_requete(row):\n    if not isinstance(row,dict) or set(row)!={'task'} or not isinstance(row['task'],str) or not 1<=len(row['task'].strip())<=4000:raise ValueError('requête invalide')\n    return row['task'].strip()",
+    "check": "assert lire_requete({'task':'  tester '})=='tester'\nfor row in [{'task':''},{'task':'x','allow_write':True},{'task':4}]:\n    try:lire_requete(row)\n    except ValueError:pass\n    else:raise AssertionError('requête invalide acceptée')",
+    "validatorVersion": "167e2fde24572c2adaa3762a83fee4bedd5f441c26400e9d662a91e9f3d8cad9"
+  },
+  "hints": [
+    "Les droits viennent de la configuration, pas des champs du client.",
+    "Le texte de tâche est limité avant le premier appel."
+  ],
+  "transfer": "Explique la différence entre --module correction, --demo calcul et --checkpoint dans une remise de projet.",
+  "quiz": {
+    "question": "Le module correction dans la CLI sert à…",
+    "choices": [
+      "Contrôler une implémentation de référence identifiée",
+      "Attester automatiquement le travail personnel",
+      "Entraîner le modèle en arrière-plan",
+      "Activer toutes les permissions du système"
+    ],
+    "answer": 0,
+    "explanation": "La référence aide à comparer et diagnostiquer. Le dossier doit identifier le module réellement exécuté.",
+    "version": "5cd56979c360b846582ff5a8799be56e73d98b2c70d3dff139d448572d2571d1"
+  },
+  "reference": {
+    "file": "harness/cli.py",
+    "symbol": "main"
+  }
+}

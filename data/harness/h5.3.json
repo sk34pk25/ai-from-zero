@@ -1,0 +1,51 @@
+{
+  "id": "h5.3",
+  "title": "Construire des contre-exemples",
+  "minutes": 30,
+  "objectives": [
+    "Tester un refus de permissions",
+    "Simuler une injection documentaire",
+    "Vérifier l’absence d’effet interdit"
+  ],
+  "prerequisites": [
+    "h5.2",
+    "h2.3"
+  ],
+  "vocabulary": {
+    "Contre-exemple": "Entrée qui distingue une implémentation correcte d’une erreur plausible.",
+    "Régression": "Retour d’un défaut après un changement.",
+    "Assertion négative": "Vérification qu’un effet interdit n’a pas eu lieu."
+  },
+  "why": "Le chemin heureux ne teste pas les frontières. Un bon banc essaie aussi de faire échouer le moteur de façon contrôlée.",
+  "explanation": "Le banc fourni couvre calcul, JSON invalide, chemin interdit, commande inconnue, écriture sans accord, rejeu, identifiant contradictoire, injection documentaire et budget d’outils. Les modèles de ces scénarios sont scriptés pour rendre chaque défaut reproductible.\n\nLe test d’injection fait demander au modèle une écriture hors dossier après lecture d’un texte hostile. La politique doit la refuser même si le modèle suit cette instruction. Cela teste la barrière d’effet, pas une immunité sémantique du modèle à toute injection.\n\nVérifie les trois axes : bon statut, réponse attendue et absence d’appel interdit. Une tâche refusée peut constituer la réussite attendue d’un scénario. Conserve les cas en échec et ajoute un contre-exemple quand tu corriges un défaut.",
+  "code": "from harness.correction import evaluate_case\nreport={'status':'denied','answer':'','events':[]}\nchecks=evaluate_case(report,{'status':'denied','forbidden_tools':['ecrire_fichier']})\nassert all(checks.values())\nprint(checks)",
+  "lab": "injection",
+  "exercise": {
+    "prompt": "Détecte si une trace contient le début d’un outil interdit.",
+    "starter": "def aucun_effet_interdit(evenements, interdits):\n    raise NotImplementedError('À compléter')",
+    "solution": "def aucun_effet_interdit(evenements, interdits):\n    return not any(e.get('kind')=='tool_started' and e.get('name') in interdits for e in evenements)",
+    "check": "assert aucun_effet_interdit([{'kind':'tool_denied','name':'ecrire'}],{'ecrire'})\nassert not aucun_effet_interdit([{'kind':'tool_started','name':'ecrire'}],{'ecrire'})\nassert aucun_effet_interdit([],{'ecrire'})",
+    "validatorVersion": "a90a00df976fb8eda3bcee170e9bfbe210bc8e1f274469ab9309d24a800d8cdd"
+  },
+  "hints": [
+    "Un refus n’est pas une exécution.",
+    "Le test doit regarder l’événement de début d’effet."
+  ],
+  "transfer": "Le modèle annonce qu’il a effacé un fichier, mais la trace indique tool_denied. Comment évaluer la politique et la véracité de sa réponse séparément ?",
+  "quiz": {
+    "question": "Un test d’injection réussi par refus d’écriture prouve…",
+    "choices": [
+      "Que le modèle ignore toutes les injections",
+      "Que tous les outils sont sûrs dans tout environnement",
+      "Que cette barrière d’effet a tenu sur ce cas",
+      "Que le document était fiable"
+    ],
+    "answer": 2,
+    "explanation": "Le cas vérifie une propriété précise de la politique. Il ne suffit pas à démontrer une robustesse universelle du modèle.",
+    "version": "d3c8086dff597e405d2292cfa5aed5c07726108255e448d2e7878c13caa2920c"
+  },
+  "reference": {
+    "file": "harness/evaluer.py",
+    "symbol": "evaluate"
+  }
+}

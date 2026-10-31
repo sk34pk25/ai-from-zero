@@ -1,0 +1,3 @@
+# Le harness de base utilise seulement la bibliothèque standard Python 3.12+.
+# L'entraînement et le checkpoint du cours demandent NumPy :
+numpy==2.3.5

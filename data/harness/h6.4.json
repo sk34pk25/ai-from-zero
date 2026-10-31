@@ -1,0 +1,52 @@
+{
+  "id": "h6.4",
+  "title": "Comparer des capacités sur des cas réservés",
+  "minutes": 40,
+  "objectives": [
+    "Apparier les mêmes graines et tâches",
+    "Séparer protocole et succès réel",
+    "Documenter les coûts et limites"
+  ],
+  "prerequisites": [
+    "h6.3",
+    "5.10",
+    "12.11"
+  ],
+  "vocabulary": {
+    "Appariement": "Comparaison des mêmes cas et graines dans les deux variantes.",
+    "Test réservé": "Ensemble non utilisé pour choisir la configuration.",
+    "Coût": "Temps, appels, contexte et ressources réellement mesurés."
+  },
+  "why": "Un joli exemple après entraînement ne suffit pas à choisir un contrôleur. Les comparaisons doivent conserver leurs cas et leurs limites.",
+  "explanation": "Commence par la sonde, puis les tâches de bout en bout dans un workspace neuf. Pour une variante de prompt ou d’entraînement, garde les mêmes familles réservées et les mêmes graines. Rapporte les écarts par graine avant leur moyenne.\n\nLe banc déterministe du harness reste utile pour détecter une régression de code. Il ne remplace pas les essais du modèle réel. Un fournisseur plus capable peut servir de comparaison locale, avec son nom, ses poids, ses réglages et son coût, sans lui attribuer les succès de ton checkpoint.\n\nLe choix de configuration se fait sur validation. Le test final s’ouvre ensuite et ses échecs sont conservés. Pour le projet final, demande aussi une explication sur un cas différent : identifier l’erreur, prédire une trace et montrer la limite observée.",
+  "code": "from harness.correction import paired_delta\na=[{'seed':1,'score':.5},{'seed':2,'score':.7}]\nb=[{'seed':2,'score':.8},{'seed':1,'score':.6}]\nprint(paired_delta(a,b))",
+  "lab": "evaluation",
+  "exercise": {
+    "prompt": "Calcule variante − référence par graine, dans l’ordre croissant, en refusant des graines non appariées.",
+    "starter": "def ecarts_graines(base, variante):\n    raise NotImplementedError('À compléter')",
+    "solution": "def ecarts_graines(base, variante):\n    a={r['seed']:r['score'] for r in base};b={r['seed']:r['score'] for r in variante}\n    if set(a)!=set(b) or not a:raise ValueError('graines non appariées')\n    return [b[k]-a[k] for k in sorted(a)]",
+    "check": "a=[{'seed':1,'score':2},{'seed':2,'score':5}];b=[{'seed':2,'score':4},{'seed':1,'score':4}]\nassert ecarts_graines(a,b)==[2,-1]\ntry:ecarts_graines(a,[{'seed':3,'score':4}])\nexcept ValueError:pass\nelse:raise AssertionError('graines différentes acceptées')",
+    "validatorVersion": "368cd406518b9329cb2a6de5e1c458fe3f25bbd99197857083f9b01ed723a3d2"
+  },
+  "hints": [
+    "L’ordre des lignes ne suffit pas à apparier des essais.",
+    "Un même identifiant de graine doit désigner le même protocole."
+  ],
+  "transfer": "Deux variantes ont le même taux de succès ; l’une utilise deux fois plus d’outils. Quelles données faut-il montrer avant de choisir ?",
+  "quiz": {
+    "question": "Pour choisir la variante avant le test final, on utilise…",
+    "choices": [
+      "Le meilleur exemple généré au hasard",
+      "Le test final après chaque essai",
+      "Uniquement la longueur des réponses",
+      "La validation selon un protocole fixé"
+    ],
+    "answer": 3,
+    "explanation": "Le test final reste réservé. Les succès, échecs et coûts se rapportent au même protocole.",
+    "version": "15e0e3d8659ba7cb9ee40aa081e40ec979ae631f33b2348f7cd3a46151ff2f5c"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "paired_delta"
+  }
+}

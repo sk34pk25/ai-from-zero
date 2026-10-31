@@ -1,0 +1,50 @@
+{
+  "id": "h1.1",
+  "title": "Ce qui décide, ce qui exécute",
+  "minutes": 30,
+  "objectives": [
+    "Séparer les rôles du modèle et du moteur",
+    "Suivre un appel d’outil jusqu’à son résultat",
+    "Reconnaître une démonstration scriptée"
+  ],
+  "prerequisites": [
+    "12.12"
+  ],
+  "vocabulary": {
+    "Modèle": "Prédit une suite à partir d’un contexte.",
+    "Harness": "Organise les appels, l’état, les outils et les contrôles.",
+    "Outil": "Fonction dont le code produit un effet ou une observation."
+  },
+  "why": "Après le checkpoint, il manque un programme qui fasse agir le modèle. La réponse « je vais calculer » ne réalise aucun calcul. Cette étape pose les trois acteurs que tu vas coder.",
+  "explanation": "Le modèle propose une action. Le harness lit cette proposition, vérifie son format et ses permissions, puis appelle une fonction précise. L’outil calcule et renvoie une observation. Le modèle peut ensuite produire une réponse finale.\n\nDans notre premier essai, ScriptedModel fournit deux réponses écrites à l’avance. Cela permet de tester le câblage sans entraîner de modèle ni payer une API. Le résultat prouve que la boucle fonctionne sur ce scénario ; il ne mesure pas une autonomie neuronale. Plus tard, tu remplaceras cette fixture par ton checkpoint et tu mesureras les erreurs de protocole séparément.\n\nDessine trois colonnes : proposition, décision du moteur et effet réel. Une phrase du modèle n’appartient jamais à la colonne des effets tant qu’un outil n’a pas été exécuté.",
+  "code": "from harness.modeles import ScriptedModel\nm = ScriptedModel([{'type':'final','text':'bonjour'}])\nprint(m.complete([], [], 1))\nprint(m.label)",
+  "lab": "loop",
+  "exercise": {
+    "prompt": "Classe les trois événements proposer, vérifier et exécuter dans leur composant.",
+    "starter": "def composant(evenement):\n    raise NotImplementedError('À compléter')",
+    "solution": "def composant(evenement):\n    return {'proposer':'modele','verifier':'harness','executer':'outil'}[evenement]",
+    "check": "assert composant('proposer')=='modele'\nassert composant('verifier')=='harness'\nassert composant('executer')=='outil'",
+    "validatorVersion": "52d5b20fe70681545fdb43f889c4c721796b33052c216817cc1946194a245f9b"
+  },
+  "hints": [
+    "Le modèle ne reçoit pas les droits du système.",
+    "Le moteur appelle une fonction après contrôle."
+  ],
+  "transfer": "Explique qui a réellement produit 36 dans une trace où le modèle demande (8+4)*3. Cite la preuve d’exécution.",
+  "quiz": {
+    "question": "Qu’est-ce qui prouve que le calcul a réellement eu lieu ?",
+    "choices": [
+      "Un événement d’outil avec son résultat",
+      "Le modèle annonce son intention",
+      "La longueur de la réponse finale",
+      "Le nombre de paramètres du modèle"
+    ],
+    "answer": 0,
+    "explanation": "Une intention textuelle ne produit aucun effet. La trace doit montrer l’appel et l’observation correspondante.",
+    "version": "9636b5324a05c71fdcddde5a26981cd53fd768be3aa7645ea628b5965fbe76a0"
+  },
+  "reference": {
+    "file": "harness/coeur.py",
+    "symbol": "Runner.run"
+  }
+}

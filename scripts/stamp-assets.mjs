@@ -33,8 +33,11 @@ export function assetHash() {
   for (const file of [
     ...assetFiles(),
     "sw.js",
+    "scripts/stamp-assets.mjs",
     "manifest.webmanifest",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
+    ...JSON.parse(readFileSync(join(root, "data/harness-project.json"), "utf8")).files,
+    ...readdirSync(join(root, "data/harness")).filter(p=>p.endsWith('.json')).map(p=>`data/harness/${p}`),
     ...readdirSync(join(root, "data"))
       .filter((p) => p.endsWith(".json") && !p.endsWith("browser.json"))
       .map((p) => `data/${p}`),
@@ -174,6 +177,11 @@ function stamp() {
     "data/glossary-core.json",
     "data/transfer-tasks.json",
     "data/capabilities.json",
+    "data/harness-index.json",
+    "data/harness-curriculum.json",
+    "data/harness-project.json",
+    ...JSON.parse(readFileSync(join(root, "data/harness-project.json"), "utf8")).documents,
+    ...readdirSync(join(root, "data/harness")).filter(p=>p.endsWith('.json')).map(p=>`data/harness/${p}`),
     ...assetFiles().filter((p) => !p.startsWith("assets/vendor/")),
   ];
   const course = [
@@ -191,6 +199,7 @@ function stamp() {
     "data/benchmark_modern_run.json",
     "data/benchmark_literature_protocol.json",
     ...JSON.parse(readFileSync(join(root, "data/atelier.json"), "utf8")).files,
+    ...JSON.parse(readFileSync(join(root, "data/harness-project.json"), "utf8")).files,
     "model/manifest.json",
     ...readdirSync(join(root, "model"))
       .filter((p) => p.endsWith(".py"))

@@ -1,0 +1,51 @@
+{
+  "id": "h1.3",
+  "title": "Un protocole JSON strict",
+  "minutes": 30,
+  "objectives": [
+    "Définir action et réponse finale",
+    "Refuser les champs et clés ambigus",
+    "Séparer parsing et permissions"
+  ],
+  "prerequisites": [
+    "h1.2",
+    "0.12"
+  ],
+  "vocabulary": {
+    "Schéma": "Structure attendue, types et champs autorisés.",
+    "Parsing": "Transformation du texte en objet structuré.",
+    "Contrat": "Règles que la réponse doit respecter avant son utilisation."
+  },
+  "why": "Le moteur ne doit pas chercher approximativement un nom d’outil dans une phrase. Un contrat strict rend les erreurs visibles et testables.",
+  "explanation": "Une action tool contient exactement type, id, name et arguments. Une réponse final contient exactement type et text. L’identifiant relie l’observation à la proposition. Le parseur refuse les blocs Markdown, les tableaux à la place d’un objet, les clés dupliquées et les nombres non finis.\n\nJSON valide ne signifie pas action autorisée : {\"name\":\"supprimer_tout\"} peut être syntaxiquement correct. Le registre et les permissions arrivent après. Évite de réparer silencieusement une réponse ambiguë : tu risquerais d’exécuter une autre action que celle réellement exprimée.\n\nPour diagnostiquer une erreur, conserve le type de refus et demande une nouvelle réponse dans le contrat. Le nombre de nouvelles tentatives reste borné. Aucun appel d’outil n’est lancé tant que le contrat n’est pas satisfait.",
+  "code": "from harness.correction import parse_action\na=parse_action('{\"type\":\"final\",\"text\":\"prêt\"}')\nassert a['text']=='prêt'\ntry: parse_action('```json {} ```')\nexcept ValueError as e: print(type(e).__name__)",
+  "lab": "protocol",
+  "exercise": {
+    "prompt": "Valide une réponse finale JSON : exactement type=final et text non vide. Refuse une clé dupliquée.",
+    "starter": "def lire_final(raw):\n    raise NotImplementedError('À compléter')",
+    "solution": "def lire_final(raw):\n    import json\n    def paires(rows):\n        result={}\n        for k,v in rows:\n            if k in result: raise ValueError('doublon')\n            result[k]=v\n        return result\n    value=json.loads(raw,object_pairs_hook=paires)\n    if not isinstance(value,dict) or set(value)!={'type','text'} or value['type']!='final' or not isinstance(value['text'],str) or not value['text'].strip():\n        raise ValueError('final invalide')\n    return value['text']",
+    "check": "assert lire_final('{\"type\":\"final\",\"text\":\"5\"}')=='5'\nfor raw in ['[]','{\"type\":\"final\",\"text\":\"\"}','{\"type\":\"final\",\"text\":\"x\",\"text\":\"y\"}']:\n    try:lire_final(raw)\n    except ValueError:pass\n    else:raise AssertionError('contrat invalide accepté')",
+    "validatorVersion": "3a2ffda31d0443e9a3b8710e54a6fadd2971490f0e7d1198885cb4170479ca86"
+  },
+  "hints": [
+    "json.loads seul accepte habituellement les clés dupliquées.",
+    "Compare l’ensemble exact des clés attendues."
+  ],
+  "transfer": "Propose un JSON syntaxiquement valide qui doit pourtant être refusé par le registre. Explique les deux contrôles.",
+  "quiz": {
+    "question": "Après le parsing JSON réussi, le moteur doit encore…",
+    "choices": [
+      "Exécuter immédiatement la proposition",
+      "Donner tous les outils au modèle",
+      "Vérifier l’outil, ses arguments et ses permissions",
+      "Considérer l’action comme une réponse vraie"
+    ],
+    "answer": 2,
+    "explanation": "Le parsing établit une structure. Les droits d’exécution et la véracité demandent leurs propres contrôles.",
+    "version": "246538ebff9bfe27c6bc56652fae0edc9d5fef84939c4ebb3545a5eb83b66130"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "parse_action"
+  }
+}

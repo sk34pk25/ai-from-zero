@@ -1,4 +1,6 @@
 import { ASSET_VERSION } from "./version.js";
+import { studyScope } from "./study-scope.js";
+import { readHarnessState } from "./harness-state.js";
 import { normalizeExerciseResult, EXERCISE_LABELS } from "./exercise-result.js";
 import { publicAssetUrl } from "./public-url.js";
 import { localToken, localChangeKey, readLocalReview, writeLocalReview, writeLocalDraft } from "./local-records.js";
@@ -100,6 +102,8 @@ const state = {
 };
 
 const els = {};
+let harnessIndex = null, harnessSearchPromise = null;
+window.addEventListener("afz-harness-progress", () => { if (state.index && state.route.name === "harness") paintChrome(); });
 
 /** Le propriétaire synchronise ; un visiteur qui l'a demandé garde sa progression dans ce navigateur. */
 function tracking() {
@@ -650,6 +654,13 @@ function isTyping(target) {
 }
 
 function openSearch() {
+  if (!harnessIndex && !harnessSearchPromise) harnessSearchPromise = fetch(publicAssetUrl("data/harness-index.json")).then(async response => {
+    if (!response.ok) throw new Error("Index harness indisponible");
+    const data = await response.json();
+    if (data.format !== "afz-harness-course-v1" || !Array.isArray(data.modules)) throw new Error("Index harness invalide");
+    harnessIndex = data;
+    if (!els.dialog.hidden) paintSearchResults();
+  }).catch(() => {}).finally(() => { harnessSearchPromise = null; });
   state.returnFocus = document.activeElement;
   els.dialog.hidden = false;
   document.body.classList.add("search-open");
@@ -696,7 +707,7 @@ function onSearchKeydown(event) {
   } else if (event.key === "Enter") {
     event.preventDefault();
     const hit = state.searchHits[state.searchActive];
-    if (hit) location.hash = `#/lecon/${hit.entry.lesson.id}`;
+    if (hit) location.hash = hit.entry.href || `#/lecon/${hit.entry.lesson.id}`;
   } else if (event.key === "Tab") {
     trapSearchTab(event);
   }
@@ -719,10 +730,12 @@ function trapSearchTab(event) {
 }
 
 function entries() {
-  return state.index.lessons.map((item) => ({
+  const modelEntries = state.index.lessons.map((item) => ({
     ...item,
     text: lessonSearchText(item.lesson, item.level.title),
   }));
+  const harnessEntries = (harnessIndex?.modules || []).flatMap(module => module.lessons.map(lesson => ({ lesson, level: { id: module.id, title: module.title }, kind: "harness", href: `#/harness/lecon/${lesson.id}`, text: lessonSearchText(lesson, "Harness · "+module.title) })));
+  return [...modelEntries, ...harnessEntries];
 }
 
 function paintSearchResults() {
@@ -740,14 +753,14 @@ function paintSearchResults() {
         class: active ? "is-active" : "",
         "aria-selected": active ? "true" : "false",
         onClick: () => {
-          location.hash = `#/lecon/${lesson.id}`;
+          location.hash = hit.entry.href || `#/lecon/${lesson.id}`;
         },
       },
       [
         h("span", { class: "result-id", text: lesson.id }),
         h("span", { class: "result-copy" }, [
           h("strong", { text: lesson.title }),
-          h("small", { text: `Niveau ${level.id} · ${level.title}` }),
+          h("small", { text: `${hit.entry.kind === "harness" ? "Harness · Module" : "Niveau"} ${level.id} · ${level.title}` }),
         ]),
       ],
     );
@@ -890,6 +903,29 @@ function paintChrome() {
     else els.track.removeAttribute("aria-current");
   }
   const activeLevel = activeLevelId();
+  const harnessLink = document.querySelector("#harness-link");
+  const projectLink = document.querySelector("#project-link"), referenceLink = document.querySelector("#track-link");
+  if (state.route.name === "harness") {
+    harnessLink?.setAttribute("aria-current", "page");
+    if(harnessLink)harnessLink.textContent="Programme du harness d’agent";
+    if(projectLink){projectLink.href="#/harness/projet";projectLink.textContent="Mon harness · 8 TP";}
+    if(referenceLink)referenceLink.textContent="Revoir les fichiers du modèle";
+    const modules = harnessIndex?.modules || [], lessons = modules.flatMap(module => module.lessons), saved = readHarnessState(studyScope()).lessons;
+    const studied = lessons.filter(lesson => saved[lesson.id]?.studied).length, percent = Math.round(studied / 32 * 100);
+    document.querySelector("#progress-label").textContent = "Mon harness · lecture";
+    els.progressValue.textContent = `${percent}%`; els.progressBar.value = percent; els.progressBar.setAttribute("aria-valuenow", String(percent));
+    els.progressMeta.textContent = `${studied} / 32 leçons étudiées`;
+    const nextHarnessLesson = lessons.find(lesson => !saved[lesson.id]?.studied);
+    els.continueLink.href = nextHarnessLesson ? `#/harness/lecon/${nextHarnessLesson.id}` : "#/harness/projet";
+    els.continueLink.textContent = studied === 32 ? "Préparer mon dossier harness" : studied ? "Continuer mon harness" : "Commencer mon harness";
+    const activeModule = state.route.module || Number(state.route.id?.match(/^h(\d+)/)?.[1]);
+    els.nav.replaceChildren(h("a", { class: "nav-level", href: "#/harness", text: "Programme des huit modules" }), ...modules.map(module => h("a", { href: `#/harness/module/${module.id}`, class: activeModule === module.id ? "nav-level is-active" : "nav-level", "aria-current": activeModule === module.id ? "page" : null }, [h("span", { class: "nav-index", text: String(module.id) }), h("span", { class: "nav-name", text: module.title }), h("span", { class: "nav-count", text: `${module.lessons.filter(lesson => saved[lesson.id]?.studied).length}/4` })])));
+    return;
+  }
+  harnessLink?.removeAttribute("aria-current");
+  if(harnessLink)harnessLink.textContent="Ensuite : mon harness d’agent";
+  if(projectLink){projectLink.href="#/atelier";projectLink.textContent="Mon projet · 12 TP";}
+  if(referenceLink)referenceLink.textContent="Fichiers et résultats de référence";
   const navLink = (level) => {
     const progress = levelProgress(level, state.done);
     const hasCore = level.steps.some(step => state.index.coreIds.includes(step.id));
@@ -919,7 +955,9 @@ function activeLevelId() {
 }
 
 function paintMain(route, ticket) {
-  if (route.name === "experiments")
+  if (route.name === "harness")
+    paintHarnessRoute(route, ticket);
+  else if (route.name === "experiments")
     paintAsync(
       ticket,
       () => import("./page-experiments.js"),
@@ -1042,6 +1080,22 @@ function paintRecovery(ticket) {
     });
 }
 
+function paintHarnessRoute(route, ticket) {
+  let attempt=0;
+  const load=async()=>{
+    els.main.replaceChildren(h("p",{role:"status",text:"Chargement du parcours…"}));
+    const url=publicAssetUrl(new URL("./page-harness.js",import.meta.url));
+    if(attempt++)url.searchParams.set("retry",String(attempt));
+    try{
+      const mod=await import(url.href);if(ticket!==state.pageTicket)return;
+      await mod.paintHarness(els.main,{id:route.id,module:route.module,project:route.project,onCatalog:spec=>{if(ticket===state.pageTicket){harnessIndex=spec;paintChrome();}}});
+      if(ticket===state.pageTicket)focusNavigationHeading();
+    }catch{
+      if(ticket===state.pageTicket)els.main.replaceChildren(h("h1",{text:"Parcours harness indisponible"}),h("p",{role:"status",text:"Le module n’a pas pu être chargé. Ton travail reste conservé."}),h("button",{type:"button",class:"button button-secondary",onClick:load},"Réessayer le module harness"));
+    }
+  };void load();
+}
+
 function paintAsync(ticket, loader, paint) {
   els.main.replaceChildren(h("p", { class: "lead", text: "Chargement…" }));
   loader()
@@ -1060,6 +1114,7 @@ function paintAsync(ticket, loader, paint) {
 
 function pageTitle(route) {
   const base = "AI From Zero";
+  if (route.name === "harness") return `${route.id ? route.id.toUpperCase()+" · " : ""}Construire mon harness · ${base}`;
   if (route.name === "assessment") return `Mes preuves de compréhension · ${base}`;
   if (route.name === "lesson") {
     const item = state.index.byId.get(route.id);
@@ -1111,6 +1166,12 @@ function paintHome() {
       h("p", { text: "Les TP accompagnent les leçons. Chaque brique a ses prérequis, un exemple et un contrôle individuel. Le dossier final réunit ton code, tes mesures et tes explications." }),
       h("a", { href: "#/atelier", class: "button button-secondary", text: "Ouvrir les 12 TP et mon dossier" }),
       h("p", {}, h("a", { href: "#/construire", text: "Voir les fichiers et résultats de référence" })),
+    ]),
+    h("section", { class: "sheet harness-entry" }, [
+      h("p", { class: "eyebrow", text: "La suite de ton modèle" }),
+      h("h2", { text: "Construire mon harness d’agent" }),
+      h("p", { text: "Après ton premier modèle : 32 leçons et huit TP pour coder la boucle d’agent, ses outils, ses permissions, sa mémoire et ses évaluations. Un projet Python autonome relie ton checkpoint à des actions inspectables." }),
+      h("a", { class: "button button-secondary", href: "#/harness", text: "Découvrir le parcours harness de A à Z" }),
     ]),
     resumePanel(state.index),
     sessionPlanner(state.index, () => state.done),
@@ -1466,6 +1527,7 @@ function lessonBody(lesson, grade, done, around) {
           : lesson.tpIds?.length ? "Pratique : à vérifier dans ton TP local. " : "Activité : à expliquer avec un exemple nouveau. Aucun contrôle Python automatique n’est prévu ici. ",
         "Ces repères ne remplacent pas le projet final."]),
       h("p", { text: "Avant de poursuivre, explique l’idée avec d’autres valeurs et conserve ton code." }),
+      lesson.id === "12.12" ? h("p", {}, h("a", { href: "#/harness", text: "Après mon modèle : construire son harness d’agent de A à Z" })) : null,
       h("a", { href: "#/preuves", text: "Reconstruire, diagnostiquer et expliquer sur un cas nouveau" }),
       ...(lesson.tpIds || []).map(tp => h("p", {}, h("a", { href: `#/atelier/tp/${tp}`, text: `Construire et vérifier le TP ${tp}` }))),
     ]),

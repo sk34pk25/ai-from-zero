@@ -52,3 +52,14 @@ Les contrôles vérifient l’outillage et des propriétés. La réussite d’un
 - [x] Chronologie, aides, relecture humaine distincte et export/import de preuves.
 - [x] Protocole de terrain et synthèse des observations consenties.
 - [ ] Pilote avec de vrais débutants, correction des blocages puis second groupe et essai de rétention. Aucun résultat humain n’est revendiqué à ce stade.
+
+## Après le modèle : construire le harness
+
+- [x] 32 leçons originales, huit modules, laboratoires inspectables, exercices Python, quiz et cas nouveaux.
+- [x] Projet autonome : 22 fonctions élève, référence séparée, huit TP, dix scénarios de régression, CLI et guides.
+- [x] Outils limités, confirmation de création, budgets, contexte, mémoire, traces et reprise sans rejeu automatique d’un effet incertain.
+- [x] Adaptateurs du checkpoint NumPy et de l’API du premier atelier ; sondes et ajustement masqué avec validation réservée.
+- [x] Procédures documentaires, délégation synchrone, file locale explicite et passerelle HTTP authentifiée sur boucle locale.
+- [x] Suivi indépendant du modèle, notes, code, versions de contrôles, explications et export/import.
+- [ ] Connecteurs de messagerie, backends distants, isolation système et exploitation de production : extensions à construire et éprouver.
+- [ ] Observer un débutant reconstruire, diagnostiquer et expliquer son propre harness ; aucune capacité humaine ni autonomie neuronale n’est déduite des fixtures.

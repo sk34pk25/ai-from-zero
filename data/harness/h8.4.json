@@ -1,0 +1,52 @@
+{
+  "id": "h8.4",
+  "title": "Livrer et expliquer son agent",
+  "minutes": 40,
+  "objectives": [
+    "Assembler code, modèle et preuves",
+    "Démontrer une réussite et un refus",
+    "Expliquer une trace sur une tâche nouvelle"
+  ],
+  "prerequisites": [
+    "h8.3",
+    "h6.4",
+    "12.12"
+  ],
+  "vocabulary": {
+    "Livrable": "Ensemble permettant de comprendre et relancer ton projet.",
+    "Cas nouveau": "Tâche différente des exemples utilisés pour construire la solution.",
+    "Relecture": "Examen humain du raisonnement, des aides et des limites."
+  },
+  "why": "La dernière étape consiste à montrer ce que ton agent fait réellement et comment tu l’as construit, avec ses limites documentées.",
+  "explanation": "Le dossier final contient ton code élève, les versions, les empreintes des contrôles et du checkpoint, le protocole de données, les rapports, une trace réussie, un refus correct et un arrêt repris ou réconcilié. Les secrets et données de personnes ne sont pas publiés.\n\nLa grille examine cinq axes sur quatre points : contrats, outils et permissions, contexte et reprise, modèle et évaluation, autonomie d’explication. Chaque point cite une preuve. Aucun quiz ni rapport importé n’attribue automatiquement un 20/20.\n\nDemande une tâche nouvelle : prédire la trace, réaliser l’essai, expliquer l’erreur puis proposer un contre-test. Les observations de vrais débutants restent à recueillir. Le harness obtenu est un projet local complet et inspectable ; les plateformes de messagerie, les backends distants et une robustesse de production restent des extensions à développer et mesurer.",
+  "code": "from harness.correction import success_metrics\nrows=[{'ok':True},{'ok':False},{'ok':True},{'ok':False}]\nassert success_metrics(rows)['success_rate']==.5\nprint('La relecture humaine reste distincte de ce compteur.')",
+  "lab": "evaluation",
+  "exercise": {
+    "prompt": "Liste les pièces manquantes d’un dossier de harness : code, modèle, protocole, traces et limites.",
+    "starter": "def pieces_absentes(dossier):\n    raise NotImplementedError('À compléter')",
+    "solution": "def pieces_absentes(dossier):\n    return sorted({'code','modele','protocole','traces','limites'}-set(dossier))",
+    "check": "assert pieces_absentes({'code':{},'modele':{}})==['limites','protocole','traces']\nassert pieces_absentes(dict.fromkeys(['code','modele','protocole','traces','limites']))==[]",
+    "validatorVersion": "16d0db6a97e972c8ed1ca06902feff755b2aa9edb9f8ab99cf15f93c7afb13d7"
+  },
+  "hints": [
+    "La présence d’une pièce n’atteste pas sa qualité : elle permet de la relire.",
+    "Une trace heureuse seule ne démontre pas un refus correct."
+  ],
+  "transfer": "Présente une tâche nouvelle, une réponse erronée de ton agent et le contre-test qui a permis de diagnostiquer la cause. Indique les aides reçues.",
+  "quiz": {
+    "question": "Quelle remise permet la relecture la plus utile ?",
+    "choices": [
+      "Un taux de succès seul",
+      "Une capture de la meilleure réponse",
+      "Le nombre de compétences installées",
+      "Code, origine du modèle, protocole, traces et limites"
+    ],
+    "answer": 3,
+    "explanation": "Un dossier reproductible et une explication sur un cas nouveau permettent d’examiner le travail. Le score reste une relecture argumentée.",
+    "version": "251e53956ff3a9621ddfb88d6b991c2f319d8ef59b955b3e2cd44fa6e9ea7e2c"
+  },
+  "reference": {
+    "file": "harness/verifier.py",
+    "symbol": "verify"
+  }
+}

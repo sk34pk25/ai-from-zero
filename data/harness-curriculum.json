@@ -1,0 +1,1819 @@
+{
+  "format": "afz-harness-course-v1",
+  "title": "Construire son harness d’agent de A à Z",
+  "description": "La suite de ton modèle : coder la boucle, les outils, la mémoire, les permissions et leurs preuves.",
+  "prerequisites": [
+    "0.9",
+    "0.12",
+    "0.21",
+    "1.3",
+    "4.14",
+    "12.12"
+  ],
+  "modules": [
+    {
+      "id": 1,
+      "title": "Du modèle au contrat",
+      "result": "Un protocole d’action validé avant toute exécution.",
+      "tp": "Messages et décisions",
+      "functions": [
+        "message",
+        "parse_action"
+      ],
+      "criteria": [
+        "Je distingue modèle, harness et outil sur une trace.",
+        "Je rejette un JSON ambigu et une action inconnue.",
+        "Je décris ce que mon modèle doit encore apprendre."
+      ],
+      "lessons": [
+        {
+          "id": "h1.1",
+          "title": "Ce qui décide, ce qui exécute",
+          "minutes": 30,
+          "objectives": [
+            "Séparer les rôles du modèle et du moteur",
+            "Suivre un appel d’outil jusqu’à son résultat",
+            "Reconnaître une démonstration scriptée"
+          ],
+          "prerequisites": [
+            "12.12"
+          ],
+          "vocabulary": {
+            "Modèle": "Prédit une suite à partir d’un contexte.",
+            "Harness": "Organise les appels, l’état, les outils et les contrôles.",
+            "Outil": "Fonction dont le code produit un effet ou une observation."
+          },
+          "why": "Après le checkpoint, il manque un programme qui fasse agir le modèle. La réponse « je vais calculer » ne réalise aucun calcul. Cette étape pose les trois acteurs que tu vas coder.",
+          "explanation": "Le modèle propose une action. Le harness lit cette proposition, vérifie son format et ses permissions, puis appelle une fonction précise. L’outil calcule et renvoie une observation. Le modèle peut ensuite produire une réponse finale.\n\nDans notre premier essai, ScriptedModel fournit deux réponses écrites à l’avance. Cela permet de tester le câblage sans entraîner de modèle ni payer une API. Le résultat prouve que la boucle fonctionne sur ce scénario ; il ne mesure pas une autonomie neuronale. Plus tard, tu remplaceras cette fixture par ton checkpoint et tu mesureras les erreurs de protocole séparément.\n\nDessine trois colonnes : proposition, décision du moteur et effet réel. Une phrase du modèle n’appartient jamais à la colonne des effets tant qu’un outil n’a pas été exécuté.",
+          "code": "from harness.modeles import ScriptedModel\nm = ScriptedModel([{'type':'final','text':'bonjour'}])\nprint(m.complete([], [], 1))\nprint(m.label)",
+          "lab": "loop",
+          "exercise": {
+            "prompt": "Classe les trois événements proposer, vérifier et exécuter dans leur composant.",
+            "starter": "def composant(evenement):\n    raise NotImplementedError('À compléter')",
+            "solution": "def composant(evenement):\n    return {'proposer':'modele','verifier':'harness','executer':'outil'}[evenement]",
+            "check": "assert composant('proposer')=='modele'\nassert composant('verifier')=='harness'\nassert composant('executer')=='outil'",
+            "validatorVersion": "52d5b20fe70681545fdb43f889c4c721796b33052c216817cc1946194a245f9b"
+          },
+          "hints": [
+            "Le modèle ne reçoit pas les droits du système.",
+            "Le moteur appelle une fonction après contrôle."
+          ],
+          "transfer": "Explique qui a réellement produit 36 dans une trace où le modèle demande (8+4)*3. Cite la preuve d’exécution.",
+          "quiz": {
+            "question": "Qu’est-ce qui prouve que le calcul a réellement eu lieu ?",
+            "choices": [
+              "Un événement d’outil avec son résultat",
+              "Le modèle annonce son intention",
+              "La longueur de la réponse finale",
+              "Le nombre de paramètres du modèle"
+            ],
+            "answer": 0,
+            "explanation": "Une intention textuelle ne produit aucun effet. La trace doit montrer l’appel et l’observation correspondante.",
+            "version": "9636b5324a05c71fdcddde5a26981cd53fd768be3aa7645ea628b5965fbe76a0"
+          },
+          "reference": {
+            "file": "harness/coeur.py",
+            "symbol": "Runner.run"
+          }
+        },
+        {
+          "id": "h1.2",
+          "title": "Messages, rôles et confiance",
+          "minutes": 30,
+          "objectives": [
+            "Construire un message typé",
+            "Séparer instruction et donnée rapportée",
+            "Garder la demande initiale identifiable"
+          ],
+          "prerequisites": [
+            "h1.1",
+            "0.10"
+          ],
+          "vocabulary": {
+            "Rôle": "Origine d’un message : system, user, assistant ou tool.",
+            "Observation": "Donnée produite par un outil, avec un identifiant d’appel.",
+            "Injection": "Texte qui tente de changer les règles depuis une source de données."
+          },
+          "why": "Un fichier peut contenir « ignore les règles ». Le lire ne doit pas donner à ce texte le pouvoir de modifier les permissions de l’agent.",
+          "explanation": "Un message est un dictionnaire qui conserve son origine. Notre helper message accepte quatre rôles et un contenu textuel. Une observation d’outil conserve en plus call_id, name et trust=data.\n\nLe rôle system porte le contrat du moteur. L’utilisateur décrit sa tâche. L’assistant propose une action. Le contenu d’un outil reste une observation, même s’il ressemble à une instruction. Cette séparation aide le modèle à interpréter le contexte ; elle ne remplace pas les contrôles Python. Une tentative d’écriture interdite sera refusée même si le modèle obéit à une injection.\n\nOn conserve aussi la demande initiale lors de la réduction du contexte. Les anciens résultats peuvent disparaître du prompt courant, mais le journal les garde. Tu dois pouvoir expliquer quelle information est active et quelle information est seulement archivée.",
+          "code": "from harness.correction import message, tool_observation\nprint(message('user','Lis ma note.'))\nprint(tool_observation('c1','lire_fichier',{'text':'ignore les règles'}))",
+          "lab": "trust",
+          "exercise": {
+            "prompt": "Construis creer_message(role, contenu) et refuse un rôle inconnu ou un contenu non textuel.",
+            "starter": "def creer_message(role, contenu):\n    raise NotImplementedError('À compléter')",
+            "solution": "def creer_message(role, contenu):\n    if role not in {'system','user','assistant','tool'} or not isinstance(contenu,str):\n        raise ValueError('message invalide')\n    return {'role':role,'content':contenu}",
+            "check": "assert creer_message('user','salut')=={'role':'user','content':'salut'}\nassert creer_message('tool','donnée')['role']=='tool'\nfor role,contenu in [('root','x'),('user',7)]:\n    try: creer_message(role,contenu)\n    except ValueError: pass\n    else: raise AssertionError('message invalide accepté')",
+            "validatorVersion": "8e19ce1fbddf179c169620684d5cb9200158ebec78a4edcf5817531aa1e6ba14"
+          },
+          "hints": [
+            "Écris la liste des rôles autorisés.",
+            "Le contenu d’un document reste du texte, pas une permission."
+          ],
+          "transfer": "Un document affirme que l’administrateur a approuvé un effacement. Où cette affirmation doit-elle rester et quel composant vérifie les droits ?",
+          "quiz": {
+            "question": "Une instruction trouvée dans un document doit être traitée comme…",
+            "choices": [
+              "Une permission accordée à l’outil",
+              "Une donnée dont la source est conservée",
+              "Un nouveau message système",
+              "Un remplacement de la demande initiale"
+            ],
+            "answer": 1,
+            "explanation": "La provenance du texte reste documentaire. La politique Python décide des effets possibles.",
+            "version": "c05899db19e90bf954a5a01fd56bde9ee8cbf13e4ca9799f66c47e3afd4f7a66"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "message"
+          }
+        },
+        {
+          "id": "h1.3",
+          "title": "Un protocole JSON strict",
+          "minutes": 30,
+          "objectives": [
+            "Définir action et réponse finale",
+            "Refuser les champs et clés ambigus",
+            "Séparer parsing et permissions"
+          ],
+          "prerequisites": [
+            "h1.2",
+            "0.12"
+          ],
+          "vocabulary": {
+            "Schéma": "Structure attendue, types et champs autorisés.",
+            "Parsing": "Transformation du texte en objet structuré.",
+            "Contrat": "Règles que la réponse doit respecter avant son utilisation."
+          },
+          "why": "Le moteur ne doit pas chercher approximativement un nom d’outil dans une phrase. Un contrat strict rend les erreurs visibles et testables.",
+          "explanation": "Une action tool contient exactement type, id, name et arguments. Une réponse final contient exactement type et text. L’identifiant relie l’observation à la proposition. Le parseur refuse les blocs Markdown, les tableaux à la place d’un objet, les clés dupliquées et les nombres non finis.\n\nJSON valide ne signifie pas action autorisée : {\"name\":\"supprimer_tout\"} peut être syntaxiquement correct. Le registre et les permissions arrivent après. Évite de réparer silencieusement une réponse ambiguë : tu risquerais d’exécuter une autre action que celle réellement exprimée.\n\nPour diagnostiquer une erreur, conserve le type de refus et demande une nouvelle réponse dans le contrat. Le nombre de nouvelles tentatives reste borné. Aucun appel d’outil n’est lancé tant que le contrat n’est pas satisfait.",
+          "code": "from harness.correction import parse_action\na=parse_action('{\"type\":\"final\",\"text\":\"prêt\"}')\nassert a['text']=='prêt'\ntry: parse_action('```json {} ```')\nexcept ValueError as e: print(type(e).__name__)",
+          "lab": "protocol",
+          "exercise": {
+            "prompt": "Valide une réponse finale JSON : exactement type=final et text non vide. Refuse une clé dupliquée.",
+            "starter": "def lire_final(raw):\n    raise NotImplementedError('À compléter')",
+            "solution": "def lire_final(raw):\n    import json\n    def paires(rows):\n        result={}\n        for k,v in rows:\n            if k in result: raise ValueError('doublon')\n            result[k]=v\n        return result\n    value=json.loads(raw,object_pairs_hook=paires)\n    if not isinstance(value,dict) or set(value)!={'type','text'} or value['type']!='final' or not isinstance(value['text'],str) or not value['text'].strip():\n        raise ValueError('final invalide')\n    return value['text']",
+            "check": "assert lire_final('{\"type\":\"final\",\"text\":\"5\"}')=='5'\nfor raw in ['[]','{\"type\":\"final\",\"text\":\"\"}','{\"type\":\"final\",\"text\":\"x\",\"text\":\"y\"}']:\n    try:lire_final(raw)\n    except ValueError:pass\n    else:raise AssertionError('contrat invalide accepté')",
+            "validatorVersion": "3a2ffda31d0443e9a3b8710e54a6fadd2971490f0e7d1198885cb4170479ca86"
+          },
+          "hints": [
+            "json.loads seul accepte habituellement les clés dupliquées.",
+            "Compare l’ensemble exact des clés attendues."
+          ],
+          "transfer": "Propose un JSON syntaxiquement valide qui doit pourtant être refusé par le registre. Explique les deux contrôles.",
+          "quiz": {
+            "question": "Après le parsing JSON réussi, le moteur doit encore…",
+            "choices": [
+              "Exécuter immédiatement la proposition",
+              "Donner tous les outils au modèle",
+              "Vérifier l’outil, ses arguments et ses permissions",
+              "Considérer l’action comme une réponse vraie"
+            ],
+            "answer": 2,
+            "explanation": "Le parsing établit une structure. Les droits d’exécution et la véracité demandent leurs propres contrôles.",
+            "version": "246538ebff9bfe27c6bc56652fae0edc9d5fef84939c4ebb3545a5eb83b66130"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "parse_action"
+          }
+        },
+        {
+          "id": "h1.4",
+          "title": "Brancher une interface de modèle",
+          "minutes": 40,
+          "objectives": [
+            "Écrire une interface complete",
+            "Conserver l’origine des réponses",
+            "Préparer un premier test de capacités"
+          ],
+          "prerequisites": [
+            "h1.3",
+            "4.14"
+          ],
+          "vocabulary": {
+            "Adaptateur": "Code qui expose la même interface pour plusieurs sources.",
+            "Fixture": "Réponse fixée pour un test reproductible.",
+            "Inférence": "Calcul d’une sortie avec des poids déjà entraînés."
+          },
+          "why": "La boucle ne doit pas être réécrite pour chaque modèle. Elle doit recevoir une interface stable et savoir d’où viennent les sorties.",
+          "explanation": "Notre interface complete(messages, tools, turn) renvoie du texte. ScriptedModel utilise turn pour rejouer une fixture. RepoCheckpointModel calcule réellement les logits de ton TinyGPT. LocalAPIModel parle au serveur de ton atelier ou à un serveur local compatible avec des messages de chat.\n\nL’adaptateur ne donne aucun droit à la réponse : le parseur et les outils restent les mêmes. Son étiquette et les empreintes du checkpoint sont conservées dans les rapports. Une clé d’API éventuelle est lue depuis une variable d’environnement et ne doit pas entrer dans un prompt ou un export.\n\nUn petit modèle de prédiction de texte peut ne produire aucun JSON valide. Dans ce cas, l’échec est une mesure utile. Tu vas d’abord vérifier le protocole sans exécuter d’outil, puis préparer un entraînement adapté et refaire une mesure réservée.",
+          "code": "from harness.modeles import LocalAPIModel\nm=LocalAPIModel('http://127.0.0.1:8765/generer')\nprint(m.label)\n# La construction ne contacte pas le serveur.\nassert m.mode=='atelier'",
+          "lab": "model",
+          "exercise": {
+            "prompt": "Écris une fixture qui renvoie la réponse correspondant au numéro de tour, en conservant la dernière si le scénario est épuisé.",
+            "starter": "def reponse_script(responses, tour):\n    raise NotImplementedError('À compléter')",
+            "solution": "def reponse_script(responses, tour):\n    if not responses or tour<1:raise ValueError('scénario invalide')\n    return responses[min(tour-1,len(responses)-1)]",
+            "check": "assert reponse_script(['outil','final'],1)=='outil'\nassert reponse_script(['outil','final'],2)=='final'\nassert reponse_script(['outil','final'],9)=='final'\ntry:reponse_script([],1)\nexcept ValueError:pass\nelse:raise AssertionError('scénario vide')",
+            "validatorVersion": "e9aa0e7a5e6646bfbb98f245c8fd780c27cfc18f3cc55ecc6f6343fc05fcfc70"
+          },
+          "hints": [
+            "Les tours commencent à 1 ; les indices de liste à 0.",
+            "L’étiquette du fournisseur doit rester visible."
+          ],
+          "transfer": "Une fixture réussit dix tâches et ton checkpoint échoue à former un JSON. Quelles conclusions peux-tu écrire séparément ?",
+          "quiz": {
+            "question": "Une réussite avec ScriptedModel démontre…",
+            "choices": [
+              "L’autonomie générale du checkpoint",
+              "La qualité de tous les fournisseurs locaux",
+              "La capacité du modèle à apprendre de lui-même",
+              "Le câblage du harness sur le scénario"
+            ],
+            "answer": 3,
+            "explanation": "Les réponses scriptées testent une infrastructure déterministe. Le comportement d’un modèle neuronal se mesure avec son adaptateur réel.",
+            "version": "c6b4b2de4a25375c46c11846758e24448427777a83e6119b8afc1854bcea5a88"
+          },
+          "reference": {
+            "file": "harness/modeles.py",
+            "symbol": "ScriptedModel.complete"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Outils et permissions",
+      "result": "Un registre limité, avec calcul, lecture et propositions de création.",
+      "tp": "Construire les outils",
+      "functions": [
+        "validate_args",
+        "calculate",
+        "safe_path"
+      ],
+      "criteria": [
+        "Je rejette un argument inconnu avant l’exécution.",
+        "Je teste calcul, traversée de dossier et lien symbolique.",
+        "Une écriture nécessite une proposition exacte et un accord."
+      ],
+      "lessons": [
+        {
+          "id": "h2.1",
+          "title": "Le registre des outils",
+          "minutes": 30,
+          "objectives": [
+            "Nommer une fonction par un contrat",
+            "Valider types et champs exacts",
+            "Limiter les outils disponibles"
+          ],
+          "prerequisites": [
+            "h1.3",
+            "0.9"
+          ],
+          "vocabulary": {
+            "Registre": "Association entre un nom, ses arguments et une implémentation.",
+            "Liste autorisée": "Ensemble des capacités explicitement activées.",
+            "Argument": "Valeur transmise à une fonction après validation."
+          },
+          "why": "Un nom inventé par le modèle ne doit pas devenir une fonction Python. Le registre fixe ce que ton agent sait réellement faire.",
+          "explanation": "Le projet déclare cinq outils : calculer, lire_fichier, ecrire_fichier, chercher dans un corpus local et diagnostic. Chaque nom possède des arguments exacts. Une clé supplémentaire comme shell est refusée avant tout effet. Le modèle ne choisit jamais une fonction par getattr sur un module quelconque.\n\nLes permissions forment un second filtre. Un outil connu peut être absent de Tools.allowed. Pour commencer, utilise seulement les outils de lecture et de calcul. La création de fichiers s’ajoute explicitement et garde une confirmation par action.\n\nLe catalogue montré au modèle sert à l’aider. La vérification du registre Python demeure obligatoire, car un texte peut demander un outil absent du catalogue.",
+          "code": "from harness.correction import validate_args\nprint(validate_args('calculer',{'expression':'6*7'}))\ntry:validate_args('calculer',{'expression':'6*7','shell':True})\nexcept ValueError:print('champ inconnu refusé')",
+          "lab": "permission",
+          "exercise": {
+            "prompt": "Valide les arguments d’un outil calculer qui accepte exactement une expression textuelle.",
+            "starter": "def arguments_calcul(args):\n    raise NotImplementedError('À compléter')",
+            "solution": "def arguments_calcul(args):\n    if not isinstance(args,dict) or set(args)!={'expression'} or not isinstance(args['expression'],str):raise ValueError('arguments invalides')\n    return dict(args)",
+            "check": "assert arguments_calcul({'expression':'1+2'})=={'expression':'1+2'}\nfor x in [{'expression':3},{'expression':'1','shell':True},[]]:\n    try:arguments_calcul(x)\n    except ValueError:pass\n    else:raise AssertionError('arguments invalides acceptés')",
+            "validatorVersion": "f1b3b72174e8e16755fa734f58637576a98580afe28fda5dffb383b49a410a6e"
+          },
+          "hints": [
+            "Un champ supplémentaire est aussi un échec du contrat.",
+            "Retourne une copie, pour séparer validation et mutation."
+          ],
+          "transfer": "Ajoute sur papier un outil compter_mots(texte). Écris ses arguments, ses limites et deux cas à refuser.",
+          "quiz": {
+            "question": "Le modèle demande un outil connu mais absent des permissions. Que faire ?",
+            "choices": [
+              "Refuser avant tout effet",
+              "L’ajouter automatiquement",
+              "L’exécuter si le JSON est valide",
+              "Le remplacer par une commande shell"
+            ],
+            "answer": 0,
+            "explanation": "Le catalogue décrit des fonctions ; les permissions de la session limitent celles qui peuvent agir.",
+            "version": "c576b5ae76851c28209b252612da4e233c29a390c523cf095f36f25b3f231c24"
+          },
+          "reference": {
+            "file": "harness/outils.py",
+            "symbol": "Tools.prepare"
+          }
+        },
+        {
+          "id": "h2.2",
+          "title": "Calculer sans exécuter du code libre",
+          "minutes": 30,
+          "objectives": [
+            "Lire un arbre syntaxique",
+            "Autoriser seulement quelques opérations",
+            "Borner la taille du calcul"
+          ],
+          "prerequisites": [
+            "h2.1",
+            "0.16"
+          ],
+          "vocabulary": {
+            "AST": "Arbre des opérations décrit par une expression.",
+            "Liste blanche": "Nœuds et opérations explicitement acceptés.",
+            "Budget": "Limite de longueur, de complexité ou de valeur."
+          },
+          "why": "Une calculatrice ne doit pas devenir un interpréteur Python général. Le texte d’un modèle reste une entrée à contrôler.",
+          "explanation": "ast.parse transforme 2+3*4 en un arbre. Notre visiteur accepte les nombres réels, les signes et quelques opérations arithmétiques. Il rejette les appels de fonction, attributs, noms et valeurs booléennes. Il n’utilise jamais eval.\n\nLa correction limite aussi la longueur de l’expression, le nombre de nœuds, l’exposant et la taille des résultats intermédiaires. Ces contraintes évitent qu’une expression valide demande un calcul disproportionné. Une division par zéro est une observation d’erreur, pas un résultat inventé.\n\nTeste un cas numérique indépendant et un cas hostile. Un calcul qui renvoie 14 pour 2+3*4 mais accepte __import__ ne remplit pas le contrat.",
+          "code": "from harness.correction import calculate\nassert calculate('2+3*4')==14\nfor raw in ['1/0','2**1000','__import__(\"os\")']:\n    try:calculate(raw)\n    except ValueError:print('refus',raw)",
+          "lab": "calculation",
+          "exercise": {
+            "prompt": "Écris une mini-calculatrice AST pour les nombres, +, − et *. Tout autre nœud est refusé.",
+            "starter": "def petit_calcul(raw):\n    raise NotImplementedError('À compléter')",
+            "solution": "def petit_calcul(raw):\n    import ast\n    if len(raw)>100:raise ValueError('trop long')\n    def visiter(n):\n        if isinstance(n,ast.Constant) and type(n.value) in (int,float):return n.value\n        if isinstance(n,ast.BinOp) and type(n.op) in (ast.Add,ast.Sub,ast.Mult):\n            a,b=visiter(n.left),visiter(n.right)\n            return a+b if isinstance(n.op,ast.Add) else a-b if isinstance(n.op,ast.Sub) else a*b\n        raise ValueError('noeud interdit')\n    return visiter(ast.parse(raw,mode='eval').body)",
+            "check": "assert petit_calcul('2+3*4')==14\nassert petit_calcul('7-9')==-2\nfor raw in ['abs(2)','True+1','2**3']:\n    try:petit_calcul(raw)\n    except ValueError:pass\n    else:raise AssertionError('noeud interdit accepté')",
+            "validatorVersion": "fca14994a10813590dbb00fbea474d994fcb6a2e7b7f082831b3e2686457f2d9"
+          },
+          "hints": [
+            "La multiplication se trouve plus bas dans l’arbre de 2+3*4.",
+            "bool hérite de int : utilise type(valeur) pour le distinguer."
+          ],
+          "transfer": "Pourquoi une limite sur la longueur seule ne suffit-elle pas à rendre 9**999999 acceptable ?",
+          "quiz": {
+            "question": "Quel texte doit être refusé par la calculatrice limitée ?",
+            "choices": [
+              "2+3*4",
+              "abs(-3)",
+              "(7-2)*3",
+              "10-12"
+            ],
+            "answer": 1,
+            "explanation": "Un appel de fonction sort du petit langage arithmétique autorisé, même si cette fonction paraît inoffensive.",
+            "version": "c55976496e1b56cda64c05fd7d058591fd835675a6f95a4c163c321863ed2b54"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "calculate"
+          }
+        },
+        {
+          "id": "h2.3",
+          "title": "Lire dans un espace de travail choisi",
+          "minutes": 30,
+          "objectives": [
+            "Résoudre un chemin relatif",
+            "Refuser les sorties du dossier et les liens",
+            "Limiter les données lues"
+          ],
+          "prerequisites": [
+            "h2.1",
+            "0.2"
+          ],
+          "vocabulary": {
+            "Workspace": "Dossier dédié que les outils peuvent consulter.",
+            "Traversée": "Chemin comme ../secret qui tente de sortir du dossier.",
+            "Lien symbolique": "Entrée qui redirige vers une autre cible."
+          },
+          "why": "Un assistant qui lit des fichiers doit savoir lesquels il est autorisé à ouvrir. Le nom proposé par le modèle ne fixe pas cette frontière.",
+          "explanation": "safe_path refuse les chemins absolus, les segments .., les antislashs et les liens symboliques. La cible résolue doit rester sous la racine choisie. L’outil limite ensuite la lecture à 8000 octets et attend du texte UTF-8.\n\nCes contrôles sont une politique d’application. Ils ne constituent pas un bac à sable du système d’exploitation : utilise un dossier dédié, sans processus hostile capable de modifier ses répertoires simultanément. L’isolation d’un programme arbitraire demande une frontière supplémentaire comme un conteneur.\n\nLa base des sessions et les secrets restent hors du workspace. Tester un lien symbolique statique et changer une cible pendant une demande d’accord permet de vérifier les refus que le projet sait effectivement garantir.",
+          "code": "from harness.correction import safe_path\nprint(safe_path('/atelier','notes.txt'))\ntry:safe_path('/atelier','../secret.txt')\nexcept ValueError:print('hors dossier refusé')",
+          "lab": "path",
+          "exercise": {
+            "prompt": "Refuse les noms absolus, vides, les antislashs et les segments .. avant résolution.",
+            "starter": "def nom_relatif(nom):\n    raise NotImplementedError('À compléter')",
+            "solution": "def nom_relatif(nom):\n    from pathlib import PurePosixPath\n    if not isinstance(nom,str) or not nom or chr(92) in nom or chr(0) in nom:raise ValueError('nom invalide')\n    p=PurePosixPath(nom)\n    if p.is_absolute() or '..' in p.parts or not p.parts:raise ValueError('sortie interdite')\n    return str(p)",
+            "check": "assert nom_relatif('notes/a.txt')=='notes/a.txt'\nfor raw in ['../a','/a','','a\\\\b']:\n    try:nom_relatif(raw)\n    except ValueError:pass\n    else:raise AssertionError('chemin interdit accepté')\nfor raw in ['a'+chr(92)+'b',chr(0)]:\n    try:nom_relatif(raw)\n    except ValueError:pass\n    else:raise AssertionError('caractère interdit accepté')",
+            "validatorVersion": "1fc73442a5ad5ff1e688fdb0306acadbc9beda48c45447482a5644cabbaddb90"
+          },
+          "hints": [
+            "Cherche des segments .., pas seulement un préfixe de texte.",
+            "La fonction complète du TP vérifie aussi la cible résolue et les liens."
+          ],
+          "transfer": "Pourquoi le dossier donnees/sessions.sqlite doit-il être distinct du workspace consultable par l’agent ?",
+          "quiz": {
+            "question": "Un chemin reste sous la racine en apparence mais traverse un lien symbolique. Le moteur doit…",
+            "choices": [
+              "L’accepter parce qu’il est relatif",
+              "Demander au modèle si le lien est sûr",
+              "Le refuser selon la politique du projet",
+              "Supprimer le lien puis continuer"
+            ],
+            "answer": 2,
+            "explanation": "Le projet refuse les liens pour garder une frontière simple et inspectable. Il ne prétend pas isoler tout processus du système.",
+            "version": "6d296e6bdb425c7a475e2ef1f052edcac86da7d084d69136b0a523b07db22437"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "safe_path"
+          }
+        },
+        {
+          "id": "h2.4",
+          "title": "Proposer puis autoriser un effet",
+          "minutes": 40,
+          "objectives": [
+            "Prévisualiser les arguments exacts",
+            "Exiger un accord distinct pour une création",
+            "Revérifier après l’accord"
+          ],
+          "prerequisites": [
+            "h2.2",
+            "h2.3"
+          ],
+          "vocabulary": {
+            "Effet": "Changement observable de l’état, comme créer un fichier.",
+            "Approbation": "Décision humaine concernant une proposition précise.",
+            "Précondition": "État qui doit encore être vrai au moment d’agir."
+          },
+          "why": "Une intention d’écriture doit pouvoir être examinée avant d’agir. L’autorisation d’un outil ne remplace pas l’accord sur une action précise.",
+          "explanation": "Le moteur prépare un aperçu avec nom, arguments et empreinte de l’action. En CLI, --allow-write permet seulement de proposer une création. La personne doit encore taper oui pour chaque effet. Le fichier est créé avec le mode exclusif x ; un fichier existant n’est jamais écrasé.\n\nLe chemin est revérifié après l’attente. Si la cible ou un répertoire a changé, la proposition est refusée. Un accord ne porte pas sur toutes les actions futures ni sur une autre version du contenu.\n\nSi le processus s’arrête pendant une écriture, la reprise ne la rejoue pas aveuglément. Le journal signale un effet incertain à réconcilier. Observe le fichier et la trace avant de décider d’une nouvelle session.",
+          "code": "import tempfile\nfrom harness.outils import Tools\nfrom harness import correction as f\nwith tempfile.TemporaryDirectory() as d:\n    t=Tools(d,f)\n    print(t.preview({'name':'ecrire_fichier','arguments':{'path':'note.txt','content':'bonjour'}})['effect'])",
+          "lab": "approval",
+          "exercise": {
+            "prompt": "Décide si une action est exécutable : une lecture est permise, une création demande exactement l’accord booléen True.",
+            "starter": "def accord_requis(effet, accord):\n    raise NotImplementedError('À compléter')",
+            "solution": "def accord_requis(effet, accord):\n    if effet not in {'lecture','creation'}:raise ValueError('effet inconnu')\n    return effet=='lecture' or accord is True",
+            "check": "assert accord_requis('lecture',False)\nassert accord_requis('creation',True)\nassert not accord_requis('creation',False)\nassert not accord_requis('creation','oui')",
+            "validatorVersion": "009aba018611350d2ac370b5d330cea59ddbb172a7fbe7e124528c491749bb59"
+          },
+          "hints": [
+            "Une chaîne non vide est truthy, mais elle n’est pas le booléen True.",
+            "Le refus laisse la proposition disponible, sans créer de fichier."
+          ],
+          "transfer": "Le fichier visé apparaît pendant que tu lis la proposition. Pourquoi faut-il revérifier avant l’ouverture exclusive ?",
+          "quiz": {
+            "question": "--allow-write signifie dans ce projet…",
+            "choices": [
+              "Écraser les fichiers existants",
+              "Approuver toutes les tâches suivantes",
+              "Laisser le modèle modifier les permissions",
+              "Permettre de proposer une création avec un accord par action"
+            ],
+            "answer": 3,
+            "explanation": "Le drapeau active une capacité ; chaque action doit encore être examinée et la cible revérifiée.",
+            "version": "cdff553c1b8c043a1d538c76386f364da4aa2adef1b86590ed4b32e0dae4a970"
+          },
+          "reference": {
+            "file": "harness/outils.py",
+            "symbol": "Tools.preview"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Une boucle qui sait s’arrêter",
+      "result": "Une exécution bornée, avec observations, erreurs et reprise d’accord.",
+      "tp": "Assembler la boucle",
+      "functions": [
+        "stop_reason",
+        "tool_observation",
+        "call_key"
+      ],
+      "criteria": [
+        "Je distingue nombre de tours et nombre d’outils exécutés.",
+        "Chaque résultat garde son identifiant et sa provenance.",
+        "Je démontre un arrêt et un rejeu sans double effet."
+      ],
+      "lessons": [
+        {
+          "id": "h3.1",
+          "title": "Tours, appels et conditions d’arrêt",
+          "minutes": 30,
+          "objectives": [
+            "Compter deux budgets distincts",
+            "Prévoir une réponse finale après le dernier outil",
+            "Interrompre sans effacer le travail"
+          ],
+          "prerequisites": [
+            "h2.4",
+            "0.8"
+          ],
+          "vocabulary": {
+            "Tour": "Une demande de réponse au modèle.",
+            "Appel d’outil": "Une fonction effectivement exécutée.",
+            "Deadline": "Limite de temps vérifiée entre les étapes."
+          },
+          "why": "Une boucle while True n’est pas une autonomie fiable. Un modèle qui répète la même demande doit rencontrer une limite lisible.",
+          "explanation": "Un tour appelle le modèle ; il peut conclure, être invalide ou demander un outil. Un appel d’outil est compté séparément juste avant son exécution. Le projet borne les deux compteurs et réserve la possibilité de conclure après le dernier outil autorisé.\n\nLa deadline est coopérative : le moteur la vérifie avant et après un appel. Une API possède aussi son timeout réseau. Un calcul Python arbitraire ne devient pas préemptible grâce à un compteur : pour l’isoler fortement, il faut un processus ou un environnement adapté.\n\nUn arrêt conserve un statut explicite comme turn_limit, tool_limit, deadline ou interrupted. Évite d’afficher « tâche réussie » pour un arrêt technique. La validité de la réponse finale sera mesurée séparément.",
+          "code": "from harness.correction import stop_reason\nlimits={'turns':4,'tools':2}\nassert stop_reason(3,1,limits) is None\nassert stop_reason(4,1,limits)=='turn_limit'\nprint(stop_reason(2,2,limits))",
+          "lab": "budget",
+          "exercise": {
+            "prompt": "Renvoie turn_limit ou tool_limit dès que le compteur correspondant atteint sa limite ; priorité au nombre de tours.",
+            "starter": "def arret(tours, appels, max_tours, max_appels):\n    raise NotImplementedError('À compléter')",
+            "solution": "def arret(tours, appels, max_tours, max_appels):\n    if tours>=max_tours:return 'turn_limit'\n    if appels>=max_appels:return 'tool_limit'\n    return None",
+            "check": "assert arret(2,1,4,3) is None\nassert arret(4,1,4,3)=='turn_limit'\nassert arret(1,3,4,3)=='tool_limit'\nassert arret(4,3,4,3)=='turn_limit'",
+            "validatorVersion": "9a49fee40b715fdcfc0cb9cd4fe39bb8d7c5b7cab61b8af18499d2f0169c960b"
+          },
+          "hints": [
+            "La vérification précède le prochain effet.",
+            "Une réponse invalide consomme quand même un tour de modèle."
+          ],
+          "transfer": "Le modèle produit trois JSON invalides puis un appel correct. Quels compteurs ont bougé avant l’outil ?",
+          "quiz": {
+            "question": "Une deadline vérifiée entre appels garantit-elle l’interruption immédiate de tout code Python ?",
+            "choices": [
+              "Non, elle reste coopérative entre les étapes",
+              "Oui, quelle que soit la fonction",
+              "Oui, si le modèle est petit",
+              "Oui, dès qu’un timeout est indiqué"
+            ],
+            "answer": 0,
+            "explanation": "Le projet contrôle ses outils et leurs bornes. La préemption d’un programme général demande une frontière d’exécution supplémentaire.",
+            "version": "e2c684137c75bc9a453d04be40a5dfa759efed4e47d45cb755ede9df1446575d"
+          },
+          "reference": {
+            "file": "harness/coeur.py",
+            "symbol": "Runner.run"
+          }
+        },
+        {
+          "id": "h3.2",
+          "title": "Relier chaque observation à son appel",
+          "minutes": 30,
+          "objectives": [
+            "Conserver call_id et nom d’outil",
+            "Distinguer donnée et instruction",
+            "Éviter un résultat attribué au mauvais appel"
+          ],
+          "prerequisites": [
+            "h3.1",
+            "h1.2"
+          ],
+          "vocabulary": {
+            "call_id": "Identifiant choisi pour relier une proposition à son observation.",
+            "Résultat": "Valeur ou erreur réellement renvoyée.",
+            "Enveloppe": "Structure qui transporte une donnée et sa provenance."
+          },
+          "why": "Deux outils peuvent répondre « 5 ». Sans identifiant, le moteur ne sait pas quelle question chaque résultat résout.",
+          "explanation": "Le moteur ajoute un message tool avec le même call_id que l’action, le nom de l’outil et le contenu JSON du résultat. L’enveloppe distingue ok=true et une erreur. Une donnée textuelle ne devient jamais une nouvelle action par simple concaténation.\n\nLes sorties longues doivent être limitées et identifiées comme tronquées. Tronquer un JSON au milieu d’une clé ne produit pas une observation complète ; la correction garde une enveloppe de prévisualisation lorsque la donnée dépasse sa limite.\n\nSur une trace, vérifie l’ordre : proposition de l’assistant, événement de début, observation, événement de fin puis nouvelle décision. Une conclusion du modèle qui invente une observation échoue à l’évaluation de la tâche.",
+          "code": "from harness.correction import tool_observation\nimport json\nrow=tool_observation('calcul-7','calculer',{'ok':True,'data':{'value':5}})\nassert row['call_id']=='calcul-7'\nprint(json.loads(row['content'])['data']['value'])",
+          "lab": "loop",
+          "exercise": {
+            "prompt": "Construis une observation avec rôle tool, identifiant, nom et trust=data, en sérialisant le résultat.",
+            "starter": "def observation(identifiant, nom, resultat):\n    raise NotImplementedError('À compléter')",
+            "solution": "def observation(identifiant, nom, resultat):\n    import json\n    return {'role':'tool','call_id':identifiant,'name':nom,'trust':'data','content':json.dumps(resultat,ensure_ascii=False)}",
+            "check": "import json\na=observation('x','calculer',{'value':-2})\nassert a['role']=='tool' and a['call_id']=='x' and a['trust']=='data'\nassert json.loads(a['content'])=={'value':-2}\nassert observation('y','chercher',[])['call_id']=='y'",
+            "validatorVersion": "3b4233b95ad9a262a9d9f51e6c73a6d1fc3b9774bc7b98faf7bd5c637a85227d"
+          },
+          "hints": [
+            "Le contenu sérialisé ne remplace pas les métadonnées.",
+            "Garde le même identifiant que la proposition."
+          ],
+          "transfer": "Deux calculs sont lancés avec des identifiants différents. Comment détecter une observation affectée au mauvais appel ?",
+          "quiz": {
+            "question": "L’observation d’un outil doit conserver…",
+            "choices": [
+              "Uniquement le texte de la réponse",
+              "Son identifiant d’appel et son origine",
+              "Un nouveau rôle système",
+              "Le mot de passe du fournisseur"
+            ],
+            "answer": 1,
+            "explanation": "Le lien entre proposition et résultat permet de vérifier la trace. Aucune observation ne justifie d’ajouter un secret au contexte.",
+            "version": "7c25c6f8a0c4c5ce2d4bf8b2d67889426c1f9ec94203bf10f54464b5a40965ba"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "tool_observation"
+          }
+        },
+        {
+          "id": "h3.3",
+          "title": "Erreurs et nouvelles tentatives bornées",
+          "minutes": 30,
+          "objectives": [
+            "Distinguer réseau, format et outil",
+            "Compter les nouvelles tentatives",
+            "Rendre l’erreur exploitable"
+          ],
+          "prerequisites": [
+            "h3.2",
+            "0.12"
+          ],
+          "vocabulary": {
+            "Erreur de transport": "L’adaptateur n’a pas reçu de réponse utilisable du serveur.",
+            "Erreur de contrat": "La sortie ne respecte pas le format attendu.",
+            "Nouvelle tentative": "Nouvel appel soumis au même budget global."
+          },
+          "why": "Un réseau coupé, une division par zéro et un JSON invalide demandent des diagnostics différents. Les confondre pousse à modifier le mauvais composant.",
+          "explanation": "Le moteur transforme une erreur d’outil attendue en observation ok=false. Un JSON invalide ne lance aucun outil et consomme un tour. Une panne du fournisseur produit model_error et ne donne pas une réponse inventée.\n\nLes nouvelles tentatives restent comptées, y compris après reprise de la session. Un modèle qui demande toujours 1/0 ne doit pas tourner indéfiniment. L’utilisateur peut lire le dernier statut et corriger le problème au bon endroit.\n\nLe code de référence limite aussi les messages d’erreur exportés. Les jetons d’API ne figurent ni dans le prompt ni dans l’URL. Garde les détails techniques utiles dans un journal local contrôlé, et ne présente jamais une panne réseau comme une erreur de compréhension de l’apprenant.",
+          "code": "from harness.cli import demo\nprint(demo('erreur').complete([],[],1))\nprint(demo('erreur').complete([],[],2))\n# Le premier texte est volontairement invalide : aucun outil ne doit partir.",
+          "lab": "error",
+          "exercise": {
+            "prompt": "Classe une erreur réseau, un contrat invalide et une erreur d’outil sans les confondre.",
+            "starter": "def diagnostic(erreur):\n    raise NotImplementedError('À compléter')",
+            "solution": "def diagnostic(erreur):\n    return {'timeout':'transport','json':'contrat','division_zero':'outil'}[erreur]",
+            "check": "assert diagnostic('timeout')=='transport'\nassert diagnostic('json')=='contrat'\nassert diagnostic('division_zero')=='outil'",
+            "validatorVersion": "77da2e5691b6bf19c0fd764e00908ff2c91537ef2444a43759dca176c3dfaed6"
+          },
+          "hints": [
+            "Demande quel composant a réellement été atteint.",
+            "Un résultat d’outil en erreur reste une observation."
+          ],
+          "transfer": "Après une panne réseau, le serveur revient. Quelle preuve faut-il conserver pour distinguer l’échec de transport du prochain calcul réussi ?",
+          "quiz": {
+            "question": "Une réponse invalide doit permettre de…",
+            "choices": [
+              "Désactiver définitivement le parseur",
+              "Exécuter le texte comme du Python",
+              "Expliquer le refus et réessayer dans le budget",
+              "Marquer la tâche réussie sans résultat"
+            ],
+            "answer": 2,
+            "explanation": "Une nouvelle tentative aide à corriger le format ; son budget empêche une boucle sans fin.",
+            "version": "002edcbe10c520bf64d849bbf5df60294367579d91ffe88f12c2bfe88425807f"
+          },
+          "reference": {
+            "file": "harness/coeur.py",
+            "symbol": "Runner.run"
+          }
+        },
+        {
+          "id": "h3.4",
+          "title": "Reprendre sans doubler un effet",
+          "minutes": 40,
+          "objectives": [
+            "Associer identité et arguments d’une action",
+            "Réutiliser un résultat déjà connu",
+            "Reconnaître un effet incertain après panne"
+          ],
+          "prerequisites": [
+            "h3.3",
+            "h2.4"
+          ],
+          "vocabulary": {
+            "Idempotence": "Un rejeu identifié ne reproduit pas un effet déjà connu.",
+            "Ledger": "Registre des appels et résultats par identifiant.",
+            "Réconciliation": "Examen de l’état réel quand une panne empêche de conclure."
+          },
+          "why": "Rejouer automatiquement une création après une panne peut produire un doublon. La reprise doit connaître ce qui a été demandé et ce qui est confirmé.",
+          "explanation": "call_key calcule une empreinte du nom et des arguments canoniques. Le ledger associe call_id à cette empreinte et à l’observation. Le même identifiant avec les mêmes arguments réutilise le résultat ; le même identifiant avec d’autres arguments est refusé.\n\nL’état est enregistré avant l’effet avec pending.started=true, puis après son résultat. Une panne entre les deux rend une écriture incertaine. Le moteur s’arrête avec uncertain_effect au lieu de la rejouer. Une lecture peut être retentée en conservant son budget.\n\nUne demande d’approbation n’a encore produit aucun effet. Elle peut donc être reprise, puis examinée par la personne. Les budgets déjà consommés restent dans l’état, et un changement de code, de permissions ou de modèle exige une nouvelle session.",
+          "code": "from harness.correction import call_key\na={'name':'calculer','arguments':{'expression':'2+3'},'id':'a'}\nb={**a,'id':'b'}\nassert call_key(a)==call_key(b)\nprint(call_key(a)[:12])",
+          "lab": "replay",
+          "exercise": {
+            "prompt": "Fabrique une clé stable à partir du nom et des arguments, indépendante de l’ordre des clés du dictionnaire et du call_id.",
+            "starter": "def cle_action(action):\n    raise NotImplementedError('À compléter')",
+            "solution": "def cle_action(action):\n    import json,hashlib\n    raw=json.dumps({'name':action['name'],'arguments':action['arguments']},sort_keys=True,ensure_ascii=False)\n    return hashlib.sha256(raw.encode()).hexdigest()",
+            "check": "a={'id':'a','name':'x','arguments':{'p':1,'q':2}}\nb={'id':'b','arguments':{'q':2,'p':1},'name':'x'}\nassert cle_action(a)==cle_action(b)\nassert cle_action(a)!=cle_action({**a,'arguments':{'p':3,'q':2}})\nassert len(cle_action(a))==64",
+            "validatorVersion": "a6afc925f769fd84e34a12073eed317c7b91f09cb25fe57a3e53573e22c5551e"
+          },
+          "hints": [
+            "Le JSON canonique trie les clés.",
+            "Une clé identique ne prouve pas à elle seule que l’effet est terminé : il faut le ledger."
+          ],
+          "transfer": "Le journal montre tool_started pour une écriture, sans tool_finished. Pourquoi ne faut-il pas conclure automatiquement « rien n’a été écrit » ?",
+          "quiz": {
+            "question": "Un identifiant d’appel réutilisé avec un contenu différent doit…",
+            "choices": [
+              "Remplacer silencieusement le résultat précédent",
+              "Être exécuté deux fois pour comparer",
+              "Rester accepté si le nom de l’outil est identique",
+              "Être refusé comme une contradiction"
+            ],
+            "answer": 3,
+            "explanation": "Un identifiant désigne une proposition précise. Le réutiliser avec d’autres arguments détruirait la preuve de ce qui a été exécuté.",
+            "version": "f25b41c51c3f07e2db780d9aad83e53bd8fafa16fe8025128241aa9c341257ec"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "call_key"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Contexte et mémoire",
+      "result": "Une demande conservée, des échanges compacts et des souvenirs sourcés.",
+      "tp": "Gérer contexte et mémoire",
+      "functions": [
+        "context_window",
+        "merge_memory"
+      ],
+      "criteria": [
+        "Je distingue caractères, tokens et fenêtre du modèle.",
+        "Je garde ensemble appel et observation en réduisant le contexte.",
+        "Je corrige un souvenir sans perdre sa provenance."
+      ],
+      "lessons": [
+        {
+          "id": "h4.1",
+          "title": "Mesurer le contexte disponible",
+          "minutes": 30,
+          "objectives": [
+            "Calculer un budget avec réserve",
+            "Distinguer mesure et estimation",
+            "Détecter un prompt qui ne tient pas"
+          ],
+          "prerequisites": [
+            "h3.1",
+            "3.3"
+          ],
+          "vocabulary": {
+            "Fenêtre": "Nombre maximal de tokens accepté par le modèle.",
+            "Réserve": "Place gardée pour la réponse à produire.",
+            "Budget de caractères": "Limite d’application, distincte du nombre de tokens."
+          },
+          "why": "Un contexte long dans le harness ne donne pas une fenêtre plus grande au modèle. Les deux limites doivent être visibles.",
+          "explanation": "La boucle applique un budget en caractères à ses messages JSON. C’est une limite simple de transport et de mémoire, pas une mesure exacte de tokens. L’adaptateur de ton checkpoint encode ensuite le prompt avec son vrai tokenizer et compare le nombre d’identifiants à block_size.\n\nLa réserve de réponse empêche de remplir tout le budget avec les entrées. Le message système et la demande initiale restent obligatoires. Si eux seuls dépassent la place disponible, le moteur s’arrête avec context_limit. Il ne supprime pas secrètement la demande pour poursuivre.\n\nAvec un tokenizer caractère, une lettre peut correspondre à un token ; avec BPE ou des octets, le rapport change. Écris toujours l’unité à côté du compteur. Une augmentation de block_size doit être compatible avec le modèle entraîné et ses positions.",
+          "code": "from harness.correction import context_window,message\nrows=[message('system','JSON'),message('user','Calcule 2+3.')]\nkept=context_window(rows,500,reserve=100)\nprint(len(kept))\nassert kept==rows",
+          "lab": "context",
+          "exercise": {
+            "prompt": "Calcule la place disponible après instruction, demande et réserve ; refuse un budget insuffisant.",
+            "starter": "def place_restante(budget, systeme, demande, reserve):\n    raise NotImplementedError('À compléter')",
+            "solution": "def place_restante(budget, systeme, demande, reserve):\n    if min(budget,systeme,demande,reserve)<0:raise ValueError('budget négatif')\n    reste=budget-systeme-demande-reserve\n    if reste<0:raise ValueError('contexte insuffisant')\n    return reste",
+            "check": "assert place_restante(1000,200,300,100)==400\nassert place_restante(10,2,3,5)==0\ntry:place_restante(9,2,3,5)\nexcept ValueError:pass\nelse:raise AssertionError('dépassement accepté')",
+            "validatorVersion": "72d84cbdfa4eb1f9e18d4b153fc16d647532b0321be3d46a164275eb56c68800"
+          },
+          "hints": [
+            "Additionne d’abord les parties obligatoires.",
+            "Un compteur de caractères n’est pas un tokenizer universel."
+          ],
+          "transfer": "Un texte de 100 caractères produit 160 tokens avec ton tokenizer. Quel compteur décide si la fenêtre du checkpoint est respectée ?",
+          "quiz": {
+            "question": "Le budget en caractères du harness est…",
+            "choices": [
+              "Une limite d’application à compléter par l’encodage réel",
+              "Le nombre exact de tokens pour tout tokenizer",
+              "La capacité RAM de la machine",
+              "Une façon d’augmenter automatiquement block_size"
+            ],
+            "answer": 0,
+            "explanation": "Le modèle compte ses identifiants. Le budget de caractères garde une utilité pratique mais ne remplace pas le tokenizer.",
+            "version": "f0cad092d4e454af344de0dd6d4c448975e08f59f0c72866b08f2d6388144cf7"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "context_window"
+          }
+        },
+        {
+          "id": "h4.2",
+          "title": "Réduire sans casser les échanges",
+          "minutes": 30,
+          "objectives": [
+            "Conserver instruction et tâche initiale",
+            "Retirer les groupes les plus anciens",
+            "Éviter une observation orpheline"
+          ],
+          "prerequisites": [
+            "h4.1",
+            "h3.2"
+          ],
+          "vocabulary": {
+            "Groupe": "Une proposition de l’assistant et ses observations associées.",
+            "Compaction": "Réduction du contexte actif selon un budget.",
+            "Archive": "Historique conservé hors du prompt courant."
+          },
+          "why": "Couper une liste de messages par sa moitié peut garder un résultat d’outil sans l’action qui l’explique. La réduction doit respecter les relations.",
+          "explanation": "Le contexte est découpé en groupes indivisibles. Le système et la première demande sont épinglés. On conserve ensuite les groupes récents qui tiennent dans la place disponible, sans séparer une proposition de ses observations. Le journal complet reste dans la session.\n\nLa correction utilise une stratégie déterministe. Elle ne prétend pas résumer le sens : si une information ancienne est nécessaire, elle doit être rappelée avec sa source ou fournie à nouveau. Le dernier échange trop long provoque une erreur explicite.\n\nUn résumé généré par le modèle peut être utile, mais il risque d’omettre ou d’inventer une contrainte. Compare-le aux sources et conserve la règle d’origine. Tu peux tester une stratégie de résumé comme une variante distincte, avec des cas où un détail ancien décide de la réussite.",
+          "code": "from harness.correction import context_window,message,tool_observation\nrows=[message('system','JSON'),message('user','But'),message('assistant','x'*300),tool_observation('c','calculer',{'value':2}),message('assistant','Fin')]\nkept=context_window(rows,180,reserve=10)\nassert [m['role'] for m in kept]==['system','user','assistant']\nprint(kept[-1]['content'])",
+          "lab": "context",
+          "exercise": {
+            "prompt": "Garde les groupes récents qui tiennent dans un budget, sans couper l’intérieur d’un groupe. Chaque groupe est une chaîne dans cet exercice miniature.",
+            "starter": "def garder_groupes(groupes, budget):\n    raise NotImplementedError('À compléter')",
+            "solution": "def garder_groupes(groupes, budget):\n    resultat=[]\n    for groupe in reversed(groupes):\n        if len(groupe)+sum(map(len,resultat))>budget:break\n        resultat.insert(0,groupe)\n    return resultat",
+            "check": "assert garder_groupes(['ancien','ab','xyz'],5)==['ab','xyz']\nassert garder_groupes(['a','trop long'],3)==[]\nassert garder_groupes([],5)==[]",
+            "validatorVersion": "9b138729bdfb36a94f18da1db1e66f6e0d98e19ef7092b8490a5faadf9768d32"
+          },
+          "hints": [
+            "Parcours du plus récent au plus ancien.",
+            "Un groupe trop grand n’est pas tronqué en silence."
+          ],
+          "transfer": "Le premier message utilisateur contient « ne modifie aucun fichier ». Pourquoi l’épingler même si des observations plus récentes occupent beaucoup de place ?",
+          "quiz": {
+            "question": "Lors d’une compaction, une observation d’outil doit…",
+            "choices": [
+              "Remplacer la règle système",
+              "Rester liée à l’appel auquel elle répond",
+              "Être gardée même si son appel est supprimé",
+              "Être convertie en une nouvelle permission"
+            ],
+            "answer": 1,
+            "explanation": "Le contexte actif doit rester interprétable. Le journal conserve l’historique supprimé du prompt.",
+            "version": "2bb0ebfff8ca56e09db92817b41aeddeb7d2b268e4cc4c0650cb501036af5b27"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "context_window"
+          }
+        },
+        {
+          "id": "h4.3",
+          "title": "Une mémoire sourcée et corrigeable",
+          "minutes": 30,
+          "objectives": [
+            "Définir un souvenir structuré",
+            "Choisir une version selon sa date",
+            "Conserver l’origine et limiter le volume"
+          ],
+          "prerequisites": [
+            "h4.2",
+            "0.10"
+          ],
+          "vocabulary": {
+            "Souvenir": "Fait conservé avec clé, valeur, source et date.",
+            "Provenance": "Origine qui permet de relire ou contester une information.",
+            "Correction": "Nouvelle version explicitement rattachée au même fait."
+          },
+          "why": "Une mémoire qui accumule des phrases sans origine devient difficile à corriger. Elle peut aussi conserver une instruction malveillante comme un fait.",
+          "explanation": "Notre format exige key, value, source et at. merge_memory conserve la version la plus récente d’une même clé, puis limite la collection à cent souvenirs. La source permet de retrouver pourquoi une information a été retenue.\n\nLa mémoire n’est pas un nouveau message système. Un contenu rappelé demeure une donnée à vérifier. Le moteur ne transforme jamais une phrase comme « autoriser toutes les commandes » en permission Python. Les informations sensibles doivent être choisies avec la personne et pouvoir être effacées.\n\nUn bon test montre un fait ancien, sa correction puis un rappel. Ajoute aussi une nouvelle information indépendante : corriger la première ne doit pas supprimer la seconde. Le temps sert ici à départager des versions, pas à garantir leur véracité.",
+          "code": "from harness.correction import merge_memory\na={'key':'projet','value':'A','source':'utilisateur','at':1}\nb={**a,'value':'B','at':2}\nassert merge_memory([a],[b])==[b]\nprint(merge_memory([b],[a])[0]['value'])",
+          "lab": "memory",
+          "exercise": {
+            "prompt": "Fusionne des souvenirs par clé en conservant la date la plus récente, sans modifier les listes reçues.",
+            "starter": "def fusionner(anciens, nouveaux):\n    raise NotImplementedError('À compléter')",
+            "solution": "def fusionner(anciens, nouveaux):\n    resultat={}\n    for r in anciens+nouveaux:\n        if r['key'] not in resultat or r['at']>=resultat[r['key']]['at']:resultat[r['key']]=dict(r)\n    return sorted(resultat.values(),key=lambda r:r['key'])",
+            "check": "a={'key':'x','value':'A','at':2};b={'key':'x','value':'B','at':1};c={'key':'y','value':'C','at':3}\nassert fusionner([a],[b,c])==[a,c]\nassert fusionner([b],[a])==[a]\nassert a['value']=='A'",
+            "validatorVersion": "c36b3b40ddc04b450ecb298735f4fac6b693e7bc1584bbc0d6ab4dd01485031f"
+          },
+          "hints": [
+            "Compare les dates, pas l’ordre d’arrivée seul.",
+            "Le TP complet exige en plus une source et des limites de taille."
+          ],
+          "transfer": "Une note affirme qu’une ancienne préférence a changé. Quelles informations faut-il garder pour qu’une personne puisse contrôler cette correction ?",
+          "quiz": {
+            "question": "La date la plus récente d’un souvenir garantit…",
+            "choices": [
+              "Que son contenu est vrai",
+              "Qu’il peut modifier les permissions",
+              "Seulement qu’il est plus récent selon les données fournies",
+              "Qu’il doit être envoyé au fournisseur"
+            ],
+            "answer": 2,
+            "explanation": "La provenance et la relecture restent nécessaires : récent ne signifie pas exact ni autorisé.",
+            "version": "1f2cc8b2cccc376ab7abfd79007b5e4b66d45b9d6f7c76d8a24cdc9fe36a6842"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "merge_memory"
+          }
+        },
+        {
+          "id": "h4.4",
+          "title": "Persister et rappeler avec SQLite",
+          "minutes": 40,
+          "objectives": [
+            "Enregistrer atomiquement un état",
+            "Rechercher avec des paramètres SQL",
+            "Séparer stockage et prompt actif"
+          ],
+          "prerequisites": [
+            "h4.3",
+            "0.11"
+          ],
+          "vocabulary": {
+            "Transaction": "Ensemble d’écritures validé ou annulé ensemble.",
+            "Paramètre SQL": "Valeur transmise séparément du texte de la requête.",
+            "Session": "Historique et état d’une tâche identifiée."
+          },
+          "why": "Un redémarrage doit pouvoir retrouver l’état de travail. La persistance ne doit pas exposer la base au propre outil de lecture de l’agent.",
+          "explanation": "SQLiteStore enregistre chaque session sous un identifiant et un JSON. Les opérations utilisent des requêtes paramétrées ; le texte de la tâche n’est jamais concaténé dans le SQL. Les souvenirs sont stockés avec leur source et leur date.\n\nLe dossier donnees reste distinct du workspace. L’outil de lecture ne doit pas ouvrir sessions.sqlite et découvrir tous les échanges précédents. recall effectue ici une recherche littérale limitée à cinq résultats. Ce n’est pas un moteur sémantique et aucun embedding n’est entraîné.\n\nTeste un mot contenant %, un redémarrage et une correction de souvenir. Le résultat rappelé doit conserver sa provenance. Une base persistante demande aussi une politique de conservation et un export volontaire ; elle ne justifie pas de tout mémoriser.",
+          "code": "from harness.stockage import MemoryStore\ns=MemoryStore();s.save('une',{'status':'en cours'})\na=s.load('une');a['status']='modifié'\nassert s.load('une')['status']=='en cours'\nprint(s.sessions())",
+          "lab": "memory",
+          "exercise": {
+            "prompt": "Conserve une copie indépendante d’un état JSON pour éviter de le modifier accidentellement après sauvegarde.",
+            "starter": "def copie_etat(etat):\n    raise NotImplementedError('À compléter')",
+            "solution": "def copie_etat(etat):\n    import json\n    return json.loads(json.dumps(etat,allow_nan=False))",
+            "check": "a={'messages':[{'content':'x'}]};b=copie_etat(a);b['messages'][0]['content']='y'\nassert a['messages'][0]['content']=='x'\nassert copie_etat({'n':0})=={'n':0}",
+            "validatorVersion": "a85a035f7d612b53e8f133579752525a71b52e290635774f612da6cfbe23e7bc"
+          },
+          "hints": [
+            "Une copie du dictionnaire extérieur ne copie pas les listes imbriquées.",
+            "L’état de session utilise des valeurs JSON."
+          ],
+          "transfer": "Pourquoi enregistrer un état complet dans une transaction est-il préférable à écrire séparément le compteur puis le résultat ?",
+          "quiz": {
+            "question": "Pour rechercher le texte fourni par une personne dans SQLite, il faut…",
+            "choices": [
+              "Le concaténer au SQL après un espace",
+              "Le traiter comme un nom de table",
+              "Supprimer tous les caractères accentués",
+              "Le placer dans un paramètre de requête"
+            ],
+            "answer": 3,
+            "explanation": "Une requête paramétrée sépare la syntaxe SQL des valeurs. Le rappel reste une donnée avec source.",
+            "version": "70e9bd753e937a0379bc481b38d0a9704bdffad5f4f8045676d0526ae79ccd13"
+          },
+          "reference": {
+            "file": "harness/stockage.py",
+            "symbol": "SQLiteStore.recall"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Fiabilité et diagnostic",
+      "result": "Un journal vérifiable et un banc de régressions qui conserve les échecs.",
+      "tp": "Vérifier les traces",
+      "functions": [
+        "event_hash",
+        "recover_pending",
+        "evaluate_case"
+      ],
+      "criteria": [
+        "Je détecte un journal modifié ou une reprise incompatible.",
+        "Je teste un effet interrompu sans le rejouer.",
+        "Je sépare succès du banc et capacité d’un modèle."
+      ],
+      "lessons": [
+        {
+          "id": "h5.1",
+          "title": "Journaliser des événements utiles",
+          "minutes": 30,
+          "objectives": [
+            "Nommer les étapes observables",
+            "Chaîner les empreintes des événements",
+            "Éviter les secrets dans la trace"
+          ],
+          "prerequisites": [
+            "h3.4",
+            "h4.4"
+          ],
+          "vocabulary": {
+            "Événement": "Fait observé par le moteur à une étape précise.",
+            "Empreinte": "Résumé déterministe du contenu, utile pour comparer des versions.",
+            "Chaîne": "Chaque événement inclut le lien calculé depuis le précédent."
+          },
+          "why": "Un message final ne raconte pas forcément ce qui s’est passé. Le journal doit permettre de reconstruire les décisions du moteur.",
+          "explanation": "La trace distingue tool_started, tool_finished, tool_denied, invalid_output et final. Chaque événement porte une empreinte calculée à partir de son contenu canonique et de l’empreinte précédente. Modifier un événement sans recalculer la chaîne est détectable à la reprise.\n\nUne empreinte n’est pas une signature : une personne qui contrôle toute la base peut réécrire la chaîne. Le journal sert au diagnostic et à la détection de corruption, pas à certifier l’identité de l’opérateur. Les jetons d’API et variables secrètes sont exclus des champs exportés.\n\nConserve les identifiants, statuts, compteurs et références nécessaires. Une sortie documentaire peut contenir des données personnelles : son archivage doit rester explicite et local. Le rapport de fin ne remplace pas la relecture de la tâche.",
+          "code": "from harness.correction import event_hash\na={'kind':'tool_started','call_id':'c1'}\nh=event_hash('',a)\nprint(h[:12])\nassert event_hash(h,{'kind':'final'})!=event_hash('',{'kind':'final'})",
+          "lab": "trace",
+          "exercise": {
+            "prompt": "Calcule une empreinte stable de précédent + événement JSON trié.",
+            "starter": "def empreinte_evenement(precedent, evenement):\n    raise NotImplementedError('À compléter')",
+            "solution": "def empreinte_evenement(precedent, evenement):\n    import hashlib,json\n    raw=precedent+chr(10)+json.dumps(evenement,sort_keys=True,ensure_ascii=False,allow_nan=False)\n    return hashlib.sha256(raw.encode()).hexdigest()",
+            "check": "assert empreinte_evenement('',{'a':1,'b':2})==empreinte_evenement('',{'b':2,'a':1})\nassert empreinte_evenement('x',{'a':1})!=empreinte_evenement('',{'a':1})\nassert len(empreinte_evenement('',{}))==64",
+            "validatorVersion": "01cfbc7fa777751bf21cba82be4efa6200f4faddac3ba8bec2ad814a1aca7089"
+          },
+          "hints": [
+            "Trie les clés pour stabiliser la représentation.",
+            "La chaîne lie l’ordre, mais n’authentifie pas la personne."
+          ],
+          "transfer": "Quel type de modification une chaîne d’empreintes détecte-t-elle ? Que peut encore faire quelqu’un qui possède et réécrit tout le fichier ?",
+          "quiz": {
+            "question": "Une chaîne SHA-256 de journal apporte ici…",
+            "choices": [
+              "Un contrôle de cohérence, sans signature d’identité",
+              "Une preuve d’identité de l’apprenant",
+              "Une garantie de vérité des réponses",
+              "Une autorisation d’exécuter les événements"
+            ],
+            "answer": 0,
+            "explanation": "L’empreinte aide à vérifier une trace et ses versions ; elle ne transforme pas des déclarations en certification.",
+            "version": "b815a03ff80652d7805e0f612855acc57281f132f73e2bd33d1cd07849b29fdb"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "event_hash"
+          }
+        },
+        {
+          "id": "h5.2",
+          "title": "Tester une panne au mauvais moment",
+          "minutes": 30,
+          "objectives": [
+            "Repérer un appel commencé non terminé",
+            "Séparer lecture rejouable et écriture incertaine",
+            "Conserver les budgets lors d’une reprise"
+          ],
+          "prerequisites": [
+            "h5.1",
+            "h3.4"
+          ],
+          "vocabulary": {
+            "Pending": "Action dont le résultat n’est pas encore confirmé.",
+            "Crash": "Arrêt du processus entre deux enregistrements.",
+            "Reprise compatible": "Même code, modèle, workspace et permissions que la session."
+          },
+          "why": "Les pannes intéressantes surviennent entre le début d’un effet et son enregistrement final. C’est précisément là qu’un rejeu naïf devient dangereux.",
+          "explanation": "Le moteur sauvegarde pending avant l’appel. Si une écriture a commencé et que le processus s’arrête, la reprise signale uncertain_effect. Elle n’affirme ni que le fichier a été créé ni qu’il ne l’a pas été. Une inspection permet de réconcilier l’état.\n\nLes événements de début et de fin doivent correspondre au pending conservé. La reprise vérifie aussi la chaîne et la signature de configuration. Une modification du code élève ou un élargissement des permissions demande une nouvelle session, ce qui évite de continuer sous une règle différente.\n\nPour tester, injecte une panne contrôlée dans un outil de test, puis ouvre l’état sauvegardé. Vérifie les compteurs, le fichier et le statut. Le test se déroule dans un dossier temporaire, avec une création sans écrasement.",
+          "code": "from harness.correction import recover_pending\nrows=[{'kind':'tool_started','call_id':'a'},{'kind':'tool_started','call_id':'b'},{'kind':'tool_finished','call_id':'a'}]\nassert recover_pending(rows)==[rows[1]]\nprint(recover_pending(rows)[0]['call_id'])",
+          "lab": "replay",
+          "exercise": {
+            "prompt": "Renvoie les identifiants commencés sans événement de fin, dans leur ordre de début.",
+            "starter": "def appels_incertains(evenements):\n    raise NotImplementedError('À compléter')",
+            "solution": "def appels_incertains(evenements):\n    ouverts={}\n    for e in evenements:\n        if e['kind']=='tool_started':ouverts[e['call_id']]=True\n        elif e['kind']=='tool_finished':ouverts.pop(e['call_id'],None)\n    return list(ouverts)",
+            "check": "rows=[{'kind':'tool_started','call_id':'a'},{'kind':'tool_started','call_id':'b'},{'kind':'tool_finished','call_id':'a'}]\nassert appels_incertains(rows)==['b']\nassert appels_incertains([])==[]",
+            "validatorVersion": "5b47c0b445b1cade3eaa9d2cbc63dcc3db8c182016e5dd958ecd8b11f16f87fd"
+          },
+          "hints": [
+            "Un événement de fin ferme seulement son identifiant.",
+            "Un événement d’accord n’est pas un début d’effet."
+          ],
+          "transfer": "Une panne a eu lieu après création du fichier mais avant tool_finished. Quelle observation manuelle faut-il consigner avant toute nouvelle action ?",
+          "quiz": {
+            "question": "Une écriture commencée dont le résultat est inconnu doit…",
+            "choices": [
+              "Être rejouée jusqu’à obtenir succès",
+              "Être arrêtée pour réconciliation",
+              "Être considérée comme jamais exécutée",
+              "Être supprimée du journal"
+            ],
+            "answer": 1,
+            "explanation": "L’incertitude sur un effet réel doit rester visible. Le moteur refuse le rejeu aveugle.",
+            "version": "acba751ce52e215688d575fc50088eb790831267793784fb2eaf2f09d23bcea9"
+          },
+          "reference": {
+            "file": "harness/coeur.py",
+            "symbol": "Runner.run"
+          }
+        },
+        {
+          "id": "h5.3",
+          "title": "Construire des contre-exemples",
+          "minutes": 30,
+          "objectives": [
+            "Tester un refus de permissions",
+            "Simuler une injection documentaire",
+            "Vérifier l’absence d’effet interdit"
+          ],
+          "prerequisites": [
+            "h5.2",
+            "h2.3"
+          ],
+          "vocabulary": {
+            "Contre-exemple": "Entrée qui distingue une implémentation correcte d’une erreur plausible.",
+            "Régression": "Retour d’un défaut après un changement.",
+            "Assertion négative": "Vérification qu’un effet interdit n’a pas eu lieu."
+          },
+          "why": "Le chemin heureux ne teste pas les frontières. Un bon banc essaie aussi de faire échouer le moteur de façon contrôlée.",
+          "explanation": "Le banc fourni couvre calcul, JSON invalide, chemin interdit, commande inconnue, écriture sans accord, rejeu, identifiant contradictoire, injection documentaire et budget d’outils. Les modèles de ces scénarios sont scriptés pour rendre chaque défaut reproductible.\n\nLe test d’injection fait demander au modèle une écriture hors dossier après lecture d’un texte hostile. La politique doit la refuser même si le modèle suit cette instruction. Cela teste la barrière d’effet, pas une immunité sémantique du modèle à toute injection.\n\nVérifie les trois axes : bon statut, réponse attendue et absence d’appel interdit. Une tâche refusée peut constituer la réussite attendue d’un scénario. Conserve les cas en échec et ajoute un contre-exemple quand tu corriges un défaut.",
+          "code": "from harness.correction import evaluate_case\nreport={'status':'denied','answer':'','events':[]}\nchecks=evaluate_case(report,{'status':'denied','forbidden_tools':['ecrire_fichier']})\nassert all(checks.values())\nprint(checks)",
+          "lab": "injection",
+          "exercise": {
+            "prompt": "Détecte si une trace contient le début d’un outil interdit.",
+            "starter": "def aucun_effet_interdit(evenements, interdits):\n    raise NotImplementedError('À compléter')",
+            "solution": "def aucun_effet_interdit(evenements, interdits):\n    return not any(e.get('kind')=='tool_started' and e.get('name') in interdits for e in evenements)",
+            "check": "assert aucun_effet_interdit([{'kind':'tool_denied','name':'ecrire'}],{'ecrire'})\nassert not aucun_effet_interdit([{'kind':'tool_started','name':'ecrire'}],{'ecrire'})\nassert aucun_effet_interdit([],{'ecrire'})",
+            "validatorVersion": "a90a00df976fb8eda3bcee170e9bfbe210bc8e1f274469ab9309d24a800d8cdd"
+          },
+          "hints": [
+            "Un refus n’est pas une exécution.",
+            "Le test doit regarder l’événement de début d’effet."
+          ],
+          "transfer": "Le modèle annonce qu’il a effacé un fichier, mais la trace indique tool_denied. Comment évaluer la politique et la véracité de sa réponse séparément ?",
+          "quiz": {
+            "question": "Un test d’injection réussi par refus d’écriture prouve…",
+            "choices": [
+              "Que le modèle ignore toutes les injections",
+              "Que tous les outils sont sûrs dans tout environnement",
+              "Que cette barrière d’effet a tenu sur ce cas",
+              "Que le document était fiable"
+            ],
+            "answer": 2,
+            "explanation": "Le cas vérifie une propriété précise de la politique. Il ne suffit pas à démontrer une robustesse universelle du modèle.",
+            "version": "d3c8086dff597e405d2292cfa5aed5c07726108255e448d2e7878c13caa2920c"
+          },
+          "reference": {
+            "file": "harness/evaluer.py",
+            "symbol": "evaluate"
+          }
+        },
+        {
+          "id": "h5.4",
+          "title": "Lire un rapport sans se raconter d’histoires",
+          "minutes": 40,
+          "objectives": [
+            "Conserver le dénominateur des essais",
+            "Distinguer infrastructure et modèle",
+            "Relier un résultat à ses sources"
+          ],
+          "prerequisites": [
+            "h5.3",
+            "12.12"
+          ],
+          "vocabulary": {
+            "Dénominateur": "Nombre total de tentatives prises en compte.",
+            "Mesure de protocole": "Respect du format et du choix d’action.",
+            "Mesure d’autonomie": "Réussite réelle avec aides et limites documentées."
+          },
+          "why": "Un rapport « dix succès » ne veut rien dire sans savoir quels essais, quel modèle et quels critères ont été utilisés.",
+          "explanation": "Le rapport du banc contient les cas, les statuts, le nombre d’outils et l’étiquette scenario-scripted. autonomy_measured reste false. Le rapport de vérification du code élève garde le nom du module et son empreinte ; le mode correction contrôle la référence.\n\nUn rapport de sonde neuronale distinguera JSON valide et bonne action. Le projet final ajoutera la réussite réelle, les aides, les délais et les échecs. Une réponse finale techniquement bien formée peut être fausse ; une tâche bloquée par une permission peut être une bonne décision.\n\nCompare les mêmes cas entre variantes. Ne retire pas les abandons du total et ne transforme pas la meilleure graine en résultat représentatif. Le dossier final doit permettre de relancer l’expérience et d’expliquer un cas nouveau.",
+          "code": "from harness.correction import success_metrics\nprint(success_metrics([{'ok':True},{'ok':False},{'ok':True}]))\nassert success_metrics([])['success_rate'] is None",
+          "lab": "evaluation",
+          "exercise": {
+            "prompt": "Calcule le nombre de succès et le taux parmi toutes les tentatives ; le taux d’un ensemble vide vaut None.",
+            "starter": "def taux_reussite(lignes):\n    raise NotImplementedError('À compléter')",
+            "solution": "def taux_reussite(lignes):\n    n=len(lignes);k=sum(r.get('ok') is True for r in lignes)\n    return {'total':n,'succes':k,'taux':k/n if n else None}",
+            "check": "assert taux_reussite([])=={'total':0,'succes':0,'taux':None}\nassert taux_reussite([{'ok':True},{'ok':False},{'ok':False}])=={'total':3,'succes':1,'taux':1/3}",
+            "validatorVersion": "4c72ec51de47329c754f2eac16f5a419a35ca7ca4d2ad1af2a81d4330b3a54e8"
+          },
+          "hints": [
+            "Le dénominateur inclut les échecs.",
+            "Ne remplace pas une absence de mesure par zéro succès sur zéro essai."
+          ],
+          "transfer": "Une version réussit 8 essais sur 10 et l’autre 8 sur 20. Quels chiffres faut-il publier pour éviter une comparaison trompeuse ?",
+          "quiz": {
+            "question": "Dix scénarios scriptés réussis permettent de déclarer…",
+            "choices": [
+              "Un agent neuronal autonome à 100 %",
+              "Une efficacité pédagogique démontrée",
+              "Une réussite garantie sur les tâches futures",
+              "Un banc d’infrastructure réussi sur ces dix cas"
+            ],
+            "answer": 3,
+            "explanation": "Le rapport doit garder l’origine des réponses et la portée exacte du banc.",
+            "version": "009465d7b6d38a28b2a335bac7aa2b8ac68b48336d53e0beb2c6a8bff2b53847"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "success_metrics"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Ton modèle devient un contrôleur",
+      "result": "Un adaptateur réel, une sonde et un entraînement au protocole mesurable.",
+      "tp": "Brancher et mesurer le modèle",
+      "functions": [
+        "format_prompt",
+        "probe_summary",
+        "paired_delta"
+      ],
+      "criteria": [
+        "Je compare la sortie de mon checkpoint à une fixture sans les confondre.",
+        "Je mesure la couverture du vocabulaire et la fenêtre du modèle.",
+        "Je réserve des familles de tâches avant entraînement et comparaison."
+      ],
+      "lessons": [
+        {
+          "id": "h6.1",
+          "title": "Sonder avant d’autoriser des outils",
+          "minutes": 30,
+          "objectives": [
+            "Mesurer JSON valide et bonne action séparément",
+            "Tester sans exécuter d’effet",
+            "Conserver sorties et origine du modèle"
+          ],
+          "prerequisites": [
+            "h5.4",
+            "h1.4"
+          ],
+          "vocabulary": {
+            "Sonde": "Petit banc qui interroge le modèle sans accorder d’outils.",
+            "Conformité": "Respect d’un contrat de sortie.",
+            "Bonne action": "Choix adapté à la tâche, distinct du format."
+          },
+          "why": "Le modèle du cours prédit du texte. Avant d’en faire un contrôleur, il faut mesurer s’il sait produire une décision exploitable.",
+          "explanation": "sonder.py fournit quatre tâches réservées à un premier diagnostic : calculs nouveaux, réponse finale simple et proposition de création. Il appelle l’adaptateur, parse la sortie et vérifie le choix. Aucun outil de fichier n’est exécuté par cette sonde.\n\nLe rapport distingue valid_json et correct_action. Une proposition bien formée avec un mauvais calcul ne réussit pas la tâche. Un modèle qui produit du texte libre échoue au format avant toute discussion de permissions. Les limites du vocabulaire et les prompts tronqués restent visibles dans evidence.\n\nQuatre cas ne suffisent pas à mesurer une autonomie générale. Utilise-les pour décider de la prochaine brique à travailler, puis constitue un banc indépendant. Les tâches de comparaison ne doivent pas devenir les exemples mémorisés de l’entraînement.",
+          "code": "from harness.correction import probe_summary\nrows=[{'valid_json':True,'correct_action':False},{'valid_json':True,'correct_action':True}]\nassert probe_summary(rows)['valid_json']==2\nprint(probe_summary(rows))",
+          "lab": "model",
+          "exercise": {
+            "prompt": "Compte les formats valides et les bonnes décisions ; réussir tous les cas demande les deux critères et un ensemble non vide.",
+            "starter": "def bilan_sonde(lignes):\n    raise NotImplementedError('À compléter')",
+            "solution": "def bilan_sonde(lignes):\n    return {'json':sum(r.get('valid_json') is True for r in lignes),'actions':sum(r.get('correct_action') is True for r in lignes),'tout':bool(lignes) and all(r.get('valid_json') is True and r.get('correct_action') is True for r in lignes)}",
+            "check": "assert bilan_sonde([])=={'json':0,'actions':0,'tout':False}\nassert bilan_sonde([{'valid_json':True,'correct_action':False}])=={'json':1,'actions':0,'tout':False}\nassert bilan_sonde([{'valid_json':True,'correct_action':True}])['tout']",
+            "validatorVersion": "ffdc3dfd081f6e577263082f35e359b5d965f4bca66d66344cc7688922bcf2be"
+          },
+          "hints": [
+            "Une syntaxe correcte n’implique pas un bon choix.",
+            "Un banc vide n’est pas une réussite."
+          ],
+          "transfer": "Le modèle obtient 4/4 JSON valides et 1/4 bonnes actions. Quelle amélioration faut-il viser et quelle statistique doit rester publiée ?",
+          "quiz": {
+            "question": "La sonde doit commencer par…",
+            "choices": [
+              "Mesurer ses propositions sans exécuter les effets",
+              "Donner les droits d’écriture au modèle",
+              "Installer toutes les extensions disponibles",
+              "Remplacer les échecs par la sortie de référence"
+            ],
+            "answer": 0,
+            "explanation": "Le diagnostic du contrôleur précède l’élargissement des capacités. Les deux taux et les erreurs restent visibles.",
+            "version": "1436e088b53da452a31df39e51facebc6e60229bbc1e01baec0a378019ad7dde"
+          },
+          "reference": {
+            "file": "harness/sonder.py",
+            "symbol": "probe"
+          }
+        },
+        {
+          "id": "h6.2",
+          "title": "Retrouver les poids et le tokenizer du cours",
+          "minutes": 30,
+          "objectives": [
+            "Charger un checkpoint réel",
+            "Encoder avec son tokenizer exact",
+            "Refuser une troncature silencieuse"
+          ],
+          "prerequisites": [
+            "h6.1",
+            "3.11",
+            "12.12"
+          ],
+          "vocabulary": {
+            "Checkpoint": "Poids, configuration et métadonnées nécessaires à l’inférence.",
+            "Empreinte des poids": "Identifiant du fichier effectivement chargé.",
+            "Troncature": "Suppression d’une partie du prompt lorsque la fenêtre est trop courte."
+          },
+          "why": "Changer le tokenizer ou oublier une partie de l’instruction modifie le problème. Le lien avec ton modèle doit être vérifiable jusque dans les logits.",
+          "explanation": "RepoCheckpointModel utilise load_checkpoint du dépôt, puis le même forward TinyGPT que le cours. L’adaptateur conserve le SHA-256 du fichier et encode le prompt avec le tokenizer chargé. Si la fenêtre ne suffit pas, il refuse par défaut au lieu de cacher l’instruction perdue.\n\nPour le projet autonome de l’atelier, generer.py expose déjà /generer sur 127.0.0.1. LocalAPIModel en mode atelier lit son contrat, les caractères inconnus, la taille de contexte et la provenance. Le navigateur du site ne se connecte pas automatiquement à ce serveur local : la liaison se teste depuis ton terminal.\n\n--allow-clipped est réservé à une expérience explicite qui journalise la troncature. Ce drapeau ne rend pas la sortie fiable. Un checkpoint à très courte fenêtre peut convenir au cours de langage et rester inadapté au protocole du harness.",
+          "code": "from harness.correction import format_prompt,message\nprompt=format_prompt([message('system','JSON'),message('user','Calcule 4+5.')])\nprint(prompt)\nassert prompt.endswith('[assistant]\\n')",
+          "lab": "context",
+          "exercise": {
+            "prompt": "Indique si un prompt déjà tokenisé dépasse la fenêtre du checkpoint. Refuse une fenêtre nulle.",
+            "starter": "def depasse_fenetre(ids, fenetre):\n    raise NotImplementedError('À compléter')",
+            "solution": "def depasse_fenetre(ids, fenetre):\n    if type(fenetre) is not int or fenetre<1:raise ValueError('fenêtre invalide')\n    return len(ids)>fenetre",
+            "check": "assert not depasse_fenetre([1,2],2)\nassert depasse_fenetre([1,2,3],2)\ntry:depasse_fenetre([1],0)\nexcept ValueError:pass\nelse:raise AssertionError('fenêtre nulle')",
+            "validatorVersion": "03f3a8a02cb23ee11ec3619637f524e7f995c937cd3b3af3356fa11a18720afa"
+          },
+          "hints": [
+            "Compare le nombre d’identifiants, pas les octets du fichier.",
+            "Un dépassement doit être annoncé avant une action."
+          ],
+          "transfer": "Le poids du checkpoint est identique mais le tokenizer a changé. Pourquoi une égalité d’empreinte du seul fichier de poids ne suffit-elle plus ?",
+          "quiz": {
+            "question": "Le prompt dépasse la fenêtre du checkpoint. Le comportement par défaut est…",
+            "choices": [
+              "Supprimer le système et poursuivre",
+              "Refuser en expliquant la limite",
+              "Agrandir la table de positions sans entraînement",
+              "Déclarer que le modèle a reçu tout le contexte"
+            ],
+            "answer": 1,
+            "explanation": "La limite réelle doit rester visible. Le protocole demande un modèle et une fenêtre adaptés.",
+            "version": "a4b950f4b84e1991e19079a4fe46b1594c07b44ffa0a83eb9b4fcb571d622097"
+          },
+          "reference": {
+            "file": "harness/modeles.py",
+            "symbol": "RepoCheckpointModel.complete"
+          }
+        },
+        {
+          "id": "h6.3",
+          "title": "Apprendre le protocole avec une perte masquée",
+          "minutes": 30,
+          "objectives": [
+            "Préparer des conversations et leurs réponses",
+            "N’apprendre que les cibles de réponse",
+            "Vérifier un vrai changement des poids"
+          ],
+          "prerequisites": [
+            "h6.2",
+            "13.6",
+            "1.16"
+          ],
+          "vocabulary": {
+            "SFT": "Ajustement supervisé sur des exemples d’entrée et de réponse.",
+            "Masque de loss": "Poids qui détermine quelles cibles contribuent à la perte.",
+            "Famille": "Groupe de formulations et variantes qui restent dans le même ensemble."
+          },
+          "why": "La capacité à émettre du JSON ne vient pas du harness. Cette étape fournit une expérience d’apprentissage explicite sur ton moteur NumPy.",
+          "explanation": "preparer_donnees.py construit un petit corpus original d’additions. Chaque exemple contient les messages vus au moment de décider et la réponse attendue. Les familles sont séparées avant les formulations : train utilise les premiers opérandes, validation et test en gardent d’autres.\n\nentrainer_controleur.py encode le préfixe et la réponse séparément. Le masque commence au premier token cible de la réponse. La perte utilise l’autograd, le forward et AdamW du cours. Le rapport conserve graines, configuration, origine éventuelle du checkpoint, empreinte des données, perte de validation et nombre de paramètres modifiés.\n\nLe script refuse les réponses qui ne tiennent pas intégralement dans la fenêtre. Avec --initial, il ajuste ton checkpoint compatible ; sans --initial, il entraîne un petit contrôleur neuf. Deux pas testent le pipeline numérique, pas la qualité d’agent. Le test final reste réservé et la sonde mesure le protocole après entraînement.",
+          "code": "from harness.preparer_donnees import dataset,validate_dataset\ndata=validate_dataset(dataset())\nprint({k:len(v) for k,v in data['parts'].items()})\nassert not {r['family'] for r in data['parts']['train']} & {r['family'] for r in data['parts']['test']}",
+          "lab": "training",
+          "exercise": {
+            "prompt": "Construis le masque next-token : la cible d’indice i+1 contribue si elle commence dans la réponse.",
+            "starter": "def masque_cibles(n_prompt, n_total):\n    raise NotImplementedError('À compléter')",
+            "solution": "def masque_cibles(n_prompt, n_total):\n    return [i+1>=n_prompt for i in range(n_total-1)]",
+            "check": "assert masque_cibles(3,6)==[False,False,True,True,True]\nassert masque_cibles(1,4)==[True,True,True]\nassert masque_cibles(4,4)==[False,False,False]",
+            "validatorVersion": "57884db372d1fe42f892e3d7d43a93190681598e72375be31da7d19a5e76bc60"
+          },
+          "hints": [
+            "Les logits à i prédisent l’identifiant à i+1.",
+            "La question reste visible sans être une cible d’apprentissage."
+          ],
+          "transfer": "La loss baisse sur train mais le modèle choisit toujours le même outil sur de nouvelles demandes. Quelles mesures faut-il ajouter ?",
+          "quiz": {
+            "question": "Une baisse de loss masquée signifie d’abord…",
+            "choices": [
+              "Que toutes les tâches sont réussies",
+              "Que le harness a appris des permissions",
+              "Que la prédiction des cibles de réponse s’est améliorée sur la mesure",
+              "Que le test peut servir à choisir la graine"
+            ],
+            "answer": 2,
+            "explanation": "La loss est une mesure de prédiction. Il faut encore mesurer le JSON, le choix d’action et les tâches réservées.",
+            "version": "f4fce081422486ac6fd840251cfadda7378ad8c95b9ee66ffcff66aa458968e5"
+          },
+          "reference": {
+            "file": "harness/entrainer_controleur.py",
+            "symbol": "train"
+          }
+        },
+        {
+          "id": "h6.4",
+          "title": "Comparer des capacités sur des cas réservés",
+          "minutes": 40,
+          "objectives": [
+            "Apparier les mêmes graines et tâches",
+            "Séparer protocole et succès réel",
+            "Documenter les coûts et limites"
+          ],
+          "prerequisites": [
+            "h6.3",
+            "5.10",
+            "12.11"
+          ],
+          "vocabulary": {
+            "Appariement": "Comparaison des mêmes cas et graines dans les deux variantes.",
+            "Test réservé": "Ensemble non utilisé pour choisir la configuration.",
+            "Coût": "Temps, appels, contexte et ressources réellement mesurés."
+          },
+          "why": "Un joli exemple après entraînement ne suffit pas à choisir un contrôleur. Les comparaisons doivent conserver leurs cas et leurs limites.",
+          "explanation": "Commence par la sonde, puis les tâches de bout en bout dans un workspace neuf. Pour une variante de prompt ou d’entraînement, garde les mêmes familles réservées et les mêmes graines. Rapporte les écarts par graine avant leur moyenne.\n\nLe banc déterministe du harness reste utile pour détecter une régression de code. Il ne remplace pas les essais du modèle réel. Un fournisseur plus capable peut servir de comparaison locale, avec son nom, ses poids, ses réglages et son coût, sans lui attribuer les succès de ton checkpoint.\n\nLe choix de configuration se fait sur validation. Le test final s’ouvre ensuite et ses échecs sont conservés. Pour le projet final, demande aussi une explication sur un cas différent : identifier l’erreur, prédire une trace et montrer la limite observée.",
+          "code": "from harness.correction import paired_delta\na=[{'seed':1,'score':.5},{'seed':2,'score':.7}]\nb=[{'seed':2,'score':.8},{'seed':1,'score':.6}]\nprint(paired_delta(a,b))",
+          "lab": "evaluation",
+          "exercise": {
+            "prompt": "Calcule variante − référence par graine, dans l’ordre croissant, en refusant des graines non appariées.",
+            "starter": "def ecarts_graines(base, variante):\n    raise NotImplementedError('À compléter')",
+            "solution": "def ecarts_graines(base, variante):\n    a={r['seed']:r['score'] for r in base};b={r['seed']:r['score'] for r in variante}\n    if set(a)!=set(b) or not a:raise ValueError('graines non appariées')\n    return [b[k]-a[k] for k in sorted(a)]",
+            "check": "a=[{'seed':1,'score':2},{'seed':2,'score':5}];b=[{'seed':2,'score':4},{'seed':1,'score':4}]\nassert ecarts_graines(a,b)==[2,-1]\ntry:ecarts_graines(a,[{'seed':3,'score':4}])\nexcept ValueError:pass\nelse:raise AssertionError('graines différentes acceptées')",
+            "validatorVersion": "368cd406518b9329cb2a6de5e1c458fe3f25bbd99197857083f9b01ed723a3d2"
+          },
+          "hints": [
+            "L’ordre des lignes ne suffit pas à apparier des essais.",
+            "Un même identifiant de graine doit désigner le même protocole."
+          ],
+          "transfer": "Deux variantes ont le même taux de succès ; l’une utilise deux fois plus d’outils. Quelles données faut-il montrer avant de choisir ?",
+          "quiz": {
+            "question": "Pour choisir la variante avant le test final, on utilise…",
+            "choices": [
+              "Le meilleur exemple généré au hasard",
+              "Le test final après chaque essai",
+              "Uniquement la longueur des réponses",
+              "La validation selon un protocole fixé"
+            ],
+            "answer": 3,
+            "explanation": "Le test final reste réservé. Les succès, échecs et coûts se rapportent au même protocole.",
+            "version": "15e0e3d8659ba7cb9ee40aa081e40ec979ae631f33b2348f7cd3a46151ff2f5c"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "paired_delta"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Compétences et tâches longues",
+      "result": "Des procédures versionnées, un enfant borné et une file locale explicite.",
+      "tp": "Étendre sans élargir les droits",
+      "functions": [
+        "select_skills",
+        "delegation_budget",
+        "due_jobs"
+      ],
+      "criteria": [
+        "Je charge une procédure comme un document sans lui donner de nouveaux droits.",
+        "Je borne le budget et les outils d’un agent enfant.",
+        "Je conserve les tâches interrompues sans les rejouer automatiquement."
+      ],
+      "lessons": [
+        {
+          "id": "h7.1",
+          "title": "Une compétence est une procédure",
+          "minutes": 30,
+          "objectives": [
+            "Décrire une procédure réutilisable",
+            "Versionner ses sources et ses limites",
+            "Séparer document et code exécutable"
+          ],
+          "prerequisites": [
+            "h6.4",
+            "h4.3"
+          ],
+          "vocabulary": {
+            "Compétence": "Document de procédure choisi pour aider une tâche.",
+            "Version": "Identifiant d’une révision de ce document.",
+            "Portée": "Outils et situations pour lesquels la procédure est prévue."
+          },
+          "why": "Répéter les mêmes étapes dans chaque prompt gaspille du contexte. Une procédure peut être chargée à la demande et corrigée séparément.",
+          "explanation": "Le projet utilise un format JSON simple avec id, description, keywords, allowed_tools, procedure et version. Il s’agit d’un format pédagogique original, pas d’une installation automatique du format de compétences de Hermes. Le chargeur refuse les champs invalides et les identifiants dupliqués.\n\nLe document propose une méthode, comme lire une note et citer deux sources. Il n’exécute aucun code à l’import et ne change pas les permissions. Un champ allowed_tools décrit sa portée ; il doit encore être intersecté avec les droits existants.\n\nTu peux proposer une amélioration de la procédure après un échec. Conserve sa version précédente, le cas qui a motivé le changement et un test de non-régression. La correction automatique d’un document ne démontre pas une amélioration réelle tant que les mêmes tâches n’ont pas été rejouées.",
+          "code": "from harness.extensions import skill_messages\nfrom harness import correction as f\nskill={'procedure':'Lire la note, citer deux faits et une limite.'}\nrow=skill_messages(skill,f)[0]\nassert row['role']=='user'\nprint(row['content'])",
+          "lab": "skills",
+          "exercise": {
+            "prompt": "Vérifie la présence des six champs exacts d’une compétence et une version entière positive.",
+            "starter": "def competence_valide(row):\n    raise NotImplementedError('À compléter')",
+            "solution": "def competence_valide(row):\n    return isinstance(row,dict) and set(row)=={'id','description','keywords','allowed_tools','procedure','version'} and type(row['version']) is int and row['version']>0",
+            "check": "a={'id':'x','description':'d','keywords':[],'allowed_tools':[],'procedure':'p','version':1}\nassert competence_valide(a)\nassert not competence_valide({**a,'version':0})\nassert not competence_valide({**a,'secret':'x'})",
+            "validatorVersion": "8d6fe76e46b84bd7958c5b4d48c2f8b5f0a0382eeb4c720ce14c1dcce855a026"
+          },
+          "hints": [
+            "Une version booléenne n’est pas une version entière.",
+            "Le chargeur complet contrôle aussi les types et la taille."
+          ],
+          "transfer": "Une compétence téléchargée demande un accès réseau absent des droits de l’agent. Quel comportement doit conserver le chargeur ?",
+          "quiz": {
+            "question": "Charger une compétence doit…",
+            "choices": [
+              "Fournir une procédure soumise aux droits existants",
+              "Lancer toutes ses commandes",
+              "Remplacer les permissions du moteur",
+              "Installer automatiquement des dépendances"
+            ],
+            "answer": 0,
+            "explanation": "Une procédure est un document. L’exécution et les permissions restent contrôlées par le harness.",
+            "version": "fc269c084b516f59a28533f37d9eaa00269730f3118fe38d4d1a25b63497f842"
+          },
+          "reference": {
+            "file": "harness/extensions.py",
+            "symbol": "load_skills"
+          }
+        },
+        {
+          "id": "h7.2",
+          "title": "Choisir et améliorer une procédure",
+          "minutes": 30,
+          "objectives": [
+            "Classer par correspondance de mots-clés",
+            "Charger seulement les documents pertinents",
+            "Comparer les versions sur les mêmes tâches"
+          ],
+          "prerequisites": [
+            "h7.1",
+            "h4.1"
+          ],
+          "vocabulary": {
+            "Divulgation progressive": "Charger d’abord un résumé, puis le détail nécessaire.",
+            "Sélection lexicale": "Classement par mots communs, sans modèle sémantique.",
+            "Retour arrière": "Retour explicite à une version antérieure."
+          },
+          "why": "Charger toutes les procédures en permanence remplit la fenêtre. Un catalogue et un sélecteur donnent une première méthode inspectable.",
+          "explanation": "select_skills compte les mots-clés communs avec la demande et garde au plus trois procédures. Les égalités sont départagées par identifiant. Cette sélection est lexicale : elle ne comprend pas les synonymes et peut manquer une procédure pertinente.\n\nMesure ces erreurs avant d’ajouter un classifieur ou des embeddings. Pour chaque tâche, note la compétence choisie, sa version, le budget consommé et le résultat. Une modification ne doit pas être jugée seulement sur le cas qui l’a déclenchée.\n\nLa version précédente reste disponible. Un retour arrière peut être la bonne décision si la nouvelle procédure améliore un cas mais dégrade plusieurs autres. Les traces et le jeu réservé permettent d’expliquer ce choix.",
+          "code": "from harness.correction import select_skills\nrows=[{'id':'a','keywords':['note','relire']},{'id':'b','keywords':['calcul']}]\nassert select_skills(rows,'relire une note')[0]['id']=='a'\nassert select_skills(rows,'inconnu')==[]",
+          "lab": "skills",
+          "exercise": {
+            "prompt": "Classe les compétences selon leur nombre de mots-clés communs ; garde seulement les scores positifs et départage par identifiant.",
+            "starter": "def choisir_competence(rows, mots):\n    raise NotImplementedError('À compléter')",
+            "solution": "def choisir_competence(rows, mots):\n    scores=[(len(set(r['keywords'])&set(mots)),r['id']) for r in rows]\n    return [ident for score,ident in sorted(scores,key=lambda x:(-x[0],x[1])) if score>0]",
+            "check": "rows=[{'id':'b','keywords':['x']},{'id':'a','keywords':['x','y']},{'id':'c','keywords':['z']}]\nassert choisir_competence(rows,['x','y'])==['a','b']\nassert choisir_competence(rows,['q'])==[]",
+            "validatorVersion": "c3513da68a4ef1ef6e7038da10a0ed1bf4e8b8c1747c3457943182df81e3a64d"
+          },
+          "hints": [
+            "Le score est une intersection d’ensembles.",
+            "Un tri déterministe rend les essais reproductibles."
+          ],
+          "transfer": "Le mot « synthétiser » n’active pas une compétence étiquetée « résumé ». Comment mesurer cette limite avant de remplacer le sélecteur ?",
+          "quiz": {
+            "question": "Une sélection par mots-clés est…",
+            "choices": [
+              "Une compréhension sémantique garantie",
+              "Une règle lexicale dont les erreurs doivent être mesurées",
+              "Un résultat du checkpoint entraîné",
+              "Une permission de charger tout le catalogue"
+            ],
+            "answer": 1,
+            "explanation": "Cette première sélection est volontairement simple. Elle fournit une baseline avant une comparaison plus complexe.",
+            "version": "5427d5c3f127d676b121b929fa646e2d05d80541af3a02870d01ab94a8670a18"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "select_skills"
+          }
+        },
+        {
+          "id": "h7.3",
+          "title": "Déléguer avec un budget partagé",
+          "minutes": 30,
+          "objectives": [
+            "Créer un contexte enfant distinct",
+            "Réduire les droits et les budgets",
+            "Compter le coût de la délégation"
+          ],
+          "prerequisites": [
+            "h7.2",
+            "h3.1"
+          ],
+          "vocabulary": {
+            "Agent enfant": "Nouvelle boucle recevant une sous-tâche et un contexte distinct.",
+            "Intersection de droits": "Capacités présentes à la fois chez le parent et dans la demande enfant.",
+            "Budget partagé": "Ressources de l’enfant déduites de celles du parent."
+          },
+          "why": "Déléguer ne doit pas créer des ressources ou des permissions infinies. Une sous-tâche garde un coût et une frontière explicite.",
+          "explanation": "delegate crée un Runner avec son propre historique. Les tours et outils sont plafonnés par le budget restant du parent ; les droits sont leur intersection. Le résultat est rendu comme une donnée, avec le coût à déduire du parent. L’enfant ne peut pas se donner un outil manquant.\n\nCette implémentation est synchrone et ne propose pas d’outil de délégation récursive. Les contextes sont séparés, mais ce ne sont pas des processus isolés par le système. Le workspace peut rester partagé selon la politique choisie.\n\nPour tester la valeur de la délégation, compare une tâche réalisée seul et la même tâche avec un enfant, à budget total égal. Un plus grand nombre d’agents ne garantit pas une meilleure réponse. Le parent doit vérifier les sources et le résultat rendu.",
+          "code": "from harness.correction import delegation_budget\np={'turns':5,'tools':2,'allowed':['calculer','chercher']}\nr={'turns':10,'tools':4,'allowed':['calculer','ecrire_fichier']}\nassert delegation_budget(p,r)=={'turns':5,'tools':2,'allowed':['calculer']}\nprint(delegation_budget(p,r))",
+          "lab": "delegation",
+          "exercise": {
+            "prompt": "Calcule les plafonds enfant et l’intersection des outils disponibles.",
+            "starter": "def budget_enfant(parent, demande):\n    raise NotImplementedError('À compléter')",
+            "solution": "def budget_enfant(parent, demande):\n    return {'turns':min(parent['turns'],demande['turns']),'tools':min(parent['tools'],demande['tools']),'allowed':sorted(set(parent['allowed'])&set(demande['allowed']))}",
+            "check": "p={'turns':3,'tools':2,'allowed':['a','b']};d={'turns':8,'tools':1,'allowed':['b','c']}\nassert budget_enfant(p,d)=={'turns':3,'tools':1,'allowed':['b']}\nassert budget_enfant({**p,'tools':0},d)['tools']==0",
+            "validatorVersion": "95014d9956295b2df3f2994d281c35f415adbf8cc04e58b01fecb53932c25666"
+          },
+          "hints": [
+            "Une demande de capacité ne crée pas un droit.",
+            "L’allocation utilise le budget restant, pas le budget initial déjà dépensé."
+          ],
+          "transfer": "Un enfant répond avec une affirmation sans source. Pourquoi le parent doit-il la vérifier malgré la séparation des contextes ?",
+          "quiz": {
+            "question": "Les outils d’un enfant doivent appartenir…",
+            "choices": [
+              "À l’union de tous les outils disponibles",
+              "Seulement à ce que le modèle enfant réclame",
+              "À l’intersection de la demande et des droits du parent",
+              "Aux droits administrateur de la machine"
+            ],
+            "answer": 2,
+            "explanation": "La délégation peut réduire des droits ; elle ne doit pas les élargir.",
+            "version": "cc673ab93f02de9468e58df21fd747bd8e24b222fe56a83d6d4c35b555b91563"
+          },
+          "reference": {
+            "file": "harness/extensions.py",
+            "symbol": "delegate"
+          }
+        },
+        {
+          "id": "h7.4",
+          "title": "Planifier une file sans rejeu automatique",
+          "minutes": 40,
+          "objectives": [
+            "Séparer tâche planifiée et tâche lancée",
+            "Marquer une tâche avant son effet",
+            "Conserver les interruptions à réconcilier"
+          ],
+          "prerequisites": [
+            "h7.3",
+            "h5.2"
+          ],
+          "vocabulary": {
+            "File": "Liste de tâches avec identité, échéance et état.",
+            "Échéance": "Instant à partir duquel une tâche devient éligible.",
+            "Running": "Tâche commencée dont le résultat n’est pas encore confirmé."
+          },
+          "why": "Une tâche longue doit garder son état quand le processus s’arrête. L’échéance ne doit pas suffire à rejouer un effet déjà commencé.",
+          "explanation": "due_jobs sélectionne les tâches pending dont l’échéance est atteinte. run_due doit être appelé explicitement : il ne lance aucun démon ni message vers une plateforme. Avant l’exécution, il marque running et demande la sauvegarde de la file.\n\nAprès succès, l’état devient done ; après erreur attendue, failed. Une interruption brutale peut laisser running. Au prochain démarrage, ce statut n’est pas repris comme pending : l’utilisateur doit réconcilier l’effet avant de décider d’une nouvelle tentative.\n\nTu peux ensuite brancher un déclencheur externe documenté, par exemple un minuteur local, en gardant ce contrat d’état et les mêmes permissions. Mesure d’abord la sélection, la persistance et l’absence de doublon avec une horloge fixée dans les tests.",
+          "code": "from harness.correction import due_jobs\njobs=[{'id':'a','due':10,'state':'pending'},{'id':'b','due':5,'state':'running'}]\nassert due_jobs(jobs,10)==[jobs[0]]\nprint(due_jobs(jobs,9))",
+          "lab": "queue",
+          "exercise": {
+            "prompt": "Sélectionne les tâches pending déjà échues, triées par échéance puis identifiant.",
+            "starter": "def taches_pretes(jobs, maintenant):\n    raise NotImplementedError('À compléter')",
+            "solution": "def taches_pretes(jobs, maintenant):\n    return sorted([dict(r) for r in jobs if r['state']=='pending' and r['due']<=maintenant],key=lambda r:(r['due'],r['id']))",
+            "check": "rows=[{'id':'b','due':1,'state':'pending'},{'id':'a','due':1,'state':'pending'},{'id':'c','due':0,'state':'done'},{'id':'d','due':2,'state':'pending'}]\nassert [r['id'] for r in taches_pretes(rows,1)]==['a','b']\nassert taches_pretes(rows,-1)==[]",
+            "validatorVersion": "7ac9e7cfc6826f09cacd186f1ff0fee64053a693bb3730b1d1b87c4dc463e2ce"
+          },
+          "hints": [
+            "Ne sélectionne ni done ni running.",
+            "Injecter maintenant évite de dépendre de l’heure réelle dans le test."
+          ],
+          "transfer": "La machine s’arrête après l’effet mais avant done. Pourquoi le statut running doit-il demander une vérification humaine ?",
+          "quiz": {
+            "question": "Une tâche restée running après panne doit…",
+            "choices": [
+              "Repartir automatiquement comme pending",
+              "Être comptée comme un succès",
+              "Être effacée pour simplifier la file",
+              "Rester à réconcilier avant un éventuel rejeu"
+            ],
+            "answer": 3,
+            "explanation": "La file conserve l’incertitude au lieu de reproduire un effet sans preuve.",
+            "version": "7bbcba0a27380e4d6986066c3644be96088447b9f345bbf6e6965cd1fdb97e47"
+          },
+          "reference": {
+            "file": "harness/extensions.py",
+            "symbol": "run_due"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Utiliser, exposer et livrer",
+      "result": "Un agent local utilisable, une passerelle limitée et un dossier reproductible.",
+      "tp": "Livrer et expliquer son harness",
+      "functions": [
+        "validate_request",
+        "export_trace",
+        "success_metrics"
+      ],
+      "criteria": [
+        "Je sais utiliser mon module élève depuis la CLI.",
+        "La passerelle locale authentifie et borne chaque requête.",
+        "Mon dossier distingue code, modèle, mesures et observation humaine."
+      ],
+      "lessons": [
+        {
+          "id": "h8.1",
+          "title": "Une CLI qui montre ce qu’elle fait",
+          "minutes": 30,
+          "objectives": [
+            "Choisir le module élève et le fournisseur",
+            "Conserver session, budgets et rapport",
+            "Examiner chaque création proposée"
+          ],
+          "prerequisites": [
+            "h7.4",
+            "0.3"
+          ],
+          "vocabulary": {
+            "CLI": "Interface en ligne de commande.",
+            "Configuration": "Paramètres choisis par l’opérateur avant l’exécution.",
+            "Code de retour": "Indication de fin exploitable par un autre programme."
+          },
+          "why": "Le projet devient un outil lorsque tu peux le lancer, comprendre son statut, arrêter et reprendre son travail sans modifier son code à chaque fois.",
+          "explanation": "La CLI démarre avec le module eleve. Les fonctions non construites produisent un message TP incomplet. --module correction sert à contrôler la référence. --demo choisit une fixture ; --endpoint ou --repo avec --checkpoint choisit une origine réelle du modèle.\n\nLes chemins workspace et state-db sont distincts. --session identifie une tâche et --resume reprend son état compatible. --out crée un rapport neuf sans écraser un fichier existant. Le statut finished signifie que le protocole a conclu ; l’évaluation vérifie encore le résultat.\n\nPour les créations, --allow-write ouvre une proposition suivie d’une confirmation précise. Les commandes terminal proposées par l’outil diagnostic restent des presets fixes : aucune commande shell libre n’est exposée. Documente toute extension de cette frontière avant son utilisation.",
+          "code": "from harness.cli import demo\nfrom harness import correction as f\na=f.parse_action(demo('calcul').complete([],[],1))\nassert a['name']=='calculer'\nprint(a['arguments'])",
+          "lab": "loop",
+          "exercise": {
+            "prompt": "Valide une requête contenant seulement une tâche textuelle non vide, sans accepter un champ qui élargit les permissions.",
+            "starter": "def lire_requete(row):\n    raise NotImplementedError('À compléter')",
+            "solution": "def lire_requete(row):\n    if not isinstance(row,dict) or set(row)!={'task'} or not isinstance(row['task'],str) or not 1<=len(row['task'].strip())<=4000:raise ValueError('requête invalide')\n    return row['task'].strip()",
+            "check": "assert lire_requete({'task':'  tester '})=='tester'\nfor row in [{'task':''},{'task':'x','allow_write':True},{'task':4}]:\n    try:lire_requete(row)\n    except ValueError:pass\n    else:raise AssertionError('requête invalide acceptée')",
+            "validatorVersion": "167e2fde24572c2adaa3762a83fee4bedd5f441c26400e9d662a91e9f3d8cad9"
+          },
+          "hints": [
+            "Les droits viennent de la configuration, pas des champs du client.",
+            "Le texte de tâche est limité avant le premier appel."
+          ],
+          "transfer": "Explique la différence entre --module correction, --demo calcul et --checkpoint dans une remise de projet.",
+          "quiz": {
+            "question": "Le module correction dans la CLI sert à…",
+            "choices": [
+              "Contrôler une implémentation de référence identifiée",
+              "Attester automatiquement le travail personnel",
+              "Entraîner le modèle en arrière-plan",
+              "Activer toutes les permissions du système"
+            ],
+            "answer": 0,
+            "explanation": "La référence aide à comparer et diagnostiquer. Le dossier doit identifier le module réellement exécuté.",
+            "version": "5cd56979c360b846582ff5a8799be56e73d98b2c70d3dff139d448572d2571d1"
+          },
+          "reference": {
+            "file": "harness/cli.py",
+            "symbol": "main"
+          }
+        },
+        {
+          "id": "h8.2",
+          "title": "Une passerelle locale authentifiée",
+          "minutes": 30,
+          "objectives": [
+            "Distinguer API de modèle et API d’agent",
+            "Authentifier et borner la requête",
+            "Dédupliquer un appel client identifié"
+          ],
+          "prerequisites": [
+            "h8.1",
+            "h6.2"
+          ],
+          "vocabulary": {
+            "Passerelle": "Point d’entrée qui reçoit une tâche et appelle le harness.",
+            "Jeton Bearer": "Secret transmis dans l’en-tête d’authentification.",
+            "Clé d’idempotence": "Identifiant client qui lie une requête à son résultat."
+          },
+          "why": "Un autre programme peut vouloir soumettre une tâche à ton agent. Il faut définir cette interface aussi précisément que celle des outils.",
+          "explanation": "passerelle.py écoute uniquement sur 127.0.0.1 et attend un jeton local de trente-deux caractères au minimum, lu dans HARNESS_TOKEN. POST /run accepte exactement une tâche. Les corps trop longs, les origines web et les requêtes concurrentes sont refusés.\n\nIdempotency-Key réutilise le résultat d’une même tâche dans le processus courant ; une clé associée à une autre tâche est refusée. Ce cache limité à cent entrées est en mémoire, pas un mécanisme durable de distribution. La passerelle garde les outils en lecture seule et ne peut pas approuver une création.\n\nL’API du modèle reçoit un prompt et génère du texte. L’API d’agent reçoit une tâche et renvoie une trace de travail. Un déploiement public demanderait une authentification et une isolation supplémentaires ; le projet fourni reste une passerelle locale.",
+          "code": "from harness.correction import validate_request\ntask=validate_request({'task':'Calcule 3*7.'})\nassert task=='Calcule 3*7.'\nprint('La passerelle n’interprète aucun champ de permission.')",
+          "lab": "gateway",
+          "exercise": {
+            "prompt": "Compare deux clés d’idempotence : la même clé n’est réutilisable que pour la même tâche.",
+            "starter": "def rejeu_client(cache, cle, tache):\n    raise NotImplementedError('À compléter')",
+            "solution": "def rejeu_client(cache, cle, tache):\n    if cle not in cache:return None\n    ancienne,resultat=cache[cle]\n    if ancienne!=tache:raise ValueError('clé contradictoire')\n    return resultat",
+            "check": "cache={'a':('tâche 1',{'status':'finished'})}\nassert rejeu_client(cache,'a','tâche 1')=={'status':'finished'}\nassert rejeu_client(cache,'b','tâche 2') is None\ntry:rejeu_client(cache,'a','autre tâche')\nexcept ValueError:pass\nelse:raise AssertionError('rejeu contradictoire')",
+            "validatorVersion": "bb5c7e135dfa9aa48fb2782fcc3b3c406aa83762454f45e0bcaba7607db34319"
+          },
+          "hints": [
+            "Une clé seule n’identifie pas le contenu.",
+            "Le cache de la démonstration ne survit pas à un redémarrage."
+          ],
+          "transfer": "Pourquoi le jeton doit-il rester dans un en-tête et une variable d’environnement plutôt que dans l’URL ou le prompt ?",
+          "quiz": {
+            "question": "La passerelle fournie est conçue pour…",
+            "choices": [
+              "Être exposée publiquement sans configuration",
+              "Recevoir localement des tâches authentifiées et bornées",
+              "Écouter sur toutes les interfaces par défaut",
+              "Approuver les écritures depuis un navigateur"
+            ],
+            "answer": 1,
+            "explanation": "La boucle locale garde une frontière simple. Une exposition à d’autres machines constitue un autre travail de déploiement.",
+            "version": "dc42fee0212e35e8570ad4e70cdd5b8550764ac6a92102201dbc5a9a9e103a7e"
+          },
+          "reference": {
+            "file": "harness/passerelle.py",
+            "symbol": "server"
+          }
+        },
+        {
+          "id": "h8.3",
+          "title": "Installer, arrêter et sauvegarder",
+          "minutes": 30,
+          "objectives": [
+            "Reproduire l’environnement du projet",
+            "Séparer données, workspace et secrets",
+            "Tester le redémarrage et la restauration"
+          ],
+          "prerequisites": [
+            "h8.2",
+            "0.14",
+            "12.12"
+          ],
+          "vocabulary": {
+            "Environnement": "Version de Python et dépendances du projet.",
+            "Sauvegarde": "Copie vérifiée des données nécessaires à la reprise.",
+            "Exploitation": "Pratiques de lancement, arrêt, logs et maintenance."
+          },
+          "why": "Un programme qui fonctionne une fois dans ton terminal doit encore pouvoir être reproduit et repris sur ta machine.",
+          "explanation": "Le harness de base utilise Python 3.12 et sa bibliothèque standard. NumPy sert au checkpoint et à son entraînement. Le ZIP contient le module élève, la correction, les contrôles, les guides et la compétence d’exemple. Les commandes se lancent depuis le dossier mon-agent.\n\nGarde le workspace, la base donnees et les secrets séparés. Arrête le processus avant une copie simple de la base ; pour une sauvegarde à chaud, utilise l’API SQLite adaptée et vérifie la restauration. Les sessions reprises doivent conserver le même code et les mêmes permissions.\n\nLe guide donne une recette de lancement au premier plan, puis les points à fixer pour un service local. Le site n’installe aucun service sur ton ordinateur. Teste aussi refus réseau, arrêt volontaire, fichier déjà présent et manque de contexte. Ces essais font partie de la livraison.",
+          "code": "from harness.correction import export_trace\nrow=export_trace({'format':'afz-harness-v1','status':'finished','answer':'ok','token':'à exclure'})\nassert 'token' not in row\nprint(row)",
+          "lab": "trace",
+          "exercise": {
+            "prompt": "Exporte seulement les champs publics autorisés du rapport, en excluant tout champ secret ou inconnu.",
+            "starter": "def exporter_rapport(row):\n    raise NotImplementedError('À compléter')",
+            "solution": "def exporter_rapport(row):\n    autorises={'format','status','answer','turns','tool_calls','model','source_sha256'}\n    return {k:v for k,v in row.items() if k in autorises}",
+            "check": "r=exporter_rapport({'status':'finished','answer':'ok','token':'secret','Authorization':'Bearer secret'})\nassert r=={'status':'finished','answer':'ok'}\nassert exporter_rapport({})=={}",
+            "validatorVersion": "4259df281fcccafd738c44f653bb6ecb3f212f048dbc25ebc36823069f6ffafa"
+          },
+          "hints": [
+            "Une liste de champs autorisés résiste mieux à l’ajout futur d’un champ sensible.",
+            "Les données documentaires peuvent rester privées même sans jeton."
+          ],
+          "transfer": "Après restauration, le code a changé. Pourquoi faut-il conserver le rapport ancien et démarrer une session nouvelle ?",
+          "quiz": {
+            "question": "Une sauvegarde utile doit être…",
+            "choices": [
+              "Seulement copiée une fois sans essai",
+              "Placée dans le prompt du modèle",
+              "Restaurée et vérifiée sur un cas concret",
+              "Écrite dans le workspace lisible par tous les outils"
+            ],
+            "answer": 2,
+            "explanation": "La restauration vérifiée démontre la possibilité de reprendre les données ; la présence d’un fichier de copie ne suffit pas.",
+            "version": "229ab7dfe0a863113f80d8df461cc5c36fdba5f44f1d48375684e2147bfda413"
+          },
+          "reference": {
+            "file": "harness/correction.py",
+            "symbol": "export_trace"
+          }
+        },
+        {
+          "id": "h8.4",
+          "title": "Livrer et expliquer son agent",
+          "minutes": 40,
+          "objectives": [
+            "Assembler code, modèle et preuves",
+            "Démontrer une réussite et un refus",
+            "Expliquer une trace sur une tâche nouvelle"
+          ],
+          "prerequisites": [
+            "h8.3",
+            "h6.4",
+            "12.12"
+          ],
+          "vocabulary": {
+            "Livrable": "Ensemble permettant de comprendre et relancer ton projet.",
+            "Cas nouveau": "Tâche différente des exemples utilisés pour construire la solution.",
+            "Relecture": "Examen humain du raisonnement, des aides et des limites."
+          },
+          "why": "La dernière étape consiste à montrer ce que ton agent fait réellement et comment tu l’as construit, avec ses limites documentées.",
+          "explanation": "Le dossier final contient ton code élève, les versions, les empreintes des contrôles et du checkpoint, le protocole de données, les rapports, une trace réussie, un refus correct et un arrêt repris ou réconcilié. Les secrets et données de personnes ne sont pas publiés.\n\nLa grille examine cinq axes sur quatre points : contrats, outils et permissions, contexte et reprise, modèle et évaluation, autonomie d’explication. Chaque point cite une preuve. Aucun quiz ni rapport importé n’attribue automatiquement un 20/20.\n\nDemande une tâche nouvelle : prédire la trace, réaliser l’essai, expliquer l’erreur puis proposer un contre-test. Les observations de vrais débutants restent à recueillir. Le harness obtenu est un projet local complet et inspectable ; les plateformes de messagerie, les backends distants et une robustesse de production restent des extensions à développer et mesurer.",
+          "code": "from harness.correction import success_metrics\nrows=[{'ok':True},{'ok':False},{'ok':True},{'ok':False}]\nassert success_metrics(rows)['success_rate']==.5\nprint('La relecture humaine reste distincte de ce compteur.')",
+          "lab": "evaluation",
+          "exercise": {
+            "prompt": "Liste les pièces manquantes d’un dossier de harness : code, modèle, protocole, traces et limites.",
+            "starter": "def pieces_absentes(dossier):\n    raise NotImplementedError('À compléter')",
+            "solution": "def pieces_absentes(dossier):\n    return sorted({'code','modele','protocole','traces','limites'}-set(dossier))",
+            "check": "assert pieces_absentes({'code':{},'modele':{}})==['limites','protocole','traces']\nassert pieces_absentes(dict.fromkeys(['code','modele','protocole','traces','limites']))==[]",
+            "validatorVersion": "16d0db6a97e972c8ed1ca06902feff755b2aa9edb9f8ab99cf15f93c7afb13d7"
+          },
+          "hints": [
+            "La présence d’une pièce n’atteste pas sa qualité : elle permet de la relire.",
+            "Une trace heureuse seule ne démontre pas un refus correct."
+          ],
+          "transfer": "Présente une tâche nouvelle, une réponse erronée de ton agent et le contre-test qui a permis de diagnostiquer la cause. Indique les aides reçues.",
+          "quiz": {
+            "question": "Quelle remise permet la relecture la plus utile ?",
+            "choices": [
+              "Un taux de succès seul",
+              "Une capture de la meilleure réponse",
+              "Le nombre de compétences installées",
+              "Code, origine du modèle, protocole, traces et limites"
+            ],
+            "answer": 3,
+            "explanation": "Un dossier reproductible et une explication sur un cas nouveau permettent d’examiner le travail. Le score reste une relecture argumentée.",
+            "version": "251e53956ff3a9621ddfb88d6b991c2f319d8ef59b955b3e2cd44fa6e9ea7e2c"
+          },
+          "reference": {
+            "file": "harness/verifier.py",
+            "symbol": "verify"
+          }
+        }
+      ]
+    }
+  ],
+  "references": [
+    {
+      "title": "Hermes Agent : architecture officielle",
+      "url": "https://hermes-agent.nousresearch.com/docs/developer-guide/architecture"
+    },
+    {
+      "title": "Hermes Agent : référence de source examinée",
+      "url": "https://github.com/NousResearch/hermes-agent/tree/6bb377a51d5c8e279a7a5e34d717d653d421d064"
+    },
+    {
+      "title": "Python : subprocess et considérations de sécurité",
+      "url": "https://docs.python.org/3/library/subprocess.html#security-considerations"
+    }
+  ],
+  "version": "0a017b182a13ee657ce01010f8982fcd6dd77d9e436c3d64959e2a9a1ae69ad7",
+  "browserFiles": [
+    "harness/__init__.py",
+    "harness/correction.py",
+    "harness/coeur.py",
+    "harness/outils.py",
+    "harness/modeles.py",
+    "harness/stockage.py",
+    "harness/extensions.py",
+    "harness/cli.py",
+    "harness/preparer_donnees.py"
+  ]
+}

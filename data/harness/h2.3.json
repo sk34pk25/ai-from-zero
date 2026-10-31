@@ -1,0 +1,51 @@
+{
+  "id": "h2.3",
+  "title": "Lire dans un espace de travail choisi",
+  "minutes": 30,
+  "objectives": [
+    "Résoudre un chemin relatif",
+    "Refuser les sorties du dossier et les liens",
+    "Limiter les données lues"
+  ],
+  "prerequisites": [
+    "h2.1",
+    "0.2"
+  ],
+  "vocabulary": {
+    "Workspace": "Dossier dédié que les outils peuvent consulter.",
+    "Traversée": "Chemin comme ../secret qui tente de sortir du dossier.",
+    "Lien symbolique": "Entrée qui redirige vers une autre cible."
+  },
+  "why": "Un assistant qui lit des fichiers doit savoir lesquels il est autorisé à ouvrir. Le nom proposé par le modèle ne fixe pas cette frontière.",
+  "explanation": "safe_path refuse les chemins absolus, les segments .., les antislashs et les liens symboliques. La cible résolue doit rester sous la racine choisie. L’outil limite ensuite la lecture à 8000 octets et attend du texte UTF-8.\n\nCes contrôles sont une politique d’application. Ils ne constituent pas un bac à sable du système d’exploitation : utilise un dossier dédié, sans processus hostile capable de modifier ses répertoires simultanément. L’isolation d’un programme arbitraire demande une frontière supplémentaire comme un conteneur.\n\nLa base des sessions et les secrets restent hors du workspace. Tester un lien symbolique statique et changer une cible pendant une demande d’accord permet de vérifier les refus que le projet sait effectivement garantir.",
+  "code": "from harness.correction import safe_path\nprint(safe_path('/atelier','notes.txt'))\ntry:safe_path('/atelier','../secret.txt')\nexcept ValueError:print('hors dossier refusé')",
+  "lab": "path",
+  "exercise": {
+    "prompt": "Refuse les noms absolus, vides, les antislashs et les segments .. avant résolution.",
+    "starter": "def nom_relatif(nom):\n    raise NotImplementedError('À compléter')",
+    "solution": "def nom_relatif(nom):\n    from pathlib import PurePosixPath\n    if not isinstance(nom,str) or not nom or chr(92) in nom or chr(0) in nom:raise ValueError('nom invalide')\n    p=PurePosixPath(nom)\n    if p.is_absolute() or '..' in p.parts or not p.parts:raise ValueError('sortie interdite')\n    return str(p)",
+    "check": "assert nom_relatif('notes/a.txt')=='notes/a.txt'\nfor raw in ['../a','/a','','a\\\\b']:\n    try:nom_relatif(raw)\n    except ValueError:pass\n    else:raise AssertionError('chemin interdit accepté')\nfor raw in ['a'+chr(92)+'b',chr(0)]:\n    try:nom_relatif(raw)\n    except ValueError:pass\n    else:raise AssertionError('caractère interdit accepté')",
+    "validatorVersion": "1fc73442a5ad5ff1e688fdb0306acadbc9beda48c45447482a5644cabbaddb90"
+  },
+  "hints": [
+    "Cherche des segments .., pas seulement un préfixe de texte.",
+    "La fonction complète du TP vérifie aussi la cible résolue et les liens."
+  ],
+  "transfer": "Pourquoi le dossier donnees/sessions.sqlite doit-il être distinct du workspace consultable par l’agent ?",
+  "quiz": {
+    "question": "Un chemin reste sous la racine en apparence mais traverse un lien symbolique. Le moteur doit…",
+    "choices": [
+      "L’accepter parce qu’il est relatif",
+      "Demander au modèle si le lien est sûr",
+      "Le refuser selon la politique du projet",
+      "Supprimer le lien puis continuer"
+    ],
+    "answer": 2,
+    "explanation": "Le projet refuse les liens pour garder une frontière simple et inspectable. Il ne prétend pas isoler tout processus du système.",
+    "version": "6d296e6bdb425c7a475e2ef1f052edcac86da7d084d69136b0a523b07db22437"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "safe_path"
+  }
+}
