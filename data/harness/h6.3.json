@@ -1,0 +1,52 @@
+{
+  "id": "h6.3",
+  "title": "Apprendre le protocole avec une perte masquée",
+  "minutes": 30,
+  "objectives": [
+    "Préparer des conversations et leurs réponses",
+    "N’apprendre que les cibles de réponse",
+    "Vérifier un vrai changement des poids"
+  ],
+  "prerequisites": [
+    "h6.2",
+    "13.6",
+    "1.16"
+  ],
+  "vocabulary": {
+    "SFT": "Ajustement supervisé sur des exemples d’entrée et de réponse.",
+    "Masque de loss": "Poids qui détermine quelles cibles contribuent à la perte.",
+    "Famille": "Groupe de formulations et variantes qui restent dans le même ensemble."
+  },
+  "why": "La capacité à émettre du JSON ne vient pas du harness. Cette étape fournit une expérience d’apprentissage explicite sur ton moteur NumPy.",
+  "explanation": "preparer_donnees.py construit un petit corpus original d’additions. Chaque exemple contient les messages vus au moment de décider et la réponse attendue. Les familles sont séparées avant les formulations : train utilise les premiers opérandes, validation et test en gardent d’autres.\n\nentrainer_controleur.py encode le préfixe et la réponse séparément. Le masque commence au premier token cible de la réponse. La perte utilise l’autograd, le forward et AdamW du cours. Le rapport conserve graines, configuration, origine éventuelle du checkpoint, empreinte des données, perte de validation et nombre de paramètres modifiés.\n\nLe script refuse les réponses qui ne tiennent pas intégralement dans la fenêtre. Avec --initial, il ajuste ton checkpoint compatible ; sans --initial, il entraîne un petit contrôleur neuf. Deux pas testent le pipeline numérique, pas la qualité d’agent. Le test final reste réservé et la sonde mesure le protocole après entraînement.",
+  "code": "from harness.preparer_donnees import dataset,validate_dataset\ndata=validate_dataset(dataset())\nprint({k:len(v) for k,v in data['parts'].items()})\nassert not {r['family'] for r in data['parts']['train']} & {r['family'] for r in data['parts']['test']}",
+  "lab": "training",
+  "exercise": {
+    "prompt": "Construis le masque next-token : la cible d’indice i+1 contribue si elle commence dans la réponse.",
+    "starter": "def masque_cibles(n_prompt, n_total):\n    raise NotImplementedError('À compléter')",
+    "solution": "def masque_cibles(n_prompt, n_total):\n    return [i+1>=n_prompt for i in range(n_total-1)]",
+    "check": "assert masque_cibles(3,6)==[False,False,True,True,True]\nassert masque_cibles(1,4)==[True,True,True]\nassert masque_cibles(4,4)==[False,False,False]",
+    "validatorVersion": "57884db372d1fe42f892e3d7d43a93190681598e72375be31da7d19a5e76bc60"
+  },
+  "hints": [
+    "Les logits à i prédisent l’identifiant à i+1.",
+    "La question reste visible sans être une cible d’apprentissage."
+  ],
+  "transfer": "La loss baisse sur train mais le modèle choisit toujours le même outil sur de nouvelles demandes. Quelles mesures faut-il ajouter ?",
+  "quiz": {
+    "question": "Une baisse de loss masquée signifie d’abord…",
+    "choices": [
+      "Que toutes les tâches sont réussies",
+      "Que le harness a appris des permissions",
+      "Que la prédiction des cibles de réponse s’est améliorée sur la mesure",
+      "Que le test peut servir à choisir la graine"
+    ],
+    "answer": 2,
+    "explanation": "La loss est une mesure de prédiction. Il faut encore mesurer le JSON, le choix d’action et les tâches réservées.",
+    "version": "f4fce081422486ac6fd840251cfadda7378ad8c95b9ee66ffcff66aa458968e5"
+  },
+  "reference": {
+    "file": "harness/entrainer_controleur.py",
+    "symbol": "train"
+  }
+}

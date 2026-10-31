@@ -1,0 +1,51 @@
+{
+  "id": "h5.4",
+  "title": "Lire un rapport sans se raconter d’histoires",
+  "minutes": 40,
+  "objectives": [
+    "Conserver le dénominateur des essais",
+    "Distinguer infrastructure et modèle",
+    "Relier un résultat à ses sources"
+  ],
+  "prerequisites": [
+    "h5.3",
+    "12.12"
+  ],
+  "vocabulary": {
+    "Dénominateur": "Nombre total de tentatives prises en compte.",
+    "Mesure de protocole": "Respect du format et du choix d’action.",
+    "Mesure d’autonomie": "Réussite réelle avec aides et limites documentées."
+  },
+  "why": "Un rapport « dix succès » ne veut rien dire sans savoir quels essais, quel modèle et quels critères ont été utilisés.",
+  "explanation": "Le rapport du banc contient les cas, les statuts, le nombre d’outils et l’étiquette scenario-scripted. autonomy_measured reste false. Le rapport de vérification du code élève garde le nom du module et son empreinte ; le mode correction contrôle la référence.\n\nUn rapport de sonde neuronale distinguera JSON valide et bonne action. Le projet final ajoutera la réussite réelle, les aides, les délais et les échecs. Une réponse finale techniquement bien formée peut être fausse ; une tâche bloquée par une permission peut être une bonne décision.\n\nCompare les mêmes cas entre variantes. Ne retire pas les abandons du total et ne transforme pas la meilleure graine en résultat représentatif. Le dossier final doit permettre de relancer l’expérience et d’expliquer un cas nouveau.",
+  "code": "from harness.correction import success_metrics\nprint(success_metrics([{'ok':True},{'ok':False},{'ok':True}]))\nassert success_metrics([])['success_rate'] is None",
+  "lab": "evaluation",
+  "exercise": {
+    "prompt": "Calcule le nombre de succès et le taux parmi toutes les tentatives ; le taux d’un ensemble vide vaut None.",
+    "starter": "def taux_reussite(lignes):\n    raise NotImplementedError('À compléter')",
+    "solution": "def taux_reussite(lignes):\n    n=len(lignes);k=sum(r.get('ok') is True for r in lignes)\n    return {'total':n,'succes':k,'taux':k/n if n else None}",
+    "check": "assert taux_reussite([])=={'total':0,'succes':0,'taux':None}\nassert taux_reussite([{'ok':True},{'ok':False},{'ok':False}])=={'total':3,'succes':1,'taux':1/3}",
+    "validatorVersion": "4c72ec51de47329c754f2eac16f5a419a35ca7ca4d2ad1af2a81d4330b3a54e8"
+  },
+  "hints": [
+    "Le dénominateur inclut les échecs.",
+    "Ne remplace pas une absence de mesure par zéro succès sur zéro essai."
+  ],
+  "transfer": "Une version réussit 8 essais sur 10 et l’autre 8 sur 20. Quels chiffres faut-il publier pour éviter une comparaison trompeuse ?",
+  "quiz": {
+    "question": "Dix scénarios scriptés réussis permettent de déclarer…",
+    "choices": [
+      "Un agent neuronal autonome à 100 %",
+      "Une efficacité pédagogique démontrée",
+      "Une réussite garantie sur les tâches futures",
+      "Un banc d’infrastructure réussi sur ces dix cas"
+    ],
+    "answer": 3,
+    "explanation": "Le rapport doit garder l’origine des réponses et la portée exacte du banc.",
+    "version": "009465d7b6d38a28b2a335bac7aa2b8ac68b48336d53e0beb2c6a8bff2b53847"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "success_metrics"
+  }
+}

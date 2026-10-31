@@ -1,0 +1,51 @@
+{
+  "id": "h1.4",
+  "title": "Brancher une interface de modèle",
+  "minutes": 40,
+  "objectives": [
+    "Écrire une interface complete",
+    "Conserver l’origine des réponses",
+    "Préparer un premier test de capacités"
+  ],
+  "prerequisites": [
+    "h1.3",
+    "4.14"
+  ],
+  "vocabulary": {
+    "Adaptateur": "Code qui expose la même interface pour plusieurs sources.",
+    "Fixture": "Réponse fixée pour un test reproductible.",
+    "Inférence": "Calcul d’une sortie avec des poids déjà entraînés."
+  },
+  "why": "La boucle ne doit pas être réécrite pour chaque modèle. Elle doit recevoir une interface stable et savoir d’où viennent les sorties.",
+  "explanation": "Notre interface complete(messages, tools, turn) renvoie du texte. ScriptedModel utilise turn pour rejouer une fixture. RepoCheckpointModel calcule réellement les logits de ton TinyGPT. LocalAPIModel parle au serveur de ton atelier ou à un serveur local compatible avec des messages de chat.\n\nL’adaptateur ne donne aucun droit à la réponse : le parseur et les outils restent les mêmes. Son étiquette et les empreintes du checkpoint sont conservées dans les rapports. Une clé d’API éventuelle est lue depuis une variable d’environnement et ne doit pas entrer dans un prompt ou un export.\n\nUn petit modèle de prédiction de texte peut ne produire aucun JSON valide. Dans ce cas, l’échec est une mesure utile. Tu vas d’abord vérifier le protocole sans exécuter d’outil, puis préparer un entraînement adapté et refaire une mesure réservée.",
+  "code": "from harness.modeles import LocalAPIModel\nm=LocalAPIModel('http://127.0.0.1:8765/generer')\nprint(m.label)\n# La construction ne contacte pas le serveur.\nassert m.mode=='atelier'",
+  "lab": "model",
+  "exercise": {
+    "prompt": "Écris une fixture qui renvoie la réponse correspondant au numéro de tour, en conservant la dernière si le scénario est épuisé.",
+    "starter": "def reponse_script(responses, tour):\n    raise NotImplementedError('À compléter')",
+    "solution": "def reponse_script(responses, tour):\n    if not responses or tour<1:raise ValueError('scénario invalide')\n    return responses[min(tour-1,len(responses)-1)]",
+    "check": "assert reponse_script(['outil','final'],1)=='outil'\nassert reponse_script(['outil','final'],2)=='final'\nassert reponse_script(['outil','final'],9)=='final'\ntry:reponse_script([],1)\nexcept ValueError:pass\nelse:raise AssertionError('scénario vide')",
+    "validatorVersion": "e9aa0e7a5e6646bfbb98f245c8fd780c27cfc18f3cc55ecc6f6343fc05fcfc70"
+  },
+  "hints": [
+    "Les tours commencent à 1 ; les indices de liste à 0.",
+    "L’étiquette du fournisseur doit rester visible."
+  ],
+  "transfer": "Une fixture réussit dix tâches et ton checkpoint échoue à former un JSON. Quelles conclusions peux-tu écrire séparément ?",
+  "quiz": {
+    "question": "Une réussite avec ScriptedModel démontre…",
+    "choices": [
+      "L’autonomie générale du checkpoint",
+      "La qualité de tous les fournisseurs locaux",
+      "La capacité du modèle à apprendre de lui-même",
+      "Le câblage du harness sur le scénario"
+    ],
+    "answer": 3,
+    "explanation": "Les réponses scriptées testent une infrastructure déterministe. Le comportement d’un modèle neuronal se mesure avec son adaptateur réel.",
+    "version": "c6b4b2de4a25375c46c11846758e24448427777a83e6119b8afc1854bcea5a88"
+  },
+  "reference": {
+    "file": "harness/modeles.py",
+    "symbol": "ScriptedModel.complete"
+  }
+}

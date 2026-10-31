@@ -1,0 +1,51 @@
+{
+  "id": "h2.4",
+  "title": "Proposer puis autoriser un effet",
+  "minutes": 40,
+  "objectives": [
+    "Prévisualiser les arguments exacts",
+    "Exiger un accord distinct pour une création",
+    "Revérifier après l’accord"
+  ],
+  "prerequisites": [
+    "h2.2",
+    "h2.3"
+  ],
+  "vocabulary": {
+    "Effet": "Changement observable de l’état, comme créer un fichier.",
+    "Approbation": "Décision humaine concernant une proposition précise.",
+    "Précondition": "État qui doit encore être vrai au moment d’agir."
+  },
+  "why": "Une intention d’écriture doit pouvoir être examinée avant d’agir. L’autorisation d’un outil ne remplace pas l’accord sur une action précise.",
+  "explanation": "Le moteur prépare un aperçu avec nom, arguments et empreinte de l’action. En CLI, --allow-write permet seulement de proposer une création. La personne doit encore taper oui pour chaque effet. Le fichier est créé avec le mode exclusif x ; un fichier existant n’est jamais écrasé.\n\nLe chemin est revérifié après l’attente. Si la cible ou un répertoire a changé, la proposition est refusée. Un accord ne porte pas sur toutes les actions futures ni sur une autre version du contenu.\n\nSi le processus s’arrête pendant une écriture, la reprise ne la rejoue pas aveuglément. Le journal signale un effet incertain à réconcilier. Observe le fichier et la trace avant de décider d’une nouvelle session.",
+  "code": "import tempfile\nfrom harness.outils import Tools\nfrom harness import correction as f\nwith tempfile.TemporaryDirectory() as d:\n    t=Tools(d,f)\n    print(t.preview({'name':'ecrire_fichier','arguments':{'path':'note.txt','content':'bonjour'}})['effect'])",
+  "lab": "approval",
+  "exercise": {
+    "prompt": "Décide si une action est exécutable : une lecture est permise, une création demande exactement l’accord booléen True.",
+    "starter": "def accord_requis(effet, accord):\n    raise NotImplementedError('À compléter')",
+    "solution": "def accord_requis(effet, accord):\n    if effet not in {'lecture','creation'}:raise ValueError('effet inconnu')\n    return effet=='lecture' or accord is True",
+    "check": "assert accord_requis('lecture',False)\nassert accord_requis('creation',True)\nassert not accord_requis('creation',False)\nassert not accord_requis('creation','oui')",
+    "validatorVersion": "009aba018611350d2ac370b5d330cea59ddbb172a7fbe7e124528c491749bb59"
+  },
+  "hints": [
+    "Une chaîne non vide est truthy, mais elle n’est pas le booléen True.",
+    "Le refus laisse la proposition disponible, sans créer de fichier."
+  ],
+  "transfer": "Le fichier visé apparaît pendant que tu lis la proposition. Pourquoi faut-il revérifier avant l’ouverture exclusive ?",
+  "quiz": {
+    "question": "--allow-write signifie dans ce projet…",
+    "choices": [
+      "Écraser les fichiers existants",
+      "Approuver toutes les tâches suivantes",
+      "Laisser le modèle modifier les permissions",
+      "Permettre de proposer une création avec un accord par action"
+    ],
+    "answer": 3,
+    "explanation": "Le drapeau active une capacité ; chaque action doit encore être examinée et la cible revérifiée.",
+    "version": "cdff553c1b8c043a1d538c76386f364da4aa2adef1b86590ed4b32e0dae4a970"
+  },
+  "reference": {
+    "file": "harness/outils.py",
+    "symbol": "Tools.preview"
+  }
+}

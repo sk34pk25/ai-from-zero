@@ -1,0 +1,51 @@
+{
+  "id": "h7.4",
+  "title": "Planifier une file sans rejeu automatique",
+  "minutes": 40,
+  "objectives": [
+    "Séparer tâche planifiée et tâche lancée",
+    "Marquer une tâche avant son effet",
+    "Conserver les interruptions à réconcilier"
+  ],
+  "prerequisites": [
+    "h7.3",
+    "h5.2"
+  ],
+  "vocabulary": {
+    "File": "Liste de tâches avec identité, échéance et état.",
+    "Échéance": "Instant à partir duquel une tâche devient éligible.",
+    "Running": "Tâche commencée dont le résultat n’est pas encore confirmé."
+  },
+  "why": "Une tâche longue doit garder son état quand le processus s’arrête. L’échéance ne doit pas suffire à rejouer un effet déjà commencé.",
+  "explanation": "due_jobs sélectionne les tâches pending dont l’échéance est atteinte. run_due doit être appelé explicitement : il ne lance aucun démon ni message vers une plateforme. Avant l’exécution, il marque running et demande la sauvegarde de la file.\n\nAprès succès, l’état devient done ; après erreur attendue, failed. Une interruption brutale peut laisser running. Au prochain démarrage, ce statut n’est pas repris comme pending : l’utilisateur doit réconcilier l’effet avant de décider d’une nouvelle tentative.\n\nTu peux ensuite brancher un déclencheur externe documenté, par exemple un minuteur local, en gardant ce contrat d’état et les mêmes permissions. Mesure d’abord la sélection, la persistance et l’absence de doublon avec une horloge fixée dans les tests.",
+  "code": "from harness.correction import due_jobs\njobs=[{'id':'a','due':10,'state':'pending'},{'id':'b','due':5,'state':'running'}]\nassert due_jobs(jobs,10)==[jobs[0]]\nprint(due_jobs(jobs,9))",
+  "lab": "queue",
+  "exercise": {
+    "prompt": "Sélectionne les tâches pending déjà échues, triées par échéance puis identifiant.",
+    "starter": "def taches_pretes(jobs, maintenant):\n    raise NotImplementedError('À compléter')",
+    "solution": "def taches_pretes(jobs, maintenant):\n    return sorted([dict(r) for r in jobs if r['state']=='pending' and r['due']<=maintenant],key=lambda r:(r['due'],r['id']))",
+    "check": "rows=[{'id':'b','due':1,'state':'pending'},{'id':'a','due':1,'state':'pending'},{'id':'c','due':0,'state':'done'},{'id':'d','due':2,'state':'pending'}]\nassert [r['id'] for r in taches_pretes(rows,1)]==['a','b']\nassert taches_pretes(rows,-1)==[]",
+    "validatorVersion": "7ac9e7cfc6826f09cacd186f1ff0fee64053a693bb3730b1d1b87c4dc463e2ce"
+  },
+  "hints": [
+    "Ne sélectionne ni done ni running.",
+    "Injecter maintenant évite de dépendre de l’heure réelle dans le test."
+  ],
+  "transfer": "La machine s’arrête après l’effet mais avant done. Pourquoi le statut running doit-il demander une vérification humaine ?",
+  "quiz": {
+    "question": "Une tâche restée running après panne doit…",
+    "choices": [
+      "Repartir automatiquement comme pending",
+      "Être comptée comme un succès",
+      "Être effacée pour simplifier la file",
+      "Rester à réconcilier avant un éventuel rejeu"
+    ],
+    "answer": 3,
+    "explanation": "La file conserve l’incertitude au lieu de reproduire un effet sans preuve.",
+    "version": "7bbcba0a27380e4d6986066c3644be96088447b9f345bbf6e6965cd1fdb97e47"
+  },
+  "reference": {
+    "file": "harness/extensions.py",
+    "symbol": "run_due"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "h4.3",
+  "title": "Une mémoire sourcée et corrigeable",
+  "minutes": 30,
+  "objectives": [
+    "Définir un souvenir structuré",
+    "Choisir une version selon sa date",
+    "Conserver l’origine et limiter le volume"
+  ],
+  "prerequisites": [
+    "h4.2",
+    "0.10"
+  ],
+  "vocabulary": {
+    "Souvenir": "Fait conservé avec clé, valeur, source et date.",
+    "Provenance": "Origine qui permet de relire ou contester une information.",
+    "Correction": "Nouvelle version explicitement rattachée au même fait."
+  },
+  "why": "Une mémoire qui accumule des phrases sans origine devient difficile à corriger. Elle peut aussi conserver une instruction malveillante comme un fait.",
+  "explanation": "Notre format exige key, value, source et at. merge_memory conserve la version la plus récente d’une même clé, puis limite la collection à cent souvenirs. La source permet de retrouver pourquoi une information a été retenue.\n\nLa mémoire n’est pas un nouveau message système. Un contenu rappelé demeure une donnée à vérifier. Le moteur ne transforme jamais une phrase comme « autoriser toutes les commandes » en permission Python. Les informations sensibles doivent être choisies avec la personne et pouvoir être effacées.\n\nUn bon test montre un fait ancien, sa correction puis un rappel. Ajoute aussi une nouvelle information indépendante : corriger la première ne doit pas supprimer la seconde. Le temps sert ici à départager des versions, pas à garantir leur véracité.",
+  "code": "from harness.correction import merge_memory\na={'key':'projet','value':'A','source':'utilisateur','at':1}\nb={**a,'value':'B','at':2}\nassert merge_memory([a],[b])==[b]\nprint(merge_memory([b],[a])[0]['value'])",
+  "lab": "memory",
+  "exercise": {
+    "prompt": "Fusionne des souvenirs par clé en conservant la date la plus récente, sans modifier les listes reçues.",
+    "starter": "def fusionner(anciens, nouveaux):\n    raise NotImplementedError('À compléter')",
+    "solution": "def fusionner(anciens, nouveaux):\n    resultat={}\n    for r in anciens+nouveaux:\n        if r['key'] not in resultat or r['at']>=resultat[r['key']]['at']:resultat[r['key']]=dict(r)\n    return sorted(resultat.values(),key=lambda r:r['key'])",
+    "check": "a={'key':'x','value':'A','at':2};b={'key':'x','value':'B','at':1};c={'key':'y','value':'C','at':3}\nassert fusionner([a],[b,c])==[a,c]\nassert fusionner([b],[a])==[a]\nassert a['value']=='A'",
+    "validatorVersion": "c36b3b40ddc04b450ecb298735f4fac6b693e7bc1584bbc0d6ab4dd01485031f"
+  },
+  "hints": [
+    "Compare les dates, pas l’ordre d’arrivée seul.",
+    "Le TP complet exige en plus une source et des limites de taille."
+  ],
+  "transfer": "Une note affirme qu’une ancienne préférence a changé. Quelles informations faut-il garder pour qu’une personne puisse contrôler cette correction ?",
+  "quiz": {
+    "question": "La date la plus récente d’un souvenir garantit…",
+    "choices": [
+      "Que son contenu est vrai",
+      "Qu’il peut modifier les permissions",
+      "Seulement qu’il est plus récent selon les données fournies",
+      "Qu’il doit être envoyé au fournisseur"
+    ],
+    "answer": 2,
+    "explanation": "La provenance et la relecture restent nécessaires : récent ne signifie pas exact ni autorisé.",
+    "version": "1f2cc8b2cccc376ab7abfd79007b5e4b66d45b9d6f7c76d8a24cdc9fe36a6842"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "merge_memory"
+  }
+}

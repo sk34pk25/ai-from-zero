@@ -1,0 +1,52 @@
+{
+  "id": "h8.3",
+  "title": "Installer, arrêter et sauvegarder",
+  "minutes": 30,
+  "objectives": [
+    "Reproduire l’environnement du projet",
+    "Séparer données, workspace et secrets",
+    "Tester le redémarrage et la restauration"
+  ],
+  "prerequisites": [
+    "h8.2",
+    "0.14",
+    "12.12"
+  ],
+  "vocabulary": {
+    "Environnement": "Version de Python et dépendances du projet.",
+    "Sauvegarde": "Copie vérifiée des données nécessaires à la reprise.",
+    "Exploitation": "Pratiques de lancement, arrêt, logs et maintenance."
+  },
+  "why": "Un programme qui fonctionne une fois dans ton terminal doit encore pouvoir être reproduit et repris sur ta machine.",
+  "explanation": "Le harness de base utilise Python 3.12 et sa bibliothèque standard. NumPy sert au checkpoint et à son entraînement. Le ZIP contient le module élève, la correction, les contrôles, les guides et la compétence d’exemple. Les commandes se lancent depuis le dossier mon-agent.\n\nGarde le workspace, la base donnees et les secrets séparés. Arrête le processus avant une copie simple de la base ; pour une sauvegarde à chaud, utilise l’API SQLite adaptée et vérifie la restauration. Les sessions reprises doivent conserver le même code et les mêmes permissions.\n\nLe guide donne une recette de lancement au premier plan, puis les points à fixer pour un service local. Le site n’installe aucun service sur ton ordinateur. Teste aussi refus réseau, arrêt volontaire, fichier déjà présent et manque de contexte. Ces essais font partie de la livraison.",
+  "code": "from harness.correction import export_trace\nrow=export_trace({'format':'afz-harness-v1','status':'finished','answer':'ok','token':'à exclure'})\nassert 'token' not in row\nprint(row)",
+  "lab": "trace",
+  "exercise": {
+    "prompt": "Exporte seulement les champs publics autorisés du rapport, en excluant tout champ secret ou inconnu.",
+    "starter": "def exporter_rapport(row):\n    raise NotImplementedError('À compléter')",
+    "solution": "def exporter_rapport(row):\n    autorises={'format','status','answer','turns','tool_calls','model','source_sha256'}\n    return {k:v for k,v in row.items() if k in autorises}",
+    "check": "r=exporter_rapport({'status':'finished','answer':'ok','token':'secret','Authorization':'Bearer secret'})\nassert r=={'status':'finished','answer':'ok'}\nassert exporter_rapport({})=={}",
+    "validatorVersion": "4259df281fcccafd738c44f653bb6ecb3f212f048dbc25ebc36823069f6ffafa"
+  },
+  "hints": [
+    "Une liste de champs autorisés résiste mieux à l’ajout futur d’un champ sensible.",
+    "Les données documentaires peuvent rester privées même sans jeton."
+  ],
+  "transfer": "Après restauration, le code a changé. Pourquoi faut-il conserver le rapport ancien et démarrer une session nouvelle ?",
+  "quiz": {
+    "question": "Une sauvegarde utile doit être…",
+    "choices": [
+      "Seulement copiée une fois sans essai",
+      "Placée dans le prompt du modèle",
+      "Restaurée et vérifiée sur un cas concret",
+      "Écrite dans le workspace lisible par tous les outils"
+    ],
+    "answer": 2,
+    "explanation": "La restauration vérifiée démontre la possibilité de reprendre les données ; la présence d’un fichier de copie ne suffit pas.",
+    "version": "229ab7dfe0a863113f80d8df461cc5c36fdba5f44f1d48375684e2147bfda413"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "export_trace"
+  }
+}

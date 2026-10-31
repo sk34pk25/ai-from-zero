@@ -1,0 +1,51 @@
+{
+  "id": "h4.4",
+  "title": "Persister et rappeler avec SQLite",
+  "minutes": 40,
+  "objectives": [
+    "Enregistrer atomiquement un état",
+    "Rechercher avec des paramètres SQL",
+    "Séparer stockage et prompt actif"
+  ],
+  "prerequisites": [
+    "h4.3",
+    "0.11"
+  ],
+  "vocabulary": {
+    "Transaction": "Ensemble d’écritures validé ou annulé ensemble.",
+    "Paramètre SQL": "Valeur transmise séparément du texte de la requête.",
+    "Session": "Historique et état d’une tâche identifiée."
+  },
+  "why": "Un redémarrage doit pouvoir retrouver l’état de travail. La persistance ne doit pas exposer la base au propre outil de lecture de l’agent.",
+  "explanation": "SQLiteStore enregistre chaque session sous un identifiant et un JSON. Les opérations utilisent des requêtes paramétrées ; le texte de la tâche n’est jamais concaténé dans le SQL. Les souvenirs sont stockés avec leur source et leur date.\n\nLe dossier donnees reste distinct du workspace. L’outil de lecture ne doit pas ouvrir sessions.sqlite et découvrir tous les échanges précédents. recall effectue ici une recherche littérale limitée à cinq résultats. Ce n’est pas un moteur sémantique et aucun embedding n’est entraîné.\n\nTeste un mot contenant %, un redémarrage et une correction de souvenir. Le résultat rappelé doit conserver sa provenance. Une base persistante demande aussi une politique de conservation et un export volontaire ; elle ne justifie pas de tout mémoriser.",
+  "code": "from harness.stockage import MemoryStore\ns=MemoryStore();s.save('une',{'status':'en cours'})\na=s.load('une');a['status']='modifié'\nassert s.load('une')['status']=='en cours'\nprint(s.sessions())",
+  "lab": "memory",
+  "exercise": {
+    "prompt": "Conserve une copie indépendante d’un état JSON pour éviter de le modifier accidentellement après sauvegarde.",
+    "starter": "def copie_etat(etat):\n    raise NotImplementedError('À compléter')",
+    "solution": "def copie_etat(etat):\n    import json\n    return json.loads(json.dumps(etat,allow_nan=False))",
+    "check": "a={'messages':[{'content':'x'}]};b=copie_etat(a);b['messages'][0]['content']='y'\nassert a['messages'][0]['content']=='x'\nassert copie_etat({'n':0})=={'n':0}",
+    "validatorVersion": "a85a035f7d612b53e8f133579752525a71b52e290635774f612da6cfbe23e7bc"
+  },
+  "hints": [
+    "Une copie du dictionnaire extérieur ne copie pas les listes imbriquées.",
+    "L’état de session utilise des valeurs JSON."
+  ],
+  "transfer": "Pourquoi enregistrer un état complet dans une transaction est-il préférable à écrire séparément le compteur puis le résultat ?",
+  "quiz": {
+    "question": "Pour rechercher le texte fourni par une personne dans SQLite, il faut…",
+    "choices": [
+      "Le concaténer au SQL après un espace",
+      "Le traiter comme un nom de table",
+      "Supprimer tous les caractères accentués",
+      "Le placer dans un paramètre de requête"
+    ],
+    "answer": 3,
+    "explanation": "Une requête paramétrée sépare la syntaxe SQL des valeurs. Le rappel reste une donnée avec source.",
+    "version": "70e9bd753e937a0379bc481b38d0a9704bdffad5f4f8045676d0526ae79ccd13"
+  },
+  "reference": {
+    "file": "harness/stockage.py",
+    "symbol": "SQLiteStore.recall"
+  }
+}

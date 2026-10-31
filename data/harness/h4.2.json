@@ -1,0 +1,51 @@
+{
+  "id": "h4.2",
+  "title": "Réduire sans casser les échanges",
+  "minutes": 30,
+  "objectives": [
+    "Conserver instruction et tâche initiale",
+    "Retirer les groupes les plus anciens",
+    "Éviter une observation orpheline"
+  ],
+  "prerequisites": [
+    "h4.1",
+    "h3.2"
+  ],
+  "vocabulary": {
+    "Groupe": "Une proposition de l’assistant et ses observations associées.",
+    "Compaction": "Réduction du contexte actif selon un budget.",
+    "Archive": "Historique conservé hors du prompt courant."
+  },
+  "why": "Couper une liste de messages par sa moitié peut garder un résultat d’outil sans l’action qui l’explique. La réduction doit respecter les relations.",
+  "explanation": "Le contexte est découpé en groupes indivisibles. Le système et la première demande sont épinglés. On conserve ensuite les groupes récents qui tiennent dans la place disponible, sans séparer une proposition de ses observations. Le journal complet reste dans la session.\n\nLa correction utilise une stratégie déterministe. Elle ne prétend pas résumer le sens : si une information ancienne est nécessaire, elle doit être rappelée avec sa source ou fournie à nouveau. Le dernier échange trop long provoque une erreur explicite.\n\nUn résumé généré par le modèle peut être utile, mais il risque d’omettre ou d’inventer une contrainte. Compare-le aux sources et conserve la règle d’origine. Tu peux tester une stratégie de résumé comme une variante distincte, avec des cas où un détail ancien décide de la réussite.",
+  "code": "from harness.correction import context_window,message,tool_observation\nrows=[message('system','JSON'),message('user','But'),message('assistant','x'*300),tool_observation('c','calculer',{'value':2}),message('assistant','Fin')]\nkept=context_window(rows,180,reserve=10)\nassert [m['role'] for m in kept]==['system','user','assistant']\nprint(kept[-1]['content'])",
+  "lab": "context",
+  "exercise": {
+    "prompt": "Garde les groupes récents qui tiennent dans un budget, sans couper l’intérieur d’un groupe. Chaque groupe est une chaîne dans cet exercice miniature.",
+    "starter": "def garder_groupes(groupes, budget):\n    raise NotImplementedError('À compléter')",
+    "solution": "def garder_groupes(groupes, budget):\n    resultat=[]\n    for groupe in reversed(groupes):\n        if len(groupe)+sum(map(len,resultat))>budget:break\n        resultat.insert(0,groupe)\n    return resultat",
+    "check": "assert garder_groupes(['ancien','ab','xyz'],5)==['ab','xyz']\nassert garder_groupes(['a','trop long'],3)==[]\nassert garder_groupes([],5)==[]",
+    "validatorVersion": "9b138729bdfb36a94f18da1db1e66f6e0d98e19ef7092b8490a5faadf9768d32"
+  },
+  "hints": [
+    "Parcours du plus récent au plus ancien.",
+    "Un groupe trop grand n’est pas tronqué en silence."
+  ],
+  "transfer": "Le premier message utilisateur contient « ne modifie aucun fichier ». Pourquoi l’épingler même si des observations plus récentes occupent beaucoup de place ?",
+  "quiz": {
+    "question": "Lors d’une compaction, une observation d’outil doit…",
+    "choices": [
+      "Remplacer la règle système",
+      "Rester liée à l’appel auquel elle répond",
+      "Être gardée même si son appel est supprimé",
+      "Être convertie en une nouvelle permission"
+    ],
+    "answer": 1,
+    "explanation": "Le contexte actif doit rester interprétable. Le journal conserve l’historique supprimé du prompt.",
+    "version": "2bb0ebfff8ca56e09db92817b41aeddeb7d2b268e4cc4c0650cb501036af5b27"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "context_window"
+  }
+}

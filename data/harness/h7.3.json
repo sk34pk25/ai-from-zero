@@ -1,0 +1,51 @@
+{
+  "id": "h7.3",
+  "title": "Déléguer avec un budget partagé",
+  "minutes": 30,
+  "objectives": [
+    "Créer un contexte enfant distinct",
+    "Réduire les droits et les budgets",
+    "Compter le coût de la délégation"
+  ],
+  "prerequisites": [
+    "h7.2",
+    "h3.1"
+  ],
+  "vocabulary": {
+    "Agent enfant": "Nouvelle boucle recevant une sous-tâche et un contexte distinct.",
+    "Intersection de droits": "Capacités présentes à la fois chez le parent et dans la demande enfant.",
+    "Budget partagé": "Ressources de l’enfant déduites de celles du parent."
+  },
+  "why": "Déléguer ne doit pas créer des ressources ou des permissions infinies. Une sous-tâche garde un coût et une frontière explicite.",
+  "explanation": "delegate crée un Runner avec son propre historique. Les tours et outils sont plafonnés par le budget restant du parent ; les droits sont leur intersection. Le résultat est rendu comme une donnée, avec le coût à déduire du parent. L’enfant ne peut pas se donner un outil manquant.\n\nCette implémentation est synchrone et ne propose pas d’outil de délégation récursive. Les contextes sont séparés, mais ce ne sont pas des processus isolés par le système. Le workspace peut rester partagé selon la politique choisie.\n\nPour tester la valeur de la délégation, compare une tâche réalisée seul et la même tâche avec un enfant, à budget total égal. Un plus grand nombre d’agents ne garantit pas une meilleure réponse. Le parent doit vérifier les sources et le résultat rendu.",
+  "code": "from harness.correction import delegation_budget\np={'turns':5,'tools':2,'allowed':['calculer','chercher']}\nr={'turns':10,'tools':4,'allowed':['calculer','ecrire_fichier']}\nassert delegation_budget(p,r)=={'turns':5,'tools':2,'allowed':['calculer']}\nprint(delegation_budget(p,r))",
+  "lab": "delegation",
+  "exercise": {
+    "prompt": "Calcule les plafonds enfant et l’intersection des outils disponibles.",
+    "starter": "def budget_enfant(parent, demande):\n    raise NotImplementedError('À compléter')",
+    "solution": "def budget_enfant(parent, demande):\n    return {'turns':min(parent['turns'],demande['turns']),'tools':min(parent['tools'],demande['tools']),'allowed':sorted(set(parent['allowed'])&set(demande['allowed']))}",
+    "check": "p={'turns':3,'tools':2,'allowed':['a','b']};d={'turns':8,'tools':1,'allowed':['b','c']}\nassert budget_enfant(p,d)=={'turns':3,'tools':1,'allowed':['b']}\nassert budget_enfant({**p,'tools':0},d)['tools']==0",
+    "validatorVersion": "95014d9956295b2df3f2994d281c35f415adbf8cc04e58b01fecb53932c25666"
+  },
+  "hints": [
+    "Une demande de capacité ne crée pas un droit.",
+    "L’allocation utilise le budget restant, pas le budget initial déjà dépensé."
+  ],
+  "transfer": "Un enfant répond avec une affirmation sans source. Pourquoi le parent doit-il la vérifier malgré la séparation des contextes ?",
+  "quiz": {
+    "question": "Les outils d’un enfant doivent appartenir…",
+    "choices": [
+      "À l’union de tous les outils disponibles",
+      "Seulement à ce que le modèle enfant réclame",
+      "À l’intersection de la demande et des droits du parent",
+      "Aux droits administrateur de la machine"
+    ],
+    "answer": 2,
+    "explanation": "La délégation peut réduire des droits ; elle ne doit pas les élargir.",
+    "version": "cc673ab93f02de9468e58df21fd747bd8e24b222fe56a83d6d4c35b555b91563"
+  },
+  "reference": {
+    "file": "harness/extensions.py",
+    "symbol": "delegate"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "h6.2",
+  "title": "Retrouver les poids et le tokenizer du cours",
+  "minutes": 30,
+  "objectives": [
+    "Charger un checkpoint réel",
+    "Encoder avec son tokenizer exact",
+    "Refuser une troncature silencieuse"
+  ],
+  "prerequisites": [
+    "h6.1",
+    "3.11",
+    "12.12"
+  ],
+  "vocabulary": {
+    "Checkpoint": "Poids, configuration et métadonnées nécessaires à l’inférence.",
+    "Empreinte des poids": "Identifiant du fichier effectivement chargé.",
+    "Troncature": "Suppression d’une partie du prompt lorsque la fenêtre est trop courte."
+  },
+  "why": "Changer le tokenizer ou oublier une partie de l’instruction modifie le problème. Le lien avec ton modèle doit être vérifiable jusque dans les logits.",
+  "explanation": "RepoCheckpointModel utilise load_checkpoint du dépôt, puis le même forward TinyGPT que le cours. L’adaptateur conserve le SHA-256 du fichier et encode le prompt avec le tokenizer chargé. Si la fenêtre ne suffit pas, il refuse par défaut au lieu de cacher l’instruction perdue.\n\nPour le projet autonome de l’atelier, generer.py expose déjà /generer sur 127.0.0.1. LocalAPIModel en mode atelier lit son contrat, les caractères inconnus, la taille de contexte et la provenance. Le navigateur du site ne se connecte pas automatiquement à ce serveur local : la liaison se teste depuis ton terminal.\n\n--allow-clipped est réservé à une expérience explicite qui journalise la troncature. Ce drapeau ne rend pas la sortie fiable. Un checkpoint à très courte fenêtre peut convenir au cours de langage et rester inadapté au protocole du harness.",
+  "code": "from harness.correction import format_prompt,message\nprompt=format_prompt([message('system','JSON'),message('user','Calcule 4+5.')])\nprint(prompt)\nassert prompt.endswith('[assistant]\\n')",
+  "lab": "context",
+  "exercise": {
+    "prompt": "Indique si un prompt déjà tokenisé dépasse la fenêtre du checkpoint. Refuse une fenêtre nulle.",
+    "starter": "def depasse_fenetre(ids, fenetre):\n    raise NotImplementedError('À compléter')",
+    "solution": "def depasse_fenetre(ids, fenetre):\n    if type(fenetre) is not int or fenetre<1:raise ValueError('fenêtre invalide')\n    return len(ids)>fenetre",
+    "check": "assert not depasse_fenetre([1,2],2)\nassert depasse_fenetre([1,2,3],2)\ntry:depasse_fenetre([1],0)\nexcept ValueError:pass\nelse:raise AssertionError('fenêtre nulle')",
+    "validatorVersion": "03f3a8a02cb23ee11ec3619637f524e7f995c937cd3b3af3356fa11a18720afa"
+  },
+  "hints": [
+    "Compare le nombre d’identifiants, pas les octets du fichier.",
+    "Un dépassement doit être annoncé avant une action."
+  ],
+  "transfer": "Le poids du checkpoint est identique mais le tokenizer a changé. Pourquoi une égalité d’empreinte du seul fichier de poids ne suffit-elle plus ?",
+  "quiz": {
+    "question": "Le prompt dépasse la fenêtre du checkpoint. Le comportement par défaut est…",
+    "choices": [
+      "Supprimer le système et poursuivre",
+      "Refuser en expliquant la limite",
+      "Agrandir la table de positions sans entraînement",
+      "Déclarer que le modèle a reçu tout le contexte"
+    ],
+    "answer": 1,
+    "explanation": "La limite réelle doit rester visible. Le protocole demande un modèle et une fenêtre adaptés.",
+    "version": "a4b950f4b84e1991e19079a4fe46b1594c07b44ffa0a83eb9b4fcb571d622097"
+  },
+  "reference": {
+    "file": "harness/modeles.py",
+    "symbol": "RepoCheckpointModel.complete"
+  }
+}

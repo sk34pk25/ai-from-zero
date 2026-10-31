@@ -1,0 +1,51 @@
+{
+  "id": "h4.1",
+  "title": "Mesurer le contexte disponible",
+  "minutes": 30,
+  "objectives": [
+    "Calculer un budget avec réserve",
+    "Distinguer mesure et estimation",
+    "Détecter un prompt qui ne tient pas"
+  ],
+  "prerequisites": [
+    "h3.1",
+    "3.3"
+  ],
+  "vocabulary": {
+    "Fenêtre": "Nombre maximal de tokens accepté par le modèle.",
+    "Réserve": "Place gardée pour la réponse à produire.",
+    "Budget de caractères": "Limite d’application, distincte du nombre de tokens."
+  },
+  "why": "Un contexte long dans le harness ne donne pas une fenêtre plus grande au modèle. Les deux limites doivent être visibles.",
+  "explanation": "La boucle applique un budget en caractères à ses messages JSON. C’est une limite simple de transport et de mémoire, pas une mesure exacte de tokens. L’adaptateur de ton checkpoint encode ensuite le prompt avec son vrai tokenizer et compare le nombre d’identifiants à block_size.\n\nLa réserve de réponse empêche de remplir tout le budget avec les entrées. Le message système et la demande initiale restent obligatoires. Si eux seuls dépassent la place disponible, le moteur s’arrête avec context_limit. Il ne supprime pas secrètement la demande pour poursuivre.\n\nAvec un tokenizer caractère, une lettre peut correspondre à un token ; avec BPE ou des octets, le rapport change. Écris toujours l’unité à côté du compteur. Une augmentation de block_size doit être compatible avec le modèle entraîné et ses positions.",
+  "code": "from harness.correction import context_window,message\nrows=[message('system','JSON'),message('user','Calcule 2+3.')]\nkept=context_window(rows,500,reserve=100)\nprint(len(kept))\nassert kept==rows",
+  "lab": "context",
+  "exercise": {
+    "prompt": "Calcule la place disponible après instruction, demande et réserve ; refuse un budget insuffisant.",
+    "starter": "def place_restante(budget, systeme, demande, reserve):\n    raise NotImplementedError('À compléter')",
+    "solution": "def place_restante(budget, systeme, demande, reserve):\n    if min(budget,systeme,demande,reserve)<0:raise ValueError('budget négatif')\n    reste=budget-systeme-demande-reserve\n    if reste<0:raise ValueError('contexte insuffisant')\n    return reste",
+    "check": "assert place_restante(1000,200,300,100)==400\nassert place_restante(10,2,3,5)==0\ntry:place_restante(9,2,3,5)\nexcept ValueError:pass\nelse:raise AssertionError('dépassement accepté')",
+    "validatorVersion": "72d84cbdfa4eb1f9e18d4b153fc16d647532b0321be3d46a164275eb56c68800"
+  },
+  "hints": [
+    "Additionne d’abord les parties obligatoires.",
+    "Un compteur de caractères n’est pas un tokenizer universel."
+  ],
+  "transfer": "Un texte de 100 caractères produit 160 tokens avec ton tokenizer. Quel compteur décide si la fenêtre du checkpoint est respectée ?",
+  "quiz": {
+    "question": "Le budget en caractères du harness est…",
+    "choices": [
+      "Une limite d’application à compléter par l’encodage réel",
+      "Le nombre exact de tokens pour tout tokenizer",
+      "La capacité RAM de la machine",
+      "Une façon d’augmenter automatiquement block_size"
+    ],
+    "answer": 0,
+    "explanation": "Le modèle compte ses identifiants. Le budget de caractères garde une utilité pratique mais ne remplace pas le tokenizer.",
+    "version": "f0cad092d4e454af344de0dd6d4c448975e08f59f0c72866b08f2d6388144cf7"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "context_window"
+  }
+}

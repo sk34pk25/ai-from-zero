@@ -1,0 +1,51 @@
+{
+  "id": "h7.1",
+  "title": "Une compétence est une procédure",
+  "minutes": 30,
+  "objectives": [
+    "Décrire une procédure réutilisable",
+    "Versionner ses sources et ses limites",
+    "Séparer document et code exécutable"
+  ],
+  "prerequisites": [
+    "h6.4",
+    "h4.3"
+  ],
+  "vocabulary": {
+    "Compétence": "Document de procédure choisi pour aider une tâche.",
+    "Version": "Identifiant d’une révision de ce document.",
+    "Portée": "Outils et situations pour lesquels la procédure est prévue."
+  },
+  "why": "Répéter les mêmes étapes dans chaque prompt gaspille du contexte. Une procédure peut être chargée à la demande et corrigée séparément.",
+  "explanation": "Le projet utilise un format JSON simple avec id, description, keywords, allowed_tools, procedure et version. Il s’agit d’un format pédagogique original, pas d’une installation automatique du format de compétences de Hermes. Le chargeur refuse les champs invalides et les identifiants dupliqués.\n\nLe document propose une méthode, comme lire une note et citer deux sources. Il n’exécute aucun code à l’import et ne change pas les permissions. Un champ allowed_tools décrit sa portée ; il doit encore être intersecté avec les droits existants.\n\nTu peux proposer une amélioration de la procédure après un échec. Conserve sa version précédente, le cas qui a motivé le changement et un test de non-régression. La correction automatique d’un document ne démontre pas une amélioration réelle tant que les mêmes tâches n’ont pas été rejouées.",
+  "code": "from harness.extensions import skill_messages\nfrom harness import correction as f\nskill={'procedure':'Lire la note, citer deux faits et une limite.'}\nrow=skill_messages(skill,f)[0]\nassert row['role']=='user'\nprint(row['content'])",
+  "lab": "skills",
+  "exercise": {
+    "prompt": "Vérifie la présence des six champs exacts d’une compétence et une version entière positive.",
+    "starter": "def competence_valide(row):\n    raise NotImplementedError('À compléter')",
+    "solution": "def competence_valide(row):\n    return isinstance(row,dict) and set(row)=={'id','description','keywords','allowed_tools','procedure','version'} and type(row['version']) is int and row['version']>0",
+    "check": "a={'id':'x','description':'d','keywords':[],'allowed_tools':[],'procedure':'p','version':1}\nassert competence_valide(a)\nassert not competence_valide({**a,'version':0})\nassert not competence_valide({**a,'secret':'x'})",
+    "validatorVersion": "8d6fe76e46b84bd7958c5b4d48c2f8b5f0a0382eeb4c720ce14c1dcce855a026"
+  },
+  "hints": [
+    "Une version booléenne n’est pas une version entière.",
+    "Le chargeur complet contrôle aussi les types et la taille."
+  ],
+  "transfer": "Une compétence téléchargée demande un accès réseau absent des droits de l’agent. Quel comportement doit conserver le chargeur ?",
+  "quiz": {
+    "question": "Charger une compétence doit…",
+    "choices": [
+      "Fournir une procédure soumise aux droits existants",
+      "Lancer toutes ses commandes",
+      "Remplacer les permissions du moteur",
+      "Installer automatiquement des dépendances"
+    ],
+    "answer": 0,
+    "explanation": "Une procédure est un document. L’exécution et les permissions restent contrôlées par le harness.",
+    "version": "fc269c084b516f59a28533f37d9eaa00269730f3118fe38d4d1a25b63497f842"
+  },
+  "reference": {
+    "file": "harness/extensions.py",
+    "symbol": "load_skills"
+  }
+}

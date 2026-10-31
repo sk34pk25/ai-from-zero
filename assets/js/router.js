@@ -31,6 +31,12 @@ export function parseHash(hash) {
   if (normalized === "/experiences") return { name: "experiments" };
   if (normalized === "/espace") return { name: "study" };
   if (normalized === "/preuves") return { name: "assessment" };
+  if (normalized === "/harness") return { name: "harness" };
+  if (normalized === "/harness/projet") return { name: "harness", project: true };
+  const harnessLesson = normalized.match(/^\/harness\/lecon\/(h[1-8]\.[1-4])$/);
+  if (harnessLesson) return { name: "harness", id: harnessLesson[1] };
+  const harnessModule = normalized.match(/^\/harness\/module\/([1-8])$/);
+  if (harnessModule) return { name: "harness", module: Number(harnessModule[1]) };
   if (normalized === "/glossaire") return { name: "glossary" };
   if (normalized === "/modele") return { name: "model" };
   if (normalized === "/construire") return { name: "track" };
@@ -53,6 +59,8 @@ export function parseHash(hash) {
 
 export function hrefFor(route) {
   switch (route.name) {
+    case "harness":
+      return route.id ? `#/harness/lecon/${route.id}` : route.module ? `#/harness/module/${route.module}` : route.project ? "#/harness/projet" : "#/harness";
     case "assessment":
       return "#/preuves";
     case "home":

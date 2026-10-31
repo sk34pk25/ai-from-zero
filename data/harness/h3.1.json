@@ -1,0 +1,51 @@
+{
+  "id": "h3.1",
+  "title": "Tours, appels et conditions d’arrêt",
+  "minutes": 30,
+  "objectives": [
+    "Compter deux budgets distincts",
+    "Prévoir une réponse finale après le dernier outil",
+    "Interrompre sans effacer le travail"
+  ],
+  "prerequisites": [
+    "h2.4",
+    "0.8"
+  ],
+  "vocabulary": {
+    "Tour": "Une demande de réponse au modèle.",
+    "Appel d’outil": "Une fonction effectivement exécutée.",
+    "Deadline": "Limite de temps vérifiée entre les étapes."
+  },
+  "why": "Une boucle while True n’est pas une autonomie fiable. Un modèle qui répète la même demande doit rencontrer une limite lisible.",
+  "explanation": "Un tour appelle le modèle ; il peut conclure, être invalide ou demander un outil. Un appel d’outil est compté séparément juste avant son exécution. Le projet borne les deux compteurs et réserve la possibilité de conclure après le dernier outil autorisé.\n\nLa deadline est coopérative : le moteur la vérifie avant et après un appel. Une API possède aussi son timeout réseau. Un calcul Python arbitraire ne devient pas préemptible grâce à un compteur : pour l’isoler fortement, il faut un processus ou un environnement adapté.\n\nUn arrêt conserve un statut explicite comme turn_limit, tool_limit, deadline ou interrupted. Évite d’afficher « tâche réussie » pour un arrêt technique. La validité de la réponse finale sera mesurée séparément.",
+  "code": "from harness.correction import stop_reason\nlimits={'turns':4,'tools':2}\nassert stop_reason(3,1,limits) is None\nassert stop_reason(4,1,limits)=='turn_limit'\nprint(stop_reason(2,2,limits))",
+  "lab": "budget",
+  "exercise": {
+    "prompt": "Renvoie turn_limit ou tool_limit dès que le compteur correspondant atteint sa limite ; priorité au nombre de tours.",
+    "starter": "def arret(tours, appels, max_tours, max_appels):\n    raise NotImplementedError('À compléter')",
+    "solution": "def arret(tours, appels, max_tours, max_appels):\n    if tours>=max_tours:return 'turn_limit'\n    if appels>=max_appels:return 'tool_limit'\n    return None",
+    "check": "assert arret(2,1,4,3) is None\nassert arret(4,1,4,3)=='turn_limit'\nassert arret(1,3,4,3)=='tool_limit'\nassert arret(4,3,4,3)=='turn_limit'",
+    "validatorVersion": "9a49fee40b715fdcfc0cb9cd4fe39bb8d7c5b7cab61b8af18499d2f0169c960b"
+  },
+  "hints": [
+    "La vérification précède le prochain effet.",
+    "Une réponse invalide consomme quand même un tour de modèle."
+  ],
+  "transfer": "Le modèle produit trois JSON invalides puis un appel correct. Quels compteurs ont bougé avant l’outil ?",
+  "quiz": {
+    "question": "Une deadline vérifiée entre appels garantit-elle l’interruption immédiate de tout code Python ?",
+    "choices": [
+      "Non, elle reste coopérative entre les étapes",
+      "Oui, quelle que soit la fonction",
+      "Oui, si le modèle est petit",
+      "Oui, dès qu’un timeout est indiqué"
+    ],
+    "answer": 0,
+    "explanation": "Le projet contrôle ses outils et leurs bornes. La préemption d’un programme général demande une frontière d’exécution supplémentaire.",
+    "version": "e2c684137c75bc9a453d04be40a5dfa759efed4e47d45cb755ede9df1446575d"
+  },
+  "reference": {
+    "file": "harness/coeur.py",
+    "symbol": "Runner.run"
+  }
+}

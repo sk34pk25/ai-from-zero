@@ -12,6 +12,18 @@ Le site publié : [https://sk34pk25.github.io/ai-from-zero/](https://sk34pk25.gi
 
 La piste [Construire mon LLM](https://sk34pk25.github.io/ai-from-zero/#/construire) relie les leçons aux fichiers de `model/`, du dossier vide jusqu'à un TinyGPT entraîné, puis au BPE, au catalogue de données, au playground et à l'ajustement. Le compte-rendu d'un run CPU réel est dans [`data/gpt_run.json`](data/gpt_run.json).
 
+La suite [Construire mon harness d’agent](https://sk34pk25.github.io/ai-from-zero/#/harness) ajoute **32 leçons, huit modules et huit TP cumulatifs** après le modèle. Elle traite le protocole JSON, les outils et permissions, la boucle bornée, le contexte, la mémoire SQLite, les reprises, les évaluations, le branchement du checkpoint et son ajustement au protocole, les procédures, la délégation et une passerelle locale. Les 161 leçons du modèle gardent leurs identifiants et leur progression.
+
+Le ZIP `mon-agent` contient 22 fonctions à reconstruire dans `harness/eleve.py`, un moteur inspectable, une correction séparée et cinq guides. [`docs/HARNESS.md`](docs/HARNESS.md) donne le plan. Les exemples et exercices s’exécutent aussi dans le navigateur, sans compte ; notes, contrôles versionnés et explications disposent d’un suivi distinct et d’un export. Les fixtures testent le moteur, les sondes mesurent le modèle réel, et une observation humaine reste une preuve supplémentaire. Ce projet original s’inspire de l’architecture documentée de Hermes Agent ; les connecteurs de messagerie et la robustesse de production restent des extensions.
+
+```sh
+python3 -m harness.verifier --module correction
+python3 -m harness.evaluer --module correction
+python3 -m harness.cli --module correction --demo calcul
+```
+
+La source de rédaction est `curriculum_src/harness/cours.json`. Après une modification du projet ou du cours, lancer `python3 scripts/build_harness.py`, puis `npm run stamp`. Les tests exécutent les 32 exemples, les 32 corrections, les refus et reprises, un véritable ajustement NumPy et le contenu du ZIP téléchargé hors du dépôt.
+
 ## Design et format visuel
 
 Le site utilise le thème « Cahier lumineux » : fond clair, bleu vif `#2558E8`, surligneur jaune, polices Inter et Inter Display servies par le site (`assets/fonts/`, licence OFL). La variante sombre « Cahier nuit » suit le réglage du système et reste au choix avec le bouton de thème.

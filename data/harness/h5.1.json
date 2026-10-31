@@ -1,0 +1,51 @@
+{
+  "id": "h5.1",
+  "title": "Journaliser des événements utiles",
+  "minutes": 30,
+  "objectives": [
+    "Nommer les étapes observables",
+    "Chaîner les empreintes des événements",
+    "Éviter les secrets dans la trace"
+  ],
+  "prerequisites": [
+    "h3.4",
+    "h4.4"
+  ],
+  "vocabulary": {
+    "Événement": "Fait observé par le moteur à une étape précise.",
+    "Empreinte": "Résumé déterministe du contenu, utile pour comparer des versions.",
+    "Chaîne": "Chaque événement inclut le lien calculé depuis le précédent."
+  },
+  "why": "Un message final ne raconte pas forcément ce qui s’est passé. Le journal doit permettre de reconstruire les décisions du moteur.",
+  "explanation": "La trace distingue tool_started, tool_finished, tool_denied, invalid_output et final. Chaque événement porte une empreinte calculée à partir de son contenu canonique et de l’empreinte précédente. Modifier un événement sans recalculer la chaîne est détectable à la reprise.\n\nUne empreinte n’est pas une signature : une personne qui contrôle toute la base peut réécrire la chaîne. Le journal sert au diagnostic et à la détection de corruption, pas à certifier l’identité de l’opérateur. Les jetons d’API et variables secrètes sont exclus des champs exportés.\n\nConserve les identifiants, statuts, compteurs et références nécessaires. Une sortie documentaire peut contenir des données personnelles : son archivage doit rester explicite et local. Le rapport de fin ne remplace pas la relecture de la tâche.",
+  "code": "from harness.correction import event_hash\na={'kind':'tool_started','call_id':'c1'}\nh=event_hash('',a)\nprint(h[:12])\nassert event_hash(h,{'kind':'final'})!=event_hash('',{'kind':'final'})",
+  "lab": "trace",
+  "exercise": {
+    "prompt": "Calcule une empreinte stable de précédent + événement JSON trié.",
+    "starter": "def empreinte_evenement(precedent, evenement):\n    raise NotImplementedError('À compléter')",
+    "solution": "def empreinte_evenement(precedent, evenement):\n    import hashlib,json\n    raw=precedent+chr(10)+json.dumps(evenement,sort_keys=True,ensure_ascii=False,allow_nan=False)\n    return hashlib.sha256(raw.encode()).hexdigest()",
+    "check": "assert empreinte_evenement('',{'a':1,'b':2})==empreinte_evenement('',{'b':2,'a':1})\nassert empreinte_evenement('x',{'a':1})!=empreinte_evenement('',{'a':1})\nassert len(empreinte_evenement('',{}))==64",
+    "validatorVersion": "01cfbc7fa777751bf21cba82be4efa6200f4faddac3ba8bec2ad814a1aca7089"
+  },
+  "hints": [
+    "Trie les clés pour stabiliser la représentation.",
+    "La chaîne lie l’ordre, mais n’authentifie pas la personne."
+  ],
+  "transfer": "Quel type de modification une chaîne d’empreintes détecte-t-elle ? Que peut encore faire quelqu’un qui possède et réécrit tout le fichier ?",
+  "quiz": {
+    "question": "Une chaîne SHA-256 de journal apporte ici…",
+    "choices": [
+      "Un contrôle de cohérence, sans signature d’identité",
+      "Une preuve d’identité de l’apprenant",
+      "Une garantie de vérité des réponses",
+      "Une autorisation d’exécuter les événements"
+    ],
+    "answer": 0,
+    "explanation": "L’empreinte aide à vérifier une trace et ses versions ; elle ne transforme pas des déclarations en certification.",
+    "version": "b815a03ff80652d7805e0f612855acc57281f132f73e2bd33d1cd07849b29fdb"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "event_hash"
+  }
+}

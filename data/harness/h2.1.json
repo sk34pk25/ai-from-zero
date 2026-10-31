@@ -1,0 +1,51 @@
+{
+  "id": "h2.1",
+  "title": "Le registre des outils",
+  "minutes": 30,
+  "objectives": [
+    "Nommer une fonction par un contrat",
+    "Valider types et champs exacts",
+    "Limiter les outils disponibles"
+  ],
+  "prerequisites": [
+    "h1.3",
+    "0.9"
+  ],
+  "vocabulary": {
+    "Registre": "Association entre un nom, ses arguments et une implémentation.",
+    "Liste autorisée": "Ensemble des capacités explicitement activées.",
+    "Argument": "Valeur transmise à une fonction après validation."
+  },
+  "why": "Un nom inventé par le modèle ne doit pas devenir une fonction Python. Le registre fixe ce que ton agent sait réellement faire.",
+  "explanation": "Le projet déclare cinq outils : calculer, lire_fichier, ecrire_fichier, chercher dans un corpus local et diagnostic. Chaque nom possède des arguments exacts. Une clé supplémentaire comme shell est refusée avant tout effet. Le modèle ne choisit jamais une fonction par getattr sur un module quelconque.\n\nLes permissions forment un second filtre. Un outil connu peut être absent de Tools.allowed. Pour commencer, utilise seulement les outils de lecture et de calcul. La création de fichiers s’ajoute explicitement et garde une confirmation par action.\n\nLe catalogue montré au modèle sert à l’aider. La vérification du registre Python demeure obligatoire, car un texte peut demander un outil absent du catalogue.",
+  "code": "from harness.correction import validate_args\nprint(validate_args('calculer',{'expression':'6*7'}))\ntry:validate_args('calculer',{'expression':'6*7','shell':True})\nexcept ValueError:print('champ inconnu refusé')",
+  "lab": "permission",
+  "exercise": {
+    "prompt": "Valide les arguments d’un outil calculer qui accepte exactement une expression textuelle.",
+    "starter": "def arguments_calcul(args):\n    raise NotImplementedError('À compléter')",
+    "solution": "def arguments_calcul(args):\n    if not isinstance(args,dict) or set(args)!={'expression'} or not isinstance(args['expression'],str):raise ValueError('arguments invalides')\n    return dict(args)",
+    "check": "assert arguments_calcul({'expression':'1+2'})=={'expression':'1+2'}\nfor x in [{'expression':3},{'expression':'1','shell':True},[]]:\n    try:arguments_calcul(x)\n    except ValueError:pass\n    else:raise AssertionError('arguments invalides acceptés')",
+    "validatorVersion": "f1b3b72174e8e16755fa734f58637576a98580afe28fda5dffb383b49a410a6e"
+  },
+  "hints": [
+    "Un champ supplémentaire est aussi un échec du contrat.",
+    "Retourne une copie, pour séparer validation et mutation."
+  ],
+  "transfer": "Ajoute sur papier un outil compter_mots(texte). Écris ses arguments, ses limites et deux cas à refuser.",
+  "quiz": {
+    "question": "Le modèle demande un outil connu mais absent des permissions. Que faire ?",
+    "choices": [
+      "Refuser avant tout effet",
+      "L’ajouter automatiquement",
+      "L’exécuter si le JSON est valide",
+      "Le remplacer par une commande shell"
+    ],
+    "answer": 0,
+    "explanation": "Le catalogue décrit des fonctions ; les permissions de la session limitent celles qui peuvent agir.",
+    "version": "c576b5ae76851c28209b252612da4e233c29a390c523cf095f36f25b3f231c24"
+  },
+  "reference": {
+    "file": "harness/outils.py",
+    "symbol": "Tools.prepare"
+  }
+}

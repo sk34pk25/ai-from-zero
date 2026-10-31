@@ -1,0 +1,51 @@
+{
+  "id": "h7.2",
+  "title": "Choisir et améliorer une procédure",
+  "minutes": 30,
+  "objectives": [
+    "Classer par correspondance de mots-clés",
+    "Charger seulement les documents pertinents",
+    "Comparer les versions sur les mêmes tâches"
+  ],
+  "prerequisites": [
+    "h7.1",
+    "h4.1"
+  ],
+  "vocabulary": {
+    "Divulgation progressive": "Charger d’abord un résumé, puis le détail nécessaire.",
+    "Sélection lexicale": "Classement par mots communs, sans modèle sémantique.",
+    "Retour arrière": "Retour explicite à une version antérieure."
+  },
+  "why": "Charger toutes les procédures en permanence remplit la fenêtre. Un catalogue et un sélecteur donnent une première méthode inspectable.",
+  "explanation": "select_skills compte les mots-clés communs avec la demande et garde au plus trois procédures. Les égalités sont départagées par identifiant. Cette sélection est lexicale : elle ne comprend pas les synonymes et peut manquer une procédure pertinente.\n\nMesure ces erreurs avant d’ajouter un classifieur ou des embeddings. Pour chaque tâche, note la compétence choisie, sa version, le budget consommé et le résultat. Une modification ne doit pas être jugée seulement sur le cas qui l’a déclenchée.\n\nLa version précédente reste disponible. Un retour arrière peut être la bonne décision si la nouvelle procédure améliore un cas mais dégrade plusieurs autres. Les traces et le jeu réservé permettent d’expliquer ce choix.",
+  "code": "from harness.correction import select_skills\nrows=[{'id':'a','keywords':['note','relire']},{'id':'b','keywords':['calcul']}]\nassert select_skills(rows,'relire une note')[0]['id']=='a'\nassert select_skills(rows,'inconnu')==[]",
+  "lab": "skills",
+  "exercise": {
+    "prompt": "Classe les compétences selon leur nombre de mots-clés communs ; garde seulement les scores positifs et départage par identifiant.",
+    "starter": "def choisir_competence(rows, mots):\n    raise NotImplementedError('À compléter')",
+    "solution": "def choisir_competence(rows, mots):\n    scores=[(len(set(r['keywords'])&set(mots)),r['id']) for r in rows]\n    return [ident for score,ident in sorted(scores,key=lambda x:(-x[0],x[1])) if score>0]",
+    "check": "rows=[{'id':'b','keywords':['x']},{'id':'a','keywords':['x','y']},{'id':'c','keywords':['z']}]\nassert choisir_competence(rows,['x','y'])==['a','b']\nassert choisir_competence(rows,['q'])==[]",
+    "validatorVersion": "c3513da68a4ef1ef6e7038da10a0ed1bf4e8b8c1747c3457943182df81e3a64d"
+  },
+  "hints": [
+    "Le score est une intersection d’ensembles.",
+    "Un tri déterministe rend les essais reproductibles."
+  ],
+  "transfer": "Le mot « synthétiser » n’active pas une compétence étiquetée « résumé ». Comment mesurer cette limite avant de remplacer le sélecteur ?",
+  "quiz": {
+    "question": "Une sélection par mots-clés est…",
+    "choices": [
+      "Une compréhension sémantique garantie",
+      "Une règle lexicale dont les erreurs doivent être mesurées",
+      "Un résultat du checkpoint entraîné",
+      "Une permission de charger tout le catalogue"
+    ],
+    "answer": 1,
+    "explanation": "Cette première sélection est volontairement simple. Elle fournit une baseline avant une comparaison plus complexe.",
+    "version": "5427d5c3f127d676b121b929fa646e2d05d80541af3a02870d01ab94a8670a18"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "select_skills"
+  }
+}

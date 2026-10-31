@@ -1,0 +1,51 @@
+{
+  "id": "h5.2",
+  "title": "Tester une panne au mauvais moment",
+  "minutes": 30,
+  "objectives": [
+    "Repérer un appel commencé non terminé",
+    "Séparer lecture rejouable et écriture incertaine",
+    "Conserver les budgets lors d’une reprise"
+  ],
+  "prerequisites": [
+    "h5.1",
+    "h3.4"
+  ],
+  "vocabulary": {
+    "Pending": "Action dont le résultat n’est pas encore confirmé.",
+    "Crash": "Arrêt du processus entre deux enregistrements.",
+    "Reprise compatible": "Même code, modèle, workspace et permissions que la session."
+  },
+  "why": "Les pannes intéressantes surviennent entre le début d’un effet et son enregistrement final. C’est précisément là qu’un rejeu naïf devient dangereux.",
+  "explanation": "Le moteur sauvegarde pending avant l’appel. Si une écriture a commencé et que le processus s’arrête, la reprise signale uncertain_effect. Elle n’affirme ni que le fichier a été créé ni qu’il ne l’a pas été. Une inspection permet de réconcilier l’état.\n\nLes événements de début et de fin doivent correspondre au pending conservé. La reprise vérifie aussi la chaîne et la signature de configuration. Une modification du code élève ou un élargissement des permissions demande une nouvelle session, ce qui évite de continuer sous une règle différente.\n\nPour tester, injecte une panne contrôlée dans un outil de test, puis ouvre l’état sauvegardé. Vérifie les compteurs, le fichier et le statut. Le test se déroule dans un dossier temporaire, avec une création sans écrasement.",
+  "code": "from harness.correction import recover_pending\nrows=[{'kind':'tool_started','call_id':'a'},{'kind':'tool_started','call_id':'b'},{'kind':'tool_finished','call_id':'a'}]\nassert recover_pending(rows)==[rows[1]]\nprint(recover_pending(rows)[0]['call_id'])",
+  "lab": "replay",
+  "exercise": {
+    "prompt": "Renvoie les identifiants commencés sans événement de fin, dans leur ordre de début.",
+    "starter": "def appels_incertains(evenements):\n    raise NotImplementedError('À compléter')",
+    "solution": "def appels_incertains(evenements):\n    ouverts={}\n    for e in evenements:\n        if e['kind']=='tool_started':ouverts[e['call_id']]=True\n        elif e['kind']=='tool_finished':ouverts.pop(e['call_id'],None)\n    return list(ouverts)",
+    "check": "rows=[{'kind':'tool_started','call_id':'a'},{'kind':'tool_started','call_id':'b'},{'kind':'tool_finished','call_id':'a'}]\nassert appels_incertains(rows)==['b']\nassert appels_incertains([])==[]",
+    "validatorVersion": "5b47c0b445b1cade3eaa9d2cbc63dcc3db8c182016e5dd958ecd8b11f16f87fd"
+  },
+  "hints": [
+    "Un événement de fin ferme seulement son identifiant.",
+    "Un événement d’accord n’est pas un début d’effet."
+  ],
+  "transfer": "Une panne a eu lieu après création du fichier mais avant tool_finished. Quelle observation manuelle faut-il consigner avant toute nouvelle action ?",
+  "quiz": {
+    "question": "Une écriture commencée dont le résultat est inconnu doit…",
+    "choices": [
+      "Être rejouée jusqu’à obtenir succès",
+      "Être arrêtée pour réconciliation",
+      "Être considérée comme jamais exécutée",
+      "Être supprimée du journal"
+    ],
+    "answer": 1,
+    "explanation": "L’incertitude sur un effet réel doit rester visible. Le moteur refuse le rejeu aveugle.",
+    "version": "acba751ce52e215688d575fc50088eb790831267793784fb2eaf2f09d23bcea9"
+  },
+  "reference": {
+    "file": "harness/coeur.py",
+    "symbol": "Runner.run"
+  }
+}

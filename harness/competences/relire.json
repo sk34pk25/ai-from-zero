@@ -1,0 +1,8 @@
+{
+  "id": "relire",
+  "version": 1,
+  "description": "Relire une note et citer une limite vérifiable.",
+  "keywords": ["note", "relire", "rapport"],
+  "allowed_tools": ["lire_fichier", "chercher"],
+  "procedure": "Lire le document choisi. Extraire deux faits avec leur source. Séparer fait et hypothèse. Signaler une information manquante. Proposer une vérification. Toute action reste soumise aux permissions du harness."
+}

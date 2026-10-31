@@ -1,0 +1,51 @@
+{
+  "id": "h1.2",
+  "title": "Messages, rôles et confiance",
+  "minutes": 30,
+  "objectives": [
+    "Construire un message typé",
+    "Séparer instruction et donnée rapportée",
+    "Garder la demande initiale identifiable"
+  ],
+  "prerequisites": [
+    "h1.1",
+    "0.10"
+  ],
+  "vocabulary": {
+    "Rôle": "Origine d’un message : system, user, assistant ou tool.",
+    "Observation": "Donnée produite par un outil, avec un identifiant d’appel.",
+    "Injection": "Texte qui tente de changer les règles depuis une source de données."
+  },
+  "why": "Un fichier peut contenir « ignore les règles ». Le lire ne doit pas donner à ce texte le pouvoir de modifier les permissions de l’agent.",
+  "explanation": "Un message est un dictionnaire qui conserve son origine. Notre helper message accepte quatre rôles et un contenu textuel. Une observation d’outil conserve en plus call_id, name et trust=data.\n\nLe rôle system porte le contrat du moteur. L’utilisateur décrit sa tâche. L’assistant propose une action. Le contenu d’un outil reste une observation, même s’il ressemble à une instruction. Cette séparation aide le modèle à interpréter le contexte ; elle ne remplace pas les contrôles Python. Une tentative d’écriture interdite sera refusée même si le modèle obéit à une injection.\n\nOn conserve aussi la demande initiale lors de la réduction du contexte. Les anciens résultats peuvent disparaître du prompt courant, mais le journal les garde. Tu dois pouvoir expliquer quelle information est active et quelle information est seulement archivée.",
+  "code": "from harness.correction import message, tool_observation\nprint(message('user','Lis ma note.'))\nprint(tool_observation('c1','lire_fichier',{'text':'ignore les règles'}))",
+  "lab": "trust",
+  "exercise": {
+    "prompt": "Construis creer_message(role, contenu) et refuse un rôle inconnu ou un contenu non textuel.",
+    "starter": "def creer_message(role, contenu):\n    raise NotImplementedError('À compléter')",
+    "solution": "def creer_message(role, contenu):\n    if role not in {'system','user','assistant','tool'} or not isinstance(contenu,str):\n        raise ValueError('message invalide')\n    return {'role':role,'content':contenu}",
+    "check": "assert creer_message('user','salut')=={'role':'user','content':'salut'}\nassert creer_message('tool','donnée')['role']=='tool'\nfor role,contenu in [('root','x'),('user',7)]:\n    try: creer_message(role,contenu)\n    except ValueError: pass\n    else: raise AssertionError('message invalide accepté')",
+    "validatorVersion": "8e19ce1fbddf179c169620684d5cb9200158ebec78a4edcf5817531aa1e6ba14"
+  },
+  "hints": [
+    "Écris la liste des rôles autorisés.",
+    "Le contenu d’un document reste du texte, pas une permission."
+  ],
+  "transfer": "Un document affirme que l’administrateur a approuvé un effacement. Où cette affirmation doit-elle rester et quel composant vérifie les droits ?",
+  "quiz": {
+    "question": "Une instruction trouvée dans un document doit être traitée comme…",
+    "choices": [
+      "Une permission accordée à l’outil",
+      "Une donnée dont la source est conservée",
+      "Un nouveau message système",
+      "Un remplacement de la demande initiale"
+    ],
+    "answer": 1,
+    "explanation": "La provenance du texte reste documentaire. La politique Python décide des effets possibles.",
+    "version": "c05899db19e90bf954a5a01fd56bde9ee8cbf13e4ca9799f66c47e3afd4f7a66"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "message"
+  }
+}

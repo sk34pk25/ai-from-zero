@@ -1,0 +1,51 @@
+{
+  "id": "h3.3",
+  "title": "Erreurs et nouvelles tentatives bornées",
+  "minutes": 30,
+  "objectives": [
+    "Distinguer réseau, format et outil",
+    "Compter les nouvelles tentatives",
+    "Rendre l’erreur exploitable"
+  ],
+  "prerequisites": [
+    "h3.2",
+    "0.12"
+  ],
+  "vocabulary": {
+    "Erreur de transport": "L’adaptateur n’a pas reçu de réponse utilisable du serveur.",
+    "Erreur de contrat": "La sortie ne respecte pas le format attendu.",
+    "Nouvelle tentative": "Nouvel appel soumis au même budget global."
+  },
+  "why": "Un réseau coupé, une division par zéro et un JSON invalide demandent des diagnostics différents. Les confondre pousse à modifier le mauvais composant.",
+  "explanation": "Le moteur transforme une erreur d’outil attendue en observation ok=false. Un JSON invalide ne lance aucun outil et consomme un tour. Une panne du fournisseur produit model_error et ne donne pas une réponse inventée.\n\nLes nouvelles tentatives restent comptées, y compris après reprise de la session. Un modèle qui demande toujours 1/0 ne doit pas tourner indéfiniment. L’utilisateur peut lire le dernier statut et corriger le problème au bon endroit.\n\nLe code de référence limite aussi les messages d’erreur exportés. Les jetons d’API ne figurent ni dans le prompt ni dans l’URL. Garde les détails techniques utiles dans un journal local contrôlé, et ne présente jamais une panne réseau comme une erreur de compréhension de l’apprenant.",
+  "code": "from harness.cli import demo\nprint(demo('erreur').complete([],[],1))\nprint(demo('erreur').complete([],[],2))\n# Le premier texte est volontairement invalide : aucun outil ne doit partir.",
+  "lab": "error",
+  "exercise": {
+    "prompt": "Classe une erreur réseau, un contrat invalide et une erreur d’outil sans les confondre.",
+    "starter": "def diagnostic(erreur):\n    raise NotImplementedError('À compléter')",
+    "solution": "def diagnostic(erreur):\n    return {'timeout':'transport','json':'contrat','division_zero':'outil'}[erreur]",
+    "check": "assert diagnostic('timeout')=='transport'\nassert diagnostic('json')=='contrat'\nassert diagnostic('division_zero')=='outil'",
+    "validatorVersion": "77da2e5691b6bf19c0fd764e00908ff2c91537ef2444a43759dca176c3dfaed6"
+  },
+  "hints": [
+    "Demande quel composant a réellement été atteint.",
+    "Un résultat d’outil en erreur reste une observation."
+  ],
+  "transfer": "Après une panne réseau, le serveur revient. Quelle preuve faut-il conserver pour distinguer l’échec de transport du prochain calcul réussi ?",
+  "quiz": {
+    "question": "Une réponse invalide doit permettre de…",
+    "choices": [
+      "Désactiver définitivement le parseur",
+      "Exécuter le texte comme du Python",
+      "Expliquer le refus et réessayer dans le budget",
+      "Marquer la tâche réussie sans résultat"
+    ],
+    "answer": 2,
+    "explanation": "Une nouvelle tentative aide à corriger le format ; son budget empêche une boucle sans fin.",
+    "version": "002edcbe10c520bf64d849bbf5df60294367579d91ffe88f12c2bfe88425807f"
+  },
+  "reference": {
+    "file": "harness/coeur.py",
+    "symbol": "Runner.run"
+  }
+}

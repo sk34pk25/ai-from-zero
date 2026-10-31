@@ -1,0 +1,51 @@
+{
+  "id": "h3.2",
+  "title": "Relier chaque observation à son appel",
+  "minutes": 30,
+  "objectives": [
+    "Conserver call_id et nom d’outil",
+    "Distinguer donnée et instruction",
+    "Éviter un résultat attribué au mauvais appel"
+  ],
+  "prerequisites": [
+    "h3.1",
+    "h1.2"
+  ],
+  "vocabulary": {
+    "call_id": "Identifiant choisi pour relier une proposition à son observation.",
+    "Résultat": "Valeur ou erreur réellement renvoyée.",
+    "Enveloppe": "Structure qui transporte une donnée et sa provenance."
+  },
+  "why": "Deux outils peuvent répondre « 5 ». Sans identifiant, le moteur ne sait pas quelle question chaque résultat résout.",
+  "explanation": "Le moteur ajoute un message tool avec le même call_id que l’action, le nom de l’outil et le contenu JSON du résultat. L’enveloppe distingue ok=true et une erreur. Une donnée textuelle ne devient jamais une nouvelle action par simple concaténation.\n\nLes sorties longues doivent être limitées et identifiées comme tronquées. Tronquer un JSON au milieu d’une clé ne produit pas une observation complète ; la correction garde une enveloppe de prévisualisation lorsque la donnée dépasse sa limite.\n\nSur une trace, vérifie l’ordre : proposition de l’assistant, événement de début, observation, événement de fin puis nouvelle décision. Une conclusion du modèle qui invente une observation échoue à l’évaluation de la tâche.",
+  "code": "from harness.correction import tool_observation\nimport json\nrow=tool_observation('calcul-7','calculer',{'ok':True,'data':{'value':5}})\nassert row['call_id']=='calcul-7'\nprint(json.loads(row['content'])['data']['value'])",
+  "lab": "loop",
+  "exercise": {
+    "prompt": "Construis une observation avec rôle tool, identifiant, nom et trust=data, en sérialisant le résultat.",
+    "starter": "def observation(identifiant, nom, resultat):\n    raise NotImplementedError('À compléter')",
+    "solution": "def observation(identifiant, nom, resultat):\n    import json\n    return {'role':'tool','call_id':identifiant,'name':nom,'trust':'data','content':json.dumps(resultat,ensure_ascii=False)}",
+    "check": "import json\na=observation('x','calculer',{'value':-2})\nassert a['role']=='tool' and a['call_id']=='x' and a['trust']=='data'\nassert json.loads(a['content'])=={'value':-2}\nassert observation('y','chercher',[])['call_id']=='y'",
+    "validatorVersion": "3b4233b95ad9a262a9d9f51e6c73a6d1fc3b9774bc7b98faf7bd5c637a85227d"
+  },
+  "hints": [
+    "Le contenu sérialisé ne remplace pas les métadonnées.",
+    "Garde le même identifiant que la proposition."
+  ],
+  "transfer": "Deux calculs sont lancés avec des identifiants différents. Comment détecter une observation affectée au mauvais appel ?",
+  "quiz": {
+    "question": "L’observation d’un outil doit conserver…",
+    "choices": [
+      "Uniquement le texte de la réponse",
+      "Son identifiant d’appel et son origine",
+      "Un nouveau rôle système",
+      "Le mot de passe du fournisseur"
+    ],
+    "answer": 1,
+    "explanation": "Le lien entre proposition et résultat permet de vérifier la trace. Aucune observation ne justifie d’ajouter un secret au contexte.",
+    "version": "7c25c6f8a0c4c5ce2d4bf8b2d67889426c1f9ec94203bf10f54464b5a40965ba"
+  },
+  "reference": {
+    "file": "harness/correction.py",
+    "symbol": "tool_observation"
+  }
+}

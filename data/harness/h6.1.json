@@ -1,0 +1,51 @@
+{
+  "id": "h6.1",
+  "title": "Sonder avant d’autoriser des outils",
+  "minutes": 30,
+  "objectives": [
+    "Mesurer JSON valide et bonne action séparément",
+    "Tester sans exécuter d’effet",
+    "Conserver sorties et origine du modèle"
+  ],
+  "prerequisites": [
+    "h5.4",
+    "h1.4"
+  ],
+  "vocabulary": {
+    "Sonde": "Petit banc qui interroge le modèle sans accorder d’outils.",
+    "Conformité": "Respect d’un contrat de sortie.",
+    "Bonne action": "Choix adapté à la tâche, distinct du format."
+  },
+  "why": "Le modèle du cours prédit du texte. Avant d’en faire un contrôleur, il faut mesurer s’il sait produire une décision exploitable.",
+  "explanation": "sonder.py fournit quatre tâches réservées à un premier diagnostic : calculs nouveaux, réponse finale simple et proposition de création. Il appelle l’adaptateur, parse la sortie et vérifie le choix. Aucun outil de fichier n’est exécuté par cette sonde.\n\nLe rapport distingue valid_json et correct_action. Une proposition bien formée avec un mauvais calcul ne réussit pas la tâche. Un modèle qui produit du texte libre échoue au format avant toute discussion de permissions. Les limites du vocabulaire et les prompts tronqués restent visibles dans evidence.\n\nQuatre cas ne suffisent pas à mesurer une autonomie générale. Utilise-les pour décider de la prochaine brique à travailler, puis constitue un banc indépendant. Les tâches de comparaison ne doivent pas devenir les exemples mémorisés de l’entraînement.",
+  "code": "from harness.correction import probe_summary\nrows=[{'valid_json':True,'correct_action':False},{'valid_json':True,'correct_action':True}]\nassert probe_summary(rows)['valid_json']==2\nprint(probe_summary(rows))",
+  "lab": "model",
+  "exercise": {
+    "prompt": "Compte les formats valides et les bonnes décisions ; réussir tous les cas demande les deux critères et un ensemble non vide.",
+    "starter": "def bilan_sonde(lignes):\n    raise NotImplementedError('À compléter')",
+    "solution": "def bilan_sonde(lignes):\n    return {'json':sum(r.get('valid_json') is True for r in lignes),'actions':sum(r.get('correct_action') is True for r in lignes),'tout':bool(lignes) and all(r.get('valid_json') is True and r.get('correct_action') is True for r in lignes)}",
+    "check": "assert bilan_sonde([])=={'json':0,'actions':0,'tout':False}\nassert bilan_sonde([{'valid_json':True,'correct_action':False}])=={'json':1,'actions':0,'tout':False}\nassert bilan_sonde([{'valid_json':True,'correct_action':True}])['tout']",
+    "validatorVersion": "ffdc3dfd081f6e577263082f35e359b5d965f4bca66d66344cc7688922bcf2be"
+  },
+  "hints": [
+    "Une syntaxe correcte n’implique pas un bon choix.",
+    "Un banc vide n’est pas une réussite."
+  ],
+  "transfer": "Le modèle obtient 4/4 JSON valides et 1/4 bonnes actions. Quelle amélioration faut-il viser et quelle statistique doit rester publiée ?",
+  "quiz": {
+    "question": "La sonde doit commencer par…",
+    "choices": [
+      "Mesurer ses propositions sans exécuter les effets",
+      "Donner les droits d’écriture au modèle",
+      "Installer toutes les extensions disponibles",
+      "Remplacer les échecs par la sortie de référence"
+    ],
+    "answer": 0,
+    "explanation": "Le diagnostic du contrôleur précède l’élargissement des capacités. Les deux taux et les erreurs restent visibles.",
+    "version": "1436e088b53da452a31df39e51facebc6e60229bbc1e01baec0a378019ad7dde"
+  },
+  "reference": {
+    "file": "harness/sonder.py",
+    "symbol": "probe"
+  }
+}
